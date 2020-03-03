@@ -1,0 +1,647 @@
+// CheckMotherDeathListCtrl.cpp : implementation file
+//
+
+#include "stdafx.h"
+#include "Fa.h"
+#include "CheckMotherDeath.h"
+#include "afxdialogex.h"
+#include "Relations.h"
+#include "html_Lines.h"
+
+// txt fájl oszlopok
+enum
+{
+	_WHO = 0,
+	_DIFF,
+	_ROWID,
+	_LINENUMBER,
+	_TABLENUMBER,
+	_SOURCE,
+	_UNITED,
+	_MOTHERINDEX,
+	_MARRIAGEDATE,
+	_NAME,
+	_BIRTH_DATE,
+	_DEATH_DATE,
+	_COLUMNS
+};
+
+
+// ListCtrl oszlopok
+enum
+{
+	L_WHO = 0,
+	L_DIFF,
+	L_ROWID, 
+	L_LINENUMBER,
+	L_TABLENUMBER,
+	L_SOURCE,
+	L_UNITED,
+	L_MOTHERINDEX,
+	L_MARRIAGEDATE,
+	L_NAME,
+	L_BIRTH,
+	L_DEATH,
+	L_ITEMDATA,
+};
+
+enum 
+{
+	ROWIDC = 0,
+	LINEC,
+	TABLEC,
+	SOURCEC,
+	UNITEDC,
+	MOTHERINDEXC, 
+	LASTNAMEC,
+	FIRSTNAMEC,
+	BIRTHDATEC,
+	DEATHDATEC,
+	FATHERIDC,
+	MOTHERIDC,
+};
+
+enum
+{
+	LINEP = 0,
+	TABLEP,
+	SOURCEP,
+	UNITEDP,
+	LASTNAMEP,
+	FIRSTNAMEP,
+	BIRTHDATEP,
+	DEATHDATEP
+};
+
+
+IMPLEMENT_DYNAMIC(CCheckMotherDeath, CDialogEx)
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CCheckMotherDeath::CCheckMotherDeath(CWnd* pParent /*=NULL*/)
+	: CDialogEx(CCheckMotherDeath::IDD, pParent)
+{
+	m_recordset		= new CSqliteDBRecordSet;
+	m_recordset1	= new CSqliteDBRecordSet;
+	m_recordset2	= new CSqliteDBRecordSet;
+	m_recordset3	= new CSqliteDBRecordSet;
+	m_recordset4	= new CSqliteDBRecordSet;
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CCheckMotherDeath::~CCheckMotherDeath()
+{
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckMotherDeath::DoDataExchange(CDataExchange* pDX)
+{
+	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_LIST, m_ListCtrl);
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BEGIN_MESSAGE_MAP(CCheckMotherDeath, CDialogEx)
+	ON_WM_SIZE()
+	ON_WM_SIZING()
+	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST, &CCheckMotherDeath::OnCustomdrawList)
+	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
+	ON_COMMAND(ID_HTML_EDIT, &CCheckMotherDeath::OnHtmlEdit)
+	ON_COMMAND(ID_HTML_SHOWS, &CCheckMotherDeath::OnHtmlShows)
+	ON_COMMAND(ID_HTML_NOTEPAD, &CCheckMotherDeath::OnHtmlNotepad)
+	ON_COMMAND(ID_LIST, &CCheckMotherDeath::OnList)
+END_MESSAGE_MAP()
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BOOL CCheckMotherDeath::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+	EASYSIZE_ADD( IDC_LIST,	ES_BORDER,	ES_BORDER,		ES_BORDER,		ES_BORDER,	0 );
+
+	EASYSIZE_INIT();
+
+
+
+	SetWindowText( L"Családok, amelyekben az anya halálozási dátuma a gyerek születési dátumánál korábbi.       piros: apa        kék: anya      sárga: kritikus dátumok" );
+
+	CString info = L"\
+Azokat a családokat (apa,anya, gyerekek) listázzuk, akinél az anya halálozási dátuma korábbi, mint egy gyerek születési dátuma.\
+";
+	if( AfxMessageBox( info, MB_OKCANCEL|MB_ICONINFORMATION ) == IDCANCEL )
+	{
+		OnCancel();
+		return FALSE;
+	}
+
+	CString fileName	= L"checkMotherDeath";
+	if( (fileSpec = theApp.openTextFile( &theApp.fl, fileName, L"w+" ) ) == L"" ) return FALSE;
+
+
+	motherDeathChildBirth();
+	createColumns();
+
+	if( m_cnt )
+		fillTable();
+	else
+	{
+		AfxMessageBox( L"Nem találtam olyan gyereket, akinek születési dátuma korábbi, mint anyja halálának dátuma." );
+		OnCancel();
+	}
+
+	return TRUE;
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void CCheckMotherDeath::OnSize(UINT nType, int cx, int cy)
+{
+	CDialogEx::OnSize(nType, cx, cy);
+	EASYSIZE_RESIZE()
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckMotherDeath::OnSizing(UINT fwSide, LPRECT pRect)
+{
+	CDialogEx::OnSizing(fwSide, pRect);
+	EASYSIZE_MINSIZE(430,314,fwSide,pRect); 
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckMotherDeath::createColumns()
+{
+	m_ListCtrl.SetExtendedStyle(m_ListCtrl.GetExtendedStyle()| LVS_EX_GRIDLINES );
+	m_ListCtrl.InsertColumn( L_WHO,			L"who",			LVCFMT_RIGHT,	 60,-1,COL_HIDDEN);
+	m_ListCtrl.InsertColumn( L_DIFF,		L"diff",		LVCFMT_RIGHT,	 60,-1,COL_HIDDEN );
+	m_ListCtrl.InsertColumn( L_ROWID,		L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_LINENUMBER,	L"line#",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_TABLENUMBER,	L"table#",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_SOURCE,		L"S",			LVCFMT_RIGHT,	 25,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_UNITED,		L"U",			LVCFMT_LEFT,	 25,-1,COL_NUM );
+	m_ListCtrl.InsertColumn( L_MOTHERINDEX,	L"X",			LVCFMT_LEFT,	 25,-1,COL_NUM );
+	m_ListCtrl.InsertColumn( L_MARRIAGEDATE,L"házasság",	LVCFMT_LEFT,	 80,-1,COL_TEXT );
+	m_ListCtrl.InsertColumn( L_NAME,		L"név",			LVCFMT_LEFT,	200,-1,COL_TEXT );
+	m_ListCtrl.InsertColumn( L_BIRTH,		L"születés",	LVCFMT_LEFT,	 80,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_DEATH,		L"halál",		LVCFMT_LEFT,	 80,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_ITEMDATA,	L"itemData",	LVCFMT_LEFT,	 80,-1,COL_HIDDEN );
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckMotherDeath::fillTable()
+{
+	int	nItem = 0;
+	int col;
+	int who;
+	int diff;
+
+	CString			cLine;
+	CStringArray	A;
+	int				n;
+
+	CStdioFile file( fileSpec, CFile::modeRead); 
+	while(file.ReadString(cLine)) 
+	{
+		if( cLine.IsEmpty() )
+		{	
+			nItem = m_ListCtrl.InsertItem( nItem, L"" );
+			++nItem;
+			continue;
+		}
+
+		A.RemoveAll();
+		n = wordList( &A, cLine, '\t', TRUE );
+		if( n != _COLUMNS )
+		{
+			str.Format( L"Oszlopok száma %d !=%d\n%s\n'%s'", n, _COLUMNS, cLine, A[n-1] );
+			AfxMessageBox( str );
+			return;
+		}
+
+		nItem = m_ListCtrl.InsertItem( nItem, L"" );
+		m_ListCtrl.SetItemText( nItem, L_WHO, A[_WHO] );
+		m_ListCtrl.SetItemText( nItem, L_DIFF, A[_DIFF] );
+		m_ListCtrl.SetItemText( nItem, L_ROWID, A[_ROWID] );
+		m_ListCtrl.SetItemText( nItem, L_LINENUMBER, A[_LINENUMBER] );
+		m_ListCtrl.SetItemText( nItem, L_TABLENUMBER, A[_TABLENUMBER]);
+		m_ListCtrl.SetItemText( nItem, L_UNITED, A[_UNITED] );
+		m_ListCtrl.SetItemText( nItem, L_SOURCE, A[_SOURCE] );
+		m_ListCtrl.SetItemText( nItem, L_MOTHERINDEX, A[_MOTHERINDEX] );
+		m_ListCtrl.SetItemText( nItem, L_MARRIAGEDATE, A[_MARRIAGEDATE] );
+		m_ListCtrl.SetItemText( nItem, L_NAME, A[_NAME] );
+		m_ListCtrl.SetItemText( nItem, L_BIRTH, A[_BIRTH_DATE] );
+		m_ListCtrl.SetItemText( nItem, L_DEATH, A[_DEATH_DATE] );
+
+		col		= 0;
+		who		= _wtoi( A[_WHO] );
+		diff	= _wtoi( A[_DIFF] );
+
+		switch( who )
+		{
+			case 1:
+				col = 1 <<_NAME;
+				if( diff )
+					col = col | 1 << _DEATH_DATE;
+				break;
+			case 2:
+				col = 1 <<_NAME;
+				if( diff )
+					col = col | 1 << _DEATH_DATE;
+				break;
+			default:
+				if( diff )
+					col = 1 << _BIRTH_DATE;
+				break;
+		};
+
+		m_ListCtrl.SetItemData( nItem, col );
+		str.Format( L"%04X", col );
+		m_ListCtrl.SetItemText( nItem, L_ITEMDATA, str );
+
+		++nItem;
+	}
+	file.Close();
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckMotherDeath::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	NMLVCUSTOMDRAW* pLVCD = reinterpret_cast<NMLVCUSTOMDRAW*>( pNMHDR );
+	
+	int nItem;
+	int nCol;
+	int iData;
+	UINT mask;
+	int	who;
+	int diff;
+
+	*pResult = 0;
+
+	switch( pLVCD->nmcd.dwDrawStage )
+	{
+	case CDDS_PREPAINT:
+		*pResult = CDRF_NOTIFYITEMDRAW;
+		break;
+	case CDDS_ITEMPREPAINT:
+		*pResult = CDRF_NOTIFYSUBITEMDRAW;
+		break;
+	case CDDS_ITEMPREPAINT|CDDS_SUBITEM:
+		nItem	= pLVCD->nmcd.dwItemSpec;
+		nCol	= pLVCD->iSubItem;
+		mask	= 1 << nCol;
+		iData	= m_ListCtrl.GetItemData( nItem );
+		who		= _wtoi( m_ListCtrl.GetItemText( nItem, _WHO ) );
+		diff	= _wtoi( m_ListCtrl.GetItemText( nItem, _DIFF ) );
+		if( iData & mask )	// a cella jelölve van szinezésre
+		{
+			if( who == MAN )
+			{
+				if( mask == 1 << _NAME )
+					pLVCD->clrText	 = RGB( 255,0,0 );
+				if( mask == (1 << _DEATH_DATE) && diff )
+					pLVCD->clrTextBk = YELLOW;
+			}
+			else if( who == WOMAN )
+			{
+				pLVCD->clrText	 = RGB( 0,0,255);
+				if( mask == (1 << _DEATH_DATE) && diff )
+					pLVCD->clrTextBk = YELLOW;
+			}
+			else
+			{
+				if( diff )
+					pLVCD->clrTextBk = YELLOW;
+			}
+		}
+
+		*pResult = CDRF_DODEFAULT;
+		break;
+	}
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+LRESULT CCheckMotherDeath:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
+{
+	CPoint* point=(CPoint*) lParam;
+    CMenu	Menu;
+	CMenu*	pPopup;
+
+
+	if(Menu.LoadMenu( IDR_DROPDOWN_HTML ))
+    {
+		pPopup = Menu.GetSubMenu(0);
+		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
+		{
+			pPopup->EnableMenuItem(ID_HTML_SHOWS, MF_BYCOMMAND | MF_GRAYED);
+			pPopup->EnableMenuItem(ID_HTML_NOTEPAD, MF_BYCOMMAND | MF_GRAYED);
+			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
+		}
+		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
+    }
+	return TRUE;
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckMotherDeath::OnHtmlEdit()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	L_LINENUMBER ) );
+	theApp.listHtmlLine( lineNumber );
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckMotherDeath::OnHtmlNotepad()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	CString lineNumber = m_ListCtrl.GetItemText( nItem, 	L_LINENUMBER );
+	if( !lineNumber.IsEmpty() ) 
+		theApp.editNotepad( lineNumber );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckMotherDeath::OnHtmlShows()
+{
+	POSITION	pos = m_ListCtrl.GetFirstSelectedItemPosition();
+	int			nItem;
+	std::vector<CString> vLines;
+
+	int cnt = 0;
+	CString name(L"");
+
+	while( pos )
+	{
+		nItem = m_ListCtrl.GetNextSelectedItem( pos );
+		vLines.push_back( m_ListCtrl.GetItemText( nItem, L_LINENUMBER ) );
+		if( name.Compare( m_ListCtrl.GetItemText( nItem, L_NAME ) ) )
+		{
+			name = m_ListCtrl.GetItemText( nItem, L_NAME );
+			++cnt;
+		}
+	
+
+	}
+
+	CHtmlLines dlg;
+
+	if( cnt == 1 )
+		dlg.child = name;
+	else
+		dlg.child = L"";
+
+	dlg._what = 1;
+	dlg.vLines = &vLines;
+
+	dlg.DoModal();
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckMotherDeath::motherDeathChildBirth()
+{
+	// gyerek adatai
+	CString child;
+	CString rowidC;
+	CString lineNumberC;
+	CString tableNumberC;
+	CString	sourceC;
+	CString unitedC;
+	CString birth_dateC;
+	CString death_dateC;
+	CString mother_indexC;
+
+
+	CString rowidF_Prev(L"");
+	CString rowidF;
+	CString father;
+	CString lineNumberF;
+	CString tableNumberF;
+	CString	sourceF;
+	CString unitedF;
+	CString marriage_indexF;
+	CString birth_dateF;
+	CString death_dateF;
+
+	CString rowidM;
+	CString mother;
+	CString lineNumberM;
+	CString tableNumberM;
+	CString	sourceM;
+	CString unitedM;
+	CString marriage_indexM;
+	CString birth_dateM;
+	CString death_dateM;
+	CString death_dateM1;
+
+	CString marriageDate;
+
+
+	CString fileName;
+	CString fileSpec;
+
+	CString info;
+
+	int		diff;
+
+	
+	CProgressWnd wndP(NULL, L"Anyja halála után született gyerekek..." ); 
+	wndP.GoModal();
+
+
+	// gyerekek lekérdezése
+	m_command = L"SELECT rowid, lineNumber, tableNumber, source, united, mother_index, last_name, first_name, birth_date, death_date, father_id, mother_id FROM people ORDER BY last_name, first_name";
+	if( !query( m_command ) ) return;
+
+	wndP.SetRange(0, m_recordset->RecordsCount() );
+	wndP.SetPos(0);
+	wndP.SetStep(1);
+
+
+	m_cnt = 0;
+	wndP.SetRange(0, m_recordset->RecordsCount() );
+	wndP.SetPos(0);
+	wndP.SetStep(1);
+
+	
+	m_recordset->MoveFirst();
+	for( UINT i = 0; i < m_recordset->RecordsCount(); ++i, m_recordset->MoveNext() )
+	{
+		birth_dateC = m_recordset->GetFieldString( BIRTHDATEC );
+		if( !birth_dateC.IsEmpty() && !checkDate( birth_dateC )  )
+		{
+			rowidM	= m_recordset->GetFieldString( MOTHERIDC );
+			if( !rowidM.IsEmpty() )
+			{
+				
+				// anya lekérdezése
+				m_command.Format( L"SELECT death_date FROM people WHERE rowid='%s'", rowidM );
+				if( !query1( m_command ) ) return;
+				death_dateM1 = m_recordset1->GetFieldString( 0 );
+				if( !death_dateM1.IsEmpty() && !checkDate( death_dateM1 ) )
+				{
+					if( theApp.dateDiff( death_dateM1, birth_dateC, 0 ) )
+					{
+						++m_cnt;
+						// apa adatai
+						rowidF = m_recordset->GetFieldString( FATHERIDC );
+						if( !rowidF.Compare( rowidF_Prev ) ) continue;
+						rowidF_Prev = rowidF;
+
+						m_command.Format( L"SELECT lineNumber, tableNumber, source, united, last_name, first_name, birth_date, death_date FROM people WHERE rowid='%s'", rowidF );
+						if( !query1( m_command ) ) return;
+						lineNumberF		= m_recordset1->GetFieldString( LINEP );
+						tableNumberF	= m_recordset1->GetFieldString( TABLEP );
+						sourceF			= m_recordset1->GetFieldString( SOURCEP );
+						unitedF			= m_recordset1->GetFieldString( UNITEDP );
+						birth_dateF		= m_recordset1->GetFieldString( BIRTHDATEP );
+						death_dateF		= m_recordset1->GetFieldString( DEATHDATEP );
+						father.Format( L"%s %s", m_recordset1->GetFieldString( LASTNAMEP ), m_recordset1->GetFieldString( FIRSTNAMEP ) );
+						
+						diff = 0;
+						str.Format( L"1\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t", diff, rowidF,lineNumberF,tableNumberF, sourceF,unitedF, L"",L"",father,birth_dateF, death_dateF );
+						fwprintf( theApp.fl, L"%s\n", str );
+
+						// apa feleségei
+						m_command.Format( L"SELECT rowid, * FROM marriages WHERE spouse1_id='%s'", rowidF );
+						if( !query2( m_command ) ) return;
+						for( UINT j = 0; j < m_recordset2->RecordsCount(); ++j, m_recordset2->MoveNext() )
+						{
+							rowidM			= m_recordset2->GetFieldString( MARRIAGES_SPOUSE2_ID );
+							marriage_indexM = m_recordset2->GetFieldString( MARRIAGES_ORDERWIFE );
+							marriageDate	= m_recordset2->GetFieldString( MARRIAGES_DATE );
+							// anya adatai
+							m_command.Format( L"SELECT lineNumber, tableNumber, source, united, last_name, first_name, birth_date, death_date FROM people WHERE rowid='%s'", rowidM );
+							if( !query3( m_command ) ) return;
+							lineNumberM		= m_recordset3->GetFieldString( LINEP );
+							tableNumberM	= m_recordset3->GetFieldString( TABLEP );
+							sourceM			= m_recordset3->GetFieldString( SOURCEP );
+							unitedM			= m_recordset3->GetFieldString( UNITEDP );
+							mother.Format( L"%s %s", m_recordset3->GetFieldString( LASTNAMEP ), m_recordset3->GetFieldString( FIRSTNAMEP ) );
+							birth_dateM = m_recordset3->GetFieldString( BIRTHDATEP );
+							death_dateM = m_recordset3->GetFieldString( DEATHDATEP );
+							mother.Format( L"%s %s", m_recordset3->GetFieldString( LASTNAMEP ), m_recordset3->GetFieldString( FIRSTNAMEP ) );
+						
+							diff = 0;
+							if( !death_dateM.Compare( death_dateM1 ) ) diff = 1;
+							str.Format( L"2\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t", diff, rowidM,lineNumberM,tableNumberM, sourceM,unitedM, marriage_indexM, marriageDate,mother,birth_dateM, death_dateM );
+							fwprintf( theApp.fl, L"%s\n",  str );
+
+							// apa-anya gyermeke adatai
+
+							m_command.Format( L"SELECT rowid, lineNumber, tableNumber, source, united, mother_index2, last_name, first_name, birth_date, death_date FROM people WHERE father_id='%s' AND mother_id='%s'", rowidF, rowidM );
+							if( !query3( m_command ) ) return;
+
+							for( UINT k = 0; k < m_recordset3->RecordsCount(); ++k, m_recordset3->MoveNext() )
+							{
+								rowidC			= m_recordset3->GetFieldString( ROWIDC );
+								lineNumberC		= m_recordset3->GetFieldString( LINEC );
+								tableNumberC	= m_recordset3->GetFieldString( TABLEC );
+								sourceC			= m_recordset3->GetFieldString( SOURCEC );
+								unitedC			= m_recordset3->GetFieldString( UNITEDC );
+								mother_indexC	= m_recordset3->GetFieldString( MOTHERINDEXC );
+								if( !mother_indexC.Compare( L"0" ) ) mother_indexC.Empty();
+								birth_dateC		= m_recordset3->GetFieldString( BIRTHDATEC );
+								death_dateC		= m_recordset3->GetFieldString( DEATHDATEC );
+								child.Format( L"%s %s", m_recordset3->GetFieldString( LASTNAMEC ), m_recordset3->GetFieldString( FIRSTNAMEC ) );		
+
+								diff = 0;
+								if( theApp.dateDiff( death_dateM, birth_dateC, 0 ) ) diff = 1; 
+
+								str.Format( L"3\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t", diff, rowidC,lineNumberC,tableNumberC, sourceC,unitedC, mother_indexC, L"", child,birth_dateC, death_dateC );
+								fwprintf( theApp.fl, L"%s\n",  str );
+							}
+						}
+						fwprintf( theApp.fl, L"\n" );
+					}
+				}
+			}
+		}
+		wndP.StepIt();
+		wndP.PeekAndPump();
+		if (wndP.Cancelled()) break;
+	}
+	wndP.DestroyWindow();
+	fclose( theApp.fl );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BOOL CCheckMotherDeath::query( CString command )
+{
+	if( m_recordset->Query(command,theApp.mainDB))
+	{
+		str.Format(L"%s\n%s",command,m_recordset->GetLastError());
+		AfxMessageBox(str);
+		return FALSE;
+	}
+	return TRUE;
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BOOL CCheckMotherDeath::query1( CString command )
+{
+	if( m_recordset1->Query(command,theApp.mainDB))
+	{
+		str.Format(L"%s\n%s",command,m_recordset1->GetLastError());
+		AfxMessageBox(str);
+		return FALSE;
+	}
+	return TRUE;
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BOOL CCheckMotherDeath::query2( CString command )
+{
+	if( m_recordset2->Query(command,theApp.mainDB))
+	{
+		str.Format(L"%s\n%s",command,m_recordset2->GetLastError());
+		AfxMessageBox(str);
+		return FALSE;
+	}
+	return TRUE;
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BOOL CCheckMotherDeath::query3( CString command )
+{
+	if( m_recordset3->Query(command,theApp.mainDB))
+	{
+		str.Format(L"%s\n%s",command,m_recordset3->GetLastError());
+		AfxMessageBox(str);
+		return FALSE;
+	}
+	return TRUE;
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BOOL CCheckMotherDeath::query4( CString command )
+{
+	if( m_recordset4->Query(command,theApp.mainDB))
+	{
+		str.Format(L"%s\n%s",command,m_recordset4->GetLastError());
+		AfxMessageBox(str);
+		return FALSE;
+	}
+	return TRUE;
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckMotherDeath::printHeader( CString title )
+{
+	CString info = L"\
+A felsorolt a családokban valamely gyerek az anyja halála után született. \
+Ezt a problémát sárga háttérrel írt dátumok emelik ki. Az apa piros, az anya kék színû.";
+
+	fwprintf( fh1, L"<HEAD>\n" );
+	fwprintf( fh1, L"<style>\n" );
+	fwprintf( fh1, L"</style>\n" );
+	fwprintf( fh1, L"</HEAD>\n" );
+	fwprintf( fh1, L"<BODY>\n" );
+	fwprintf( fh1, L"<center>%s</center><br><br>\n\n", title );
+	fwprintf( fh1, L"%s\n", info );
+	fwprintf( fh1, L"<pre>" );
+	fwprintf( fh1, L"%s %s<br>",		L"Adatbázis:    ", theApp.m_databaseSpec );
+	fwprintf( fh1, L"%s %s<br><br>", L"Lista készült:", theApp.getPresentDateTime() );
+	str.Format( L"\n<font color='red'>%8s %8s %8s %1s %1s %2s %-12s %-28s %-12s %-12s</font><br>\n",
+L"rowid",\
+L"line#",\
+L"table#",\
+L"S",\
+L"U",\
+L"ix",\
+L"esküvõ",\
+L"név",\
+L"születés",\
+L"halál" );
+	fwprintf( fh1, str );
+
+
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckMotherDeath::OnList()
+{
+	CString	logFile(L"checkMotherdeath"); 
+	CString	title(L"Anya halálozási dátuma a gyerek szüeltési dátumánál korábbi");;
+	
+	theApp.exportAll( logFile, title, &m_ListCtrl );
+}

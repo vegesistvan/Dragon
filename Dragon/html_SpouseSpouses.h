@@ -1,0 +1,55 @@
+#pragma once
+#include "listctrlex.h"
+#include "colorstatic.h"
+
+
+// CSpouseSpouses dialog
+
+class CSpouseSpouses : public CDialogEx
+{
+	DECLARE_DYNAMIC(CSpouseSpouses)
+	DECLARE_EASYSIZE
+
+public:
+	CSpouseSpouses(CWnd* pParent = NULL);   // standard constructor
+	virtual ~CSpouseSpouses();
+
+// Dialog Data
+	enum { IDD = IDD_HTML_SPSP };
+	int m_tableNumber;
+	int	m_lineNumber;
+	int m_familyNumber;
+	CString m_tableName;
+
+	int	m_orderix;
+	CListCtrlEx m_ListCtrl;
+	CString m_search;
+	CString str;
+
+protected:
+	FILE* fh1;
+
+	CColorStatic m_colorCaption;
+
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	void CSpouseSpouses::fillTable( );
+
+	void CSpouseSpouses::menu();
+	virtual void PostNcDestroy();
+
+	DECLARE_MESSAGE_MAP()
+
+public:
+	CWnd* m_pParent;
+
+	virtual BOOL OnInitDialog();
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
+	afx_msg LRESULT OnSetColumnColor(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnColumnSorted(WPARAM wParam, LPARAM lParam);
+	afx_msg void OnChangeSearch();
+	afx_msg void OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult);
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	
+	afx_msg void OnNewtable();
+};

@@ -1,0 +1,14 @@
+commit-message
+faHelp
+Release
+Debug
+x64/Release
+x64/Debug
+Dragon/Release
+Dragon/Debug
+Dragon/x64/Release
+Dragon/x64/Debug
+ipch
+*.suo
+*.sdf
+*.bak

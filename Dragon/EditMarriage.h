@@ -1,0 +1,42 @@
+#pragma once
+
+
+// CEditMarriage dialog
+
+class CEditMarriage : public CDialogEx
+{
+	DECLARE_DYNAMIC(CEditMarriage)
+
+public:
+	CEditMarriage(CWnd* pParent = NULL);   // standard constructor
+	virtual ~CEditMarriage();
+
+// Dialog Data
+	enum { IDD = IDD_EDIT_MARRIAGE };
+
+	CString m_rowid;	// marriage rowid
+	CString m_rowidH;		// husband rowid;
+	CString m_rowidW;		// wife rowid;
+
+
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+
+	CString m_command;
+	CString str;
+
+	
+	
+	CString m_place;
+	CString m_date;
+	CString m_orderWife;
+	CString m_orderHusband;
+
+
+
+	CString getSpouse( CString rowid );
+	DECLARE_MESSAGE_MAP()
+public:
+	virtual BOOL OnInitDialog();
+	afx_msg void OnBnClickedOk();
+};

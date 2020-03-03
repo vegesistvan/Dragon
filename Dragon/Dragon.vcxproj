@@ -1,0 +1,451 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{E5CD2F3B-C6E9-44A9-8766-C6C6DE3E58F4}</ProjectGuid>
+    <RootNamespace>Dragon</RootNamespace>
+    <Keyword>MFCProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>Static</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>Static</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>Dynamic</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>Dynamic</UseOfMfc>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <ValidateAllParameters>true</ValidateAllParameters>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level2</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level2</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <ValidateAllParameters>true</ValidateAllParameters>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level2</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="about.h" />
+    <ClInclude Include="EditComment.h" />
+    <ClInclude Include="EditMarriage.h" />
+    <ClInclude Include="GedcomOut.h" />
+    <ClInclude Include="GA_ascendantsChain.h" />
+    <ClInclude Include="build_defs.h" />
+    <ClInclude Include="CheckMotherIndex.h" />
+    <ClInclude Include="CheckNames.h" />
+    <ClInclude Include="checkParam0.h" />
+    <ClInclude Include="checkParentChild.h" />
+    <ClInclude Include="checkFatherDeath9.h" />
+    <ClInclude Include="checkMotherDeath.h" />
+    <ClInclude Include="checkParam.h" />
+    <ClInclude Include="checkParam3.h" />
+    <ClInclude Include="checkDateFormat.h" />
+    <ClInclude Include="checkSameNameAnd.h" />
+    <ClInclude Include="Help.h" />
+    <ClInclude Include="InputErrors.h" />
+    <ClInclude Include="listPeopleAndFamily.h" />
+    <ClInclude Include="listPeopleAndSpouses.h" />
+    <ClInclude Include="checkSpouseAge.h" />
+    <ClInclude Include="checkSpousesDiff.h" />
+    <ClInclude Include="checkSpousesSex.h" />
+    <ClInclude Include="GA_descendants.h" />
+    <ClInclude Include="GA_structures.h" />
+    <ClInclude Include="GetLastFirst.h" />
+    <ClInclude Include="GetMarriage.h" />
+    <ClInclude Include="GetPeople.h" />
+    <ClInclude Include="gedcomIn.h" />
+    <ClInclude Include="EditPeople.h" />
+    <ClInclude Include="Color.h" />
+    <ClInclude Include="ColorStatic.h" />
+    <ClInclude Include="ColumnsList.h" />
+    <ClInclude Include="ComboItem.h" />
+    <ClInclude Include="ConnectCsalad.h" />
+    <ClInclude Include="database.h" />
+    <ClInclude Include="Date.h" />
+    <ClInclude Include="EditFirstName.h" />
+    <ClInclude Include="EditTable.h" />
+    <ClInclude Include="FirstLetter.h" />
+    <ClInclude Include="checkGenerations.h" />
+    <ClInclude Include="checkParam1.h" />
+    <ClInclude Include="html_Edit.h" />
+    <ClInclude Include="html_Lines.h" />
+    <ClInclude Include="html_Brackets.h" />
+    <ClInclude Include="checkParam4.h" />
+    <ClInclude Include="checkLifespanListCtrl.h" />
+    <ClInclude Include="checkLifespan.h" />
+    <ClInclude Include="GA_ascendants.h" />
+    <ClInclude Include="Languages.h" />
+    <ClInclude Include="Message.h" />
+    <ClInclude Include="namesParam.h" />
+    <ClInclude Include="NewPeople.h" />
+    <ClInclude Include="Pictures.h" />
+    <ClInclude Include="SameName.h" />
+    <ClInclude Include="SamePeople.h" />
+    <ClInclude Include="SaveFirstName.h" />
+    <ClInclude Include="Table_blobs.h" />
+    <ClInclude Include="Table_people.h" />
+    <ClInclude Include="Table_places.h" />
+    <ClInclude Include="checkParam2.h" />
+    <ClInclude Include="SelectMother.h" />
+    <ClInclude Include="Setup.h" />
+    <ClInclude Include="html_Descendants.h" />
+    <ClInclude Include="html_Spouses.h" />
+    <ClInclude Include="checkSameSpouses.h" />
+    <ClInclude Include="Filter.h" />
+    <ClInclude Include="Info_db.h" />
+    <ClInclude Include="EasySizeHD.h" />
+    <ClInclude Include="EditItem.h" />
+    <ClInclude Include="SelectFamily.h" />
+    <ClInclude Include="SelectFamilyName.h" />
+    <ClInclude Include="SelectParent.h" />
+    <ClInclude Include="Relations.h" />
+    <ClInclude Include="EditText.h" />
+    <ClInclude Include="Fa.h" />
+    <ClInclude Include="FaDlg.h" />
+    <ClInclude Include="GA_input_parameters.h" />
+    <ClInclude Include="GetString.h" />
+    <ClInclude Include="ListBoxEx.h" />
+    <ClInclude Include="ListCtrlEx.h" />
+    <ClInclude Include="ProgressWnd.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="SelectCodesystem.h" />
+    <ClInclude Include="SelectHtmlFile.h" />
+    <ClInclude Include="SelectOne.h" />
+    <ClInclude Include="SelectPeople.h" />
+    <ClInclude Include="SelectString.h" />
+    <ClInclude Include="SelectTableHtml.h" />
+    <ClInclude Include="SelectTableName.h" />
+    <ClInclude Include="SelectedFiles.h" />
+    <ClInclude Include="Table_firstnames.h" />
+    <ClInclude Include="sfqSort.h" />
+    <ClInclude Include="GA_input.h" />
+    <ClInclude Include="SqliteDB.h" />
+    <ClInclude Include="SqliteDBEx.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="structures.h" />
+    <ClInclude Include="Table_GaTables.h" />
+    <ClInclude Include="Table_files.h" />
+    <ClInclude Include="Table_html.h" />
+    <ClInclude Include="html_Marriages.h" />
+    <ClInclude Include="html_SpouseSpouses.h" />
+    <ClInclude Include="Table_tables.h" />
+    <ClInclude Include="Table_marriages.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="textfile.h" />
+    <ClInclude Include="Table_titles.h" />
+    <ClInclude Include="SameParams.h" />
+    <ClInclude Include="utilities.h" />
+    <ClInclude Include="version.h" />
+    <ClInclude Include="version_num.h" />
+    <ClInclude Include="WM_USER.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="about.cpp" />
+    <ClCompile Include="EditComment.cpp" />
+    <ClCompile Include="EditMarriage.cpp" />
+    <ClCompile Include="Gedcom.cpp" />
+    <ClCompile Include="GedcomOut.cpp" />
+    <ClCompile Include="app_export.cpp" />
+    <ClCompile Include="GA_ascendantsChain.cpp" />
+    <ClCompile Include="CheckMotherIndex.cpp" />
+    <ClCompile Include="CheckNames.cpp" />
+    <ClCompile Include="checkParam0.cpp" />
+    <ClCompile Include="checkParentChild.cpp" />
+    <ClCompile Include="checkFatherDeath9.cpp" />
+    <ClCompile Include="checkMotherDeath.cpp" />
+    <ClCompile Include="checkParam.cpp" />
+    <ClCompile Include="checkParam3.cpp" />
+    <ClCompile Include="checkDateFormat.cpp" />
+    <ClCompile Include="checkSameNameAnd.cpp" />
+    <ClCompile Include="gedcomTagTable.cpp" />
+    <ClCompile Include="Help.cpp" />
+    <ClCompile Include="InputErrors.cpp" />
+    <ClCompile Include="inputMethod1.cpp" />
+    <ClCompile Include="listPeopleAndFamily.cpp" />
+    <ClCompile Include="listPeopleAndSpouses.cpp" />
+    <ClCompile Include="checkSpouseAge.cpp" />
+    <ClCompile Include="checkSpousesDiff.cpp" />
+    <ClCompile Include="checkSpousesSex.cpp" />
+    <ClCompile Include="GA_descendants.cpp" />
+    <ClCompile Include="GA_descendantsPrint.cpp" />
+    <ClCompile Include="GA_descendant_utility.cpp" />
+    <ClCompile Include="GetLastFirst.cpp" />
+    <ClCompile Include="GetMarriage.cpp" />
+    <ClCompile Include="GetPeople.cpp" />
+    <ClCompile Include="GedcomIn.cpp" />
+    <ClCompile Include="GedcomIn_fillVectors.cpp" />
+    <ClCompile Include="EditPeople.cpp" />
+    <ClCompile Include="ColorStatic.cpp" />
+    <ClCompile Include="ColumnsList.cpp" />
+    <ClCompile Include="ComboItem.cpp" />
+    <ClCompile Include="ConnectCsalad.cpp" />
+    <ClCompile Include="Date.cpp" />
+    <ClCompile Include="EditFirstName.cpp" />
+    <ClCompile Include="EditTable.cpp" />
+    <ClCompile Include="FirstLetter.cpp" />
+    <ClCompile Include="checkGenerations.cpp" />
+    <ClCompile Include="html.cpp" />
+    <ClCompile Include="checkParam1.cpp" />
+    <ClCompile Include="html_Edit.cpp" />
+    <ClCompile Include="html_Lines.cpp" />
+    <ClCompile Include="html_Brackets.cpp" />
+    <ClCompile Include="checkParam4.cpp" />
+    <ClCompile Include="checkLifespanListCtrl.cpp" />
+    <ClCompile Include="checkLifespan.cpp" />
+    <ClCompile Include="GA_ascendants.cpp" />
+    <ClCompile Include="Info.cpp" />
+    <ClCompile Include="Languages.cpp" />
+    <ClCompile Include="Message.cpp" />
+    <ClCompile Include="namesParam.cpp" />
+    <ClCompile Include="NewPeople.cpp" />
+    <ClCompile Include="Pictures.cpp" />
+    <ClCompile Include="SameName.cpp" />
+    <ClCompile Include="SamePeople.cpp" />
+    <ClCompile Include="SaveFirstName.cpp" />
+    <ClCompile Include="Table_blobs.cpp" />
+    <ClCompile Include="Table_people.cpp" />
+    <ClCompile Include="Table_places.cpp" />
+    <ClCompile Include="checkParam2.cpp" />
+    <ClCompile Include="SelectMother.cpp" />
+    <ClCompile Include="Setup.cpp" />
+    <ClCompile Include="GA_input_DescendantSubstring.cpp" />
+    <ClCompile Include="GA_input_MarriageVector.cpp" />
+    <ClCompile Include="GA_input_PlaceDateComment.cpp" />
+    <ClCompile Include="GA_input_PeopleString.cpp" />
+    <ClCompile Include="html_Descendants.cpp" />
+    <ClCompile Include="html_Spouses.cpp" />
+    <ClCompile Include="GA_input_common.cpp" />
+    <ClCompile Include="checkSameSpouses.cpp" />
+    <ClCompile Include="FaDlg_input.cpp" />
+    <ClCompile Include="Filter.cpp" />
+    <ClCompile Include="Info_db.cpp" />
+    <ClCompile Include="EditItem.cpp" />
+    <ClCompile Include="SelectFamily.cpp" />
+    <ClCompile Include="SelectFamilyName.cpp" />
+    <ClCompile Include="SelectParent.cpp" />
+    <ClCompile Include="Relations.cpp" />
+    <ClCompile Include="EditText.cpp" />
+    <ClCompile Include="Fa.cpp" />
+    <ClCompile Include="FaDlg.cpp" />
+    <ClCompile Include="ga_input_parameters.CPP" />
+    <ClCompile Include="GetString.cpp" />
+    <ClCompile Include="SelectString.cpp" />
+    <ClCompile Include="SelectTableHtml.cpp" />
+    <ClCompile Include="SelectTableName.cpp" />
+    <ClCompile Include="GA_input.cpp" />
+    <ClCompile Include="GA_input_Line.cpp" />
+    <ClCompile Include="GA_input_insert_blocks.cpp" />
+    <ClCompile Include="Table_firstnames.cpp" />
+    <ClCompile Include="GA_input_TableHeader.cpp" />
+    <ClCompile Include="Table_GaTables.cpp" />
+    <ClCompile Include="Table_files.cpp" />
+    <ClCompile Include="Table_html.cpp" />
+    <ClCompile Include="html_Marriages.cpp" />
+    <ClCompile Include="html_SpouseSpouses.cpp" />
+    <ClCompile Include="Table_tables.cpp" />
+    <ClCompile Include="Table_marriages.cpp" />
+    <ClCompile Include="Fa_utilities.cpp" />
+    <ClCompile Include="ListBoxEx.cpp" />
+    <ClCompile Include="ListCtrlEx.cpp" />
+    <ClCompile Include="ProgressWnd.cpp" />
+    <ClCompile Include="SelectCodesystem.cpp" />
+    <ClCompile Include="SelectHtmlFile.cpp" />
+    <ClCompile Include="SelectOne.cpp" />
+    <ClCompile Include="SelectPeople.cpp" />
+    <ClCompile Include="SelectedFiles.cpp" />
+    <ClCompile Include="sfqSort.cpp" />
+    <ClCompile Include="SqliteDB.cpp" />
+    <ClCompile Include="SqliteDBEx.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="textfile.cpp" />
+    <ClCompile Include="Table_titles.cpp" />
+    <ClCompile Include="SameParams.cpp" />
+    <ClCompile Include="utilities.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Dragon.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\Dragon.rc2" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\families.ico" />
+    <Image Include="res\tree.bmp">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="res\tree.ico" />
+    <Image Include="res\tree91x60.bmp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties RESOURCE_FILE="Dragon.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>
