@@ -13,17 +13,9 @@ _Bool is_utf8( UCHAR * string, _int64 length );
 // INDI rekordokat megkeresi a ged-fájlban és mindegyikre meghívja a recordINDI függvényt
 void CGedcomIn::fillVectors()
 {
-	fill_v_indi();
-	fill_v_fam();
-
-	if( v_fam.size() ) sync_fam_indi();   // ha több felesége van, akkor
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// INDI rekordokat megkeresi a ged-fájlban és mindegyikre meghívja a recordINDI függvényt
-void CGedcomIn::fill_v_indi()
-{
-
-	theApp.m_inputCode = GetInputCode( theApp.m_gedFileSpec );
+	theApp.m_inputCode = gedCHAR( theApp.m_gedFileSpec );
+	if( theApp.m_inputCode == -1 )
+		theApp.m_inputCode = GetInputCode( theApp.m_gedFileSpec );
 
 	file_ged.Open( theApp.m_gedFileSpec, CFile::modeRead );
 	if( theApp.m_inputCode == UTF8BOM )
@@ -31,6 +23,33 @@ void CGedcomIn::fill_v_indi()
 		file_ged.Seek( 3, CFile::begin );
 	}
 
+	fill_v_indi();
+	fill_v_fam();
+
+	if( v_fam.size() ) sync_fam_indi();   // ha több felesége van, akkor
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int CGedcomIn::gedCHAR( CString fileSpec )
+{
+	CString cLine;
+	CString code;
+	int		pos;
+	file_ged.Open( theApp.m_gedFileSpec, CFile::modeRead );
+	while( file_ged.ReadString( cLine ) )
+	{
+		if( cLine.Find( L"CHAR" ) != -1 )
+			break;
+	}
+	file_ged.Close();
+	if( ( pos= cLine.Find( L"CHAR" ) ) == -1 ) return -1; // nincs CHAR
+	code = cLine.Mid( pos + 5 );
+	if( code == L"ANSI" ) return ANSI;
+	else return UTF8;
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// INDI rekordokat megkeresi a ged-fájlban és mindegyikre meghívja a recordINDI függvényt
+void CGedcomIn::fill_v_indi()
+{
 	str.Format( L"%s fájl beolvasása folyik...", theApp.m_gedFileName );
 	CProgressWnd wndP( NULL, str );
 	wndP.GoModal();
@@ -114,7 +133,9 @@ void CGedcomIn::recordINDI( GEDLINE* gl )
 	while( file_ged.ReadString( cLine ) )
 	{
 		if( cLine.IsEmpty() ) break;
-		if( theApp.m_inputCode == UTF8 || theApp.m_inputCode == UTF8BOM ) cLine = Utf8ToAnsi( cLine );
+		if( theApp.m_inputCode == UTF8 || theApp.m_inputCode == UTF8BOM )
+			cLine = Utf8ToAnsi( cLine );
+		cLine.Replace( '\'', '|' );
 
 		extract( cLine, &lxtv );
 		if( lxtv.level < 0 ) continue;
@@ -360,7 +381,7 @@ void CGedcomIn::getName( CString value, INDI* indi )
 	}
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// a v_fam vektor elemeinek marriage és marraigeHAll értékadás
+// a v_fam vektor elemeinek marriage és marraigeHAll és numofSpouses értékadása
 void CGedcomIn::sync_fam_indi()
 {
 	int index;
@@ -384,12 +405,14 @@ void CGedcomIn::sync_fam_indi()
 
 	for( UINT i = 0; i < v_fam.size()-1; ++i )								// családok
 	{
+		if( i == 660 )
+			int z = 0;
 		refH = v_fam.at(i).refH;
 		if( v_fam.at(i).refH.IsEmpty() ) continue;		// nincs megadva férj
 
 		fix = i;
 		cnt = 1;
-		while( v_fam.at(i).refH == v_fam.at(i+1).refH )		// megszámolja, hogy az apa hány családban azonos
+		while( i < v_fam.size()-1  && v_fam.at(i).refH == v_fam.at(i+1).refH )		// megszámolja, hogy az apa hány családban azonos
 		{
 			++cnt;			// az apa hány családban azonos
 			++i;			
@@ -503,7 +526,7 @@ void CGedcomIn::sync_fam_indi()
 // orderFather beállítása
 //	std::sort( v_chil.begin(), v_chil.end(), multiSort_refH );  // apa-anya szerint rendez
 	std::sort( v_chil.begin(), v_chil.end(), sortChil_cnt );  // apa-anya szerint rendez
-	for( UINT i = 0; i < v_chil.size()-1; ++i )
+	for( UINT i = 0; i < v_chil.size()-2; ++i )
 	{
 		cnt = 1;
 		fix = i;

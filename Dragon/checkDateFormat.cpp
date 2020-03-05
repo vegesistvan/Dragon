@@ -52,7 +52,7 @@ Az alábbi dátum formátumokat fogadja el a program:\r\n\
 1848.03.\r\n\
 1848.03.15\r\n\r\n\
 A dátum elõtt a 'kb' módosító szó állhat.\r\n\
-A dátum után a 'kb', 'elõtt', 'után' módosító szavak valamelyike állhat.\
+A dátum után a 'kb', 'elõtt', 'után', 'körül' módosító szavak valamelyike állhat.\
 \r\n\r\n\
 Az ezektõl eltérõ születési, halálozási és esküvõi dátumokat listázza a program.\
 \r\n\r\n\
@@ -115,7 +115,7 @@ void CDateFormat::fillTable()
 		n = wordList( &A, datum, ' ', FALSE );
 		if( n > 1 )
 		{
-			if( A[1] == L"kb" || A[1] == L"elõtt" || A[1] == L"után" )
+			if( A[1] == L"kb" || A[1] == L"elõtt" || A[1] == L"után" || A[1] == L"körül" )
 				datum = A[0];
 			if( A[0] == L"kb" )
 				datum = A[1];
@@ -139,7 +139,7 @@ void CDateFormat::fillTable()
 		n = wordList( &A, datum, ' ', FALSE );
 		if( n > 1 )
 		{
-			if( A[1] == L"kb" || A[1] == L"elõtt" || A[1] == L"után" )
+			if( A[1] == L"kb" || A[1] == L"elõtt" || A[1] == L"után" || A[1] == L"körül" )
 				datum = A[0];
 			if( A[0] == L"kb" )
 				datum = A[1];
@@ -175,7 +175,7 @@ void CDateFormat::fillTable()
 		n = wordList( &A, datum, ' ', FALSE );
 		if( n > 1 )
 		{
-			if( A[1] == L"kb" || A[1] == L"elõtt" || A[1] == L"után" )
+			if( A[1] == L"kb" || A[1] == L"elõtt" || A[1] == L"után" || A[1] == L"körül" )
 				datum = A[0];
 			if( A[0] == L"kb" )
 				datum = A[1];

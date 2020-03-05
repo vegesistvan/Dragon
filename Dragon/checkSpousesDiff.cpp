@@ -77,7 +77,7 @@ BOOL CCheckSpousesDiff::OnInitDialog()
 	EASYSIZE_ADD( IDC_LIST,	ES_BORDER,	ES_BORDER,		ES_BORDER,		ES_BORDER,	0 );
 
 	EASYSIZE_INIT();
-
+	
 	CCheckParam dlg;
 	dlg.m_title = L"Házastársak korkülönbségének ellenõrzése";
 	dlg.m_function1 = L"A program listázza azokat a házaspárokat, akiknek korkülönbsége nagyobb mint egy adott szám.";
@@ -91,7 +91,7 @@ BOOL CCheckSpousesDiff::OnInitDialog()
 	}
 
 	m_diff = dlg.m_value;
-
+	
 	m_title.Format( L"Házastársak, akiknek korkülönbsége nagyobb mint %d év", m_diff );
 	SetWindowTextW( m_title );
 
@@ -280,6 +280,7 @@ void CCheckSpousesDiff::spousesDiff()
 	{
 		str.Format( L"\n\nMinden házastárs korkülönbsége kisebb mint %d év\n", m_diff );
 		AfxMessageBox( str );
+		CDialogEx::OnOK();
 	}
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

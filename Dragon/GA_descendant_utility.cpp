@@ -70,14 +70,17 @@ BOOL CGaDescendants::openHtml( CString file, CString title, UINT colorBgrnd )
 //	link.Format( L"<link rel=\"stylesheet\" type=\"text/css\" href=\"%s\">\n", cssFile );
 
 
+	CString today;
+	today = theApp.getPresentDateTime();
 
 	CString header;
 	header.Format( L"\n\
 <pre>\n\
 Program:   %s\n\
 Adatbázis: %s\n\
+Készült:   %s\n\
 </pre>\n\n\
-", L"Families version " VERSION, theApp.m_databaseName );
+", L"Dragon version " VERSION, theApp.m_databaseName, today );
 
 	
 //	CString style;

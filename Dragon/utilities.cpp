@@ -769,12 +769,14 @@ CString date2date( CString date )
 	int pos1 = -1;
 	int pos2 = -1;
 	int n;
+	int	i;
 	int year;
 	int month = 0 ;
 	int day;
 	CString honap;
 	CString modifier(L"");
 	CString str;
+	CString modi[] = { L"kb", L"elõtt", L"után", L"körül" };
 
 
 	if( (pos1 = date.Find( L"BEF" ) ) != -1  || (pos2 = date.Find( L"AFT" ) ) != -1 )
@@ -784,6 +786,16 @@ CString date2date( CString date )
 		date = date.Mid( 4 );
 	}
 
+	for( i = 0; i < sizeof( TCHAR )/ sizeof( modi ); ++i )
+	{
+		if( ( pos1 = date.Find( modi[i] ) ) != -1 )
+		{
+			modifier = modi[i];
+			date = date.Left( pos1 );
+			break;
+		}
+	}
+
 	n = wordList( &A, date, ' ', FALSE );
 
 	if( n != 3 )
@@ -791,10 +803,20 @@ CString date2date( CString date )
 		date.Remove( '(' );
 		date.Remove( ')' );
 		date.Trim();
+
+		int len = date.GetLength();
+		if( len == 11 )
+		{
+			if( date.GetAt( len-1 ) == '.' )
+			{
+				str = date.Left( len-1 );
+				date = str;
+			}
+		}
 		return( date );
 	}
 	else
-	{
+	{										// 17 DEC 1944
 		day = _wtoi( A.GetAt(0) );
 		year = _wtoi( A.GetAt( 2 ) );
 

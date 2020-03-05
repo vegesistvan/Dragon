@@ -262,8 +262,9 @@ void CCheckSpouseAge::fillColumns()
 
 	if( !cnt )
 	{
-		str.Format( L"\n\nMinden házastárs kora a házasságkötéskor kisebb mint %d év\n", m_diff );
+		str.Format( L"\n\nMinden házastárs kora a házasságkötéskor nagyobb mint %d év\n", m_diff );
 		AfxMessageBox( str );
+		CDialogEx::OnOK();
 	}
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

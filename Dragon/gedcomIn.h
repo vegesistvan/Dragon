@@ -145,6 +145,7 @@ protected:
 	int		_ix;
 
 
+	int CGedcomIn::gedCHAR( CString fileSpec );
 	void CGedcomIn::fillVectors();
 	void CGedcomIn::fill_v_indi();
 	void CGedcomIn::fill_v_fam();

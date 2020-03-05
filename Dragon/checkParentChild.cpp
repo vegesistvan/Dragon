@@ -277,7 +277,6 @@ void CCheckParentChild::fillColumns()
 						++nItem;
 						++cnt;
 					}
-					++cnt;
 				}
 			}
 		}
@@ -291,6 +290,7 @@ void CCheckParentChild::fillColumns()
 	{
 		str.Format( L"\n\nMinden szülõ-gyermek korkülönbsége a megadott %d éven belül van\n", m_diff );
 		AfxMessageBox( str );
+		CDialogEx::OnOK();
 	}
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

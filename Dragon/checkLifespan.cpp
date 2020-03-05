@@ -183,20 +183,29 @@ death_date\
 	}
 	wndProgress.DestroyWindow();
 
-	if( _mfc )
+	if( _mfc ) fclose( theApp.fl );
+	if( cnt )
 	{
-		fclose( theApp.fl );
+		if( _mfc )
+		{
 
-		CLifespanListCtrl dlg;
-		dlg._fileSpec = fileSpec;
-		dlg._caption.Format( L"%d évnél tovább élt emberek", _lifespan );
-		dlg.DoModal();
+			CLifespanListCtrl dlg;
+			dlg._fileSpec = fileSpec;
+			dlg._caption.Format( L"%d évnél tovább élt emberek", _lifespan );
+			dlg.DoModal();
+		}
+		else
+		{
+			fwprintf(fl, L"\nElapsed time: %s\n", theApp.get_time_elapsed() );
+			fclose( fl );
+			theApp.showLogFile();
+		}
 	}
 	else
 	{
-		fwprintf(fl, L"\nElapsed time: %s\n", theApp.get_time_elapsed() );
-		fclose( fl );
-		theApp.showLogFile();
+		if( !_mfc ) fclose( fl );
+		str.Format( L"Minden ember élettartama kisebb mint %d év.", _lifespan );
+		AfxMessageBox( str );
 	}
 	CDialogEx::OnOK();
 }

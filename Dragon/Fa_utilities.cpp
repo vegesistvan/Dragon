@@ -1009,7 +1009,7 @@ void CFaApp::OnUsermanual()
 {
 	if( _waccess( m_helpFileSpec, 0 ) )
 	{
-		AfxMessageBox( L"Nincs a faHelp.chm fájl a program könyvtárában!" );
+		AfxMessageBox( L"Nincs a DragonHelp.chm fájl a program könyvtárában!" );
 		return;
 	}
 	else

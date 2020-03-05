@@ -335,7 +335,7 @@ void CTablePeople::OnFilterAncestors()
 {
 	if( theApp.m_inputMode != GAHTML )
 	{
-		m_filterTextNew = L"- õsök - nincsenek szülei, de van gyereke";
+		m_filterTextNew = L"- õsök - férfiak, akiknek nincsenek szülei, de van gyereke";
 		m_filterNew = L"sex_id = 1 AND (typeof(father_id) = 'null' OR father_id == 0 OR father_id = '' )\
 AND ( rowid IN (SELECT father_id FROM people ) OR rowid IN (SELECT mother_id FROM people) )";
 	}

@@ -73,12 +73,12 @@ BOOL CFaApp::InitInstance()
 	if( !exeDir.CompareNoCase( L"Release" ) || !exeDir.CompareNoCase( L"Debug" ) )
 	{
 		m_systemDatabaseSpec.Format( L"%s\\SYSTEM\\system.db", rootDir );
-		m_helpFileSpec.Format( L"%s\\SYSTEM\\faHelp.chm", rootDir ); 
+		m_helpFileSpec.Format( L"%s\\SYSTEM\\DragonHelp.chm", rootDir ); 
 	}
 	else
 	{
 		m_systemDatabaseSpec.Format( L"%s\\system.db", m_exePath ); 
-		m_helpFileSpec.Format( L"%s\\faHelp.chm", m_exePath ); 
+		m_helpFileSpec.Format( L"%s\\DragonHelp.chm", m_exePath ); 
 	}
 /* main database ***********************************************************************************************/
 	m_databaseSpec	= GetProfileString(	L"Settings", L"database", L"" );
@@ -86,10 +86,8 @@ BOOL CFaApp::InitInstance()
 	{
 		if( !selectDatabase() ) return false;
 	}
-	while( !openDatabase() )
-	{
-		selectDatabase();
-	}
+	
+	if( !openDatabase() ) return false;
 // system database ********************************************************************************************************/
 	if( _waccess( m_systemDatabaseSpec, 0 ) )
 	{
@@ -223,7 +221,8 @@ BOOL CFaApp::selectDatabase()
 		dlg.m_ofn.lpstrInitialDir = initialDir;
 	}
 
-	if( dlg.DoModal( ) == IDCANCEL ) return FALSE;
+	if( dlg.DoModal( ) == IDCANCEL ) 
+		return FALSE;
 
 	POSITION pos = dlg.GetStartPosition( );
 	newFile = dlg.GetNextPathName( pos );
@@ -329,7 +328,7 @@ BOOL CFaApp::openDatabase()
 
 	while( !openBlob() )
 	{
-		selectDatabase();
+		if( !selectDatabase() ) return false;
 	}
 
 	return TRUE;
