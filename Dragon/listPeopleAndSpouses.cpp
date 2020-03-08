@@ -56,7 +56,7 @@ BEGIN_MESSAGE_MAP(CListPeopleAndSpouses, CDialogEx)
 
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST, &CListPeopleAndSpouses::OnCustomdrawList)
 	ON_COMMAND(ID_EDITNOTEPAD, &CListPeopleAndSpouses::OnEditnotepad)
-	ON_COMMAND(ID_EDIT_NOTPAD_PARENTS, &CListPeopleAndSpouses::OnEditNotpadParents)
+//	ON_COMMAND(ID_EDIT_NOTPAD_PARENTS, &CListPeopleAndSpouses::OnEditNotpadParents)
 	ON_COMMAND(ID_LIST_PEOPLE, &CListPeopleAndSpouses::OnListPeople)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CListPeopleAndSpouses::OnDblclkList)
 

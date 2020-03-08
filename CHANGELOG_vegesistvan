@@ -1,3 +1,5 @@
+version 1.0.2 Új ember és a rokonség kézi adatbevitelének átalakítása. Hasonlítson az Ahnenblatt-ra.
+
 version 1.0.1 GEDCOM beolvasásnál a sync_fam_indi() javítása
 
 version 1.0.0 Fa új néven

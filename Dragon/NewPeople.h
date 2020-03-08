@@ -7,7 +7,8 @@ enum
 	MOTHER,
 	CHILD,
 	SPOUSE,
-	SIBLING
+	SIBLING,
+	NOBODY
 };
 
 class CNewPeople : public CDialogEx
@@ -21,6 +22,8 @@ public:
 // Dialog Data
 	enum { IDD = IDD_NEW_PEOPLE };
 // input
+
+	CString m_caption;
 	CString m_rowidMain;	// ember azonosítója, akinek egy rokonát meg akarjuk adni
 	CString m_rowidClick;	// a click-kelt ember azonosítója ( ha nincs, akkor empty ) ebebn adja vissza a megadott ember azonosítóját!
 	int		m_newPeople;	// milyen rokonát adjuk meg?

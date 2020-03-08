@@ -28,7 +28,9 @@
 #include "pictures.h"
 #include "Relations.h"
 #include "GedcomOut.h"
-#include "NewPeople.h"
+#include "NewPeople2.h"
+#include "Message.h"
+#include "Info.h"
 // GEDCOM
 enum
 {
@@ -159,9 +161,9 @@ BEGIN_MESSAGE_MAP(CTablePeople, CDialogEx)
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
 	ON_COMMAND(ID_FILTER_UNFILTER, &CTablePeople::OnFilterUnfilter)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CTablePeople::OnDblclkList)
-	ON_COMMAND(ID_EDIT_DELETE, &CTablePeople::OnEditDelete)
-	ON_COMMAND(ID_EDIT_INSERT, &CTablePeople::OnEditInsert)
-	ON_COMMAND(ID_EDIT_UPDATE, &CTablePeople::OnEditUpdate)
+	ON_COMMAND(ID_EDIT_DELETEFM, &CTablePeople::OnEditDelete)
+//	ON_COMMAND(ID_EDIT_INSERT, &CTablePeople::OnEditInsert)
+//	ON_COMMAND(ID_EDIT_UPDATE, &CTablePeople::OnEditUpdate)
 	ON_COMMAND(ID_RELATIONS, &CTablePeople::OnRelations)
 	ON_EN_CHANGE(IDC_SEARCH, &CTablePeople::OnChangeSearch)
 	ON_COMMAND(ID_FILTER_FILE, &CTablePeople::OnFilterFile)
@@ -1065,19 +1067,19 @@ LRESULT CTablePeople::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 	int		MENU_IDR;
 
 	if( theApp.m_inputMode == GEDCOM )
-		MENU_IDR = IDR_DROPDOWN_DELETE_RELATIONS;
+		MENU_IDR = IDR_DROPDOWN_DELETE;
 	else if( theApp.m_inputMode == GAHTML )
 		MENU_IDR = IDR_DROPDOWN_TABLE;
 	else if( theApp.m_inputMode == MANUAL )
-		MENU_IDR = IDR_DROPDOWN_DELETE_RELATIONS;
+		MENU_IDR = IDR_DROPDOWN_DELETE;
 
 	if(Menu.LoadMenu( MENU_IDR ))
     {
 		pPopup = Menu.GetSubMenu(0);
 		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
 		{
-			pPopup->EnableMenuItem(ID_RELATIONS,MF_BYCOMMAND | MF_GRAYED);
-			pPopup->EnableMenuItem(ID_EDIT_DELETE,MF_BYCOMMAND | MF_GRAYED);
+//			pPopup->EnableMenuItem(ID_RELATIONS,MF_BYCOMMAND | MF_GRAYED);
+//			pPopup->EnableMenuItem(ID_EDIT_DELETE,MF_BYCOMMAND | MF_GRAYED);
 		}
 		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
     }
@@ -1112,57 +1114,40 @@ void CTablePeople::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTablePeople::OnInputManual()
 {
+	CString message;
+	CString captiopn;
+	message = L"Már vannak emberek az adtbázisban.\nÚj ember csak akkor tanácsos megadni, ha nincs rokoni kapcsolatban \
+az adatbázisban már létezõ személyekkel.\n\
+Egyébként a rokonhoz kapcsolódóan lehet megadni.\n\n\
+Mégis megad új személyt?";
+
+	if( AfxMessageBox( message, MB_YESNO ) == IDNO ) return;
+
 	ShowWindow( SW_HIDE );
 
 	CNewPeople dlg;
-
-	dlg.m_newPeople = -1;
+	dlg.m_caption = L"Adj meg egy új embert!";
 	if( dlg.DoModal() == IDCANCEL ) return;
-
 	ShowWindow( SW_RESTORE );
 
-	m_command.Format( L"SELECT rowid, * FROM people WHERE rowid ='%s'", dlg.m_rowidClick );
-	if( !query( m_command ) ) return;
-
-	int nItem = m_ListCtrl.GetItemCount();
-
-	
-
-	fillRow( nItem-1 );
-
-	m_ListCtrl.DeleteAllItems();
-	m_ListCtrl.AttachDataset( &v_individuals );
-	m_ListCtrl.SetItemState( nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED);
-	m_ListCtrl.EnsureVisible( nItem, FALSE );
-
-/*
-	CString table(L"");
-
-	m_ListCtrl.SetSortOrder( 1, 1 );
-	while( TRUE )
+	if( dlg.m_inserted )
 	{
-		ShowWindow( SW_HIDE );
-		CEditPeople dlg;
-		dlg.m_caption = L"Új ember bevitele";
-		dlg.m_rowid.Empty();
-		dlg.m_table	= table;
-		if( dlg.DoModal() != IDCANCEL )
-		{
-			m_rowid = dlg.m_m;  // ez érthetetlen! dlg.m_rowid rossz!!!
-			table = dlg.m_table;
-//			insertRow();
-		}
-		else
-		{
-			ShowWindow( SW_RESTORE );
-			break;
-		}
-		ShowWindow( SW_RESTORE );
+		m_command.Format( L"SELECT rowid, * FROM people WHERE rowid ='%s'", dlg.m_rowid );
+		if( !query( m_command ) ) return;
+
+
+		fillRow( 0 );
+
+		int nItem  = m_ListCtrl.GetItemCount();
+		m_ListCtrl.DeleteAllItems();
+		m_ListCtrl.AttachDataset( &v_individuals );
+		m_ListCtrl.SetItemState( nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED);
+		m_ListCtrl.EnsureVisible( nItem, FALSE );
 	}
-*/
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 void CTablePeople::OnEditInsert()
 {
 	ShowWindow( SW_HIDE );
@@ -1186,7 +1171,7 @@ void CTablePeople::OnEditUpdate()
 
 	CNewPeople dlg;
 
-	dlg.m_rowidMain.Empty();
+	dlg.m_rowid.Empty();
 	nItem	= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED); 
 	if( nItem == -1 ) return;
 
@@ -1194,10 +1179,8 @@ void CTablePeople::OnEditUpdate()
 	last_name = m_ListCtrl.GetItemText( nItem, N_LAST_NAME );
 	name.Format( L"%s %s", last_name, first_name );
 
-	dlg.m_rowidClick	= m_ListCtrl.GetItemText( nItem, N_ROWID );
+	dlg.m_rowid	= m_ListCtrl.GetItemText( nItem, N_ROWID );
 	str.Format( L"%s szerkesztése", name );
-
-	dlg.m_newPeople = -1;
 
 	ShowWindow( SW_HIDE );
 	if( dlg.DoModal() == IDCANCEL ) return;
@@ -1209,6 +1192,7 @@ void CTablePeople::OnEditUpdate()
 //	m_ListCtrl.SetItemState( nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED);
 //	m_ListCtrl.EnsureVisible( nItem, FALSE );
 }
+*/
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTablePeople::OnEditDelete()
 {

@@ -34,7 +34,6 @@ BOOL CMessage::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-//	SetWindowPos(&wndTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 	SetWindowTextW( caption );
 	GetDlgItem( IDC_BUTTON )->SetWindowTextW( message ); 
 	return TRUE;

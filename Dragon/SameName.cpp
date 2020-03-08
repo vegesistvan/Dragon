@@ -48,8 +48,8 @@ void CSameName::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CSameName, CDialogEx)
 	ON_WM_SIZE()
 	ON_WM_SIZING()
-	ON_BN_CLICKED(IDC_OLD, &CSameName::OnClickedOld)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST, &CSameName::OnCustomdrawList)
+	ON_BN_CLICKED(IDOK, &CSameName::OnBnClickedOk)
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CSameName::OnInitDialog()
@@ -59,7 +59,6 @@ BOOL CSameName::OnInitDialog()
 	EASYSIZE_ADD( IDC_LIST,	ES_BORDER,	ES_BORDER,		ES_BORDER,		ES_BORDER,	0 );
 	EASYSIZE_ADD( IDC_EDIT,	ES_BORDER,	ES_BORDER,	ES_BORDER,		ES_KEEPSIZE,	0 );
 	EASYSIZE_ADD( IDOK,		ES_BORDER,	ES_KEEPSIZE,	ES_KEEPSIZE,	ES_BORDER,	0 );
-	EASYSIZE_ADD( IDC_OLD,	ES_BORDER,	ES_KEEPSIZE,	ES_KEEPSIZE,	ES_BORDER,	0 );
 	EASYSIZE_ADD( IDCANCEL,	ES_BORDER,	ES_KEEPSIZE,	ES_KEEPSIZE,	ES_BORDER,	0 );
 
 	EASYSIZE_INIT();
@@ -163,7 +162,7 @@ void CSameName::OnSizing(UINT fwSide, LPRECT pRect)
 	EASYSIZE_MINSIZE(430,314,fwSide,pRect); 
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSameName::OnClickedOld()
+void CSameName::OnBnClickedOk()
 {
 	int nItem	= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
 	if( nItem == - 1 )

@@ -92,8 +92,8 @@ public:
 	afx_msg LRESULT OnSetColumnColor(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnColumnSorted(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnEditDelete();
-	afx_msg void OnEditInsert();
-	afx_msg void OnEditUpdate();
+//	afx_msg void OnEditInsert();
+//	afx_msg void OnEditUpdate();
 	afx_msg void OnRelations();
 	afx_msg void OnFilterUnfilter();
 	afx_msg void OnFilterAncestors();

@@ -56,6 +56,7 @@ BOOL CNewPeople::OnInitDialog()
 	CString command;
 	CString caption;
 
+	SetWindowText( m_caption );
 	// a megklikkelt ember: 
 //	if( !m_rowidClick.IsEmpty() && m_newPeople != CHILD ) 
 	if( !m_rowidClick.IsEmpty() ) 
@@ -198,7 +199,7 @@ void CNewPeople::newChild()
 {
 	CString caption;
 	caption.Format( L"Add meg %s és %s gyerekét!", m_name, m_nameMain );
-	SetWindowText( caption );
+//	SetWindowText( caption );
 	if( m_sexIdMain == MAN )
 	{
 		GetDlgItem( IDC_LAST_NAME )->SetWindowTextW( m_lastNameMain );
@@ -207,6 +208,7 @@ void CNewPeople::newChild()
 	{
 		GetDlgItem( IDC_LAST_NAME )->SetWindowTextW( m_last_name );   // megklikkelt ember neve
 	}
+	comboSex.SetCurSel( 0 );
 	keybd_event(VK_TAB,0x8f,0 , 0);					// Tab Press
 	keybd_event(VK_TAB,0x8f, KEYEVENTF_KEYUP,0);	// Tab Release
 }

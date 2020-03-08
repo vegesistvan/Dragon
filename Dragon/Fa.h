@@ -18,8 +18,6 @@
 #include "textfile.h"
 #include "WM_USER.h"
 
-
-
 #define	TOSCREEN FALSE
 #define	FROMSCREEN TRUE
 

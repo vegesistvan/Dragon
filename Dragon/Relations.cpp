@@ -15,11 +15,12 @@
 #include "setup.h"
 #include "html_Lines.h"
 #include "pictures.h"
-#include "NewPeople.h"
+#include "NewPeople2.h"
 #include "EditPeople.h"
 #include "EditMarriage.h"
 #include "Help.h"
 #include "EditComment.h"
+#include "MoreSpouses.h"
 
 #define BISEX 0
 #define MAN   1
@@ -149,6 +150,8 @@ void CRelations::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_TABLE, colorTable);
 	DDX_Text(pDX, IDC_EDIT_OCCUPATION, m_occupation);
 	DDX_Control(pDX, IDC_STATIC_COMMENT, colorComment);
+	DDX_Control(pDX, IDC_CHILDREN, colorChildren);
+	DDX_Control(pDX, IDC_NAME, colorName);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CRelations, CDialogEx)
@@ -169,17 +172,37 @@ ON_STN_CLICKED(IDC_MARRIAGES, &CRelations::OnClickedMarriages)
 ON_STN_CLICKED(IDC_NEW_FATHER, &CRelations::OnClickedNewFather)
 ON_STN_CLICKED(IDC_NEW_MOTHER, &CRelations::OnClickedNewMother)
 ON_STN_CLICKED(IDC_SIBLINGS, &CRelations::OnClickedSiblings)
+ON_STN_CLICKED(IDC_CHILDREN, &CRelations::OnClickedChildren)
+
 
 ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
 ON_BN_CLICKED(ID_EDIT_DELETE, &CRelations::OnEditDelete )
 ON_BN_CLICKED(ID_EDIT_UPDATE, &CRelations::OnEditUpdate )
 ON_BN_CLICKED(ID_EDIT_GYEREK, &CRelations::OnEditGyerek )
+
 ON_WM_PAINT()
 ON_COMMAND(ID_HELP, &CRelations::OnHelp)
 ON_COMMAND(ID_PICTURES, &CRelations::OnPictures)
 ON_BN_CLICKED(IDOK, &CRelations::OnBnClickedOk)
 ON_STN_DBLCLK(IDC_TABLE, &CRelations::OnDblclkTabla)
 ON_STN_CLICKED(IDC_STATIC_COMMENT, &CRelations::OnClickedStaticComment)
+ON_NOTIFY(NM_THEMECHANGED, IDC_STATIC_TABLE, &CRelations::OnThemechangedStaticTable)
+ON_CBN_SELCHANGE(IDC_COMBO_SEX, &CRelations::OnSelchangeComboSex)
+ON_CBN_SELCHANGE(IDC_COMBO_TITLE, &CRelations::OnSelchangeComboTitle)
+ON_EN_CHANGE(IDC_TITOLO, &CRelations::OnChangeTitolo)
+ON_EN_CHANGE(IDC_LAST_NAME, &CRelations::OnChangeLastName)
+ON_EN_CHANGE(IDC_FIRST_NAME, &CRelations::OnChangeFirstName)
+ON_EN_CHANGE(IDC_BIRTH_PLACE, &CRelations::OnChangeBirthPlace)
+ON_EN_CHANGE(IDC_BIRTH_DATE, &CRelations::OnChangeBirthDate)
+ON_CBN_SELCHANGE(IDC_COMBO_BIRTH, &CRelations::OnSelchangeComboBirth)
+ON_EN_CHANGE(IDC_EDIT_OCCUPATION, &CRelations::OnChangeEditOccupation)
+ON_EN_CHANGE(IDC_DEATH_PLACE, &CRelations::OnChangeDeathPlace)
+ON_EN_CHANGE(IDC_DEATH_DATE, &CRelations::OnChangeDeathDate)
+ON_CBN_SELCHANGE(IDC_COMBO_DEATH, &CRelations::OnSelchangeComboDeath)
+ON_EN_CHANGE(IDC_COMMENT, &CRelations::OnChangeComment)
+
+
+
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CRelations::OnInitDialog()
@@ -193,6 +216,7 @@ BOOL CRelations::OnInitDialog()
 	colorNewFather.SetTextColor( theApp.m_colorClick );
 	colorNewMother.SetTextColor( theApp.m_colorClick );
 	colorComment.SetTextColor( theApp.m_colorClick );
+	colorChildren.SetTextColor( theApp.m_colorClick );
 
 	m_command = L"SELECT title FROM titles";
 	if( ! theApp.querySystem( m_command ) ) return FALSE;
@@ -285,9 +309,8 @@ void CRelations:: createScreen( CString rowid )
 //		str.Format( L"%s - %s       LDblClick: váltás az ember rokonságára   RDblClick: a list aembereinek ga.html sorai", tableHeader, theApp.sourceA[sourceI] );
 //	else
 //		str.Format( L"%s - %s       LDblClick: váltás az ember rokonságára", tableHeader, theApp.sourceA[sourceI] );
-	str.Format( L"%s és rokonai", m_name );
+	str.Format( L"%s (rowid=%s) és rokonai", m_name, rowid );
 	SetWindowText( str );
-
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////// S Z Ü L Õ K //////////////////////////////////////////////////////////////////////
@@ -423,6 +446,10 @@ void CRelations::people( CString rowid )
 	birth.Trim();
 	death.Trim();
 
+	colorName.SetTextColor( colorRed );
+	GetDlgItem( IDC_NAME )->SetWindowText( m_name );
+	m_changed = false;
+
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////// S Z Ü L Õ K //////////////////////////////////////////////////////////////////////
@@ -554,12 +581,12 @@ void CRelations::hazastarsak( CString rowid, int sex_id )
 		if( rowid == spouse1_id )
 		{
 			m_command.Format( L"SELECT rowid,* FROM people WHERE rowid ='%s'",spouse2_id );
-			order = orderWife;
+			order = orderHusband;
 		}
 		else
 		{
 			m_command.Format( L"SELECT rowid,* FROM people WHERE rowid ='%s'",spouse1_id );
-			order = orderHusband;
+			order = orderWife;
 		}
 		lineNumber		= m_recordset->GetFieldString( PEOPLE_LINENUMBER );
 		if( !query2( m_command ) ) return;
@@ -718,50 +745,17 @@ BOOL CRelations::query2( CString command )
 	}
 	return TRUE;
 }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-void CRelations::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	NMLVCUSTOMDRAW* pLVCD = reinterpret_cast<NMLVCUSTOMDRAW*>( pNMHDR );
-	
-	int nItem;
-	int nCol;
-	int iData;
-
-	*pResult = 0;
-
-	switch( pLVCD->nmcd.dwDrawStage )
-	{
-	case CDDS_PREPAINT:
-		*pResult = CDRF_NOTIFYITEMDRAW;
-		break;
-	case CDDS_ITEMPREPAINT:
-		*pResult = CDRF_NOTIFYSUBITEMDRAW;
-		break;
-	case CDDS_ITEMPREPAINT|CDDS_SUBITEM:
-		nItem	= pLVCD->nmcd.dwItemSpec;
-		nCol	= pLVCD->iSubItem;
-		iData	= m_ListCtrl.GetItemData( nItem );
-//		if( iData  )
-		{
-			pLVCD->clrText = RGB(250,  0,  0);
-		}
-		*pResult = CDRF_DODEFAULT;
-		break;
-	}
-}
-*/
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 void CRelations::OnDblclkListM(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	int nItem	= pNMItemActivate->iItem;
 	CString rowid = m_ListCtrlM.GetItemText( nItem, LISTM_ROWID );
+	if( m_changed ) savePeople();
 	createScreen( rowid );
 	*pResult = 0;
 }
@@ -772,6 +766,7 @@ void CRelations::OnDblclkListS(NMHDR *pNMHDR, LRESULT *pResult)
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	int nItem	= pNMItemActivate->iItem;
 	CString rowid = m_ListCtrlS.GetItemText( nItem, LISTP_ROWID );
+	if( m_changed ) savePeople();
 	createScreen( rowid );
 
 	*pResult = 0;
@@ -783,6 +778,7 @@ void CRelations::OnDblclkListP(NMHDR *pNMHDR, LRESULT *pResult)
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	int nItem	= pNMItemActivate->iItem;
 	CString rowid = m_ListCtrlP.GetItemText( nItem, LISTP_ROWID );
+	if( m_changed ) savePeople();
 	createScreen( rowid );
 	*pResult = 0;
 }
@@ -792,6 +788,7 @@ void CRelations::OnDblclkListC(NMHDR *pNMHDR, LRESULT *pResult)
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	int nItem	= pNMItemActivate->iItem;
 	CString rowid = m_ListCtrlC.GetItemText( nItem, LISTP_ROWID );
+	if( m_changed ) savePeople();
 	createScreen( rowid );
 	*pResult = 0;
 }
@@ -799,17 +796,6 @@ void CRelations::OnDblclkListC(NMHDR *pNMHDR, LRESULT *pResult)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//void CRelations::OnRdblclkList(NMHDR *pNMHDR, LRESULT *pResult)
-//{
-//	if( theApp.m_inputMode != GAHTML ) return;
-//	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-//	int nItem = pNMItemActivate->iItem;
-//
-//	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	LIST_LINENUMBER ) );
-//	theApp.listHtmlLine( lineNumber );
-//	*pResult = 0;
-//}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CRelations::OnRdblclkListP(NMHDR *pNMHDR, LRESULT *pResult)
 {
@@ -898,23 +884,6 @@ void CRelations::OnRdblclkListC(NMHDR *pNMHDR, LRESULT *pResult)
 void CRelations::OnRdblclkListS(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	if( theApp.m_inputMode != GAHTML ) return;
-/*
-	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	
-	
-	CPoint* point=(CPoint*)pNMItemActivate->lParam;
-
-	CMenu	Menu;
-	CMenu*	pPopup;
-
-
-	if(Menu.LoadMenu( IDR_DROPDOWN_HTML_P ))
-    {
-		pPopup = Menu.GetSubMenu(0);
-		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
-    }	
-*/	
-	
 	std::vector<CString> vLines;
 
 	int cnt = 0;
@@ -963,13 +932,40 @@ void CRelations::OnClickedMarriages()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CRelations::newSpouse( int db )
 {
+	CString caption;
+	CString rowidH;
+	CString rowidW;
+	int		orderHusband = 1;
+	int		orderWife = 1;
+
+	if( m_sex_id == MAN )
+	{
+		rowidH = m_rowid;
+		caption.Format( L"Add meg %s feleségét!", m_name );
+		orderWife = m_ListCtrlM.GetItemCount() + 1;
+	}
+	else
+	{
+		rowidW = m_rowid;
+		caption.Format( L"Add meg %s férjét!", m_name );
+		orderHusband = m_ListCtrlM.GetItemCount() + 1;
+	}
+
 	CNewPeople dlg;
-	
-	dlg.EDIT		= false;
-	dlg.m_rowidMain	= p_rowid;
-	dlg.m_rowidClick.Empty();
-	dlg.m_newPeople = SPOUSE;
+	dlg.m_caption = caption;
 	if( dlg.DoModal() == IDCANCEL ) return false;
+
+
+	if( m_sex_id == dlg.m_sex_id )
+	{
+		AfxMessageBox( L"A házaspár azonos nemû!" );
+		return( false );
+	}
+	if( m_sex_id == MAN )
+		m_command.Format( L"INSERT INTO marriages ( spouse1_id, spouse2_id, orderHusband  ) VALUES ('%s', '%s', %d )", m_rowid, dlg.m_rowid, orderWife );
+	else
+		m_command.Format( L"INSERT INTO marriages ( spouse1_id, spouse2_id, orderWife ) VALUES ('%s', '%s', %d )", dlg.m_rowid, m_rowid, orderHusband );
+	theApp.execute( m_command );
 
 	hazastarsak( p_rowid, m_sex_id );
 	return true;
@@ -979,35 +975,24 @@ void CRelations::OnClickedNewFather()
 {
 	CString rowidF;
 	rowidF = m_ListCtrlP.GetItemText( 0, 2 );
-	if( rowidF.IsEmpty() )
-	{
-		if( !newFather() ) return;
-	}
-	else
+	if( !rowidF.IsEmpty() )
 	{
 		str.Format( L"Meg akarod változtatni %s apját?", m_name );
 		if( AfxMessageBox( str, MB_YESNO ) == IDNO ) return;
-		if( !newFather() ) return;
 	}
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CRelations::newFather()
-{
+
 	CNewPeople dlg;
-	CString father;
-	CString mother;
+	
+	dlg.m_last_name = m_last_name;
+	if( dlg.DoModal() == IDCANCEL ) return;
 
-	dlg.EDIT		= false;
-	dlg.m_rowidMain = p_rowid;
-	dlg.m_rowidClick.Empty();
-	dlg.m_newPeople = FATHER;
-	if( dlg.DoModal() == IDCANCEL ) return false;
+	m_father_id = dlg.m_rowid;
+	m_command.Format( L"UPDATE people SET father_id ='%s' WHERE rowid='%s'", m_father_id, m_rowid );
+	if( !theApp.execute( m_command ) ) return;
 
-	m_father_id = dlg.m_rowidClick;
 	szulok( m_father_id, m_mother_id );
-
 	insertMarriage();
-	return true;
+	return;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1015,32 +1000,23 @@ void CRelations::OnClickedNewMother()
 {
 	CString rowidM;
 	rowidM = m_ListCtrlP.GetItemText( 1, 2 );
-	if( rowidM.IsEmpty() )
-	{
-		if( !newMother() ) return;
-	}
-	else
+	if( !rowidM.IsEmpty() )
 	{
 		str.Format( L"Meg akarod változtatni %s anyját?", m_name );
 		if( AfxMessageBox( str, MB_YESNO ) == IDNO ) return;
-		if( !newMother() ) return;
 	}
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CRelations::newMother()
-{
+
 	CNewPeople dlg;
+	dlg.m_last_name.Empty();
+	if( dlg.DoModal() == IDCANCEL ) return;
 
-	dlg.EDIT		= false;
-	dlg.m_rowidClick.Empty();
-	dlg.m_rowidMain = p_rowid;
-	dlg.m_newPeople = MOTHER;
-	if( dlg.DoModal() == IDCANCEL ) return false;
+	m_mother_id = dlg.m_rowid;
+	m_command.Format( L"UPDATE people SET mother_id ='%s' WHERE rowid='%s'", m_mother_id, m_rowid );
+	if( !theApp.execute( m_command ) ) return;
 
-	m_mother_id = dlg.m_rowidClick;
 	szulok( m_father_id, m_mother_id );
 	insertMarriage();
-	return true;
+	return;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CRelations::insertMarriage()
@@ -1063,20 +1039,63 @@ void CRelations::insertMarriage()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CRelations::OnClickedSiblings()
 {
-	int parentCnt = m_ListCtrlP.GetItemCount();
-	if( parentCnt == 0 )
-	{
-		AfxMessageBox( L"Csak akkor lehet testvért megadni,\nha vagy az apa vagy az anya vagy mindkettõ ismert!" );
-		return;
-	}
+	int parentCnt = m_ListCtrlM.GetItemCount();
+
+	CString father_id;
+	CString mother_id;
+	int		mother_index = 1;
 
 	CNewPeople dlg;
-	dlg.m_rowidClick.Empty();
-	dlg.m_rowidMain = p_rowid;
-	dlg.m_newPeople = SIBLING;
-	if( dlg.DoModal() == IDCANCEL ) return;
+	dlg.m_last_name = m_last_name;
 
-	testverek( p_rowid, m_father_id, m_mother_id );
+	if( dlg.DoModal() == IDCANCEL ) return;
+	switch( parentCnt )
+	{
+	case 0:			// csak az egyik szülõ ismert
+		if( m_sex_id == MAN )
+		{
+			father_id = m_rowid;
+			mother_id.Empty();
+		}
+		else
+		{
+			father_id.Empty();
+			mother_id = m_rowid;
+		}
+		break;
+	case 1:
+		if( m_sex_id == MAN )
+		{
+			father_id = m_rowid;
+			mother_id = m_ListCtrlM.GetItemText( 0, LISTM_ROWID );
+		}
+		else
+		{
+			father_id = m_ListCtrlM.GetItemText( 0, LISTM_ROWID );
+			mother_id = m_rowid;
+		}
+		break;
+	default:
+		CMoreSpouses dlg;
+		dlg.m_rowid = m_rowid;
+		dlg.m_sex_id = m_sex_id;
+		if( dlg.DoModal() == IDCANCEL  ) return;
+		mother_index = dlg.m_mother_index;
+		if( m_sex_id == MAN )
+		{
+			father_id = m_rowid;
+				mother_id = m_ListCtrlM.GetItemText( mother_index - 1, LISTM_ROWID );
+		}
+		else
+		{
+			father_id = m_ListCtrlM.GetItemText( mother_index - 1, LISTM_ROWID );
+			mother_id = m_rowid;
+		}
+		break;
+	}
+	m_command.Format( L"UPDATE people SET father_id='%s', mother_id='%s', mother_index=%d WHERE rowid = '%s'", father_id, mother_id, mother_index, dlg.m_rowid );
+	theApp.execute( m_command );
+	testverek( p_rowid, father_id, mother_id );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1086,32 +1105,18 @@ LRESULT CRelations::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
     CMenu	Menu;
 	CMenu*	pPopup;
 
-//	CRect rect;
 	CRect rectP;
 	CRect rectM;
 	CRect rectS;
 	CRect rectC;
 
 	listCtrlFlag = -1;
-//	GetDlgItem( IDC_LIST )->GetWindowRect( rect );
+
 	GetDlgItem( IDC_LISTP )->GetWindowRect( rectP );
 	GetDlgItem( IDC_LISTM )->GetWindowRect( rectM );
 	GetDlgItem( IDC_LISTS )->GetWindowRect( rectS );
 	GetDlgItem( IDC_LISTC )->GetWindowRect( rectC );
 
-/*
-	if( rect.top <= point->y && point->y <= rect.bottom )					// a fõember
-	{
-	//	if( m_ListCtrl.GetNextItem(-1, LVNI_SELECTED) == -1 ) return false; 
-		listCtrlFlag = PP;
-		if(Menu.LoadMenu( IDR_DROPDOWN_UPDATE ))
-		{
-			pPopup = Menu.GetSubMenu(0);
-			pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
-		}
-		return TRUE;
-    }
-*/
 	if( rectP.top <= point->y && point->y <= rectP.bottom )			// szülei
 	{
 		if( m_ListCtrlP.GetNextItem(-1, LVNI_SELECTED) == -1 ) return false; 
@@ -1235,20 +1240,15 @@ void CRelations::OnEditGyerek()
 
 	CNewPeople dlg;
 
-	dlg.nItem		= nItem;		// a gyerek sorszáma!!!
-	dlg.m_rowidMain = m_rowid;		// egyik szülõ
-	dlg.m_rowidClick	= rowidM;		// másik szülõ
-	dlg.m_newPeople = CHILD;
-	dlg.m_mother_index = nItem + 1;
 	if( m_sex_id == MAN )
 	{
-		dlg.m_orderFather = m_ListCtrlC.GetItemCount() + 1;
-		dlg.m_orderMother = getOrderMother( rowidM );		// az anya rowid-ja
+//		dlg.m_orderFather = m_ListCtrlC.GetItemCount() + 1;
+//		dlg.m_orderMother = getOrderMother( rowidM );		// az anya rowid-ja
 	}
 	else
 	{
-		dlg.m_orderFather = getOrderFather( rowidM );		// az apa rowid-ja
-		dlg.m_orderMother = m_ListCtrlC.GetItemCount() + 1;
+//		dlg.m_orderFather = getOrderFather( rowidM );		// az apa rowid-ja
+//		dlg.m_orderMother = m_ListCtrlC.GetItemCount() + 1;
 	}
 
 	if( dlg.DoModal() == IDCANCEL ) return;
@@ -1266,7 +1266,6 @@ void CRelations::OnEditUpdate()
 
 	CNewPeople dlg;
 
-	dlg.m_rowidMain.Empty();
 	switch( listCtrlFlag )
 	{
 	case PP:
@@ -1287,9 +1286,9 @@ void CRelations::OnEditUpdate()
 		nItem	= m_ListCtrlP.GetNextItem(-1, LVNI_SELECTED); 
 		if( nItem == -1 ) return;
 		name = m_ListCtrlP.GetItemText( nItem, LISTP_NAME );
-		dlg.m_rowidClick	= m_ListCtrlP.GetItemText( nItem, LISTP_ROWID );
+		dlg.m_rowid	= m_ListCtrlP.GetItemText( nItem, LISTP_ROWID );
 		str.Format( L"%s szerkesztése", name );
-		dlg.m_newPeople = -1;
+//		dlg.m_newPeople = -1;
 		dlg.DoModal();
 		szulok( m_father_id, m_mother_id );
 		break;
@@ -1297,9 +1296,9 @@ void CRelations::OnEditUpdate()
 		nItem	= m_ListCtrlM.GetNextItem(-1, LVNI_SELECTED); 
 		if( nItem == -1 ) return;
 		name = m_ListCtrlM.GetItemText( nItem, LISTM_NAME );
-		dlg.m_rowidClick	= m_ListCtrlM.GetItemText( nItem, LISTM_ROWID );
+//		dlg.m_rowidClick	= m_ListCtrlM.GetItemText( nItem, LISTM_ROWID );
 		str.Format( L"%s szerkesztése", name );
-		dlg.m_newPeople = -1;
+//		dlg.m_newPeople = -1;
 		dlg.DoModal();
 		hazastarsak( p_rowid, m_sex_id );
 		break;
@@ -1307,19 +1306,19 @@ void CRelations::OnEditUpdate()
 		nItem	= m_ListCtrlS.GetNextItem(-1, LVNI_SELECTED); 
 		if( nItem == -1 ) return;
 		name = m_ListCtrlS.GetItemText( nItem, LISTS_NAME );
-		dlg.m_rowidClick	= m_ListCtrlS.GetItemText( nItem, LISTS_ROWID );
+//		dlg.m_rowidClick	= m_ListCtrlS.GetItemText( nItem, LISTS_ROWID );
 		str.Format( L"%s szerkesztése", name );
-		dlg.m_newPeople = -1;
+//		dlg.m_newPeople = -1;
 		dlg.DoModal();
 		testverek( p_rowid, m_father_id, m_mother_id  );
 		break;
 	case C:
 		nItem	= m_ListCtrlC.GetNextItem(-1, LVNI_SELECTED); 
 		if( nItem == -1 ) return;
-		dlg.m_rowidClick	= m_ListCtrlC.GetItemText( nItem, LISTC_ROWID );
+//		dlg.m_rowidClick	= m_ListCtrlC.GetItemText( nItem, LISTC_ROWID );
 		name = m_ListCtrlC.GetItemText( nItem, LISTC_NAME );
 		str.Format( L"%s szerkesztése", name );
-		dlg.m_newPeople = -1;
+//		dlg.m_newPeople = -1;
 		dlg.DoModal();
 		gyerekek( p_rowid, m_sex_id );
 		break;
@@ -1418,15 +1417,12 @@ void CRelations::OnPaint()
 	float bmRatio	= (float)bm.bmWidth/(float)bmHeight;
 
 	CRect rect;		// a dlg ablak méretei 0,0 pontból ( Windows koordinátákban )
-//	CRect rectW;	// a dlg ablak adatai  ( 0,0 pont a menü alatt!!
 	CRect rectE;	
 
 	GetClientRect(&rect);
 	GetWindowRect( rectW );
-//	GetDlgItem( IDC_TITLE )->GetWindowRect( rectE );
 
 	int height = rectW.Height()/2;				// a transzformát kép magassága az ablak feléig!
-//	height = rectE.top - rectW.top - 72 ;
 	height = 160;
 
 	int width = (int) (height * bmRatio );		// a transzformált kép szélessége a bmRatio-val arányos
@@ -1435,9 +1431,9 @@ void CRelations::OnPaint()
 	int cB = width/2;						// a sarokban lévõ kép középpontjának x koordinátája
 	int x = cW - cB;						// az ablak új sarka
 
-	x = rect.right - width - 10;
+	x = rect.right - width - 20;
 
-	int	y = 10;
+	int	y = 120;
 
 	dc.SetStretchBltMode( STRETCH_HALFTONE );
 	dc.StretchBlt( x, y, width, height, &dcMemory, 0,0, bmWidth, bmHeight, SRCCOPY);	
@@ -1542,6 +1538,7 @@ birth_place='%s',\
 birth_date='%s',\
 death_place='%s',\
 death_date='%s',\
+occupation='%s',\
 comment='%s'\
 ",\
 m_tableNumber,\
@@ -1554,6 +1551,7 @@ m_birth_place,\
 m_birth_date,\
 m_death_place,\
 m_death_date,\
+m_occupation,\
 m_comment\
 );
 	m_command.Format( L"UPDATE people SET %s WHERE rowid='%s'", set, m_rowid );
@@ -1588,3 +1586,176 @@ void CRelations::OnClickedStaticComment()
 	UpdateData( TOSCREEN );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CRelations::OnThemechangedStaticTable(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	m_changed = true;
+	*pResult = 0;
+}
+void CRelations::OnSelchangeComboSex()
+{
+	m_changed = true;
+}
+void CRelations::OnSelchangeComboTitle()
+{
+	m_changed = true;
+}
+void CRelations::OnChangeTitolo()
+{
+	m_changed = true;
+}
+void CRelations::OnChangeLastName()
+{
+	m_changed = true;
+}
+void CRelations::OnChangeFirstName()
+{
+	m_changed = true;
+}
+void CRelations::OnChangeBirthPlace()
+{
+	m_changed = true;
+}
+void CRelations::OnChangeBirthDate()
+{
+	m_changed = true;
+}
+
+void CRelations::OnSelchangeComboBirth()
+{
+	m_changed = true;
+}
+void CRelations::OnChangeEditOccupation()
+{
+	m_changed = true;
+}
+void CRelations::OnChangeDeathPlace()
+{
+	m_changed = true;
+}
+void CRelations::OnChangeDeathDate()
+{
+	m_changed = true;
+}
+void CRelations::OnSelchangeComboDeath()
+{
+	m_changed = true;
+}
+void CRelations::OnChangeComment()
+{
+	m_changed = true;
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CRelations::OnClickedChildren()
+{
+	CString last_name;
+	CString father;
+	CString mother;
+	CString rowidF;		// apa 
+	CString rowidM;		// anya
+	int		mother_index = 1;
+	
+	int n = m_ListCtrlM.GetItemCount();		// házasrtásak száma
+	switch( n )
+	{
+		case 0:							// csak 1 szülõ van
+			if( m_sex_id == MAN )		// apa van, anya nincs
+			{
+				if( AfxMessageBox( L"Az anya nincs megadva!\nAkkor is megadsz egy gyereket?", MB_YESNO ) == IDNO ) return;
+				rowidF = m_rowid;
+				father.Format( L"%s %s", m_last_name, m_first_name );
+				rowidM.Empty();
+				last_name = m_last_name;
+			}
+			else						// anya van, apa nincs
+			{
+				if( AfxMessageBox( L"Az apa nincs megadva!\nAkkor is megadsz egy gyereket?", MB_YESNO ) == IDNO ) return;
+				rowidM = m_rowid;
+				mother.Format( L"%s %s", m_last_name, m_first_name );
+				rowidF.Empty();
+				mother_index = 1;
+				last_name.Empty();
+			}
+			break;
+		case 1:							// 1 apa és 1 anya van
+			if( m_sex_id == MAN )
+			{
+				rowidF = m_rowid;										// apa a fõ ember
+				rowidM = m_ListCtrlM.GetItemText( 0, LISTM_ROWID );	// anya a házastárs
+				father.Format( L"%s %s", m_last_name, m_first_name );
+				mother = m_ListCtrlM.GetItemText( 0, LISTM_NAME );
+				last_name = m_last_name;
+			}
+			else
+			{
+				rowidM = m_rowid;										// anaya  fõ ember
+				rowidF = m_ListCtrlM.GetItemText( 0, LISTM_ROWID );	// apa aházastárs
+				mother.Format( L"%s %s", m_last_name, m_first_name );
+				father = m_ListCtrlM.GetItemText( 0, LISTM_NAME );
+				last_name = getFirstWord( father );
+			}
+			mother_index= 1;
+			break;
+		default:						// Az egyik szülõnke több házastûársa van
+			CMoreSpouses dlg;
+			dlg.m_rowid = m_rowid;
+			dlg.m_sex_id = m_sex_id;
+			if( dlg.DoModal() == IDCANCEL  ) return;
+
+			mother_index = dlg.m_mother_index;
+			if( m_sex_id == MAN )
+			{
+				rowidF = m_rowid;
+				rowidM = dlg.m_rowid;
+				father.Format( L"%s %s", m_last_name, m_first_name );
+				mother = m_ListCtrlM.GetItemText( mother_index-1, LISTM_NAME );
+				last_name = m_last_name;
+			}
+			else
+			{
+				rowidF = dlg.m_rowid;
+				rowidM = m_rowid;
+				mother.Format( L"%s %s", m_last_name, m_first_name );
+				father = m_ListCtrlM.GetItemText( mother_index-1, LISTM_NAME );
+				last_name = getFirstWord( father );
+			}
+			break;
+	}
+
+	CNewPeople dlg;
+	dlg.m_last_name = last_name;
+
+	if( !father.IsEmpty() && !mother.IsEmpty() )
+		dlg.m_caption.Format( L"Add meg %s és %s gyerekét!", father, mother );
+	else if ( !father.IsEmpty() )
+		dlg.m_caption.Format( L"Add meg %s gyerekét!", father );
+	else 
+		dlg.m_caption.Format( L"Add meg %s gyerekét!", mother );
+
+	int nItem	= m_ListCtrlC.GetNextItem(-1, LVNI_SELECTED); 
+	dlg.nItem			= nItem + 1;		// a gyerek sorszáma!!!
+
+	int orderFather;
+	int orderMother;
+
+	if( m_sex_id == MAN )
+	{
+		orderFather = m_ListCtrlC.GetItemCount() + 1;
+		orderMother = getOrderMother( rowidM );		// az anya rowid-ja
+	}
+	else
+	{
+		orderFather = getOrderFather( rowidF );		// az apa rowid-ja
+		orderMother = m_ListCtrlC.GetItemCount() + 1;
+	}
+	if( dlg.DoModal() == IDCANCEL ) return;
+	m_command.Format( L"UPDATE people SET father_id='%s', mother_id='%s', orderFather=%d, orderMother=%d WHERE rowid = '%s'", rowidF, rowidM, orderFather, orderMother, dlg.m_rowid );
+	if( !theApp.execute( m_command ) ) return;
+
+	gyerekek( p_rowid, m_sex_id );  // m_sex_id: apa vagy anya gyerekeit listázzuk? 
+}

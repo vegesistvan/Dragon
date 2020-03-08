@@ -30,7 +30,7 @@ public:
 	CSqliteDBRecordSet*	 m_recordset2;
 // Dialog Data
 	enum { IDD = IDD_RELATIONS };
-
+	CString m_command;
 	CString m_rowid;
 
 
@@ -45,6 +45,7 @@ public:
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
+	bool	m_changed;
 	bool	m_paint;
 	CString	m_fileSpec;
 	CRect	rectW;
@@ -60,7 +61,6 @@ protected:
 	CString m_name;
 	
 	CString	str;
-	CString m_command;
 	CString m_father_id;
 	CString m_mother_id;
 
@@ -89,8 +89,8 @@ protected:
 	void	gyerekek( CString rowid, int sex_id );
 
 	bool	newSpouse( int db );
-	bool	newFather();
-	bool	newMother();
+//	bool	newFather();
+//	bool	newMother();
 	void	insertMarriage();
 	void	savePeople();
 
@@ -99,7 +99,6 @@ protected:
 	int		getOrderMother( CString rowid );
 	int		getOrderFather( CString rowid );
 
-//	CListCtrlEx m_ListCtrl;
 	CListCtrlEx m_ListCtrlP;
 	CListCtrlEx m_ListCtrlM;
 	CListCtrlEx m_ListCtrlS;
@@ -169,4 +168,21 @@ public:
 	afx_msg void OnClickedStaticComment();
 	CString m_occupation;
 	CColorStatic colorComment;
+	afx_msg void OnThemechangedStaticTable(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnSelchangeComboSex();
+	afx_msg void OnSelchangeComboTitle();
+	afx_msg void OnChangeTitolo();
+	afx_msg void OnChangeLastName();
+	afx_msg void OnChangeFirstName();
+	afx_msg void OnChangeBirthPlace();
+	afx_msg void OnChangeBirthDate();
+	afx_msg void OnSelchangeComboBirth();
+	afx_msg void OnChangeEditOccupation();
+	afx_msg void OnChangeDeathPlace();
+	afx_msg void OnChangeDeathDate();
+	afx_msg void OnSelchangeComboDeath();
+	afx_msg void OnChangeComment();
+	afx_msg void OnClickedChildren();
+	CColorStatic colorChildren;
+	CColorStatic colorName;
 };

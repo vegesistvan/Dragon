@@ -7,6 +7,7 @@
 class CSameName : public CDialogEx
 {
 	DECLARE_DYNAMIC(CSameName)
+	DECLARE_EASYSIZE
 
 public:
 	CSameName(CWnd* pParent = NULL);   // standard constructor
@@ -31,15 +32,13 @@ public:
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
-
+	CListCtrlEx m_ListCtrl;
 	void fillTable();
 	DECLARE_MESSAGE_MAP()
-	DECLARE_EASYSIZE()
 public:
 	virtual BOOL OnInitDialog();
-	CListCtrlEx m_ListCtrl;
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
-	afx_msg void OnClickedOld();
 	afx_msg void OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnBnClickedOk();
 };
