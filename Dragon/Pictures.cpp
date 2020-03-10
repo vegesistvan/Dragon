@@ -14,6 +14,8 @@ enum
 	P_TITLE,
 };
 
+
+
 // egy ember képeinek megjelenítése és kezelése
 
 IMPLEMENT_DYNAMIC(CPictures, CDialogEx)
@@ -32,37 +34,48 @@ void CPictures::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_SPIN, m_SpinCtrl);
-	DDX_Control(pDX, IDC_TITLE, m_TitleCtrl);
+	//  DDX_Control(pDX, IDC_TITLE, m_TitleCtrl);
 	DDX_Control(pDX, IDC_PRIMARY, m_PrimaryCtrl);
 	DDX_Control(pDX, IDC_LIST, m_ListCtrl);
+	DDX_Control(pDX, IDC_TITLE, m_TitleCtrl);
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CPictures, CDialogEx)
 	ON_WM_PAINT()
+	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
 	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN, &CPictures::OnDeltaposSpin)
 	ON_WM_SIZE()
 	ON_WM_SIZING()
 	ON_EN_CHANGE(IDC_TITLE, &CPictures::OnChangeTitle)
 	ON_BN_CLICKED(IDC_VIEW, &CPictures::OnClickedView)
 	ON_BN_CLICKED(IDC_PRIMARY, &CPictures::OnClickedPrimary)
-	ON_BN_CLICKED(IDC_DELETE, &CPictures::OnClickedDelete)
+//	ON_BN_CLICKED(IDC_DELETE, &CPictures::OnClickedDelete)
 	ON_WM_SYSCOMMAND()
 	ON_BN_CLICKED(IDOK, &CPictures::OnBnClickedOk)
 ON_NOTIFY(NM_RDBLCLK, IDC_LIST, &CPictures::OnRdblclkList)
 ON_NOTIFY(NM_CLICK, IDC_LIST, &CPictures::OnClickList)
+
+	ON_BN_CLICKED(ID_EDIT_UPDATE, &CPictures::OnEditUpdate )
+	ON_BN_CLICKED(ID_EDIT_DELETE, &CPictures::OnEditDelete )
+	ON_BN_CLICKED(ID_EDIT_INSERT, &CPictures::OnEditInsert )
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CPictures::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-	EASYSIZE_ADD( IDC_DELETE,	ES_BORDER,	ES_KEEPSIZE,	ES_KEEPSIZE,	ES_BORDER,	0 );
-	EASYSIZE_ADD( IDC_VIEW,		ES_KEEPSIZE,ES_KEEPSIZE,	ES_BORDER,		ES_BORDER,	0 );
+//	EASYSIZE_ADD( IDC_DELETE,	ES_BORDER,	ES_KEEPSIZE,	ES_KEEPSIZE,	ES_BORDER,	0 );
+//	EASYSIZE_ADD( IDC_VIEW,		ES_KEEPSIZE,ES_KEEPSIZE,	ES_BORDER,		ES_BORDER,	0 );
 
+	EASYSIZE_ADD( IDC_VIEW,	ES_BORDER,	ES_KEEPSIZE,	ES_KEEPSIZE,	ES_BORDER,	0 );
 	EASYSIZE_ADD( IDC_TITLE,	ES_BORDER,	ES_KEEPSIZE,	ES_BORDER,	ES_BORDER,	ES_HCENTER );
 	EASYSIZE_ADD( IDC_PRIMARY,	ES_BORDER,	ES_KEEPSIZE,	ES_BORDER,	ES_BORDER,	ES_HCENTER );
 	EASYSIZE_ADD( IDC_LIST,		ES_BORDER,	ES_KEEPSIZE,	ES_BORDER,	ES_BORDER,	ES_HCENTER );
 	EASYSIZE_ADD( IDC_SPIN,		ES_BORDER,	ES_KEEPSIZE,	ES_BORDER,	ES_BORDER,	ES_HCENTER );
-	EASYSIZE_ADD( IDOK,			ES_BORDER,	ES_KEEPSIZE,	ES_BORDER,	ES_BORDER,	ES_HCENTER );
+//	EASYSIZE_ADD( IDOK,			ES_BORDER,	ES_KEEPSIZE,	ES_BORDER,	ES_BORDER,	ES_HCENTER );
+	EASYSIZE_ADD( IDOK,			ES_KEEPSIZE,ES_KEEPSIZE,	ES_BORDER,	ES_BORDER,	0 );
+
+
+
 
 	EASYSIZE_INIT();
 	int		errno_t;
@@ -77,24 +90,15 @@ BOOL CPictures::OnInitDialog()
 	CString rowidB;
 	CString date;
 	int		primary;
-
+/*
 	command.Format( L"SELECT rowid, * FROM pictures %s", m_filter );   //WHERE table_id = '%d' AND id ='%s' ", m_table, m_rowidP );
 	if( !theApp.queryBlob( command ) ) return false;
 	if( !theApp.m_recordsetBlob->RecordsCount() ) return false;
 
-	if( !m_rowidB.IsEmpty() )  // megadott képpel kezdi a megjelenítést
-	{
-		for( UINT i = 0; i < theApp.m_recordsetBlob->RecordsCount(); ++i )
-		{
-			if( theApp.m_recordsetBlob->GetFieldString( PIC_ROWID ) == m_rowidB ) break;
-			theApp.m_recordsetBlob->MoveNext();
-		}
-	}
-
 	m_SpinCtrl.SetRange( 1, theApp.m_recordsetBlob->RecordsCount() );
 
 	m_TitleCtrl.SetSel( -1, -1, true );
-
+*/
 
 	m_ListCtrl.KeepSortOrder(TRUE);
 	m_ListCtrl.SetExtendedStyle(m_ListCtrl.GetExtendedStyle()| LVS_EX_GRIDLINES | LVS_EX_HEADERDRAGDROP );	
@@ -104,13 +108,19 @@ BOOL CPictures::OnInitDialog()
 	m_ListCtrl.InsertColumn( P_TITLE,	L"cím",			LVCFMT_LEFT,	700,-1,COL_TEXT );
 
 	fillBlobTable();
-	theApp.m_recordsetBlob->MoveFirst();
+	if( theApp.m_recordsetBlob->RecordsCount() )
+	{
+		theApp.m_recordsetBlob->MoveFirst();
 
-	m_cnt = 1;
-	caption( m_cnt );
-	paintBlob( 0 );
+		m_cnt = 1;
+		caption( m_cnt );
+		paintBlob( 0 );
 
-	GetDlgItem( IDC_SPIN )->SetFocus();
+//	str.Format( L"%s képei", m_name);
+//	SetWindowTextW( str );
+
+		GetDlgItem( IDC_SPIN )->SetFocus();
+	}
 	return FALSE;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -121,6 +131,25 @@ void CPictures::fillBlobTable()
 	m_ListCtrl.DeleteAllItems();
 	int nItem = 0;
 
+
+	m_command.Format( L"SELECT rowid, * FROM pictures %s", m_filter );   //WHERE table_id = '%d' AND id ='%s' ", m_table, m_rowidP );
+	if( !theApp.queryBlob( m_command ) ) return;
+//	if( !theApp.m_recordsetBlob->RecordsCount() ) return;
+
+/*
+	if( !m_rowidB.IsEmpty() )  // megadott képpel kezdi a megjelenítést
+	{
+		for( UINT i = 0; i < theApp.m_recordsetBlob->RecordsCount(); ++i )
+		{
+			if( theApp.m_recordsetBlob->GetFieldString( PIC_ROWID ) == m_rowidB ) break;
+			theApp.m_recordsetBlob->MoveNext();
+		}
+	}
+*/
+	m_SpinCtrl.SetRange( 1, theApp.m_recordsetBlob->RecordsCount() );
+
+	m_TitleCtrl.SetSel( -1, -1, true );
+
 	theApp.m_recordsetBlob->MoveFirst();
 	for( UINT i = 0; i < theApp.m_recordsetBlob->RecordsCount(); ++i, theApp.m_recordsetBlob->MoveNext() )
 	{
@@ -129,6 +158,7 @@ void CPictures::fillBlobTable()
 		m_ListCtrl.SetItemText( nItem, P_TITLE, theApp.m_recordsetBlob->GetFieldString( PIC_TITLE) );
 		sizeBlob = _wtoi( theApp.m_recordsetBlob->GetFieldString( PIC_SIZE) );
 		sizeTotal += sizeBlob;
+		++nItem;
 	}
 	m_ListCtrl.SetItemState( 0, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED);
 	m_ListCtrl.EnsureVisible( nItem, FALSE );
@@ -159,11 +189,11 @@ bool CPictures::paintBlob( int nItem )
 		
 
 	
-	caption.Format( L"%s %s *%s", theApp.m_recordset2->GetFieldString(0), theApp.m_recordset2->GetFieldString(1), theApp.m_recordset2->GetFieldString(2) );
-	SetWindowTextW( caption );
+//	caption.Format( L"%s %s *%s", theApp.m_recordset2->GetFieldString(0), theApp.m_recordset2->GetFieldString(1), theApp.m_recordset2->GetFieldString(2) );
+//	SetWindowTextW( caption );
 
 	InvalidateRect( NULL, true );
-	m_PrimaryCtrl.SetCheck( primary );
+	m_PrimaryCtrl.SetCheck( primary );    ///????
 	GetDlgItem( IDC_TITLE )->SetWindowTextW( title );
 
 	m_modified = false;
@@ -199,11 +229,13 @@ void CPictures::OnPaint()
 	{
 		GetDlgItem( IDC_TITLE )->GetWindowTextW( str );
 		str.Format( L"%s %s file!", (CString)str, m_ext ); 
+		AfxMessageBox( str );
 //		GetDlgItem( IDC_TITLE )->SetWindowTextW( str );
 		CDialogEx::OnPaint();
 		return;
 	}
-	
+
+	Invalidate( FALSE );  // fölöslegesnek látszik
 
 	CPaintDC dc(this); // device context for painting
 
@@ -211,9 +243,8 @@ void CPictures::OnPaint()
 	CImage image;
 	CBitmap bitmap;
 
-	
 
-	image.Load( m_fileSpec ); // just change extension to load jpg
+	image.Load( m_fileSpec );
 	bitmap.Attach(image.Detach());
 
 	dcMemory.CreateCompatibleDC( &dc);
@@ -263,14 +294,7 @@ bool CPictures::writeBlockToFile( void* block, int blob_size  )
 	m_fileSpec.Format( L"%s\\tmp.%s", theApp.m_workingDirectory, m_ext );
 
 	if( !openFileSpec( &theApp.fl, m_fileSpec, L"wb" ) ) return false;
-/*
-	if((errno_t=_wfopen_s(&fl, m_fileSpec,L"wb") )!=0)
-	{	
-		str.Format(L"%s megnyitási hiba!", m_fileSpec );
-		AfxMessageBox(str);
-		return false;
-	}
-*/
+
 	if( fwrite( block, blob_size, 1, theApp.fl ) != 1 )
 	{
 		AfxMessageBox( L"fwrite failed!" );
@@ -295,20 +319,22 @@ void CPictures::OnDeltaposSpin(NMHDR *pNMHDR, LRESULT *pResult)
 
 	if( iDelta == -1 )  // kisebb sorszámó képek felé megyünk
 	{
-		if( nItem == 0 )
-			nItem = theApp.m_recordsetBlob->RecordsCount();
+		if( nItem == 0 )  // mér az elején vagyunk
+			return;
+//			nItem = theApp.m_recordsetBlob->RecordsCount();
 		else
 			--nItem;
 	}
 	else
 	{
-		if( nItem == theApp.m_recordsetBlob->RecordsCount() )
-			nItem = 0;
+		if( nItem == theApp.m_recordsetBlob->RecordsCount() - 1 )  // már az utolsónál vagyunk
+			return;
+//			nItem = 0;
 		else
 			++nItem;
 	}
 
-//	InvalidateRect( NULL, true );  // törli az ablakban lévõ korábbi képet!
+	InvalidateRect( NULL, true );  // törli az ablakban lévõ korábbi képet!
 	if( m_modified ) saveValues();
 
 	m_paint = false;
@@ -339,13 +365,15 @@ void CPictures::OnChangeTitle()
 {
 	m_modified = true;
 }
-//void CPictures::OnChangeComment()
-//{
-//	m_modified = true;
-//}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CPictures::OnClickedPrimary()
 {
+	int primary = m_PrimaryCtrl.GetCheck();
+	if( primary )		// törli az esetleges korábbi kijelöléseket 
+	{
+		saveValues();
+
+	}
 	m_modified = true;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -389,32 +417,32 @@ void CPictures::OnClickedView()
 		ShellExecute(NULL, L"open", m_fileSpec,NULL, NULL, SW_SHOWNORMAL);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CPictures::OnClickedDelete()
-{
-	CString str;
-	str.Format( L"Tényleg törölni akarod a dokumentumot?" ); 
-	if( ( AfxMessageBox( str, MB_YESNO ) ) == IDNO ) return;
-
-	str.Format( L"DELETE FROM pictures WHERE rowid='%s'", m_rowidB );
-	if( !theApp.executeBlob( str ) ) return;
-
+//void CPictures::OnClickedDelete()
+//{
+//	CString str;
+//	str.Format( L"Tényleg törölni akarod a dokumentumot?" ); 
+//	if( ( AfxMessageBox( str, MB_YESNO ) ) == IDNO ) return;
+//
+//	str.Format( L"DELETE FROM pictures WHERE rowid='%s'", m_rowidB );
+//	if( !theApp.executeBlob( str ) ) return;
+//
 //	m_command.Format( L"SELECT rowid, * FROM pictures WHERE table_id='%s' AND id ='%s' ", m_table, m_rowidP );
-	m_command.Format( L"SELECT rowid, * FROM pictures %s", m_filter );
-	if( !theApp.queryBlob( m_command ) ) return;
-	if( !theApp.m_recordsetBlob->RecordsCount() )
-	{
-		InvalidateRect( NULL, true );
-	}
-
-	m_SpinCtrl.SetRange( 1, theApp.m_recordsetBlob->RecordsCount() );
-
-	theApp.m_recordsetBlob->MoveFirst();
-	m_cnt= 1;
-	caption( m_cnt );
-	m_paint = false;
-	paintBlob(0);
-	GetDlgItem( IDC_SPIN )->SetFocus();  // hogy ne legyen az IDC_TITLE-ban a cursor és a kiválasztás
-}
+//	m_command.Format( L"SELECT rowid, * FROM pictures %s", m_filter );
+//	if( !theApp.queryBlob( m_command ) ) return;
+//	if( !theApp.m_recordsetBlob->RecordsCount() )
+//	{
+//		InvalidateRect( NULL, true );
+//	}
+//
+//	m_SpinCtrl.SetRange( 1, theApp.m_recordsetBlob->RecordsCount() );
+//
+//	theApp.m_recordsetBlob->MoveFirst();
+//	m_cnt= 1;
+//	caption( m_cnt );
+//	m_paint = false;
+//	paintBlob(0);
+//	GetDlgItem( IDC_SPIN )->SetFocus();  // hogy ne legyen az IDC_TITLE-ban a cursor és a kiválasztás
+//}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CPictures::OnSysCommand(UINT nID, LPARAM lParam)
 {
@@ -446,3 +474,160 @@ void CPictures::OnClickList(NMHDR *pNMHDR, LRESULT *pResult)
 	paintBlob( nItem );
 	*pResult = 0;
 }
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+LRESULT CPictures::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
+{
+	CPoint* point=(CPoint*) lParam;
+    CMenu	Menu;
+	CMenu*	pPopup;
+
+	if(Menu.LoadMenu( IDR_DROPDOWN_DELETE_INSERT ))
+	{
+		pPopup = Menu.GetSubMenu(0);
+		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
+		{
+//			pPopup->EnableMenuItem(ID_EDIT_UPDATE,MF_BYCOMMAND | MF_GRAYED);
+			pPopup->EnableMenuItem(ID_EDIT_DELETE,MF_BYCOMMAND | MF_GRAYED);
+		}
+	pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
+	}
+	return TRUE;
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CPictures::OnEditUpdate()
+{
+	EditUpdate( false );
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CPictures::EditUpdate( bool all )
+{
+	CString rowidB(L"");
+	if( !all )
+	{
+		int nItem	= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+		if( nItem == -1 ) return;
+		rowidB = m_ListCtrl.GetItemText( nItem, P_ROWID );
+	}
+
+	CPictures dlg;
+
+	dlg.m_filter.Format( L"WHERE table_id='%d' AND id='%s'", PEOPLE, m_rowidP ); 
+	dlg.m_name		= m_name;	// az ember neve
+	dlg.m_rowidP	= m_rowidP;	// ember rowid-ja
+	dlg.m_rowidB	= rowidB;	// kép rowid-ja:  Az ember összes képeit a rowidB-vel kezdve mutassa be
+
+	dlg.DoModal();
+	fillBlobTable();
+	displayPicture();
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CPictures::OnEditDelete()
+{
+	int nItem	= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	if( nItem == -1 ) return;
+
+	CString rowid;
+	CString title;
+	rowid = m_ListCtrl.GetItemText( nItem, P_ROWID );
+	title = m_ListCtrl.GetItemText( nItem, P_TITLE );
+
+	str.Format( L"Tényleg törölni akarod a '%s' fájlt?", title );
+	if( AfxMessageBox( str, MB_YESNO ) == IDNO ) return;
+
+
+	m_command.Format( L"DELETE FROM pictures WHERE rowid='%s'", rowid );
+	theApp.executeBlob( m_command );
+	m_ListCtrl.DeleteItem( nItem );
+	if( !m_ListCtrl.GetItemCount() ) 
+	{
+		GetDlgItem( IDC_PHOTOS )->EnableWindow( false );
+		return;
+	}
+
+
+	m_command.Format( L"SELECT rowid, * FROM pictures %s", m_filter );
+	if( !theApp.queryBlob( m_command ) ) return;
+	if( !theApp.m_recordsetBlob->RecordsCount() )
+	{
+		InvalidateRect( NULL, true );
+	}
+
+	m_SpinCtrl.SetRange( 1, theApp.m_recordsetBlob->RecordsCount() );
+
+	theApp.m_recordsetBlob->MoveFirst();
+	m_cnt= 1;
+	caption( m_cnt );
+	m_paint = false;
+	paintBlob(0);
+	GetDlgItem( IDC_SPIN )->SetFocus();  // hogy ne legyen az IDC_TITLE-ban a cursor és a kiválasztás
+
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CPictures::OnEditInsert()
+{
+	if( !theApp.selectFiles() ) return;
+
+	BLOBSTAT stat;
+	int rowid;
+	
+	int sorsz = m_ListCtrl.GetItemCount() + 1;
+	int	nItem = m_ListCtrl.GetItemCount();
+
+	theApp.executeBlob( L"BEGIN" );
+	for( UINT i = 0; i < theApp.vBlobs.size(); ++i )
+	{
+		stat.ext = theApp.vBlobs.at(i).ext;
+		stat.filename	= theApp.vBlobs.at(i).filename;
+		stat.fileSpec	= theApp.vBlobs.at(i).fileSpec;
+		stat.size		= theApp.vBlobs.at(i).size;
+
+		rowid = theApp.blobDB->blobInsert( "pictures", "picture", &stat );
+		if( !rowid ) return;
+	
+		m_command.Format( L"UPDATE pictures SET id='%s', table_id='%d', title='%s', filename= '%s', ext='%s', size='%d' WHERE rowid='%d'", m_rowidP, PEOPLE, stat.filename, stat.filename, stat.ext, stat.size, rowid );
+		if( !theApp.executeBlob( m_command ) ) return;
+/*
+		str.Format( L"%d", rowid );
+		nItem = m_ListCtrl.InsertItem( nItem, str );
+
+//		str.Format( L"%d", sorsz );
+//		m_ListCtrl.SetItemText( nItem, P_CNT, str );
+
+		m_ListCtrl.SetItemText( nItem, P_EXT, theApp.vBlobs.at(i).ext ) ;
+		m_ListCtrl.SetItemText( nItem, P_TITLE, theApp.vBlobs.at(i).filename );
+		++sorsz;
+*/
+	}
+	theApp.executeBlob( L"COMMIT" );
+
+	fillBlobTable();
+	theApp.m_recordsetBlob->MoveFirst();
+
+	m_cnt = 1;
+	caption( m_cnt );
+	paintBlob( 0 );
+	
+//	m_ListCtrl.EnsureVisible( nItem, FALSE );
+
+//	if( m_ListCtrl.GetItemCount() ) GetDlgItem( IDC_PHOTOS )->EnableWindow( true );
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CPictures::displayPicture()
+{
+
+	m_command.Format( L"SELECT rowid FROM pictures WHERE id='%s' AND table_id=%d AND primaryPic=1", m_rowidP, PEOPLE );
+	if( !theApp.queryBlob( m_command ) ) return;
+
+	InvalidateRect( NULL, true );
+	m_paint = false;
+	CString rowid = theApp.m_recordsetBlob->GetFieldString( 0 );
+	if( !rowid.IsEmpty() )
+	{
+		_int64 blob_size;
+		void* block = theApp.blobDB->blobRead( "pictures", "picture", rowid, &blob_size );
+		if( block == NULL ) return;
+		if( !writeBlockToFile( block, blob_size ) ) return;
+		m_paint = true;
+	}
+	}

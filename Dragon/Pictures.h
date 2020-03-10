@@ -43,25 +43,34 @@ protected:
 	void CPictures::saveValues();
 	void fillBlobTable();
 
+	void CPictures::EditUpdate( bool all );
+	void CPictures::displayPicture();
+
 	CEdit m_TitleCtrl;
 	CButton m_PrimaryCtrl;
 	CSpinButtonCtrl m_SpinCtrl;
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnInitDialog();
+
+	afx_msg void OnEditUpdate();
+	afx_msg void OnEditInsert();
+	afx_msg void OnEditDelete();
+
 	afx_msg void OnPaint();
 	afx_msg void OnDeltaposSpin(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
 	afx_msg void OnChangeTitle();
-//	afx_msg void OnChangeComment();
 	afx_msg void OnClickedView();
 	afx_msg void OnClickedPrimary();
-	afx_msg void OnClickedDelete();
+//	afx_msg void OnClickedDelete();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnBnClickedOk();
 	CListCtrlEx m_ListCtrl;
-//	afx_msg void OnLvnItemchangedList(NMHDR *pNMHDR, LRESULT *pResult);
+
 	afx_msg void OnRdblclkList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnClickList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
+
 };

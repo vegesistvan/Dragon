@@ -1096,6 +1096,7 @@ void CTablePeople::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
 	str.Format( L"%s %s adatainak módosítása", m_ListCtrl.GetItemText( nItem, N_LAST_NAME ), m_ListCtrl.GetItemText( nItem, N_FIRST_NAME ) );
 //	ShowWindow( SW_HIDE );
 
+/*
 	if( theApp.m_inputMode == GAHTML )
 	{
 		CEditPeople dlg;
@@ -1104,6 +1105,7 @@ void CTablePeople::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
 		dlg.DoModal();
 	}
 	else
+*/
 		OnRelations();
 
 	SetForegroundWindow();

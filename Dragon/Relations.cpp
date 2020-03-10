@@ -167,7 +167,7 @@ ON_NOTIFY(NM_RDBLCLK, IDC_LISTM, &CRelations::OnRdblclkListM)
 ON_NOTIFY(NM_RDBLCLK, IDC_LISTC, &CRelations::OnRdblclkListC)
 ON_NOTIFY(NM_RDBLCLK, IDC_LISTS, &CRelations::OnRdblclkListS)
 
-ON_COMMAND(ID_PHOTO, &CRelations::OnPhoto)
+//ON_COMMAND(ID_PHOTO, &CRelations::OnPhoto)
 ON_STN_CLICKED(IDC_MARRIAGES, &CRelations::OnClickedMarriages)
 ON_STN_CLICKED(IDC_NEW_FATHER, &CRelations::OnClickedNewFather)
 ON_STN_CLICKED(IDC_NEW_MOTHER, &CRelations::OnClickedNewMother)
@@ -908,12 +908,6 @@ void CRelations::OnRdblclkListS(NMHDR *pNMHDR, LRESULT *pResult)
 	*pResult = 0;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CRelations::OnPhoto()
-{
-
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CRelations::OnClickedMarriages()
 {
 	int db = m_ListCtrlM.GetItemCount();
@@ -1504,8 +1498,10 @@ void CRelations::OnPictures()
 	dlg.m_rowidB	= rowidB;	// kép rowid-ja, amit ábrázolni fog
 
 	dlg.DoModal();
-//	fillBlobTable();
-//	displayPicture();
+
+	displayPicture( m_rowid );
+
+
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CRelations::OnBnClickedOk()

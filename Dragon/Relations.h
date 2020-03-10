@@ -144,7 +144,7 @@ public:
 	afx_msg void OnRdblclkListS(NMHDR *pNMHDR, LRESULT *pResult);
 
 	afx_msg void OnReset();
-	afx_msg void OnPhoto();
+//	afx_msg void OnPhoto();
 	
 	afx_msg void OnClickedMarriages();
 	afx_msg void OnClickedNewFather();
