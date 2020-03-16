@@ -255,13 +255,13 @@ BOOL CFaApp::selectDatabase()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CFaApp::openDatabase() 
 {
-	CProgressWnd pWin(NULL,L"Az adatbázis megnyitása és ellenõrzése..." ); 
+	m_databaseName = m_databaseSpec.Mid( m_databaseSpec.ReverseFind( '\\' ) + 1 );
+	str.Format( L"%s adatbázis megnyitása és ellenõrzése...", m_databaseName );
+	CProgressWnd pWin(NULL, str ); 
 	pWin.GoModal();
 
-	m_databaseName = m_databaseSpec.Mid( m_databaseSpec.ReverseFind( '\\' ) + 1 );
 	splitFilespec( m_databaseSpec, &drive, &path,&filename,&ext );
 	m_baseName = filename;
-
 	m_databasePath.Format( L"%s:\\%s", drive, path );
 
 	m_workingDirectory.Format( L"%s\\lists", m_databasePath );

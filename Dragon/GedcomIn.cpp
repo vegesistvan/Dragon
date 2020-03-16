@@ -248,8 +248,8 @@ void CGedcomIn::insertMarriages()
 	CString spouse2_id;
 	CString place;
 	CString date;
-	CString orderHusband;
-	CString orderWife;
+	int orderHusband;
+	int orderWife;
 
 	CString fields;
 	CString values;
@@ -271,10 +271,10 @@ orderWife\
 		spouse2_id	= getRowid( v_fam.at(i).refW );
 		place		= v_fam.at(i).place;
 		date		= date2date( v_fam.at(i).date );
-		orderHusband = L"1";
-		orderWife	 = L"1";
+		orderHusband = v_fam.at(i).marriageH;				// férj házasságának sorszáma
+		orderWife	 = v_fam.at(i).marriageW;				// feleség házasságának sorszáma
 
-		values.Format( L" 1, '%s','%s', '%s','%s','%s','%s'",
+		values.Format( L" 1, '%s','%s', '%s','%s','%d','%d'",
 		place,\
 		date,\
 		spouse1_id,\

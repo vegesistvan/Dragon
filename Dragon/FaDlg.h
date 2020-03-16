@@ -177,7 +177,7 @@ protected:
 
 
 	std::vector<TCHAR*> v_peoples;
-	std::vector<FAMS> v_fams;
+//	std::vector<FAMS> v_fams;
 	
 	HMENU	m_hMenuDefault;
 
@@ -426,4 +426,5 @@ public:
 	afx_msg void OnMotherIndex();
 	afx_msg void OnDisplayBlob();
 	afx_msg void OnGedcomTagtable();
+	afx_msg void OnGedcomINDIFAMS();
 };

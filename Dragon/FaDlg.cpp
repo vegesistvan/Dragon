@@ -185,6 +185,7 @@ ON_COMMAND(ID_NAME_PROBLEMS, &CFaDlg::OnNameProblems)
 ON_COMMAND(ID_MOTHER_INDEX, &CFaDlg::OnMotherIndex)
 ON_COMMAND(ID_DISPLAY_BLOB, &CFaDlg::OnDisplayBlob)
 ON_COMMAND(ID_GEDCOM_TAGTABLE, &CFaDlg::OnGedcomTagtable)
+ON_COMMAND(ID_GEDCOM_INDIFAMS, &CFaDlg::OnGedcomINDIFAMS)
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CFaDlg::OnInitDialog()
@@ -372,7 +373,7 @@ void CFaDlg::mainTitle( )
 {
 	CString caption;
 
-	caption.Format( L"Dragon v. %s - %s || Családfa adatbázis || adatbázis: %s (%s)||", BUILT, PLATFORM, theApp.m_databaseSpec, theApp.m_inputMode );
+	caption.Format( L"Dragon v. %s - %s || Családok nyilvántartása || adatbázis: %s || %s ||", BUILT, PLATFORM, theApp.m_databaseSpec, theApp.m_inputMode );
 	SetWindowText( caption );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1152,3 +1153,10 @@ void CFaDlg::OnDisplayBlob()
 	dlg.DoModal();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+void CFaDlg::OnGedcomINDIFAMS()
+{
+	CGedcomIn ged;
+	ged.indiFams();
+}

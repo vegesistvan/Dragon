@@ -58,7 +58,7 @@ void CGedcomIn::fill_v_indi()
 	CString cLine;	
 	GEDLINE lxtv;
 
-	v_indifam.clear();
+	v_famc.clear();
 	v_indi.clear();
 	vPhotos.clear();
 	while( file_ged.ReadString( cLine ) )
@@ -92,6 +92,8 @@ void CGedcomIn::fill_v_fam()
 	int		cnt = 0;
 	CString cLine;
 	GEDLINE lxtv;
+	v_famc.clear();
+//	v_fams.clear();
 	v_fam.clear();
 	v_chil.clear();
 	while( file_ged.ReadString( cLine ) )
@@ -116,6 +118,7 @@ void CGedcomIn::fill_v_fam()
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // INDI rekordot beteszi a v_indi vektorba
+// A INDIFAMC azonosítójaó családot beteszi a v_infifam vektorba, megadva a refI és refM értékeket
 void CGedcomIn::recordINDI( GEDLINE* gl )
 {
 	CString cLine;
@@ -126,10 +129,14 @@ void CGedcomIn::recordINDI( GEDLINE* gl )
 	PHOTOS	photos;
 	UINT	last;
 
-	INDIFAM	indifam;
+	INDIFAMC famc;
+	INDIFAMS fams;
 
 	int pos;
 	indi.refI = gl->xref;
+	indi.numOfSpouses = 0;
+
+	fams.order = 0;				// házasság sorszáma
 	while( file_ged.ReadString( cLine ) )
 	{
 		if( cLine.IsEmpty() ) break;
@@ -200,9 +207,18 @@ void CGedcomIn::recordINDI( GEDLINE* gl )
 		}
 		else if( lxtv.tag == L"FAMC" )
 		{
-			indifam.refI = v_lxtv.at(last).xref;
-			indifam.refF = lxtv.value;
-			v_indifam.push_back( indifam );
+			famc.refI = v_lxtv.at(last).xref;		// család azonosítója
+			famc.refF = lxtv.value;					// gyerek azonosítója
+			v_famc.push_back( famc );
+		}
+		else if( lxtv.tag == L"FAMS" )
+		{
+			fams.refI = v_lxtv.at(last).xref;		// család azonosítója
+			fams.refF = lxtv.value;					// házastárs azonosítója
+			fams.order++;
+			fams.sex  = indi.sex;
+			indi.numOfSpouses++;
+			v_fams.push_back( fams );
 		}
 		else if ( lxtv.tag == L"FILE" )
 		{
@@ -210,14 +226,13 @@ void CGedcomIn::recordINDI( GEDLINE* gl )
 			photos.link = lxtv.value;
 			vPhotos.push_back( photos );
 		}
-		else if( lxtv.tag == L"NPFX" ) // surname prefix
+		else if( lxtv.tag == L"NPFX" )				// surname prefix
 			indi.title = lxtv.value;
 
 		v_lxtv.push_back( lxtv );
 	}
 	indi.mother_index	= 0;
 	indi.mother_index2	= 0;
-	indi.numOfSpouses	= 0;
 	indi.orderFather	= 0;
 	indi.orderMother	= 0;
 	v_indi.push_back( indi );
@@ -225,7 +240,7 @@ void CGedcomIn::recordINDI( GEDLINE* gl )
 	file_ged.Seek( fpos, 0 );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// A FAM rekordot beteszi a v_fam és a v_chil vektorokba,  cnt a házasság sorszáma
+// A FAM rekordot beteszi a v_fam és a v_chil vektorokba,  cnt a házasság sorsszáma (semmi jelentõsége )
 void CGedcomIn::recordFAM( GEDLINE* gl, int cnt )
 {
 	CString cLine;
@@ -381,7 +396,8 @@ void CGedcomIn::getName( CString value, INDI* indi )
 	}
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// a v_fam vektor elemeinek marriage és marraigeHAll és numofSpouses értékadása
+// v_famc vektor elemeinek marriage és marraigeHAll és numofSpouses értékadása
+// v_fams
 void CGedcomIn::sync_fam_indi()
 {
 	int index;
@@ -398,9 +414,31 @@ void CGedcomIn::sync_fam_indi()
 	int		orderFather;
 	int		orderMother;
 
+	
+	for( UINT i = 0; i < v_fams.size()-1; ++i )								// családok
+	{
+		refF = v_fams.at(i).refF;
+		for( UINT j = 0; j < v_fam.size(); ++j )
+		{
+			if( v_fam.at(j).refF == refF )
+			{
+				if( v_fams.at(i).sex == L"1" )
+				{
+					v_fam.at(j).marriageH = v_fams.at(i).order;
+					v_fam.at(j).marriageHAll = getMarriageAll( v_fams.at(i).refI );
+				}
+				else
+				{
+					v_fam.at(j).marriageW = v_fams.at(i).order;
+					v_fam.at(j).marriageWAll = getMarriageAll( v_fams.at(i).refI );
+				}
+			}
+		}
+	}
+/*
 		
 // egy férj házasságainak sorszáma és összes házasságának száma	
-	std::sort( v_fam.begin(), v_fam.end(), sortByCnt );		// azért kell, hogy a RefW szerinti rendezésban az azonosak sorrendje rekonstruálható legyen
+	std::sort( v_fam.begin(), v_fam.end(), sortByCnt );		// eredfeti sorrendbe rendezi, azért kell, hogy a RefW szerinti rendezésban az azonosak sorrendje rekonstruálható legyen
 	std::sort( v_fam.begin(), v_fam.end(), multiSort_FAM_refH ); // refH szerint rendezi: a férj feleségeivel kötött házasságai egymás után lesznek
 
 	for( UINT i = 0; i < v_fam.size()-1; ++i )								// családok
@@ -452,7 +490,7 @@ void CGedcomIn::sync_fam_indi()
 		if( ( index = getIndexIndi( refW ) ) != -1 )
 			v_indi.at(index).numOfSpouses = cnt;
 	}
-
+*/
 
 
 // a családba tartozó gyerekek indi.mother_index-ének beállítása az anya sorszámára
@@ -617,4 +655,18 @@ bool extract( CString cLine, GEDLINE* lxtv )
 	if( n > i + 1 )
 		lxtv->value = packWords( &A, i+1, n-i-1 );
 	return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int CGedcomIn::getMarriageAll( CString refI )
+{
+	for( UINT i = 0; i < v_indi.size(); ++i )
+	{
+		if( v_indi.at(i).refI == refI )
+		{
+			return v_indi.at(i).numOfSpouses;
+			break;
+		}
+	}
+	return 0;
 }

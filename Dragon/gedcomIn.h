@@ -14,7 +14,6 @@ typedef struct
 {
 	TCHAR	*name;
 	TCHAR	*type;
-//	void   (*foo)( FILE* fl, CString);
 	void   (*foo)( int level, CString xref, CString tag, CString value );
 }GEDTAGS;
 
@@ -41,52 +40,54 @@ typedef struct
 	int		mother_index2;		// apja hanyadik feleségének gyermeke
 	int		orderFather;		// apja hagyadik gyermeke
 	int		orderMother;		// anyja hanyadik gyermeke
-	int		numOfSpouses;
+	int		numOfSpouses;		// házastársai száma
 	CString https;
 }INDI;
 
-/*
-typedef struct
-{
-	CString refI;
-	CString link;
-}PHOTOS;
-*/
 
 typedef struct
 {
-	int		cnt;
-	CString refF;
-	CString refH;
-	CString refW;
-	CString place;
-	CString date;
-	int		marriageH;
-	int		marriageW;
-	int		marriageHAll;
-	int		marriageWAll;
-	int		numOfChildren;
+	int		cnt;			// v_rekord sorszáam, csak azért kell, hogy az eredeti sorrendet visszaállíthassuk
+	CString refF;			// család azonosítója
+	CString refH;			// férj azonosítója
+	CString refW;			// feleség azonosítója
+	CString place;			// házasságkötés helye
+	CString date;			// házasságkötés ideje
+	int		marriageH;		// férj házasságának sorszáma
+	int		marriageW;		// feleség házasságának sorszáma
+	int		marriageHAll;	// fáérj összes házasságának száma
+	int		marriageWAll;	// felaség összes házasságának száma
+	int		numOfChildren;	// gyerekek száma
 }FAM; 
 
 typedef struct
 {
 	int		cnt;
-	CString refF;
-	CString	refH;
-	CString refW;
-	CString refC;
+	CString refF;			// család azonosítója
+	CString	refH;			// apa azonosítója
+	CString refW;			// anya azonosítója
+	CString refC;			// gyerek azonosítója
 	int		numRefI;
-	int		mother_index;
-	int		mother_index2;
-	int		orderFather;
+	int		mother_index;	// apa hanyadik felesége az anyja
+	int		mother_index2;	// apa hanyadik felesége az anyja
+	int		orderFather;	//
 	int		orderMother;
 }CHIL;
 
 typedef struct
 {
-	CString refI;	// INDI rekord xref-je
-	CString refF;	// INDI rekord FAMC-re
-}INDIFAM;
+	CString refI;	// INDI rekord xref-je		// gyerek azonosítója
+	CString refF;	// INDI rekord INDIFAMC-re	// család azonosítója
+}INDIFAMC;
+
+typedef struct
+{
+	CString	sex;
+	CString refI;	// INDI rekord xref-je		// házastárs azonosítója
+	CString refF;	// INDI rekord FAMS-je		// család azonosítója
+	int		order;	// FAMS sorszáma az INDI rekordban
+}INDIFAMS;
+
 
 bool sortByCnt(const FAM &v1, const FAM &v2);
 bool multiSort_FAM_refH(const FAM &v1, const FAM &v2);
@@ -94,9 +95,13 @@ bool multiSort_FAM_refW(const FAM &v1, const FAM &v2);
 bool multiSort_refH(const CHIL &v1, const CHIL &v2);
 bool multiSort_refW(const CHIL &v1, const CHIL &v2);
 bool sortChil_cnt(const CHIL &v1, const CHIL &v2);
+bool sortRefF(const INDIFAMS &v1, const INDIFAMS &v2);
+bool sortSexRefI(const INDIFAMS &v1, const INDIFAMS &v2) ;
+void listIndiFams();
+
+bool sort_refF(const INDIFAMC &v1, const INDIFAMC &v2);
 
 
-bool sort_refF(const INDIFAM &v1, const INDIFAM &v2);
 bool extract( CString cLine, GEDLINE* lxtv );
 
 class CGedcomIn : public CWnd
@@ -115,9 +120,10 @@ public:
 	void CGedcomIn::zeroLevel();
 	bool CGedcomIn::gedcomInput();
 	void CGedcomIn::tagTable();
-	
+	void CGedcomIn::indiFams();
+	void CGedcomIn::listIndiFams();
 	void listVindi();
-
+	
 	
 	CStdioFile file_ged;
 protected:
@@ -130,7 +136,9 @@ protected:
 	std::vector<INDI> v_indi;
 	std::vector<FAM> v_fam;
 	std::vector<CHIL> v_chil;
-	std::vector<INDIFAM> v_indifam;
+	std::vector<INDIFAMC> v_famc;
+	std::vector<INDIFAMS>v_fams;
+
 	std::vector<PHOTOS> vPhotos;
 	
 	std::vector<GEDLINE> v_lxtv;
@@ -172,6 +180,9 @@ protected:
 	CString CGedcomIn::findHref( CString refFam );
 	void CGedcomIn::listMultiMarriages();
 //	int CGedcomIn::GetInputCode( CString fileSpec );
+
+	CString CGedcomIn::getRefSpouse( CString sex, CString refF );
+	int CGedcomIn::getMarriageAll( CString refI );
 
 	void (*foo)(CString );
 
@@ -280,7 +291,7 @@ const GEDTAGS tags[] =
 	L"ENGA",	L"ENGAGEMENT",		NULL,		// An event of recording or announcing an agreement between two people to become married. 
 	L"EVEN",	L"EVENT",			NULL,		// A noteworthy happening related to an individual, a group, or an organization. 
 	L"FAM",		L"FAMILY",			&fam,		// Identifies a legal, common law, or other customary relationship of man and woman and their children, if any, or a family created by virtue of the birth of a child to its biological father and mother.
-	L"FAMC",	L"FAMILY_CHILD",	&famc,		// Identifies the family in which an individual appears as a child. 
+	L"INDIFAMC",	L"FAMILY_CHILD",	&famc,		// Identifies the family in which an individual appears as a child. 
 	L"FAMF",	L"FAMILY_FILE",		NULL,		// Pertaining to, or the name of, a family file. Names stored in a file that are assigned to a family for doing temple ordinance work. 
 	L"FAMS",	L"FAMILY_SPOUSE",	&fams,		// Identifies the family in which an individual appears as a spouse. 
 	L"FCOM",	L"FIRST_COMMUNION",	NULL,		// A religious rite, the first act of sharing in the Lord's supper as part of church worship. 

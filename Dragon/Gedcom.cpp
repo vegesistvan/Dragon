@@ -5,6 +5,7 @@
 #include <algorithm>
 
 
+
 // Nem értelmezett TAG-ek listáját készíti el
 void CGedcomIn::checkTags()
 {
@@ -111,7 +112,58 @@ void CGedcomIn::listHEAD()
 {
 	listZeroRecord( L"HEAD" );
 }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CGedcomIn::indiFams()
+{
+	listIndiFams();
+}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CGedcomIn::listIndiFams()
+{
+	fillVectors();
+
+	CString fileName( L"indiFams" );
+	CString fileSpec;
+	CString name1;
+	CString name2;
+	CString refSpouse;
+	int		total;
+	fileSpec = theApp.openTextFile( &theApp.fl, fileName, L"w+" );
+	fwprintf( theApp. fl, L"  %s\n\n", theApp.m_gedFileSpec );
+	
+	std::sort( v_fams.begin(), v_fams.end(), sortSexRefI ); // refH szerint rendezi: a férj feleségeivel kötött házasságai egymás után lesznek
+
+	fwprintf( theApp.fl, L"%20s %2s %20s\n", L"házastárs", L"m", L"család" ); 
+	for( UINT i= 0; i < v_fams.size(); ++i )
+	{
+		name1 = getIndi( v_fams.at(i).refI );
+		total = getMarriageAll( v_fams.at(i).refI );
+		refSpouse = getRefSpouse( v_fams.at(i).sex, v_fams.at(i).refF );
+		name2 = getIndi( refSpouse );
+		str.Format( L"%s %20s %2d/%2d %20s %20s %20s", v_fams.at(i).sex, v_fams.at(i).refI, v_fams.at(i).order, total,  v_fams.at(i).refF, name1, name2 );
+		fwprintf( theApp.fl, L"%s\n", str );
+	}
+	fclose( theApp.fl );
+	theApp.showFile( fileSpec );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CString CGedcomIn::getRefSpouse( CString sex, CString refF ) 
+{
+	CString ref;
+	for( int i = 0; i < v_fam.size(); ++i )
+	{
+		if( v_fam.at(i).refF == refF )
+		{
+			if( sex == L"1" )
+				ref = v_fam.at(i).refW;
+			else
+				ref =v_fam.at(i).refH;
+			break;
+		}
+	}
+	return( ref );
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGedcomIn::listPeople()
 {
 	fillVectors();
@@ -176,8 +228,8 @@ A következõ sorokban a gyerekek nevei vannak, és ha az apának több felesége volt
 	CString refW;
 	CString refC;
 	
-	int		numOfSpousesH = 0;
-	int		numOfSpousesW = 0;
+//	int		numOfSpousesH = 0;
+//	int		numOfSpousesW = 0;
 
 	CString fileName( L"familiesByName" );
 	CString fileSpec;
@@ -217,8 +269,8 @@ A következõ sorokban a gyerekek nevei vannak, és ha az apának több felesége volt
 		husband = getIndi( refH );
 		wife	= getIndi( refW );
 
-		if( indexH != -1 ) numOfSpousesH = v_indi.at(indexH).numOfSpouses;
-		if( indexW != -1 ) numOfSpousesW = v_indi.at(indexW).numOfSpouses;
+//		if( indexH != -1 ) numOfSpousesH = v_indi.at(indexH).numOfSpouses;
+//		if( indexW != -1 ) numOfSpousesW = v_indi.at(indexW).numOfSpouses;
 
 		fwprintf( theApp.fl, L"%-10s %-10s %-28s %-10s %-28s %2d/%d %2d/%d\n",
 		refF,\
@@ -227,9 +279,9 @@ A következõ sorokban a gyerekek nevei vannak, és ha az apának több felesége volt
 		refW,\
 		wife,\
 		v_fam.at(i).marriageH,\
-		numOfSpousesH,\
+		v_fam.at(i).marriageHAll,\
 		v_fam.at(i).marriageW,\
-		numOfSpousesW\
+		v_fam.at(i).marriageWAll\
 		);
 
 		for( UINT j = 0; j < v_chil.size(); ++j )
@@ -237,7 +289,7 @@ A következõ sorokban a gyerekek nevei vannak, és ha az apának több felesége volt
 			if( v_chil.at(j).refF == v_fam.at(i).refF )
 			{
 				refC	= v_chil.at(j).refC;
-				if( numOfSpousesH > 1 )
+				if( v_fam.at(i).marriageHAll > 1 )
 				{
 //				if( v_chil.at(j).mother_index != 0 )
 					fwprintf( theApp.fl, L"%4d. %3d. %-10s %s/%d /%d\n",\
@@ -267,15 +319,14 @@ A következõ sorokban a gyerekek nevei vannak, és ha az apának több felesége volt
 
 	int indexI;
 	CString refFPrev(L"");
-	std::sort( v_indifam.begin(), v_indifam.end(), sort_refF );
+	std::sort( v_famc.begin(), v_famc.end(), sort_refF );
 	fwprintf( theApp.fl, L"\n\nindifam rekords rendezett\n\n" );
-	for( UINT i = 0; i < v_indifam.size(); ++i )
+	for( UINT i = 0; i < v_famc.size(); ++i )
 	{
-		indexI = getIndexIndi( v_indifam.at(i).refI );
-
-		if( refFPrev != v_indifam.at(i).refF ) fwprintf( theApp.fl, L"\n" );
-		fwprintf( theApp.fl, L"%s %s %d\n", v_indifam.at(i).refF, v_indifam.at(i).refI, indexI );
-		refFPrev = v_indifam.at(i).refF;
+		indexI = getIndexIndi( v_famc.at(i).refI );
+		if( refFPrev != v_famc.at(i).refF ) fwprintf( theApp.fl, L"\n" );
+		fwprintf( theApp.fl, L"%s %s %d\n", v_famc.at(i).refF, v_famc.at(i).refI, indexI );
+		refFPrev = v_famc.at(i).refF;
 	}
 
 
@@ -517,11 +568,21 @@ bool sortChil_cnt(const CHIL &v1, const CHIL &v2)
     return( v1.cnt < v2.cnt ); 
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool sort_refF(const INDIFAM &v1, const INDIFAM &v2) 
+bool sort_refF(const INDIFAMC &v1, const INDIFAMC &v2) 
 { 
 	if( v1.refF == v2.refF ) 
 		return( v1.refI < v2.refI ); 
 	return( v1.refF < v2.refF ); 
+}
+bool sortRefF(const INDIFAMS &v1, const INDIFAMS &v2) 
+{ 
+	return( v1.refF < v2.refF ); 
+}
+bool sortSexRefI(const INDIFAMS &v1, const INDIFAMS &v2) 
+{ 
+	if( v1.sex == v2.sex ) 
+		return( v1.refI < v2.refI ); 
+    return( v1.sex < v2.sex ); 
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // v_indi mother_index-ébe átteszi a v_fam marriageH-ját

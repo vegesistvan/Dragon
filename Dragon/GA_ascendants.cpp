@@ -48,7 +48,6 @@ CGaAscendants::~CGaAscendants()
 void CGaAscendants::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Radio(pDX, IDC_RADIO_SORREND1, m_lista);
 	DDX_Check(pDX, IDC_CHECK_NN, m_NN);
 	DDX_Check(pDX, IDC_CHECK_BOLD, m_bold);
 	DDX_Control(pDX, IDC_COMBO_LISTSTYLE, m_ListStyle);

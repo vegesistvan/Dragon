@@ -266,6 +266,7 @@ void CGaDescendants::printSpRelatives()
 	{
 		queryPeople( s.mother_id, &sm );
 		mother = getFullname( &sm );
+		mother = getLastFirst( &sm );
 	}
 //	if( father.IsEmpty() && mother.IsEmpty() ) return;   // nincs se apa, se anya
 	
@@ -292,9 +293,9 @@ void CGaDescendants::printSpRelatives()
 
 
 	if( s.sex_id == MANS )
-		m_command.Format( L"SELECT spouse2_id, orderWife  FROM marriages WHERE spouse1_id='%s'", s.rowid ); // a házastárs házastársai
+		m_command.Format( L"SELECT spouse2_id, orderHusband  FROM marriages WHERE spouse1_id='%s'", s.rowid ); // a házastárs házastársai
 	else
-		m_command.Format( L"SELECT spouse1_id, orderHusband FROM marriages WHERE spouse2_id='%s'", s.rowid ); // a házastárs házastársai
+		m_command.Format( L"SELECT spouse1_id, orderWife FROM marriages WHERE spouse2_id='%s'", s.rowid ); // a házastárs házastársai
 	if( !query4( m_command ) ) return;
 	numOfSpouses = m_recordset4.RecordsCount();
 	if( numOfSpouses > 1 )
@@ -336,19 +337,28 @@ CString CGaDescendants::getLastname( PPEOPLE* p )
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CGaDescendants::getFirstname( PPEOPLE* p )
 {
-	CString firstname = attrib[m_ixName].code1;
-	firstname += p->first_name;
-	firstname += attrib[m_ixName].code2;
+	CString firstname(L"");
+
+	if( !p->first_name.IsEmpty() )
+	{
+		firstname = attrib[m_ixName].code1;
+		firstname += p->first_name;
+		firstname += attrib[m_ixName].code2;
+	}
 	return firstname;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CGaDescendants::getLastFirst( PPEOPLE* p )
 {
-	CString name = attrib[m_ixName].code1;
-	name += p->last_name;
-	name += L" ";
-	name += p->first_name;
-	name += attrib[m_ixName].code2;
+	CString name;
+	if( !p->first_name.IsEmpty() && !p->last_name.IsEmpty() )
+	{
+		name = attrib[m_ixName].code1;
+		name += p->last_name;
+		name += L" ";
+		name += p->first_name;
+		name += attrib[m_ixName].code2;
+	}
 	return name;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
