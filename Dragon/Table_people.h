@@ -149,5 +149,5 @@ public:
 	afx_msg LRESULT OnUpdateRecord( WPARAM wParam, LPARAM lParam);
 	afx_msg void OnIndividualDescendants();
 	afx_msg void OnGedcomOutput();
-	afx_msg void OnPrivatDescendants();
+	afx_msg void OnPrivateDescendants();
 };

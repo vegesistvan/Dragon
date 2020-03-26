@@ -55,12 +55,20 @@ void CGaDescendants::printBegining( int ix )
 		tags = L"<li>";
 	else if( generation < m_genPrev )						// régi generáció, kijebb hozza a generáció-különbség-szeresen
 	{
+/*
 		for( UINT i = 0; i < (m_genPrev - generation); ++i )
 		{
 			tags += m_tag2;
 			--cnt_ol;
 		}
 		tags += L"<li>";
+*/
+		for( UINT i = 0; i < (m_genPrev - generation); ++i )
+		{
+			fwprintf( fl, L"%s\n", m_tag2 );
+			--cnt_ol;
+		}
+		tags = L"<li>";
 	}
 	m_genPrev = generation;
 

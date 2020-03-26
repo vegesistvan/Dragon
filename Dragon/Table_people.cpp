@@ -211,7 +211,7 @@ ON_MESSAGE(WM_EDIT_INDIVIDUAL, OnUpdateRecord )
 ON_COMMAND(ID_DESCENDANTS_INDIVIDUAL, &CTablePeople::OnIndividualDescendants)
 ON_COMMAND(ID_ASCENDANTS_CHAIN, &CTablePeople::OnAscendantsChain)
 ON_COMMAND(ID_GEDCOM_OUTPUT, &CTablePeople::OnGedcomOutput)
-ON_COMMAND(ID_PRIVAT_DESCENDANTS, &CTablePeople::OnPrivatDescendants)
+ON_COMMAND(ID_PRIVATE_DESCENDANTS, &CTablePeople::OnPrivateDescendants)
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CTablePeople::OnInitDialog()
@@ -1535,7 +1535,7 @@ void CTablePeople::OnIndividualDescendants()
 	if( dlg.DoModal() == IDCANCEL ) return;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTablePeople::OnPrivatDescendants()
+void CTablePeople::OnPrivateDescendants()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
 	if( nItem == -1 )

@@ -1,5 +1,5 @@
 #pragma once
-#define VERSION L"1.0.4"
+#define VERSION L"1.0.5"
 //	Felmenõi listák átalakítása, javítása
 //#define VERSION L"1.1.7.1"
 

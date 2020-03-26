@@ -117,7 +117,10 @@ void CGaDescendants::closeHtml()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaDescendants::createStyle()
 {
+	
 	fwprintf( fl, L"<style>\n" );
+	if( m_syntax != 0 )
+	{
 	fwprintf( fl, L"ul {\n" );
 	fwprintf( fl, L"display: block;\n" );
 	fwprintf( fl, L"list-style-type: square;\n" );
@@ -127,7 +130,9 @@ void CGaDescendants::createStyle()
 	fwprintf( fl, L"margin-right: 0;\n" );
 	fwprintf( fl, L"padding-left: 40px;\n" );
 	fwprintf( fl, L"}\n" );
-
+	}
+	else
+	{
 	fwprintf( fl, L"ol {\n" );
 	fwprintf( fl, L"display: block;\n" );
 	fwprintf( fl, L"list-style-type: decimal;\n" );
@@ -137,6 +142,7 @@ void CGaDescendants::createStyle()
 	fwprintf( fl, L"margin-right: 0;\n" );
 	fwprintf( fl, L"padding-left: 40px;\n" );
 	fwprintf( fl, L"}\n" );
+	}
 	fwprintf( fl, L"</style>\n" );
 }
 
