@@ -187,6 +187,7 @@
     <ClInclude Include="about.h" />
     <ClInclude Include="EditComment.h" />
     <ClInclude Include="EditMarriage.h" />
+    <ClInclude Include="EditPeople.h" />
     <ClInclude Include="GedcomOut.h" />
     <ClInclude Include="GA_ascendantsChain.h" />
     <ClInclude Include="build_defs.h" />
@@ -214,7 +215,6 @@
     <ClInclude Include="GetMarriage.h" />
     <ClInclude Include="GetPeople.h" />
     <ClInclude Include="gedcomIn.h" />
-    <ClInclude Include="EditPeople.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="ColorStatic.h" />
     <ClInclude Include="ColumnsList.h" />
@@ -304,6 +304,7 @@
     <ClCompile Include="about.cpp" />
     <ClCompile Include="EditComment.cpp" />
     <ClCompile Include="EditMarriage.cpp" />
+    <ClCompile Include="EditPeople.cpp" />
     <ClCompile Include="Gedcom.cpp" />
     <ClCompile Include="GedcomOut.cpp" />
     <ClCompile Include="app_export.cpp" />
@@ -335,7 +336,6 @@
     <ClCompile Include="GetPeople.cpp" />
     <ClCompile Include="GedcomIn.cpp" />
     <ClCompile Include="GedcomIn_fillVectors.cpp" />
-    <ClCompile Include="EditPeople.cpp" />
     <ClCompile Include="ColorStatic.cpp" />
     <ClCompile Include="ColumnsList.cpp" />
     <ClCompile Include="ComboItem.cpp" />

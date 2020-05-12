@@ -125,9 +125,12 @@ public:
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnClickedRadioClear();
 	afx_msg void OnRadioDefault();
-	BOOL m_syntax;
+//	BOOL m_unordered;
 	CComboBox m_ComboBgrd;
 //	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 	afx_msg LRESULT OnCtlColorBtn( WPARAM wparam, LPARAM lparam );
+//	CButton m_ordered;
+//	CButton m_unordered;
+	BOOL m_unordered;
 };
 #endif // !defined(AFX_DESCENDANT_H__930379D8_BDD1_4973_93FF_041F3F3811E4__INCLUDED_)

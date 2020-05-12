@@ -539,11 +539,12 @@ void CPictures::OnEditDelete()
 	m_command.Format( L"DELETE FROM pictures WHERE rowid='%s'", rowid );
 	theApp.executeBlob( m_command );
 	m_ListCtrl.DeleteItem( nItem );
-	if( !m_ListCtrl.GetItemCount() ) 
-	{
-		GetDlgItem( IDC_PHOTOS )->EnableWindow( false );
-		return;
-	}
+
+//	if( !m_ListCtrl.GetItemCount() ) 
+//	{
+//		GetDlgItem( IDC_PHOTOS )->EnableWindow( false );
+//		return;
+//	}
 
 
 	m_command.Format( L"SELECT rowid, * FROM pictures %s", m_filter );

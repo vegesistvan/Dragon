@@ -42,6 +42,7 @@ CGaDescendants::CGaDescendants(CWnd* pParent /*=NULL*/)
 	,m_tableNumber(L"")
 	, m_CheckLastName(FALSE)
 	, m_code(FALSE)
+	, m_unordered(FALSE)
 {
 
 }
@@ -62,6 +63,9 @@ void CGaDescendants::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_LASTNAME, m_CheckLastName);
 	DDX_Radio(pDX, IDC_ANSI, m_code);
 	DDX_Control(pDX, IDC_COMBO_BGRD, m_ComboBgrd);
+	//  DDX_Control(pDX, IDC_ORDERED, m_ordered);
+	//  DDX_Control(pDX, IDC_ORDERED, m_unordered);
+	DDX_Radio(pDX, IDC_ORDERED, m_unordered);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CGaDescendants, CDialogEx)
@@ -144,7 +148,7 @@ void CGaDescendants::treePeople()
 	TCHAR* kicsoda[] = { L"leszármazott", L"leszármazott házastársa", L"Leszármazott házastársának apja", L"leszármazott házastársának anyja", L"leszármazott házastársának továnbbi házastársa" };
 
 
-	if( m_syntax == 0 )  // orderd list
+	if( m_unordered == 0 )  // orderd list
 	{
 		m_tag1 = L"<ol>";
 		m_tag2 = L"</ol>";
@@ -206,7 +210,7 @@ void CGaDescendants::treeTables()
 	CString familyName;
 	CString father_id;
 
-	if( m_syntax == 0 )
+	if( m_unordered == 0 )
 	{
 		m_tag1 = L"<ol list-style-type: circle>";
 		m_tag2 = L"</ol>";

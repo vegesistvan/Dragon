@@ -3,8 +3,8 @@
 #include "Ga_descendants.h"
 #include "GA_structures.h"
 
-#define KESMARKY 0
-#define MAREK 1
+#define ORDERED 0
+#define UNORDERED 1
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ix a kiirandó leszármazott indexe a vDesc vektorban
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -76,14 +76,14 @@ void CGaDescendants::printBegining( int ix )
 	if( p.generation.IsEmpty() )    // gedcom vagy kézi feltöltés
 	{
 		gen = TCHAR('A') + TCHAR(generation);				// a generációs karakter-jel ( A,B,C,D.....)
-		if( m_syntax == KESMARKY )
+		if( m_unordered == ORDERED )
 			str.Format( L"%s%c&diams;", tags, gen );			// gedcom és kézi bevitelnél nincs generáció, ezt úgy kell beletenni!!
 		else
 			str.Format( L"%s%c%d ", tags, gen, vDesc.at(ix).children );
 	}
 	else   // GAHTM feltöltés
 	{
-		if( m_syntax == KESMARKY )
+		if( m_unordered == ORDERED )
 			str.Format( L"%s%s&diams;", tags, p.generation );
 		else
 			str.Format( L"%s%s%d ", tags, p.generation,  vDesc.at(ix).children );
@@ -106,7 +106,7 @@ void CGaDescendants::printDescendant( int ix )
 	
 	if( vDesc.at(ix).numOfMothers > 1 )
 	{
-		if( m_syntax == MAREK )
+		if( m_unordered == UNORDERED )
 		{
 			if( !p.mother_index2.IsEmpty() && p.mother_index2.Compare( L"0" ) )
 				fwprintf( fl, L"%s. ", p.mother_index2 );
@@ -121,7 +121,7 @@ void CGaDescendants::printDescendant( int ix )
 		}
 	}
 	
-	if( m_syntax == MAREK )
+	if( m_unordered == UNORDERED )
 	{
 		str = getPlaceDateBlock( p.birth_place, p.birth_date, '*' );
 		if( !str.IsEmpty() )
@@ -207,7 +207,7 @@ void CGaDescendants::printMarriage( CString place, CString date, int i, int numb
 {
 	CString marriage;
 
-//	if( m_syntax == MAREK )
+//	if( m_unordered == UNORDERED )
 //		fwprintf( fl, L";" );
 
 	marriage = attrib[m_ixSpec].code1;

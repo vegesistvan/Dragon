@@ -119,11 +119,12 @@ void CGaDescendants::createStyle()
 {
 	
 	fwprintf( fl, L"<style>\n" );
-	if( m_syntax != 0 )
+	if( m_unordered != 0 )
 	{
 	fwprintf( fl, L"ul {\n" );
 	fwprintf( fl, L"display: block;\n" );
-	fwprintf( fl, L"list-style-type: square;\n" );
+//	fwprintf( fl, L"list-style-type: square;\n" );
+	fwprintf( fl, L"list-style-type: none;\n" );
 	fwprintf( fl, L"margin-top: 0 em;\n" );
 	fwprintf( fl, L"margin-bottom: 0 em;\n" );
 	fwprintf( fl, L"margin-left: 0;\n" );
