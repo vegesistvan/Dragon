@@ -82,6 +82,7 @@ BOOL CFaApp::InitInstance()
 	}
 /* main database ***********************************************************************************************/
 	m_databaseSpec	= GetProfileString(	L"Settings", L"database", L"" );
+	m_databaseSpec = L"alma.db";
 	if( _waccess( m_databaseSpec, 0 ) )
 	{
 		if( !selectDatabase() ) return false;
@@ -248,8 +249,6 @@ BOOL CFaApp::selectDatabase()
 
 	m_blobName.Format( L"%s_blob.db", m_baseName );
 	m_blobSpec.Format( L"%s\\%s", m_databasePath, m_blobName );
-	m_inputMode = getInputMode();
-
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -496,10 +496,8 @@ void CFaDlg::OnOpenDb()
 {
 	if( m_pIndividuals != NULL )
 		m_pIndividuals->OnClose();
-//		m_pIndividuals->CloseWindow();
 	if( m_pMarriages )
 		m_pMarriages->OnClose();
-//		m_pMarriages->CloseWindow();
 
 	if( !theApp.selectDatabase() ) return;
 	
