@@ -954,7 +954,7 @@ int CSqliteDB::blobInsert( char* table, char* column, BLOBSTAT* stat )
 		return 0;
 	}
 	// Bind a block of zeros the size of the file we're going to insert later
-	SqliteDBBindZeroblob( insert_stmt, 1, stat->size );
+	SqliteDBBindZeroblob( insert_stmt, 1, (int)stat->size );
 	if(SQLITE_DONE != (rc = SqliteDBStep( insert_stmt )))
 	{
 		str.Format( L"Insert statement didn't work (%i): %s\n", rc, SqliteDBErrmsg(db));
@@ -999,7 +999,7 @@ int CSqliteDB::blobInsert( char* table, char* column, BLOBSTAT* stat )
 		offset+=len;
 	}
 	SqliteDBBlobClose(blob);
-	return rowid;
+	return (int)rowid;
 
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

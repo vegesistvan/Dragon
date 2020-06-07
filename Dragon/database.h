@@ -1,5 +1,6 @@
 #pragma once
-//#include "structures.h"
+#include "structures.h"
+/*
 typedef struct
 {
 	TCHAR	*name;
@@ -19,7 +20,7 @@ typedef struct
 	TCHAR	*column;
 	TCHAR	*name;
 }INDEXES;
-
+*/
 typedef struct
 {
 	CString modifier;
@@ -29,6 +30,7 @@ typedef struct
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // sqlite_master table
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 enum
 {
 	MASTERTABLE_TYPE = 0,						// 'table' or 'index'
@@ -37,6 +39,7 @@ enum
 	MASTERTABLE_ROOTPAGE,
 	MASTERTABLE_SQL							// CREATE .....
 };
+*/
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const COLUMN inputFiles[] =
 {
@@ -341,8 +344,9 @@ enum
 	PIC_PICTURE
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ABC sorrendben!!!
-const DB mainStructure[] =
+const DB databaseTables[] =
 {
 	{ L"inputFiles", (COLUMN*)&inputFiles, sizeof( inputFiles )/sizeof(COLUMN) },
 	{ L"marriages", (COLUMN*)&marriages, sizeof( marriages )/sizeof(COLUMN) },
@@ -351,26 +355,9 @@ const DB mainStructure[] =
 	{ L"tables", (COLUMN*)&tables, sizeof( tables )/sizeof(COLUMN) },
 	{ L"united", (COLUMN*)&united, sizeof( united )/sizeof(COLUMN) },
 };
-const int mainNumberOfTables = sizeof( mainStructure )/ sizeof( DB );
+const int numberOfTables = sizeof( databaseTables )/ sizeof( DB );
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// ABC sorrendben!!!
-const DB systemStructure[] =
-{
-	{ L"firstnames", (COLUMN*)&firstnames, sizeof( firstnames )/sizeof(COLUMN) },
-	{ L"languages", (COLUMN*)&languages, sizeof( languages )/sizeof(COLUMN) },
-	{ L"titles", (COLUMN*)&titles, sizeof( titles )/sizeof(COLUMN) },
-};
-const int systemNumberOfTables = sizeof( systemStructure )/ sizeof( DB );
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// ABC sorrendben!!!
-const DB blobStructure[] =
-{
-	{ L"pictures", (COLUMN*)&pictures, sizeof( pictures )/sizeof(COLUMN) },
-};
-const int blobNumberOfTables = sizeof( blobStructure )/ sizeof( DB );
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const INDEXES mainIndexes[] =
+const INDEXES databaseIndexes[] =
 {
 	{ L"people", L"father_id", L"fatherIx" },
 	{ L"people", L"mother_id", L"motherIx" },
@@ -380,17 +367,38 @@ const INDEXES mainIndexes[] =
 	{ L"marriages", L"spouse2_id", L"spouse2Ix" },
 	{ L"marriages", L"place", L"placeIx" },
 };
+const int numberOfIndexes = sizeof( databaseIndexes )/ sizeof( INDEXES );
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// ABC sorrendben!!!
+const DB systemTables[] =
+{
+	{ L"firstnames", (COLUMN*)&firstnames, sizeof( firstnames )/sizeof(COLUMN) },
+	{ L"languages", (COLUMN*)&languages, sizeof( languages )/sizeof(COLUMN) },
+	{ L"titles", (COLUMN*)&titles, sizeof( titles )/sizeof(COLUMN) },
+};
+const int numberOfSystemTables = sizeof( systemTables )/ sizeof( DB );
+
 const INDEXES systemIndexes[] =
 {
 	{ L"firstnames", L"first_name", L"firstnamesX" },
 	{ L"titles", L"title", L"titleX" },
 };
+const int numberOfSystemIndexes = sizeof( systemIndexes )/ sizeof( INDEXES );
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// ABC sorrendben!!!
+const DB blobStructure[] =
+{
+	{ L"pictures", (COLUMN*)&pictures, sizeof( pictures )/sizeof(COLUMN) },
+};
+const int blobNumberOfTables = sizeof( blobStructure )/ sizeof( DB );
+
 const INDEXES blobIndexes[] =
 {
 	{ L"pictures", L"id", L"idX" },
 };
+const int numberOfBlobIndexes = sizeof( blobIndexes ) / sizeof( INDEXES );
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const DATEMODIFIERS dateModifiers[] =
@@ -402,5 +410,5 @@ const DATEMODIFIERS dateModifiers[] =
 	{ L"?" }
 };
 const UINT dateModifiersSize = sizeof( dateModifiers ) / sizeof( DATEMODIFIERS );
-
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

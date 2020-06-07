@@ -24,6 +24,15 @@
 
 #define EXTERNAL_LIB	//ha dll-kent akarjuk hasznalni az sqlite-ot akkor hasznaljuk ezt az opciot
 
+
+typedef struct
+{
+	CString filename;
+	CString fileSpec;
+	CString ext;
+	u_int64	size;
+}BLOBSTAT;
+
 //a kovetkezo opcioknak akkor van ertelme, ha kozvetlenul forditjuk az sqliteot az sqlitedb-be
 //#define ENCRYPTION //ha megvannak a titkosítast tamogato kiegeszitesek, akkor engedelyezzuk ezt, es hasznaljuk a   SQLITE_ENABLE_RTREE;SQLITE_HAS_CODEC;SQLITE3ENCRYPT_EXPORTS;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;CODEC_TYPE=CODEC_TYPE_AES128; preprocessor directivakat
 //#define SQLITE_METADATA  //ha akarunk metadatat, akkor engedelyezzuk ezt az opciot, es hasznaljuk a SQLITE_ENABLE_COLUMN_METADATA preprocessor directivat

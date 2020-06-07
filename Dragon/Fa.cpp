@@ -7,6 +7,7 @@
 #include "FaDlg.h"
 #include "locale.h"
 #include "ProgressWnd.h"
+#include "OpenDatabase.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -82,13 +83,14 @@ BOOL CFaApp::InitInstance()
 	}
 /* main database ***********************************************************************************************/
 	m_databaseSpec	= GetProfileString(	L"Settings", L"database", L"" );
-	m_databaseSpec = L"alma.db";
 	if( _waccess( m_databaseSpec, 0 ) )
 	{
-		if( !selectDatabase() ) return false;
+		if( !selectDatabase() ) return FALSE;
 	}
-	
-	if( !openDatabase() ) return false;
+	while( !openDatabase() )
+		if( !selectDatabase() ) break;
+
+
 // system database ********************************************************************************************************/
 	if( _waccess( m_systemDatabaseSpec, 0 ) )
 	{
@@ -232,23 +234,7 @@ BOOL CFaApp::selectDatabase()
 	{
 		setCreationTime( newFile );
 	}
-
-
 	m_databaseSpec = newFile;
-
-//	WriteProfileStringW( L"Settings", L"database", m_databaseSpec );
-
-	m_databaseName = m_databaseSpec.Mid( m_databaseSpec.ReverseFind( '\\' ) + 1 );
-	splitFilespec( m_databaseSpec, &drive, &path,&filename,&ext );
-	m_baseName = filename;
-
-	m_databasePath.Format( L"%s:\\%s", drive, path );
-	m_workingDirectory.Format( L"%s\\lists", m_databasePath );
-	if( _waccess( m_workingDirectory, 0 ) )
-		_wmkdir( m_workingDirectory );
-
-	m_blobName.Format( L"%s_blob.db", m_baseName );
-	m_blobSpec.Format( L"%s\\%s", m_databasePath, m_blobName );
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -259,55 +245,30 @@ BOOL CFaApp::openDatabase()
 	CProgressWnd pWin(NULL, str ); 
 	pWin.GoModal();
 
+	COpenDatabase open;
+
+	open.m_databaseSpec		= m_databaseSpec;
+	open.m_connDB			= mainDB;
+	open.m_databaseTables	= databaseTables;
+	open.m_databaseIndexes	= databaseIndexes;
+	open.m_numberOfTables	= numberOfTables;
+	open.m_numberOfIndexes	= numberOfIndexes;
+
+	if( !open.openDatabase() ) return false;
+
+	WriteProfileString( L"Settings",L"databasespec", m_databaseSpec ); // jó adatbázis, eltenni
+
 	splitFilespec( m_databaseSpec, &drive, &path,&filename,&ext );
 	m_baseName = filename;
 	m_databasePath.Format( L"%s:\\%s", drive, path );
+
+	m_blobName.Format( L"%s_blob.db", m_baseName );
+	m_blobSpec.Format( L"%s\\%s", m_databasePath, m_blobName );
 
 	m_workingDirectory.Format( L"%s\\lists", m_databasePath );
 	if( _waccess( m_workingDirectory, 0 ) )
 		_wmkdir( m_workingDirectory );
 
-/*********************************************************************************************************************/
-	if(mainDB->IsConnected()) mainDB->Close();
-	if( mainDB->Connect( m_databaseSpec, L"" ) )
-	{
-		str.Format( L"%s (key:%s)\nconnect error\n%s", m_databaseSpec, L"", mainDB->GetLastError() );
-		AfxMessageBox(str);
-		return FALSE;
-	}
-
-	m_command = L"SELECT * FROM sqlite_master WHERE type == 'table' ORDER BY tbl_name"; 
-	if( !query( m_command ) ) return FALSE;
-/**********************************************************************************************************************/
-	if( !m_recordset->RecordsCount() )		// az adatbázisban még nincsenek táblák!! Létre kell hozni õket!
-	{
-		m_command.Format(L"PRAGMA encoding = 'UTF-8'" );
-		if( !execute( m_command ) ) return FALSE;
-
-		for( int i = 0; i < sizeof(mainStructure)/sizeof( DB ); ++i )
-		{
-			createCommand( mainStructure[i].name, (COLUMN*)mainStructure[ i ].columns, mainStructure[ i ].size );
-			if( !execute( m_command ) ) return FALSE;
-		}
-	
-		for( int i = 0; i < sizeof(mainIndexes)/sizeof( INDEXES ); ++i )
-		{
-			m_command.Format( L"CREATE INDEX %s ON %s (%s)", mainIndexes[i].name, mainIndexes[i].table, mainIndexes[i].column ); 
-			if( !execute( m_command ) ) return FALSE;
-		}
-	}
-	else						// már létezõ adatbázist nyitunk meg, elõtte ellenõrizzük
-	{
-		#ifndef _DEBUG
-		pWin.SetText( L"Az adatbázis integritásának ellenõrzése..." ); 
-		#endif
-
-		if( !checkIntegrity( mainDB ) ) return false;
-		if( !checkStructure( m_recordset, mainStructure, mainNumberOfTables, m_databaseSpec ) ) return false;
-
-	}
-/****************************************************************************************************************/
-	WriteProfileStringW( L"Settings", L"database", m_databaseSpec );
 
 	if( !query( L"SELECT count() FROM people" ) ) return FALSE;
 	m_cntPeople = _wtoi( m_recordset->GetFieldString( 0 ) );
@@ -322,9 +283,6 @@ BOOL CFaApp::openDatabase()
 
 	pWin.DestroyWindow();
 
-	m_blobName.Format( L"%s_blob.db", m_baseName );
-	m_blobSpec.Format( L"%s\\%s", m_databasePath, m_blobName );
-
 	while( !openBlob() )
 	{
 		if( !selectDatabase() ) return false;
@@ -335,183 +293,32 @@ BOOL CFaApp::openDatabase()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CFaApp::openBlob() 
 {
-	if(blobDB->IsConnected()) blobDB->Close();
-	if( blobDB->Connect( m_blobSpec, L"" ) )
-	{
-		str.Format( L"%s \nconnect error\n%s", m_blobSpec, blobDB->GetLastError() );
-		AfxMessageBox(str);
-		return FALSE;
-	}
+	COpenDatabase open;
 
-	m_command = L"SELECT * FROM sqlite_master WHERE type='table' ORDER BY tbl_name";
-	if( !queryBlob( m_command ) ) return FALSE;
+	open.m_databaseSpec		= m_blobSpec;
+	open.m_connDB			= blobDB;
+	open.m_databaseTables	= blobStructure;
+	open.m_databaseIndexes	= blobIndexes;
+	open.m_numberOfTables	= blobNumberOfTables;
+	open.m_numberOfIndexes	= numberOfBlobIndexes;
 
-	if( !m_recordsetBlob->RecordsCount() )		// az adatbázisban még nincsenek táblák!!
-	{
-		m_command.Format(L"PRAGMA encoding = 'UTF-8'" );
-		if( !executeBlob( m_command ) ) return FALSE;
-		for( int i = 0; i < sizeof(blobStructure)/sizeof( DB ); ++i )
-		{
-			createCommand( blobStructure[i].name, (COLUMN*)blobStructure[ i ].columns, blobStructure[ i ].size );
-			if( !executeBlob( m_command ) ) return FALSE;
-		}
-		for( int i = 0; i < sizeof(blobIndexes)/sizeof( INDEXES ); ++i )
-		{
-			m_command.Format( L"CREATE INDEX %s ON %s (%s)", blobIndexes[i].name, blobIndexes[i].table, blobIndexes[i].column ); 
-			if( !executeBlob( m_command ) ) return FALSE;
-		}
-	}
-	else
-	{
-		if( !checkIntegrity( blobDB ) ) return false;
-		if( !checkStructure( m_recordsetBlob, blobStructure, blobNumberOfTables, m_blobSpec ) ) return false;
-	}
+	if( !open.openDatabase() ) return false;
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CFaApp::openSystemDatabase() 
 {
-	if(systemDB->IsConnected()) systemDB->Close();
-	if( systemDB->Connect( m_systemDatabaseSpec, L"" ) )
-	{
-		str.Format( L"%s (key:%s)\nconnect error\n%s", m_systemDatabaseSpec, L"", systemDB->GetLastError() );
-		AfxMessageBox(str);
-		return FALSE;
-	}
+	COpenDatabase open;
 
-	m_command = L"SELECT * FROM sqlite_master WHERE type='table' ORDER BY tbl_name";
-	if( !querySystem( m_command ) ) return FALSE;
+	open.m_databaseSpec		= m_systemDatabaseSpec;
+	open.m_connDB			= systemDB;
+	open.m_databaseTables	= systemTables;
+	open.m_databaseIndexes	= systemIndexes;
+	open.m_numberOfTables	= numberOfSystemTables;
+	open.m_numberOfIndexes	= numberOfSystemIndexes;
 
-	if( !m_recordsetSystem->RecordsCount() )		// az adatbázisban még nincsenek táblák!!
-	{
-		m_command.Format(L"PRAGMA encoding = 'UTF-8'" );
-		if( !executeSys( m_command ) ) return FALSE;
-		for( int i = 0; i < sizeof(systemStructure)/sizeof( DB ); ++i )
-		{
-			createCommand( systemStructure[i].name, (COLUMN*)systemStructure[ i ].columns, systemStructure[ i ].size );
-			if( !executeSys( m_command ) ) return FALSE;
-		}
-		for( int i = 0; i < sizeof(systemIndexes)/sizeof( INDEXES ); ++i )
-		{
-			m_command.Format( L"CREATE INDEX IF NOT EXISTS %s ON %s (%s)", systemIndexes[i].name, systemIndexes[i].table, systemIndexes[i].column ); 
-			if( !executeSys( m_command ) ) return FALSE;
-		}
-	}
-	else
-	{
-		if( !checkIntegrity( systemDB ) ) return false;
-		if( !checkStructure( m_recordsetSystem, systemStructure, systemNumberOfTables, m_systemDatabaseSpec ) ) return false;
-	}
+	if( !open.openDatabase() ) return false;
 	return TRUE;
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CFaApp::checkStructure( CSqliteDBRecordSet* rec, const DB* fileStructure, int tableNumberDB, CString fileSpec )
-{
-	int tableCnt = rec->RecordsCount();
-	
-	if( tableCnt != tableNumberDB )
-	{
-		 str.Format( L"%s\nadatbázis fájlban %d tábla van, pedig %d-nek kellen lenni!\n", fileSpec, tableCnt, tableNumberDB );
-		 str +=  L"\nJelölj ki egy másik adatbázis fájlt vagy adj meg egy újat!";
-		 AfxMessageBox( str );
-		 return false;
-	}
-
-
-	CString createCommand;
-	CString columnName;
-	int		numOfColumnsDB;
-	std::vector<CString> vColumns;
-	COLUMN* columns;
-	CString tableName;
-
-	for( UINT i = 0; i < rec->RecordsCount(); ++i, rec->MoveNext() )
-	{
-		tableName = rec->GetFieldString( M_TABLE_NAME );
-		if( tableName != fileStructure[i].name )
-		{
-			str.Format( L"%s\nadatbázis fájlban a %d. tábla név '%s', pedig '%s'-nek kellen lenni!\n", fileSpec, i+1, tableName, fileStructure[i].name );
-			str +=  L"\nJelölj ki egy másik adatbázis fájlt vagy adj meg egy újat!";
-			AfxMessageBox( str );
-			return false;
-		}
-
-		createCommand	= rec->GetFieldString( M_SQL );
-		createColumnVector( createCommand, &vColumns );
-		numOfColumnsDB	= fileStructure[i].size;
-
-		if( numOfColumnsDB != vColumns.size() )
-		{
-			str.Format( L"%s\nadatbázis fájlban '%s' táblájában %d oszlop van,\n pedig %d-nek kellen lenni!\n", fileSpec, tableName, vColumns.size(), numOfColumnsDB );
-			str +=  L"\nJelölj ki egy másik adatbázis fájlt vagy adj meg egy újat!";
-			AfxMessageBox( str );
-			return false;
-		}
-
-		for( UINT j = 0 ; j < vColumns.size(); ++j )
-		{
-			if( toLower( vColumns.at(j) ) != toLower( fileStructure[i].columns[j].name ) )
-			{
-				str.Format( L"A %s\nadatbázis fájl '%s' táblájában a %d. oszlop '%s'\npedig '%s'-nek kellen lenni!\n", fileSpec, tableName, j+1, vColumns.at(j), fileStructure[i].columns[j].name );
-				str +=  L"\nJelölj ki egy másik adatbázis fájlt vagy adj meg egy újat!";
-				AfxMessageBox( str );
-				return false;
-			}
-		}
-	}
-	return true;
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CFaApp::checkIntegrity( CSqliteDB* db )
-{
-	bool hiba = false;
-
-	CString fileSpec;
-	fileSpec.Format( L"%s\\databaseCheck.txt", m_workingDirectory );
-
-	if( (openFileSpec( &theApp.fl, fileSpec, L"w+" ) ) == NULL )
-		return false;
-
-	if( !queryX( db, L"PRAGMA integrity_check" ) ) goto z;
-	str = m_recSetX->GetFieldString( 0 );
-	if( str != L"ok" )
-	{
-		hiba = true;
-		fwprintf( theApp.fl, L"Elsõ integrity check eredménye:\n\n" );
-		fwprintf( theApp.fl, L"%s\n\n", str );
-		if( !executeX( db, L"REINDEX" ) ) goto z;
-		
-		if( !queryX( db, L"PRAGMA integrity_check" ) ) goto z;
-		str = m_recSetX->GetFieldString( 0 );
-		if( str != L"ok" )
-		{
-			if( !executeX( db, L"VACUUM" ) ) goto z;
-			if( !queryX( db, L"PRAGMA integrity_check" ) ) goto z;
-			str = m_recSetX->GetFieldString( 0 );
-			if( str != L"ok" )
-			{
-				fwprintf( theApp.fl, L"REINDEX után is probléma van. VACUUM utána integrity check-ben is probléma van:\n\n" );
-				fwprintf( theApp.fl, L"Adatvesztés történhetett!!" );
-				fwprintf( theApp.fl, str );
-			}
-		}
-		else
-		{
-			fwprintf( theApp.fl, L"REINDEX megoldotta a problémát!\n\n" );
-		}
-	}
-
-z:	fclose( theApp.fl );
-	if( hiba )
-	{
-		showFile( fileSpec );
-		return false;
-	}
-	else
-	{
-		CFile::Remove( fileSpec );
-		return true;
-	}
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CFaApp::getInputMode()
@@ -727,31 +534,6 @@ void CFaApp::clearDatabase()
 
 	if( theApp.openDatabase() ) return;
 	return;
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaApp::createColumnVector( CString list, std::vector<CString>* vColumns )
-{
-	CString column;
-	int pos = list.Find( '[' );
-	int pos2;
-	char term1 = '[';
-	char term2 = ']';
-
-	if( pos == -1 )
-	{
-		term1 = '\'';
-		term2 = '\'';
-	}
-	vColumns->clear();
-	while( ( pos = list.Find( term1, pos + 1 ) ) != -1 )
-	{
-		if( ( pos2 = list.Find( term2, pos + 1 ) ) != -1 )
-		{
-			column = list.Mid( pos + 1, pos2-pos-1 );
-			vColumns->push_back( column );
-			pos = pos2 + 1;
-		}
-	}
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

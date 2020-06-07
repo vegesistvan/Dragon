@@ -17,6 +17,26 @@
     '\0'
 };
 
+typedef struct
+{
+	TCHAR	*name;
+	TCHAR	*type;
+}COLUMN;
+
+typedef struct
+{
+	TCHAR	*name;
+	const COLUMN	*columns;
+	int		size;
+}DB;
+
+typedef struct
+{
+	TCHAR	*table;
+	TCHAR	*column;
+	TCHAR	*name;
+}INDEXES;
+
 
 typedef struct
 {
@@ -27,7 +47,7 @@ typedef struct
 	int		primaryPic;
 }PHOTOS;
 
-
+/*
 typedef struct
 {
 	CString filename;
@@ -35,7 +55,7 @@ typedef struct
 	CString ext;
 	u_int64	size;
 }BLOBSTAT;
-
+*/
 typedef struct FAMS
 {
 	int	indi;

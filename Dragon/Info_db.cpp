@@ -271,11 +271,11 @@ void CInfoDb::OnClickedReindex()
 {
 	CProgressWnd wndProgress(NULL, L"Adatbázis újraindexelése folyik..." ); 
 	wndProgress.GoModal();
-	for( int i = 0; i < sizeof(mainIndexes)/sizeof( INDEXES ); ++i )
+	for( int i = 0; i < numberOfIndexes; ++i )
 	{
-		m_command.Format( L"DROP INDEX IF EXISTS %s", mainIndexes[i].name );
+		m_command.Format( L"DROP INDEX IF EXISTS %s", databaseIndexes[i].name );
 		if( !theApp.execute( m_command ) ) return;
-		m_command.Format( L"CREATE INDEX IF NOT EXISTS %s ON %s (%s)", mainIndexes[i].name, mainIndexes[i].table, mainIndexes[i].column ); 
+		m_command.Format( L"CREATE INDEX IF NOT EXISTS %s ON %s (%s)", databaseIndexes[i].name, databaseIndexes[i].table, databaseIndexes[i].column ); 
 		if( !theApp.execute( m_command ) ) return;
 	}
 	wndProgress.DestroyWindow();
@@ -286,19 +286,7 @@ void CInfoDb::OnClickedReindex()
 void CInfoDb::OnClickedReindexBlob()
 {
 	theApp.executeBlob( L"REINDEX" );
-	/*
 
-	CProgressWnd wndProgress(NULL, L"Adatbázis újraindexelése folyik..." ); 
-	wndProgress.GoModal();
-	for( int i = 0; i < sizeof(blobIndexes)/sizeof( INDEXES ); ++i )
-	{
-		m_command.Format( L"DROP INDEX IF EXISTS %s", blobIndexes[i].name );
-		if( !theApp.executeBlob( m_command ) ) return;
-		m_command.Format( L"CREATE INDEX IF NOT EXISTS %s ON %s (%s)", blobIndexes[i].name, blobIndexes[i].table, blobIndexes[i].column ); 
-		if( !theApp.executeBlob( m_command ) ) return;
-	}
-	wndProgress.DestroyWindow();
-	*/
 	str.Format( L"%s adatbázis\nújraindexelése sikeresen megtörtént!", theApp.m_blobName );
 	AfxMessageBox( str );
 }
