@@ -9,7 +9,7 @@
 // Ha a felhasználó Cancel-el mégsem akar új embert adni, akkor az m_rowid empty lesz. 
 
 #include "stdafx.h"
-#include "Fa.h"
+#include "Dragon.h"
 #include "NewPeople2.h"
 #include "afxdialogex.h"
 #include "SameName.h"

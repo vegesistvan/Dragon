@@ -4,8 +4,8 @@
 // GEDCOM table
 
 #include "stdafx.h"
-#include "Fa.h"
-#include "FaDlg.h"
+#include "Dragon.h"
+#include "DragonDlg.h"
 #include "Table_people.h"
 #include "afxdialogex.h"
 #include "Filter.h"
@@ -1686,7 +1686,7 @@ void CTablePeople::OnClose()
 {
 	m_ListCtrl.DeleteAllItems();	// erre szükség van?
 	m_recordset->Clear();			// erre szükség van?
-	((CFaDlg*)m_dlg )->m_pIndividuals = NULL;
+	((CDragonDlg*)m_dlg )->m_pIndividuals = NULL;
 //	theApp.m_pMainWnd->ShowWindow( SW_RESTORE );
 	theApp.m_pMainWnd->SetForegroundWindow();
 	CDialogEx::OnClose();
@@ -1698,7 +1698,7 @@ void CTablePeople::PostNcDestroy()
 	CDialog::PostNcDestroy();
 	if(m_dlg )
 	{		
-		((CFaDlg*)m_dlg )->m_pIndividuals = NULL;
+		((CDragonDlg*)m_dlg )->m_pIndividuals = NULL;
 	}
 	delete this;
 }

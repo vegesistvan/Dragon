@@ -1,6 +1,6 @@
 #include "stdafx.h"
-#include "Fa.h"
-#include "FaDlg.h"
+#include "Dragon.h"
+#include "DragonDlg.h"
 #include "utilities.h"
 #include <algorithm>
 #include "GetString.h"
@@ -40,7 +40,7 @@ bool openFileSpec( FILE** ff, CString fileSpec, CString mode )
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CFaApp::openTextFile( FILE ** fl, CString fileName, CString mode )
+CString CDragonApp::openTextFile( FILE ** fl, CString fileName, CString mode )
 {
 	CString fileSpec;
 	fileSpec.Format(L"%s\\%s_%s.text",m_workingDirectory,fileName, getTimeTag() );
@@ -48,7 +48,7 @@ CString CFaApp::openTextFile( FILE ** fl, CString fileName, CString mode )
 	return fileSpec;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CFaApp::openHtmlFile( FILE** fh,  CString fileName, CString mode )
+CString CDragonApp::openHtmlFile( FILE** fh,  CString fileName, CString mode )
 {
 	CString fileSpec;
 	fileSpec.Format(L"%s\\%s_%s.html",m_workingDirectory,fileName, getTimeTag() );
@@ -59,7 +59,7 @@ CString CFaApp::openHtmlFile( FILE** fh,  CString fileName, CString mode )
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-FILE * CFaApp::openLogFile(CString fname,CString title)
+FILE * CDragonApp::openLogFile(CString fname,CString title)
 {
 	CString	sor;
 	int		n;
@@ -113,35 +113,35 @@ FILE * CFaApp::openLogFile(CString fname,CString title)
 	return fl;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaApp::showLogFile()
+void CDragonApp::showLogFile()
 {
 	CString fileSpec;
 	fileSpec.Format( L"\"%s\"", m_listFile );
 	ShellExecute(NULL,L"open",m_editorName, fileSpec, m_editorFolder,SW_SHOW);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaApp::showFile(CString file )
+void CDragonApp::showFile(CString file )
 {
 	CString	fileSpec;
 	fileSpec.Format(L"\"%s\"", file );
 	ShellExecute(NULL,L"open",m_editorName, fileSpec, m_editorFolder,SW_SHOW);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaApp::showHtmlFile(CString file )
+void CDragonApp::showHtmlFile(CString file )
 {
 	CString	fileSpec;
 	fileSpec.Format(L"\"%s\"", file );
 	ShellExecute(NULL, L"open", fileSpec,NULL, NULL, SW_SHOWNORMAL);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaApp::editNotepad( CString lineNumber )
+void CDragonApp::editNotepad( CString lineNumber )
 {
 	CString	fileSpec;
 	fileSpec.Format( L"\"%s\" -n%s -alwaysOnTop -nosession", theApp.m_htmlFileSpec, lineNumber );
 	ShellExecute(NULL,L"open",m_editorName, fileSpec, m_editorFolder,SW_SHOW);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaApp::notepad( CString file, CString option )
+void CDragonApp::notepad( CString file, CString option )
 {
 	CString	fileSpec;
 	fileSpec.Format( L"\"%s\" %s",  file, option );
@@ -149,7 +149,7 @@ void CFaApp::notepad( CString file, CString option )
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
-CString CFaApp::getTimeTag() 
+CString CDragonApp::getTimeTag() 
 {
 	CString		dateTime;
 
@@ -160,7 +160,7 @@ CString CFaApp::getTimeTag()
 }
 */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CFaApp::getPresentDateTime() 
+CString CDragonApp::getPresentDateTime() 
 {
 	CString		dateTime;
 	CString		str;
@@ -172,7 +172,7 @@ CString CFaApp::getPresentDateTime()
 	return dateTime;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CFaApp::getDateIFromStr( CString dateS ) 
+CString CDragonApp::getDateIFromStr( CString dateS ) 
 {
 	CString dateI;
 	CString datum;
@@ -191,7 +191,7 @@ CString CFaApp::getDateIFromStr( CString dateS )
 	return dateI;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString	CFaApp::getDateStrFromI( CString dateI ) 
+CString	CDragonApp::getDateStrFromI( CString dateI ) 
 {
 	CString	str;
 	CTime	ido;
@@ -210,21 +210,21 @@ CString	CFaApp::getDateStrFromI( CString dateI )
 	return str;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-_int64 CFaApp::getPresentTime()
+_int64 CDragonApp::getPresentTime()
 {
 	m_command = L"SELECT strftime('%s','now' )";
 	if( !query4( m_command ) ) return 0;
 	return ( _wtoi( m_recordset4->GetFieldString( 0 ) ) );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaApp::setStartTime()
+void CDragonApp::setStartTime()
 {
 	m_command = L"SELECT strftime('%s','now' )";
 	if( !query( m_command ) ) return;
 	m_time_start = _wtoi( m_recordset->GetFieldString( 0 ) );	
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CFaApp::get_time_elapsed()
+CString CDragonApp::get_time_elapsed()
 {
 	int time_end;
 
@@ -241,7 +241,7 @@ CString CFaApp::get_time_elapsed()
 // Ellenõrtuzi, hogy a megadott 2 dátum között van-e 9 hónap különbség.
 // return TRUE: ha 9 hónapnál nagyobb
 //        FALSE: ha 9 hónapnál kisebb
-BOOL CFaApp::dateDiff(  CString date1, CString date2, int month  )
+BOOL CDragonApp::dateDiff(  CString date1, CString date2, int month  )
 {
 	CString str1;
 	CString str2;
@@ -274,7 +274,7 @@ BOOL CFaApp::dateDiff(  CString date1, CString date2, int month  )
 	return FALSE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CFaApp::getDateI( CString dateS, int month ) 
+CString CDragonApp::getDateI( CString dateS, int month ) 
 {
 	CString dateI;
 	CString datum;
@@ -295,28 +295,28 @@ CString CFaApp::getDateI( CString dateS, int month )
 	return dateI;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CStringA CFaApp::MultiToUtf8( LPCSTR multi )
+CStringA CDragonApp::MultiToUtf8( LPCSTR multi )
 {
 	CStringA utf8;
 	utf8 = UnicodeToUtf8(MultiToUnicode( multi ));
 	return utf8;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CFaApp::getLanguage( int language_id )
+CString CDragonApp::getLanguage( int language_id )
 {
 	m_command.Format( L"SELECT language FROM languages WHERE rowid = '%d'", language_id );
 	if( !querySystem( m_command ) ) return L"";
 	return( m_recordsetSystem->GetFieldString( 0 ) );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int CFaApp::getUserVersion()
+int CDragonApp::getUserVersion()
 {
 	m_command.Format( L"PRAGMA %s", L"user_version" );
 	if( !query( m_command ) ) return 0;
 	return( _wtoi( m_recordset->GetFieldString( 0 ) ) );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaApp::setUserVersion( int iterationCount )
+void CDragonApp::setUserVersion( int iterationCount )
 {
 	m_command.Format(L"PRAGMA user_version=%d", iterationCount );
 	if( !theApp.execute( m_command ) ) return;
@@ -326,7 +326,7 @@ void CFaApp::setUserVersion( int iterationCount )
 // a v_Replace vektorban összegyûjtött emberek törlése 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // a v_Replace vektorban összegyûjtött emberek törlése 
-void CFaApp::unite( UINT iter )
+void CDragonApp::unite( UINT iter )
 {
 	CString	sex_id;
 	CString rowid;
@@ -363,7 +363,7 @@ void CFaApp::unite( UINT iter )
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // a rowid emberre történõ hivatkozásokat kicseréli rowidBy-ra és magát a rowid-t törli
 // 
-void CFaApp::replaceBy( CString rowid, CString rowidBy, CString sex_id, int source )
+void CDragonApp::replaceBy( CString rowid, CString rowidBy, CString sex_id, int source )
 {
 	int united;
 	int	spouse;
@@ -415,7 +415,7 @@ void CFaApp::replaceBy( CString rowid, CString rowidBy, CString sex_id, int sour
 	if( !theApp.execute( m_command ) ) return;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaApp::saveInfo( CString rowid, CString rowidBy )
+void CDragonApp::saveInfo( CString rowid, CString rowidBy )
 {
 	m_command.Format( L"SELECT rowid, * FROM people WHERE rowid == '%s'", rowid );
 	if( !query1( m_command ) ) return;
@@ -433,7 +433,7 @@ void CFaApp::saveInfo( CString rowid, CString rowidBy )
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
-void CFaApp::sameMarriages( int iter )
+void CDragonApp::sameMarriages( int iter )
 {
 	CString spouse1_id;
 	CString spouse2_id;
@@ -506,7 +506,7 @@ void CFaApp::sameMarriages( int iter )
 }
 */
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CFaApp::contractions()
+CString CDragonApp::contractions()
 {
 	CString contr(L"");
 	
@@ -527,7 +527,7 @@ CString CFaApp::contractions()
 // 0 biszex
 // 1 férfi keresztnév
 // 2 nõi keresztnév
-int CFaApp::isFirstName( CString name )
+int CDragonApp::isFirstName( CString name )
 {
 	name.Replace( ')', ' ' );
 	name.Replace( '?', ' ' );
@@ -567,7 +567,7 @@ int CFaApp::isFirstName( CString name )
 
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int CFaApp::getNumberOfDb( std::vector<CString>* vE )
+int CDragonApp::getNumberOfDb( std::vector<CString>* vE )
 {
 	int pos;
 	splitFilespec( m_databaseSpec, &drive, &path, &filename, &ext );
@@ -610,7 +610,7 @@ bool sortByName1(const CString &v1, const CString &v2)
     return( v1 > v2 ); 
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaApp::OnHusbandWife()
+void CDragonApp::OnHusbandWife()
 {
 	CString rowid;
 	CString spouse1_id;
@@ -642,7 +642,7 @@ void CFaApp::OnHusbandWife()
 	}
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaApp::newDatabase( CString tag )
+void CDragonApp::newDatabase( CString tag )
 {
 	CString databaseSpec;
 	CString databaseName;
@@ -659,7 +659,7 @@ void CFaApp::newDatabase( CString tag )
 	if( !theApp.openDatabase() ) return;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int CFaApp::getYearFromDate( CString date )
+int CDragonApp::getYearFromDate( CString date )
 {
 //	int pos;
 
@@ -680,7 +680,7 @@ int CFaApp::getYearFromDate( CString date )
 	return( year );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaApp::insertIntoFiles( CString fileSpec )
+void CDragonApp::insertIntoFiles( CString fileSpec )
 {
 	CFileStatus status;
 	CString mtime;
@@ -714,7 +714,7 @@ void CFaApp::insertIntoFiles( CString fileSpec )
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CFaApp::selectFile(  CString fileSpec, BLOBSTAT* stat)
+bool CDragonApp::selectFile(  CString fileSpec, BLOBSTAT* stat)
 {
 	if( fileSpec.IsEmpty() )
 	{
@@ -753,7 +753,7 @@ bool CFaApp::selectFile(  CString fileSpec, BLOBSTAT* stat)
 }
 /*
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CFaApp::selectFiles( )
+bool CDragonApp::selectFiles( )
 {
 	BLOBSTAT stat;
 	CString fileSpec;
@@ -794,7 +794,7 @@ bool CFaApp::selectFiles( )
 }
 */
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CFaApp::selectFiles( )
+bool CDragonApp::selectFiles( )
 {
 	#define MAX_CFileDialog_FILE_COUNT 99
 	#define FILE_LIST_BUFFER_SIZE ((MAX_CFileDialog_FILE_COUNT * (MAX_PATH + 1)) + 1)
@@ -849,14 +849,14 @@ bool CFaApp::selectFiles( )
 
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaApp::OnEmail()
+void CDragonApp::OnEmail()
 {
 	CString str1("open"),str2("mailto:veges.istvan@gmail.com ? subject=Hi & cc=");
 	ShellExecute(NULL, str1, str2, NULL , NULL, SW_SHOWNORMAL);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
-CString CFaApp::rootExists( CString root )
+CString CDragonApp::rootExists( CString root )
 {
 	m_command.Format( L"SELECT rowid, familyName FROM tables WHERE familyName = '%s'", root );
 	if( !query1( m_command ) ) return L"";
@@ -868,7 +868,7 @@ CString CFaApp::rootExists( CString root )
 }
 */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaApp::OnPrivatFolyt()
+void CDragonApp::OnPrivatFolyt()
 {
 
 	CString logFile( L"folyt" );
@@ -910,7 +910,7 @@ void CFaApp::OnPrivatFolyt()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // A rowid+sex_id-vel megadott ember házastársait gyûjti össze a vektor-ban
 // 
-CString CFaApp::getSpouses( CString rowid, CString sex_id, std::vector<SPOUSES>* vektor, SPOUSES2* sp )
+CString CDragonApp::getSpouses( CString rowid, CString sex_id, std::vector<SPOUSES>* vektor, SPOUSES2* sp )
 {
 	CString spouse_id;
 	CString spouse;
@@ -983,21 +983,21 @@ CString CFaApp::getSpouses( CString rowid, CString sex_id, std::vector<SPOUSES>*
 	return sp->spouses;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaApp::OnLanguages()
+void CDragonApp::OnLanguages()
 {
 	CLanguages dlg;
 
 	if( dlg.DoModal() == IDCANCEL ) return;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaApp::OnPlaces()
+void CDragonApp::OnPlaces()
 {
 	CTablePlaces dlg;
 
 	if( dlg.DoModal() == IDCANCEL ) return;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaApp::message( CString caption, CString str )
+void CDragonApp::message( CString caption, CString str )
 {
 	CMessage dlg;
 	dlg.caption	= caption;
@@ -1005,7 +1005,7 @@ void CFaApp::message( CString caption, CString str )
 	dlg.DoModal();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaApp::OnUsermanual()
+void CDragonApp::OnUsermanual()
 {
 	if( _waccess( m_helpFileSpec, 0 ) )
 	{
@@ -1018,13 +1018,13 @@ void CFaApp::OnUsermanual()
 	}
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaApp::OnTableFirstNames()
+void CDragonApp::OnTableFirstNames()
 {
 	CTableFirstnames dlg;
 	dlg.DoModal();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CFaApp::getPresentDate() 
+CString CDragonApp::getPresentDate() 
 {
 	CString		dateTime;
 	m_command=L"SELECT date('now','localtime')";
@@ -1034,14 +1034,14 @@ CString CFaApp::getPresentDate()
 	return dateTime;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CFaApp::getFamily( CString tableNumber )
+CString CDragonApp::getFamily( CString tableNumber )
 {
 	m_command.Format( L"SELECT familyName FROM  tables WHERE rowid='%s'", tableNumber );
 	if( !query4( m_command ) ) return L"";
 	return( m_recordset4->GetFieldString( 0 ) );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CFaApp::getTable( CString tableNumber )
+CString CDragonApp::getTable( CString tableNumber )
 {
 	m_command.Format( L"SELECT tableHeader FROM  tables WHERE rowid='%s'", tableNumber );
 	if( !query4( m_command ) ) return L"";
@@ -1051,7 +1051,7 @@ CString CFaApp::getTable( CString tableNumber )
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaApp::listHtmlLine( int lineNumber )
+void CDragonApp::listHtmlLine( int lineNumber )
 {
 	CHtmlEdit dlg;
 
@@ -1149,7 +1149,7 @@ void CFaApp::listHtmlLine( int lineNumber )
 //	AfxMessageBox( L"A html fájl módisítása megtörtént!" );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaApp::selectAll( CListCtrlEx * p_ListCtrl )
+void CDragonApp::selectAll( CListCtrlEx * p_ListCtrl )
 {
 	for( int i=0; i < p_ListCtrl->GetItemCount(); ++i)
 	{
@@ -1158,7 +1158,7 @@ void CFaApp::selectAll( CListCtrlEx * p_ListCtrl )
 
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaApp::unselectAll( CListCtrlEx * p_ListCtrl )
+void CDragonApp::unselectAll( CListCtrlEx * p_ListCtrl )
 {
 	for( int i=0; i < p_ListCtrl->GetItemCount(); ++i)
 	{
@@ -1167,7 +1167,7 @@ void CFaApp::unselectAll( CListCtrlEx * p_ListCtrl )
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
-void CFaApp::changeTime()
+void CDragonApp::changeTime()
 {
 	m_command.Format( L"SELECT rowid,* FROM people" );
 	if( !query( m_command ) ) return;
@@ -1191,7 +1191,7 @@ void CFaApp::changeTime()
 }
 */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaApp::search( CString search, INT_PTR orderix,  CListCtrlEx* p_ListCtrl )
+void CDragonApp::search( CString search, INT_PTR orderix,  CListCtrlEx* p_ListCtrl )
 {
 	int		n				= p_ListCtrl->GetItemCount();
 	int		count_per_page	= p_ListCtrl->GetCountPerPage();

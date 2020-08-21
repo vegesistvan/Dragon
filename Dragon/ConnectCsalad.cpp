@@ -2,8 +2,8 @@
 //
 
 #include "stdafx.h"
-#include "Fa.h"
-#include "FaDlg.h"
+#include "Dragon.h"
+#include "DragonDlg.h"
 #include "ConnectCsalad.h"
 
 
@@ -13,7 +13,7 @@ IMPLEMENT_DYNAMIC(CConnectCsalad, CWnd)
 
 	
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnCsaladTorzs()
+void CDragonDlg::OnCsaladTorzs()
 {
 	CString info = L"\
 A html fájlban egy leszármazott lehet egy új család alapítója. Ezt az [xxx család] jelzi és a hivatkozott család \
@@ -35,13 +35,13 @@ Tehát ez nem egy hibalista, csak egy kimutatás a html fájlban megadott család->t
 	conn.connectCsalad( FALSE );
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnCsalad()
+void CDragonDlg::OnCsalad()
 {
 	CConnectCsalad conn;
 	conn.connectCsalad( TRUE );
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnConnectCsalad()
+void CDragonDlg::OnConnectCsalad()
 {
 	CConnectCsalad conn;
 	conn.connectCsalad( FALSE );

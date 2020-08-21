@@ -2,7 +2,7 @@
 //
 
 #include "stdafx.h"
-#include "Fa.h"
+#include "Dragon.h"
 #include "Pictures.h"
 #include "afxdialogex.h"
 
@@ -148,7 +148,7 @@ void CPictures::fillBlobTable()
 */
 	m_SpinCtrl.SetRange( 1, theApp.m_recordsetBlob->RecordsCount() );
 
-	m_TitleCtrl.SetSel( -1, -1, true );
+//	m_TitleCtrl.SetSel( -1, -1, true );
 
 	theApp.m_recordsetBlob->MoveFirst();
 	for( UINT i = 0; i < theApp.m_recordsetBlob->RecordsCount(); ++i, theApp.m_recordsetBlob->MoveNext() )

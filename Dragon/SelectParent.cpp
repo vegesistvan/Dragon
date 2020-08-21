@@ -2,7 +2,7 @@
 //
 
 #include "stdafx.h"
-#include "Fa.h"
+#include "Dragon.h"
 #include "afxdialogex.h"
 #include "SelectParent.h"
 #include "SelectPeople.h"

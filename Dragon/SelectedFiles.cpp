@@ -2,7 +2,7 @@
 //
 
 #include "stdafx.h"
-#include "Fa.h"
+#include "Dragon.h"
 #include "SelectedFiles.h"
 #include "afxdialogex.h"
 
@@ -86,6 +86,7 @@ void CSelectedFiles::OnClickedStaticHtml()
 void CSelectedFiles::OnClickedStaticTexteditor()
 {
 	theApp.selectTextEditor();
+	GetDlgItem( IDC_TEXTEDITOR )->SetWindowTextW( m_texteditor );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSelectedFiles::OnClickedStaticGed()

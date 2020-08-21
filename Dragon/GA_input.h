@@ -66,7 +66,6 @@ public:
 	int		m_tableAncestry;			// a táblák elsõ emberét, az õst jelzi ha TRUE; 
 	CString	m_rowidLastDescendant;
 
-	BOOL m_method;
 	std::vector<TABLEHEADER>	v_tableHeader;
 
 // elsõ foku substringek

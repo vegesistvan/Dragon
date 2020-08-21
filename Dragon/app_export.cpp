@@ -1,9 +1,9 @@
 #include "stdafx.h"
-#include "Fa.h"
+#include "Dragon.h"
 #include "ProgressWnd.h"
 #include "ColumnsList.h"
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaApp::exportAll( CString logFile, CString title, CListCtrlEx* p_ListCtrl )
+void CDragonApp::exportAll( CString logFile, CString title, CListCtrlEx* p_ListCtrl )
 {
 //	int n = p_ListCtrl->GetItemCount();
 	for( int i=0; i < p_ListCtrl->GetItemCount(); ++i)
@@ -13,7 +13,7 @@ void CFaApp::exportAll( CString logFile, CString title, CListCtrlEx* p_ListCtrl 
 	exportSelected( logFile, title, p_ListCtrl );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaApp::exportSelected( CString logFile, CString title, CListCtrlEx* p_ListCtrl )
+void CDragonApp::exportSelected( CString logFile, CString title, CListCtrlEx* p_ListCtrl )
 {
 	if( p_ListCtrl->GetSelectedCount() == 0 )
 	{
@@ -33,7 +33,7 @@ void CFaApp::exportSelected( CString logFile, CString title, CListCtrlEx* p_List
 	showLogFile();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CFaApp::listTable( FILE * fl, CListCtrlEx* p_ListCtrl )
+BOOL CDragonApp::listTable( FILE * fl, CListCtrlEx* p_ListCtrl )
 {
 	int	i;
 	int	j;
@@ -163,7 +163,7 @@ BOOL CFaApp::listTable( FILE * fl, CListCtrlEx* p_ListCtrl )
 	return TRUE;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaApp::underlining( FILE * fl, std::vector<BOOL>* selected, std::vector<COLUMNS>* columns )
+void CDragonApp::underlining( FILE * fl, std::vector<BOOL>* selected, std::vector<COLUMNS>* columns )
 {
 	for( UINT i = 0; i < columns->size(); i++ )
 	{
@@ -176,7 +176,7 @@ void CFaApp::underlining( FILE * fl, std::vector<BOOL>* selected, std::vector<CO
 	fwprintf( fl, L"\n" );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaApp::header( FILE * fl, std::vector<BOOL>* selected, std::vector<COLUMNS>* columns )
+void CDragonApp::header( FILE * fl, std::vector<BOOL>* selected, std::vector<COLUMNS>* columns )
 {
 	for( UINT j = 0; j < columns->size(); j++ )
 	{

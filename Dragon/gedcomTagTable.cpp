@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include "Fa.h"
+#include "Dragon.h"
 #include "gedcomIn.h"
-#include "GA_input_parameters.h"
+#include "GAtoDB.h"
 #include <algorithm>
 
 int cnt = 1;

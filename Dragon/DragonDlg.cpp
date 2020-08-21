@@ -4,8 +4,8 @@
 #pragma once
 
 #include "stdafx.h"
-#include "Fa.h"
-#include "FaDlg.h"
+#include "Dragon.h"
+#include "DragonDlg.h"
 #include "afxdialogex.h"
 #include "winuser.h"
 #include "build_defs.h"
@@ -21,7 +21,7 @@
 #include "Table_marriages.h"
 #include "Table_tables.h"
 #include "Table_blobs.h"
-#include "GA_input_parameters.h"
+#include "GAtoDB.h"
 
 #include "Table_files.h"
 #include "GA_input.h"
@@ -65,8 +65,8 @@
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CFaDlg::CFaDlg(CWnd* pParent /*=NULL*/)
-	: CDialogEx(CFaDlg::IDD, pParent)
+CDragonDlg::CDragonDlg(CWnd* pParent /*=NULL*/)
+	: CDialogEx(CDragonDlg::IDD, pParent)
 {
 	theApp._dlg = pParent;
 
@@ -79,17 +79,17 @@ CFaDlg::CFaDlg(CWnd* pParent /*=NULL*/)
 
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CFaDlg::~CFaDlg()
+CDragonDlg::~CDragonDlg()
 {
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::DoDataExchange(CDataExchange* pDX)
+void CDragonDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_PICTURE, m_picture);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BEGIN_MESSAGE_MAP(CFaDlg, CDialogEx)
+BEGIN_MESSAGE_MAP(CDragonDlg, CDialogEx)
 //ON_WM_SYSCOMMAND()
 //ON_WM_SIZE()
 
@@ -97,98 +97,98 @@ ON_MESSAGE(WM_SET_COLUMN_COLOR, OnSetColumnColor)
 ON_MESSAGE(WM_CLICKED_COLUMN, OnColumnSorted)
 
 //Descendants
-ON_COMMAND(ID_DESCENDANT_FILE, &CFaDlg::OnDescendantFile)
-ON_COMMAND(ID_DESCENDANT_TABLE, &CFaDlg::OnDescendantTable)
-ON_COMMAND(ID_DESCENDANT_LINE, &CFaDlg::OnDescendantLine)
+ON_COMMAND(ID_DESCENDANT_FILE, &CDragonDlg::OnDescendantFile)
+ON_COMMAND(ID_DESCENDANT_TABLE, &CDragonDlg::OnDescendantTable)
+ON_COMMAND(ID_DESCENDANT_LINE, &CDragonDlg::OnDescendantLine)
 
 // házasságok
-ON_COMMAND(ID_MARRIAGES_FILE, &CFaDlg::OnMarriagesFile)
-ON_COMMAND(ID_MARRIAGES_TABLE, &CFaDlg::OnMarriagesTable)
-ON_COMMAND(ID_MARRIAGES_LINE, &CFaDlg::OnMarriagesLine)
+ON_COMMAND(ID_MARRIAGES_FILE, &CDragonDlg::OnMarriagesFile)
+ON_COMMAND(ID_MARRIAGES_TABLE, &CDragonDlg::OnMarriagesTable)
+ON_COMMAND(ID_MARRIAGES_LINE, &CDragonDlg::OnMarriagesLine)
 
 // házastársak
-ON_COMMAND(ID_SPOUSES_FILE, &CFaDlg::OnSpousesFile)
-ON_COMMAND(ID_SPOUSES_TABLE, &CFaDlg::OnSpousesTable)
-ON_COMMAND(ID_SPOUSES_LINE, &CFaDlg::OnSpousesLine)
+ON_COMMAND(ID_SPOUSES_FILE, &CDragonDlg::OnSpousesFile)
+ON_COMMAND(ID_SPOUSES_TABLE, &CDragonDlg::OnSpousesTable)
+ON_COMMAND(ID_SPOUSES_LINE, &CDragonDlg::OnSpousesLine)
 
 // házastársak házasságai
-ON_COMMAND(ID_SS_FILE, &CFaDlg::OnSsFile)
-ON_COMMAND(ID_SS_TABLE, &CFaDlg::OnSsTable)
-ON_COMMAND(ID_SS_LINE, &CFaDlg::OnSsLine)
-ON_COMMAND(ID_SELECTED_FILES, &CFaDlg::OnSelectedFiles)
-ON_COMMAND(ID_TITLES, &CFaDlg::OnTitles)
-//ON_COMMAND(ID_GAHTML, &CFaDlg::OnGahtml)
+ON_COMMAND(ID_SS_FILE, &CDragonDlg::OnSsFile)
+ON_COMMAND(ID_SS_TABLE, &CDragonDlg::OnSsTable)
+ON_COMMAND(ID_SS_LINE, &CDragonDlg::OnSsLine)
+ON_COMMAND(ID_SELECTED_FILES, &CDragonDlg::OnSelectedFiles)
+ON_COMMAND(ID_TITLES, &CDragonDlg::OnTitles)
+//ON_COMMAND(ID_GAHTML, &CDragonDlg::OnGahtml)
 
 ON_WM_HSCROLL()
-ON_COMMAND(ID_OPEN_DB, &CFaDlg::OnOpenDb)
-ON_COMMAND(ID_DATABASE_INFORMATION, &CFaDlg::OnDatabaseInformation)
-ON_COMMAND(ID_DISPLAY_MARRIAGES, &CFaDlg::OnDisplayMarriages)
-ON_COMMAND(ID_DISPLAY_FILESTABLE, &CFaDlg::OnDisplayFilestable)
-ON_COMMAND(ID_INFO_ONPROGRAM, &CFaDlg::OnInfoOnprogram)
-ON_COMMAND(ID_DISPLAY_INDIVIDUALS, &CFaDlg::OnDisplayIndividuals)
-ON_COMMAND(ID_DISPLAY_TABLES, &CFaDlg::OnDisplayTables)
-ON_COMMAND(ID_INPUT_GAHTML_FILE, &CFaDlg::OnInputGahtmlFile)
-ON_COMMAND(ID_INPUT_GAHTML_FAMILY, &CFaDlg::OnInputGahtmlFamily)
-ON_COMMAND(ID_INPUT_GAHTML_FROMLINE, &CFaDlg::OnInputGahtmlFromline)
-ON_COMMAND(ID_INPUT_GAHTML_LINE, &CFaDlg::OnInputGahtmlLine)
-ON_COMMAND(ID_INPUT_GAHTML_TABLE, &CFaDlg::OnInputGahtmlTable)
-ON_COMMAND(ID_CONNECT_BRANCHES, &CFaDlg::OnConnectBranches)
-ON_COMMAND(ID_INPUT_KEYBOARD, &CFaDlg::OnInputKeyboard)
+ON_COMMAND(ID_OPEN_DB, &CDragonDlg::OnOpenDb)
+ON_COMMAND(ID_DATABASE_INFORMATION, &CDragonDlg::OnDatabaseInformation)
+ON_COMMAND(ID_DISPLAY_MARRIAGES, &CDragonDlg::OnDisplayMarriages)
+ON_COMMAND(ID_DISPLAY_FILESTABLE, &CDragonDlg::OnDisplayFilestable)
+ON_COMMAND(ID_INFO_ONPROGRAM, &CDragonDlg::OnInfoOnprogram)
+ON_COMMAND(ID_DISPLAY_INDIVIDUALS, &CDragonDlg::OnDisplayIndividuals)
+ON_COMMAND(ID_DISPLAY_TABLES, &CDragonDlg::OnDisplayTables)
+ON_COMMAND(ID_INPUT_GAHTML_FILE, &CDragonDlg::OnInputGahtmlFile)
+ON_COMMAND(ID_INPUT_GAHTML_FAMILY, &CDragonDlg::OnInputGahtmlFamily)
+ON_COMMAND(ID_INPUT_GAHTML_FROMLINE, &CDragonDlg::OnInputGahtmlFromline)
+ON_COMMAND(ID_INPUT_GAHTML_LINE, &CDragonDlg::OnInputGahtmlLine)
+ON_COMMAND(ID_INPUT_GAHTML_TABLE, &CDragonDlg::OnInputGahtmlTable)
+ON_COMMAND(ID_CONNECT_BRANCHES, &CDragonDlg::OnConnectBranches)
+ON_COMMAND(ID_INPUT_KEYBOARD, &CDragonDlg::OnInputKeyboard)
 ON_WM_PAINT()
-ON_COMMAND(ID_APP_EXIT, &CFaDlg::OnAppExit)
-ON_COMMAND(ID_BRACKETS_SQUARE, &CFaDlg::OnBracketsSquare)
-ON_COMMAND(ID_BRACKETS_ROUND, &CFaDlg::OnBracketsRound)
-ON_COMMAND(ID_BRACES, &CFaDlg::OnBraces)
-ON_COMMAND(ID_GENERATIONCODE, &CFaDlg::OnGenerationcode)
-ON_COMMAND(ID_FROMTABLE, &CFaDlg::OnFromtable)
-ON_COMMAND(ID_FROMFAMILY, &CFaDlg::OnFromfamily)
-ON_COMMAND(ID_CONNECT_CSALAD, &CFaDlg::OnConnectCsalad)
-ON_COMMAND(ID_CSALAD, &CFaDlg::OnCsalad)
-ON_COMMAND(ID_CSALAD_TORZS, &CFaDlg::OnCsaladTorzs)
-ON_COMMAND(ID_MOTHERDEATH, &CFaDlg::OnMotherDeath)
-ON_COMMAND(ID_CHECK_LIFESPAN, &CFaDlg::OnCheckLifespan)
-ON_COMMAND(ID_DATEFORMAT, &CFaDlg::OnDateFormat)
-ON_COMMAND(ID_INPUT_MANUAL, &CFaDlg::OnInputManual)
-ON_COMMAND(ID_GEDCOM_TAGS, &CFaDlg::OnCheckTags)
-ON_COMMAND(ID_GEDCOM_FAM, &CFaDlg::OnGedcomFam)
-ON_COMMAND(ID_GEDCOM_INDI, &CFaDlg::OnGedcomIndi)
-ON_COMMAND(ID_GEDCOM_PEOPLE, &CFaDlg::OnListPeople)
-ON_COMMAND(ID_GEDCOM_FILE, &CFaDlg::OnGedcomFile)
-ON_COMMAND(ID_GEDCOM_0LEVEL, &CFaDlg::OnGedcom0level)
-ON_COMMAND(ID_GEDCOM_HEAD, &CFaDlg::OnGedcomHead)
-ON_COMMAND(ID_GEDCOM_INPUT, &CFaDlg::OnGedcomInput)
-ON_COMMAND(ID_GEDCOM_FAMILIES, &CFaDlg::OnListFamilyByName)
-ON_COMMAND(ID_GEDCOM_VINDI, &CFaDlg::OnGedcomVindi)
-ON_COMMAND(ID_NEW_FAMILIES, &CFaDlg::OnNewFamilies)
+ON_COMMAND(ID_APP_EXIT, &CDragonDlg::OnAppExit)
+ON_COMMAND(ID_BRACKETS_SQUARE, &CDragonDlg::OnBracketsSquare)
+ON_COMMAND(ID_BRACKETS_ROUND, &CDragonDlg::OnBracketsRound)
+ON_COMMAND(ID_BRACES, &CDragonDlg::OnBraces)
+ON_COMMAND(ID_GENERATIONCODE, &CDragonDlg::OnGenerationcode)
+ON_COMMAND(ID_FROMTABLE, &CDragonDlg::OnFromtable)
+ON_COMMAND(ID_FROMFAMILY, &CDragonDlg::OnFromfamily)
+ON_COMMAND(ID_CONNECT_CSALAD, &CDragonDlg::OnConnectCsalad)
+ON_COMMAND(ID_CSALAD, &CDragonDlg::OnCsalad)
+ON_COMMAND(ID_CSALAD_TORZS, &CDragonDlg::OnCsaladTorzs)
+ON_COMMAND(ID_MOTHERDEATH, &CDragonDlg::OnMotherDeath)
+ON_COMMAND(ID_CHECK_LIFESPAN, &CDragonDlg::OnCheckLifespan)
+ON_COMMAND(ID_DATEFORMAT, &CDragonDlg::OnDateFormat)
+ON_COMMAND(ID_INPUT_MANUAL, &CDragonDlg::OnInputManual)
+ON_COMMAND(ID_GEDCOM_TAGS, &CDragonDlg::OnCheckTags)
+ON_COMMAND(ID_GEDCOM_FAM, &CDragonDlg::OnGedcomFam)
+ON_COMMAND(ID_GEDCOM_INDI, &CDragonDlg::OnGedcomIndi)
+ON_COMMAND(ID_GEDCOM_PEOPLE, &CDragonDlg::OnListPeople)
+ON_COMMAND(ID_GEDCOM_FILE, &CDragonDlg::OnGedcomFile)
+ON_COMMAND(ID_GEDCOM_0LEVEL, &CDragonDlg::OnGedcom0level)
+ON_COMMAND(ID_GEDCOM_HEAD, &CDragonDlg::OnGedcomHead)
+ON_COMMAND(ID_GEDCOM_INPUT, &CDragonDlg::OnGedcomInput)
+ON_COMMAND(ID_GEDCOM_FAMILIES, &CDragonDlg::OnListFamilyByName)
+ON_COMMAND(ID_GEDCOM_VINDI, &CDragonDlg::OnGedcomVindi)
+ON_COMMAND(ID_NEW_FAMILIES, &CDragonDlg::OnNewFamilies)
 ON_WM_CLOSE()
-ON_COMMAND(ID_CHECK_FATHER9, &CFaDlg::OnCheckFather9)
-ON_COMMAND(ID_CHECK_SPOUSEDIFF, &CFaDlg::OnCheckSpousesDiff)
-ON_COMMAND(ID_FATHERCHILD_GREATER, &CFaDlg::OnFatherchildGreater)
-ON_COMMAND(ID_FATHERCHILD_LESS, &CFaDlg::OnFatherchildLess)
-ON_COMMAND(ID_MOTHERCHILD_GREATER, &CFaDlg::OnMotherchildGreater)
-ON_COMMAND(ID_MOTHERCHILD_LESS, &CFaDlg::OnMotherchildLess)
-ON_COMMAND(ID_HUSBAND_AGE_G, &CFaDlg::OnHusbandAgeG)
-ON_COMMAND(ID_HUSBAND_AGE_L, &CFaDlg::OnHusbandAgeL)
-ON_COMMAND(ID_WIFE_AGE_G, &CFaDlg::OnWifeAgeG)
-ON_COMMAND(ID_WIFE_AGE_L, &CFaDlg::OnWifeAgeL)
-ON_COMMAND(ID_CHECK_SPOUSES_SEX, &CFaDlg::OnCheckSpousesSex)
-ON_COMMAND(ID_SAMENAMEANDBIRTH2, &CFaDlg::OnSameNameAndBirth)
-ON_COMMAND(ID_SAMENAMEANDDEATH2, &CFaDlg::OnSameNameAndDeath)
-ON_COMMAND(ID_SAMENAMEANDFATHER2, &CFaDlg::OnSameNameAndFather)
-ON_COMMAND(ID_SAMENAMEANDMOTHER2, &CFaDlg::OnSameNameAndMother)
-ON_COMMAND(ID_CHECK_SAMESPOUSENAME, &CFaDlg::OnCheckSameSpouseName)
-ON_COMMAND(ID_CHECK_SAMENAMES_SPOUSES, &CFaDlg::OnCheckSameNamesSpouses)
-ON_COMMAND(ID_LIST_PEOPLEANDFAMILY, &CFaDlg::OnListPeopleAndFamily)
-ON_COMMAND(ID_SAME_PEOPLE, &CFaDlg::OnSamePeople)
-ON_COMMAND(ID_SAME_PEOPLE_CONTRACT, &CFaDlg::OnSamePeopleContract)
-ON_COMMAND(ID_NAME_PROBLEMS, &CFaDlg::OnNameProblems)
-ON_COMMAND(ID_MOTHER_INDEX, &CFaDlg::OnMotherIndex)
-ON_COMMAND(ID_DISPLAY_BLOB, &CFaDlg::OnDisplayBlob)
-ON_COMMAND(ID_GEDCOM_TAGTABLE, &CFaDlg::OnGedcomTagtable)
-ON_COMMAND(ID_GEDCOM_INDIFAMS, &CFaDlg::OnGedcomINDIFAMS)
+ON_COMMAND(ID_CHECK_FATHER9, &CDragonDlg::OnCheckFather9)
+ON_COMMAND(ID_CHECK_SPOUSEDIFF, &CDragonDlg::OnCheckSpousesDiff)
+ON_COMMAND(ID_FATHERCHILD_GREATER, &CDragonDlg::OnFatherchildGreater)
+ON_COMMAND(ID_FATHERCHILD_LESS, &CDragonDlg::OnFatherchildLess)
+ON_COMMAND(ID_MOTHERCHILD_GREATER, &CDragonDlg::OnMotherchildGreater)
+ON_COMMAND(ID_MOTHERCHILD_LESS, &CDragonDlg::OnMotherchildLess)
+ON_COMMAND(ID_HUSBAND_AGE_G, &CDragonDlg::OnHusbandAgeG)
+ON_COMMAND(ID_HUSBAND_AGE_L, &CDragonDlg::OnHusbandAgeL)
+ON_COMMAND(ID_WIFE_AGE_G, &CDragonDlg::OnWifeAgeG)
+ON_COMMAND(ID_WIFE_AGE_L, &CDragonDlg::OnWifeAgeL)
+ON_COMMAND(ID_CHECK_SPOUSES_SEX, &CDragonDlg::OnCheckSpousesSex)
+ON_COMMAND(ID_SAMENAMEANDBIRTH2, &CDragonDlg::OnSameNameAndBirth)
+ON_COMMAND(ID_SAMENAMEANDDEATH2, &CDragonDlg::OnSameNameAndDeath)
+ON_COMMAND(ID_SAMENAMEANDFATHER2, &CDragonDlg::OnSameNameAndFather)
+ON_COMMAND(ID_SAMENAMEANDMOTHER2, &CDragonDlg::OnSameNameAndMother)
+ON_COMMAND(ID_CHECK_SAMESPOUSENAME, &CDragonDlg::OnCheckSameSpouseName)
+ON_COMMAND(ID_CHECK_SAMENAMES_SPOUSES, &CDragonDlg::OnCheckSameNamesSpouses)
+ON_COMMAND(ID_LIST_PEOPLEANDFAMILY, &CDragonDlg::OnListPeopleAndFamily)
+ON_COMMAND(ID_SAME_PEOPLE, &CDragonDlg::OnSamePeople)
+ON_COMMAND(ID_SAME_PEOPLE_CONTRACT, &CDragonDlg::OnSamePeopleContract)
+ON_COMMAND(ID_NAME_PROBLEMS, &CDragonDlg::OnNameProblems)
+ON_COMMAND(ID_MOTHER_INDEX, &CDragonDlg::OnMotherIndex)
+ON_COMMAND(ID_DISPLAY_BLOB, &CDragonDlg::OnDisplayBlob)
+ON_COMMAND(ID_GEDCOM_TAGTABLE, &CDragonDlg::OnGedcomTagtable)
+ON_COMMAND(ID_GEDCOM_INDIFAMS, &CDragonDlg::OnGedcomINDIFAMS)
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CFaDlg::OnInitDialog()
+BOOL CDragonDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 //	EASYSIZE_ADD( IDC_PICTURE,	ES_BORDER,	ES_BORDER,		ES_BORDER,		ES_BORDER,	0 );
@@ -242,13 +242,13 @@ BOOL CFaDlg::OnInitDialog()
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnInfoOnprogram()
+void CDragonDlg::OnInfoOnprogram()
 {
 	CAboutDlg dlgAbout;
 	dlgAbout.DoModal();
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-LRESULT CFaDlg::OnSetColumnColor(WPARAM wParam, LPARAM lParam)//wparam: oszlopszam, lparam: a COLUMNCOLOR struktura cime
+LRESULT CDragonDlg::OnSetColumnColor(WPARAM wParam, LPARAM lParam)//wparam: oszlopszam, lparam: a COLUMNCOLOR struktura cime
 {
 	CELLCOLOR* cColor= (CELLCOLOR*) lParam;//a COLUMNCOLOR struktura deklaralva van a ListCtrlEx.h -ban.
 
@@ -260,13 +260,13 @@ LRESULT CFaDlg::OnSetColumnColor(WPARAM wParam, LPARAM lParam)//wparam: oszlopsz
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-LRESULT CFaDlg::OnColumnSorted(WPARAM wParam, LPARAM lParam) //wparam: column number
+LRESULT CDragonDlg::OnColumnSorted(WPARAM wParam, LPARAM lParam) //wparam: column number
 {
 	m_orderix = wParam;
 	return TRUE;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CFaDlg::query( CString command )
+BOOL CDragonDlg::query( CString command )
 {
 	if( m_recordset->Query(command,theApp.mainDB))
 	{
@@ -277,7 +277,7 @@ BOOL CFaDlg::query( CString command )
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CFaDlg::query1( CString command )
+BOOL CDragonDlg::query1( CString command )
 {
 	if( m_recordset2->Query(command,theApp.mainDB))
 	{
@@ -288,7 +288,7 @@ BOOL CFaDlg::query1( CString command )
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CFaDlg::query2( CString command )
+BOOL CDragonDlg::query2( CString command )
 {
 	if( m_recordset2->Query(command,theApp.mainDB))
 	{
@@ -299,7 +299,7 @@ BOOL CFaDlg::query2( CString command )
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CFaDlg::query3( CString command )
+BOOL CDragonDlg::query3( CString command )
 {
 	if( m_recordset3->Query(command,theApp.mainDB))
 	{
@@ -310,7 +310,7 @@ BOOL CFaDlg::query3( CString command )
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CFaDlg::query4( CString command )
+BOOL CDragonDlg::query4( CString command )
 {
 	if( m_recordset4->Query(command,theApp.mainDB))
 	{
@@ -321,7 +321,7 @@ BOOL CFaDlg::query4( CString command )
 	return TRUE;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnSelectedFiles()
+void CDragonDlg::OnSelectedFiles()
 {
 	CString drive;
 	CString	dir;
@@ -349,7 +349,7 @@ void CFaDlg::OnSelectedFiles()
 
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::mainTitle( )
+void CDragonDlg::mainTitle( )
 {
 	CString caption;
 
@@ -357,13 +357,13 @@ void CFaDlg::mainTitle( )
 	SetWindowText( caption );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnTitles()
+void CDragonDlg::OnTitles()
 {
 	CTitles dlg;
 	if( dlg.DoModal() == IDCANCEL ) return;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CFaDlg::PreTranslateMessage(MSG* pMsg)
+BOOL CDragonDlg::PreTranslateMessage(MSG* pMsg)
 {
 	int x=(int)pMsg->wParam;
 
@@ -382,7 +382,7 @@ BOOL CFaDlg::PreTranslateMessage(MSG* pMsg)
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnDatabaseInformation()
+void CDragonDlg::OnDatabaseInformation()
 {
 	CInfoDb dlg;
 	dlg.DoModal();
@@ -396,7 +396,7 @@ void CFaDlg::OnDatabaseInformation()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnDisplayIndividuals()
+void CDragonDlg::OnDisplayIndividuals()
 {
 	if( m_pIndividuals != NULL )
 	{
@@ -412,7 +412,7 @@ void CFaDlg::OnDisplayIndividuals()
 	}
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnDisplayMarriages()
+void CDragonDlg::OnDisplayMarriages()
 {
 	if( m_pMarriages )
 	{
@@ -427,11 +427,11 @@ void CFaDlg::OnDisplayMarriages()
 	}
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnDisplayTables()
+void CDragonDlg::OnDisplayTables()
 {
 //	OnTabletables();
 //}
-//void CFaDlg::OnTabletables()
+//void CDragonDlg::OnTabletables()
 //{
 	CTableTables dlg;
 	dlg.m_select = false;
@@ -439,17 +439,17 @@ void CFaDlg::OnDisplayTables()
 	dlg.DoModal();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnDisplayFilestable()
+void CDragonDlg::OnDisplayFilestable()
 {
 //	OnFiles();
 //}
-//void CFaDlg::OnFiles()
+//void CDragonDlg::OnFiles()
 //{
 	CTableFiles dlg;
 	dlg.DoModal();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnListUtf8()
+void CDragonDlg::OnListUtf8()
 {
 	CString filespec;
 	filespec = L"f:\\fa\\samlpefile.txt";
@@ -472,7 +472,7 @@ void CFaDlg::OnListUtf8()
 	theApp.showFile( filespec );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnOpenDb()
+void CDragonDlg::OnOpenDb()
 {
 	if( m_pIndividuals != NULL )
 		m_pIndividuals->OnClose();
@@ -491,7 +491,7 @@ void CFaDlg::OnOpenDb()
 	ChangeMenu();
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::ChangeMenu()
+void CDragonDlg::ChangeMenu()
 {
 	if( theApp.m_inputMode == GEDCOM )
 	{
@@ -511,7 +511,7 @@ void CFaDlg::ChangeMenu()
 	}
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnMenuEmpty()
+void CDragonDlg::OnMenuEmpty()
 {
 	SetMenu(NULL);
 	::DestroyMenu(GetMenu()->GetSafeHmenu());
@@ -520,7 +520,7 @@ void CFaDlg::OnMenuEmpty()
 	SetMenu(&menu);	
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnMenuGahtml()
+void CDragonDlg::OnMenuGahtml()
 {
 	SetMenu(NULL);
 	::DestroyMenu(GetMenu()->GetSafeHmenu());
@@ -532,7 +532,7 @@ void CFaDlg::OnMenuGahtml()
 		menu.EnableMenuItem( 12, MF_BYPOSITION|MF_GRAYED);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnMenuGedcom()
+void CDragonDlg::OnMenuGedcom()
 {
 	SetMenu(NULL);
 	::DestroyMenu(GetMenu()->GetSafeHmenu());
@@ -544,7 +544,7 @@ void CFaDlg::OnMenuGedcom()
 			menu.EnableMenuItem( 12, MF_BYPOSITION|MF_GRAYED);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnMenuManual()
+void CDragonDlg::OnMenuManual()
 {
 	SetMenu(NULL);
 	::DestroyMenu(GetMenu()->GetSafeHmenu());
@@ -576,14 +576,14 @@ void CFaDlg::OnMenuManual()
 	DrawMenuBar();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnConnectBranches()
+void CDragonDlg::OnConnectBranches()
 {
 	CGaInput split;
 	split.connectBranches();
 	split.setDummyFather();
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnInputKeyboard()
+void CDragonDlg::OnInputKeyboard()
 {
 	OnMenuManual();
 	if( !theApp.m_cntPeople )
@@ -592,13 +592,13 @@ void CFaDlg::OnInputKeyboard()
 		OnMenuManual();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnPaint()
+void CDragonDlg::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
 	displayTree();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::displayTree()
+void CDragonDlg::displayTree()
 {
 //	HBITMAP hBmp = (HBITMAP)LoadImage( NULL, theApp.m_bitmapSpec, IMAGE_BITMAP, 1024, 678,
 //	LR_CREATEDIBSECTION | LR_DEFAULTSIZE | LR_LOADFROMFILE );
@@ -634,7 +634,7 @@ void CFaDlg::displayTree()
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnAppExit()
+void CDragonDlg::OnAppExit()
 {
 
 	if( m_pIndividuals != NULL ) m_pIndividuals->DestroyWindow();
@@ -658,7 +658,7 @@ void CFaDlg::OnAppExit()
 
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnBracketsSquare()
+void CDragonDlg::OnBracketsSquare()
 {
 	CHtmlBrackets dlg;
 	dlg._square = TRUE;
@@ -667,7 +667,7 @@ void CFaDlg::OnBracketsSquare()
 	dlg.DoModal();
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnBracketsRound()
+void CDragonDlg::OnBracketsRound()
 {
 	CHtmlBrackets dlg;
 	dlg._square = FALSE;
@@ -676,7 +676,7 @@ void CFaDlg::OnBracketsRound()
 	dlg.DoModal();
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnBraces()
+void CDragonDlg::OnBraces()
 {
 	CHtmlBrackets dlg;
 	dlg._square = FALSE;
@@ -685,12 +685,12 @@ void CFaDlg::OnBraces()
 	dlg.DoModal();
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnManualInputDialog()
+void CDragonDlg::OnManualInputDialog()
 {
 	OnDisplayIndividuals();
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnInputManual()
+void CDragonDlg::OnInputManual()
 {
 	CEditPeople dlg;
 
@@ -698,61 +698,61 @@ void CFaDlg::OnInputManual()
 	if( dlg.DoModal() == IDCANCEL ) return;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnListPeople()
+void CDragonDlg::OnListPeople()
 {
 	CGedcomIn ged;
 	ged.listPeople();
 }
-void CFaDlg::OnListFamilyByName()
+void CDragonDlg::OnListFamilyByName()
 {
 	CGedcomIn ged;
 	ged.listFamiliesByName();
 }
 
-void CFaDlg::OnCheckTags()
+void CDragonDlg::OnCheckTags()
 {
 	CGedcomIn ged;
 	ged.checkTags();
 
 }
-void CFaDlg::OnGedcomTagtable()
+void CDragonDlg::OnGedcomTagtable()
 {
 	CGedcomIn ged;
 	ged.tagTable();
 }
-void CFaDlg::OnGedcomFam()
+void CDragonDlg::OnGedcomFam()
 {
 	CGedcomIn ged;
 	ged.listFAM();
 }
 
 
-void CFaDlg::OnGedcomIndi()
+void CDragonDlg::OnGedcomIndi()
 {
 	CGedcomIn ged;
 	ged.listINDI();
 }
 
-void CFaDlg::OnGedcomFile()
+void CDragonDlg::OnGedcomFile()
 {
 	theApp.showFile( theApp.m_gedFileSpec );
 }
 
-void CFaDlg::OnGedcom0level()
+void CDragonDlg::OnGedcom0level()
 {
 	CGedcomIn ged;
 	ged.zeroLevel();
 }
 
 
-void CFaDlg::OnGedcomHead()
+void CDragonDlg::OnGedcomHead()
 {
 	CGedcomIn ged;
 	ged.listHEAD();
 }
 
 
-void CFaDlg::OnGedcomInput()
+void CDragonDlg::OnGedcomInput()
 {
 	CGedcomIn ged;
 	if( !ged.gedcomInput() ) return;
@@ -763,14 +763,14 @@ void CFaDlg::OnGedcomInput()
 	ChangeMenu();
 }
 
-void CFaDlg::OnGedcomVindi()
+void CDragonDlg::OnGedcomVindi()
 {
 	CGedcomIn ged;
 	ged.listVindi();;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnNewFamilies()
+void CDragonDlg::OnNewFamilies()
 {
 	CString fname( L"root" );
 	CString title( L"új család-root kapcsolat ellenõrzése" );
@@ -939,7 +939,7 @@ család->törzs kapcsolatokról. Az alábbi felsorolásokban megtaláljuk a nemlétezõ 
 
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnClose()
+void CDragonDlg::OnClose()
 {
 	if( m_pIndividuals != NULL )
 		m_pIndividuals->CloseWindow();
@@ -949,44 +949,44 @@ void CFaDlg::OnClose()
 	CDialogEx::OnClose();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnGenerationcode()
+void CDragonDlg::OnGenerationcode()
 {
 	CcheckGenerations dlg;
 	if( dlg.DoModal() == IDCANCEL ) return;
 
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnCheckLifespan()
+void CDragonDlg::OnCheckLifespan()
 {
 	CLifespanParam dlg;
 	dlg.DoModal();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnDateFormat()
+void CDragonDlg::OnDateFormat()
 {
 	CDateFormat dlg;
 	dlg.DoModal();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnMotherDeath()
+void CDragonDlg::OnMotherDeath()
 {
 	CCheckMotherDeath dlg;
 	dlg.DoModal();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnCheckFather9()
+void CDragonDlg::OnCheckFather9()
 {
 	CCheckFatherDeath9 dlg;
 	dlg.DoModal();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnCheckSpousesDiff()
+void CDragonDlg::OnCheckSpousesDiff()
 {
 	CCheckSpousesDiff dlg;
 	dlg.DoModal();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnFatherchildGreater()
+void CDragonDlg::OnFatherchildGreater()
 {
 	CCheckParentChild dlg;
 
@@ -994,7 +994,7 @@ void CFaDlg::OnFatherchildGreater()
 	dlg.DoModal();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnFatherchildLess()
+void CDragonDlg::OnFatherchildLess()
 {
 	CCheckParentChild dlg;
 
@@ -1002,7 +1002,7 @@ void CFaDlg::OnFatherchildLess()
 	dlg.DoModal();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnMotherchildGreater()
+void CDragonDlg::OnMotherchildGreater()
 {
 	CCheckParentChild dlg;
 
@@ -1010,7 +1010,7 @@ void CFaDlg::OnMotherchildGreater()
 	dlg.DoModal();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnMotherchildLess()
+void CDragonDlg::OnMotherchildLess()
 {
 	CCheckParentChild dlg;
 
@@ -1018,7 +1018,7 @@ void CFaDlg::OnMotherchildLess()
 	dlg.DoModal();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnHusbandAgeG()
+void CDragonDlg::OnHusbandAgeG()
 {
 	CCheckSpouseAge dlg;
 
@@ -1026,7 +1026,7 @@ void CFaDlg::OnHusbandAgeG()
 	dlg.DoModal();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnHusbandAgeL()
+void CDragonDlg::OnHusbandAgeL()
 {
 	CCheckSpouseAge dlg;
 
@@ -1034,7 +1034,7 @@ void CFaDlg::OnHusbandAgeL()
 	dlg.DoModal();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnWifeAgeG()
+void CDragonDlg::OnWifeAgeG()
 {
 	CCheckSpouseAge dlg;
 
@@ -1042,7 +1042,7 @@ void CFaDlg::OnWifeAgeG()
 	dlg.DoModal();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnWifeAgeL()
+void CDragonDlg::OnWifeAgeL()
 {
 	CCheckSpouseAge dlg;
 
@@ -1050,82 +1050,82 @@ void CFaDlg::OnWifeAgeL()
 	dlg.DoModal();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnCheckSpousesSex()
+void CDragonDlg::OnCheckSpousesSex()
 {
 	CCheckSpousesSex dlg;
 	dlg.DoModal();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnSameNameAndBirth()
+void CDragonDlg::OnSameNameAndBirth()
 {
 	CcheckSameNameAnd dlg;
 	dlg.and = L"birth";
 	dlg.DoModal();
 }
-void CFaDlg::OnSameNameAndDeath()
+void CDragonDlg::OnSameNameAndDeath()
 {
 	CcheckSameNameAnd dlg;
 	dlg.and = L"death";
 	dlg.DoModal();
 }
-void CFaDlg::OnSameNameAndFather()
+void CDragonDlg::OnSameNameAndFather()
 {
 	CcheckSameNameAnd dlg;
 	dlg.and = L"father";
 	dlg.DoModal();
 }
-void CFaDlg::OnSameNameAndMother()
+void CDragonDlg::OnSameNameAndMother()
 {
 	CcheckSameNameAnd dlg;
 	dlg.and = L"mother";
 	dlg.DoModal();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnCheckSameSpouseName()
+void CDragonDlg::OnCheckSameSpouseName()
 {
 	CCheckSameSpouses dlg;
 	dlg.DoModal();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnCheckSameNamesSpouses()
+void CDragonDlg::OnCheckSameNamesSpouses()
 {
 	CListPeopleAndSpouses dlg;
 	dlg.DoModal();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnListPeopleAndFamily()
+void CDragonDlg::OnListPeopleAndFamily()
 {
 	CListPeopleAndFamily dlg;
 	dlg.DoModal();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnSamePeople()
+void CDragonDlg::OnSamePeople()
 {
 	CSamePeople dlg;
 	dlg._onlyList = true;
 	dlg.DoModal();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnSamePeopleContract()
+void CDragonDlg::OnSamePeopleContract()
 {
 	CSamePeople dlg;
 	dlg._onlyList = false;
 	dlg.DoModal();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnNameProblems()
+void CDragonDlg::OnNameProblems()
 {
 	CCheckNames dlg;
 	dlg.DoModal();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnMotherIndex()
+void CDragonDlg::OnMotherIndex()
 {
 	CCheckMotherIndex dlg;
 	dlg.DoModal();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaDlg::OnDisplayBlob()
+void CDragonDlg::OnDisplayBlob()
 {
 	CTableBlobs dlg;
 	dlg.DoModal();
@@ -1133,7 +1133,7 @@ void CFaDlg::OnDisplayBlob()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-void CFaDlg::OnGedcomINDIFAMS()
+void CDragonDlg::OnGedcomINDIFAMS()
 {
 	CGedcomIn ged;
 	ged.indiFams();

@@ -2,7 +2,7 @@
 //
 
 #include "stdafx.h"
-#include "Fa.h"
+#include "Dragon.h"
 #include "GetPeople.h"
 #include "afxdialogex.h"
 #include "GetLastFirst.h"

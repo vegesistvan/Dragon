@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "Fa.h"
+#include "Dragon.h"
 //#include "People.h"
 #include "afxdialogex.h"
 #include "utilities.h"
@@ -95,8 +95,20 @@ void CGaInput::splitTableHeader( CString cLine )
 	else
 		joint = 1;
 
-	if( ( pos = cLine.Find( '<' ) ) != -1 )   // ez nem tudom miért van itt
-		cLine = cLine.Left( pos );
+	if( ( pos1 = cLine.Find( '<' ) ) != -1 )   // az esetleges html formattálás levágása
+	{
+		if( ( pos2 = cLine.Find( '>' ) ) != -1 )
+		{
+			if( pos2 == cLine.GetLength() - 1 )
+				cLine = cLine.Left( pos );
+			else
+			{
+				str.Format( L"<> jelek a tábla fejlécen belül!!\n%s", cLine  );
+				AfxMessageBox( str );
+				exit(1);
+			}
+		}
+	}
 
 	// szögletes zárójelek tartalmának megõrzése és leszedése a cLine-ról
 	while( ( pos1 = cLine.ReverseFind( '[' ) ) != -1 )			// [] zárójelek leszedése

@@ -2,12 +2,12 @@
 //
 
 #include "stdafx.h"
-#include "Fa.h"
+#include "Dragon.h"
 #include "Table_marriages.h"
 #include "afxdialogex.h"
 #include "html_Edit.h"
 #include "Filter.h"
-#include "FaDlg.h"
+#include "DragonDlg.h"
 #include "SelectOne.h"
 #include "GetString.h"
 #include "html_Lines.h"
@@ -546,7 +546,7 @@ void CTableMarriages::PostNcDestroy()
 	CDialog::PostNcDestroy();
 	if(m_pParent)
 	{		
-		((CFaDlg*)m_pParent)->m_pMarriages = NULL;
+		((CDragonDlg*)m_pParent)->m_pMarriages = NULL;
 	}
 	delete this;
 }
@@ -572,7 +572,7 @@ void CTableMarriages::OnClose()
 {
 	m_ListCtrl.DeleteAllItems();	// erre szükség van?
 	theApp.m_recordset->Clear();	// erre szükség van?
-	((CFaDlg*)m_pParent )->m_pMarriages = NULL;
+	((CDragonDlg*)m_pParent )->m_pMarriages = NULL;
 	theApp.m_pMainWnd->SetForegroundWindow();
 	CDialogEx::OnClose();
 }

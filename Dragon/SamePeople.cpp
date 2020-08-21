@@ -2,7 +2,7 @@
 //
 
 #include "stdafx.h"
-#include "Fa.h"
+#include "Dragon.h"
 #include "SamePeople.h"
 #include "afxdialogex.h"
 #include "FirstLetter.h"
@@ -107,7 +107,7 @@ enum
 	S_LINENUMBERF,
 };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//void CFaApp::OnDeleteSamemarriages()   // privát funkció
+//void CDragonApp::OnDeleteSamemarriages()   // privát funkció
 //{
 //	CSamePeople identical;
 //

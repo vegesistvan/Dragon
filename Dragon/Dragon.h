@@ -63,10 +63,10 @@ bool openFileSpec( FILE** ff, CString fileSpec, CString mode );
 CString getTimeTag();
 
 
-class CFaApp : public CWinApp
+class CDragonApp : public CWinApp
 {
 public:
-	CFaApp();
+	CDragonApp();
 
 //	static char THIS_FILE[]=__FILE__;
 
@@ -353,6 +353,6 @@ public:
 	afx_msg void OnHusbandWife();
 	afx_msg void OnEmail();
 };
-extern CFaApp theApp;
+extern CDragonApp theApp;
 
 #endif // !defined(AFX_FA_H__930379D8_BDD1_4973_93FF_041F3F3811E4__INCLUDED_)

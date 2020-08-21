@@ -3,8 +3,8 @@
 //
 
 #include "stdafx.h"
-#include "Fa.h"
-#include "FaDlg.h"
+#include "Dragon.h"
+#include "DragonDlg.h"
 #include "locale.h"
 #include "ProgressWnd.h"
 #include "OpenDatabase.h"
@@ -15,35 +15,36 @@
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BEGIN_MESSAGE_MAP(CFaApp, CWinApp)
+BEGIN_MESSAGE_MAP(CDragonApp, CWinApp)
 ON_COMMAND(ID_HELP, &CWinApp::OnHelp)
-ON_COMMAND(ID_TABLE_BOYS, &CFaApp::OnTableFirstNames)
-ON_COMMAND(ID_USERMANUAL, &CFaApp::OnUsermanual)
-ON_COMMAND(ID_LANGUAGES, &CFaApp::OnLanguages)
-ON_COMMAND(ID_PLACES, &CFaApp::OnPlaces)
-ON_COMMAND(ID_PRIVAT_FOLYT, &CFaApp::OnPrivatFolyt)
-ON_COMMAND(ID_HUSBAND_WIFE, &CFaApp::OnHusbandWife)
-ON_COMMAND(ID_EMAIL, &CFaApp::OnEmail)
+ON_COMMAND(ID_TABLE_BOYS, &CDragonApp::OnTableFirstNames)
+ON_COMMAND(ID_USERMANUAL, &CDragonApp::OnUsermanual)
+ON_COMMAND(ID_LANGUAGES, &CDragonApp::OnLanguages)
+ON_COMMAND(ID_PLACES, &CDragonApp::OnPlaces)
+ON_COMMAND(ID_PRIVAT_FOLYT, &CDragonApp::OnPrivatFolyt)
+ON_COMMAND(ID_HUSBAND_WIFE, &CDragonApp::OnHusbandWife)
+ON_COMMAND(ID_EMAIL, &CDragonApp::OnEmail)
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CFaApp::CFaApp()
+CDragonApp::CDragonApp()
 {
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CFaApp theApp;
+CDragonApp theApp;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CFaApp::InitInstance()
+BOOL CDragonApp::InitInstance()
 {
+/*
 	INITCOMMONCONTROLSEX InitCtrls;
 	InitCtrls.dwSize = sizeof(InitCtrls);
 	InitCtrls.dwICC = ICC_WIN95_CLASSES;
 	InitCommonControlsEx(&InitCtrls);
-
+*/
 	CWinApp::InitInstance();
 
 	AfxEnableControlContainer();
 
-	SetRegistryKey(_T("Local AppWizard-Generated Applications"));
+	SetRegistryKey(_T("Dragon"));
 
 	setlocale(LC_CTYPE,"Hungarian_Hungary.1250"); 
 	
@@ -82,7 +83,7 @@ BOOL CFaApp::InitInstance()
 		m_helpFileSpec.Format( L"%s\\DragonHelp.chm", m_exePath ); 
 	}
 /* main database ***********************************************************************************************/
-	m_databaseSpec	= GetProfileString(	L"Settings", L"database", L"" );
+	m_databaseSpec	= GetProfileString(	L"Settings", L"databasespec", L"" );
 	if( _waccess( m_databaseSpec, 0 ) )
 	{
 		if( !selectDatabase() ) return FALSE;
@@ -184,29 +185,13 @@ BOOL CFaApp::InitInstance()
 	_h = GetDeviceCaps(hdc, VERTRES);
 	ReleaseDC(NULL, hdc);
 
-/**************************************************************************************************************/
-	CFaDlg dlg;
+	CDragonDlg dlg;
 	m_pMainWnd = &dlg;
-	INT_PTR nResponse = dlg.DoModal();
-	if (nResponse == IDOK)
-	{
-		// TODO: Place code here to handle when the dialog is
-		//  dismissed with OK
-	}
-	else if (nResponse == IDCANCEL)
-	{
-		// TODO: Place code here to handle when the dialog is
-		//  dismissed with Cancel
-	}
-	else if (nResponse == -1)
-	{
-		TRACE(traceAppMsg, 0, "Warning: dialog creation failed, so application is terminating unexpectedly.\n");
-		TRACE(traceAppMsg, 0, "Warning: if you are using MFC controls on the dialog, you cannot #define _AFX_NO_MFC_CONTROLS_IN_DIALOGS.\n");
-	}
+	dlg.DoModal();
 	return FALSE;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CFaApp::selectDatabase()
+BOOL CDragonApp::selectDatabase()
 {
 	CString initialDir;
 	CString newFile;
@@ -238,7 +223,7 @@ BOOL CFaApp::selectDatabase()
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CFaApp::openDatabase() 
+BOOL CDragonApp::openDatabase() 
 {
 	m_databaseName = m_databaseSpec.Mid( m_databaseSpec.ReverseFind( '\\' ) + 1 );
 	str.Format( L"%s adatbázis megnyitása és ellenõrzése...", m_databaseName );
@@ -291,7 +276,7 @@ BOOL CFaApp::openDatabase()
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CFaApp::openBlob() 
+BOOL CDragonApp::openBlob() 
 {
 	COpenDatabase open;
 
@@ -306,7 +291,7 @@ BOOL CFaApp::openBlob()
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CFaApp::openSystemDatabase() 
+BOOL CDragonApp::openSystemDatabase() 
 {
 	COpenDatabase open;
 
@@ -321,7 +306,7 @@ BOOL CFaApp::openSystemDatabase()
 	return TRUE;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CFaApp::getInputMode()
+CString CDragonApp::getInputMode()
 {
 	CString filename;
 	CString ext;
@@ -358,7 +343,7 @@ CString CFaApp::getInputMode()
 	return m_inputMode;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaApp::createColumnList()
+void CDragonApp::createColumnList()
 {
 	int n;
 
@@ -373,7 +358,7 @@ void CFaApp::createColumnList()
 
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CFaApp::getColumns( COLUMN* table, int n )
+CString CDragonApp::getColumns( COLUMN* table, int n )
 {
 	CString fields;
 
@@ -386,7 +371,7 @@ CString CFaApp::getColumns( COLUMN* table, int n )
 	return fields;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaApp::createCommand( CString tablename, COLUMN *tableStruct, int n )
+void CDragonApp::createCommand( CString tablename, COLUMN *tableStruct, int n )
 {
 	str.Format( L"CREATE TABLE IF NOT EXISTS %s (", tablename );
 	for( int i=0;  i < n; ++i )
@@ -399,7 +384,7 @@ void CFaApp::createCommand( CString tablename, COLUMN *tableStruct, int n )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CFaApp::selectHtml( BOOL same )
+BOOL CDragonApp::selectHtml( BOOL same )
 {
 	CString initialDir;
 	CString newFile;
@@ -437,7 +422,7 @@ BOOL CFaApp::selectHtml( BOOL same )
 	return TRUE;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CFaApp::selectGedcom( BOOL sameDB )
+BOOL CDragonApp::selectGedcom( BOOL sameDB )
 {
 	CFileDialog dlg( TRUE, L".*", NULL, OFN_HIDEREADONLY | OFN_EXPLORER,
 		L"gedcom files (*.ged)|*.ged|All Files (*.*)|*.*||" );
@@ -466,7 +451,7 @@ BOOL CFaApp::selectGedcom( BOOL sameDB )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CFaApp::selectTextEditor()
+BOOL CDragonApp::selectTextEditor()
 {
 	CString drive;
 	CString path;
@@ -479,21 +464,22 @@ BOOL CFaApp::selectTextEditor()
 		L"exe files (*.exe)|*.exe|All Files (*.*)|*.*||" );
 
 	dlg.m_ofn.lpstrTitle = L"Válaszd ki a kívánt text editort!";
+/*	
 	if( !m_texteditor.IsEmpty() )
 	{
 		splitFilespec( m_texteditor, &drive, &path,&filename,&ext );
 		initialDir.Format( L"%s:%s", drive,path );
 		dlg.m_ofn.lpstrInitialDir = initialDir;
 	}
-
+*/
 	if( dlg.DoModal( ) == IDCANCEL ) return FALSE;
 
 	POSITION pos = dlg.GetStartPosition( );
-	newFile = dlg.GetNextPathName( pos );
+	m_texteditor = dlg.GetNextPathName( pos );
 
-	if( m_texteditor != newFile )
-	{
-		m_texteditor = newFile;
+//	if( m_texteditor != newFile )
+//	{
+//		m_texteditor = newFile;
 		theApp.WriteProfileStringW( L"Settings", L"texteditor", m_texteditor );
 		splitFilespec( m_texteditor, &drive,&path,&filename,&ext );
 		m_editorName.Format( L"%s.%s", filename, ext );
@@ -502,11 +488,11 @@ BOOL CFaApp::selectTextEditor()
 		if( filename == L"notepad++" ) NOTEPAD = true;
 
 		return TRUE;
-	}
-	return FALSE;
+//	}
+//	return FALSE;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CFaApp::selectViewer()
+BOOL CDragonApp::selectViewer()
 {
 	CString newFile;
 
@@ -523,7 +509,7 @@ BOOL CFaApp::selectViewer()
 	return TRUE;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CFaApp::clearDatabase()
+void CDragonApp::clearDatabase()
 {
 	if( AfxMessageBox( L"Tényleg törölni karod az adatbázis a blob fájjal együtt?", MB_YESNO ) == IDNO ) return;
 
@@ -540,7 +526,7 @@ void CFaApp::clearDatabase()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CFaApp::query( CString command )
+BOOL CDragonApp::query( CString command )
 {
 	if( m_recordset->Query(command,mainDB))
 	{
@@ -551,7 +537,7 @@ BOOL CFaApp::query( CString command )
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CFaApp::query1( CString command )
+BOOL CDragonApp::query1( CString command )
 {
 	if( m_recordset1->Query(command,mainDB))
 	{
@@ -562,7 +548,7 @@ BOOL CFaApp::query1( CString command )
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CFaApp::query2( CString command )
+BOOL CDragonApp::query2( CString command )
 {
 	if( m_recordset2->Query(command,mainDB))
 	{
@@ -573,7 +559,7 @@ BOOL CFaApp::query2( CString command )
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CFaApp::query3( CString command )
+BOOL CDragonApp::query3( CString command )
 {
 	if( m_recordset3->Query(command,mainDB))
 	{
@@ -584,7 +570,7 @@ BOOL CFaApp::query3( CString command )
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CFaApp::query4( CString command )
+BOOL CDragonApp::query4( CString command )
 {
 	if( m_recordset4->Query(command,mainDB))
 	{
@@ -595,7 +581,7 @@ BOOL CFaApp::query4( CString command )
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CFaApp::querySystem( CString command )
+BOOL CDragonApp::querySystem( CString command )
 {
 	if( m_recordsetSystem->Query(command,systemDB))
 	{
@@ -606,7 +592,7 @@ BOOL CFaApp::querySystem( CString command )
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CFaApp::queryBlob( CString command )
+BOOL CDragonApp::queryBlob( CString command )
 {
 	if( m_recordsetBlob->Query(command,blobDB))
 	{
@@ -617,7 +603,7 @@ BOOL CFaApp::queryBlob( CString command )
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CFaApp::queryName( CString command )
+BOOL CDragonApp::queryName( CString command )
 {
 	if( m_recordsetName->Query(command,systemDB))
 	{
@@ -628,7 +614,7 @@ BOOL CFaApp::queryName( CString command )
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CFaApp::queryX( CSqliteDB* db, CString command )
+BOOL CDragonApp::queryX( CSqliteDB* db, CString command )
 {
 	if( m_recSetX->Query(command, db ))
 	{
@@ -639,7 +625,7 @@ BOOL CFaApp::queryX( CSqliteDB* db, CString command )
 	return true;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CFaApp::execute( CString command)
+BOOL CDragonApp::execute( CString command)
 {
 	if( mainDB->Execute(command))
 	{
@@ -650,7 +636,7 @@ BOOL CFaApp::execute( CString command)
 	return TRUE;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CFaApp::executeSys( CString command)
+BOOL CDragonApp::executeSys( CString command)
 {
 	if( systemDB->Execute(command))
 	{
@@ -661,7 +647,7 @@ BOOL CFaApp::executeSys( CString command)
 	return TRUE;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CFaApp::executeBlob( CString command)
+BOOL CDragonApp::executeBlob( CString command)
 {
 	if( blobDB->Execute(command))
 	{
@@ -672,7 +658,7 @@ BOOL CFaApp::executeBlob( CString command)
 	return TRUE;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CFaApp::executeX( CSqliteDB* db, CString command)
+BOOL CDragonApp::executeX( CSqliteDB* db, CString command)
 {
 	if( db->Execute(command))
 	{

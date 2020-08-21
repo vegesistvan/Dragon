@@ -2,8 +2,8 @@
 //
 
 #include "stdafx.h"
-#include "Fa.h"
-#include "FaDlg.h"
+#include "Dragon.h"
+#include "DragonDlg.h"
 #include "Table_files.h"
 #include "afxdialogex.h"
 #include "Table_GaTables.h"

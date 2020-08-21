@@ -2,12 +2,12 @@
 //
 
 #include "stdafx.h"
-#include "Fa.h"
+#include "Dragon.h"
 #include "html_Marriages.h"
 #include "afxdialogex.h"
 #include "GA_input.h"
 #include "html_Edit.h"
-#include "FaDlg.h"
+#include "DragonDlg.h"
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 enum
@@ -422,7 +422,7 @@ void CHtmlSpouses::OnChangeSearch()
 void CHtmlSpouses::OnNewtable()
 {
 //	SetWindowPos(&wndNoTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-	CFaDlg dlg;
+	CDragonDlg dlg;
 	if( m_lineNumber != 0 )
 		dlg.OnSpousesLine();
 	else if( m_tableNumber != 0 )
@@ -450,9 +450,9 @@ void CHtmlSpouses::PostNcDestroy()
 	CDialog::PostNcDestroy();
 	if(m_pParent)
 	{		
-		((CFaDlg*)m_pParent)->m_pSpousesF = NULL;
-		((CFaDlg*)m_pParent)->m_pSpousesT = NULL;
-		((CFaDlg*)m_pParent)->m_pSpousesL = NULL;
+		((CDragonDlg*)m_pParent)->m_pSpousesF = NULL;
+		((CDragonDlg*)m_pParent)->m_pSpousesT = NULL;
+		((CDragonDlg*)m_pParent)->m_pSpousesL = NULL;
 	}
 	delete this;
 }

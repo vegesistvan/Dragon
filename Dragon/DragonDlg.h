@@ -61,13 +61,13 @@ RESAMPLE_API HBITMAP CreateResampledBitmap(HDC hdc, HBITMAP hBmpSource, DWORD dw
 
 
 
-// CFaDlg dialog
-class CFaDlg : public CDialogEx
+// CDragonDlg dialog
+class CDragonDlg : public CDialogEx
 {
 // Construction
 public:
-	CFaDlg(CWnd* pParent = NULL);	// standard constructor
-	virtual ~CFaDlg();
+	CDragonDlg(CWnd* pParent = NULL);	// standard constructor
+	virtual ~CDragonDlg();
 //	DECLARE_EASYSIZE
 
 	enum { IDD = IDD_FA_DIALOG };
@@ -84,12 +84,12 @@ public:
 	CString m_name;
 
 	void	mainTitle();
-	void CFaDlg::listHtmlLine( int lineNumber );
-	void CFaDlg::displayTree();
-	void CFaDlg::displayTree2();
-	void CFaDlg::displayTree3();
-	void CFaDlg::closeHtml();
-	void CFaDlg::reloadMSubstr();
+	void CDragonDlg::listHtmlLine( int lineNumber );
+	void CDragonDlg::displayTree();
+	void CDragonDlg::displayTree2();
+	void CDragonDlg::displayTree3();
+	void CDragonDlg::closeHtml();
+	void CDragonDlg::reloadMSubstr();
 
 	int _xDest;
 	int _yDest;
@@ -137,7 +137,7 @@ protected:
 	int m_numberOfPixelsVertical;
 	CString	str;
 	CString	m_command;
-	void CFaDlg::OnInfo();
+	void CDragonDlg::OnInfo();
 
 	std::vector<TCHAR*> v_individuals;
 
@@ -188,7 +188,7 @@ protected:
 	int		m_columnsCount;
 	CString m_save;
 
-	void CFaDlg::createListColumns( );
+	void CDragonDlg::createListColumns( );
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// GEDCOM	
 	CString tag0;
@@ -199,36 +199,36 @@ protected:
 	std::vector<CString> v_tables;
 
 
-	void CFaDlg::extractChildren( int fams, int motherIndex );
+	void CDragonDlg::extractChildren( int fams, int motherIndex );
 //	void	fillFams( int fams, int husb, int wife, ORDERS* orders );
-	void CFaDlg::getZeroLevel( CString cLine );
-	BOOL CFaDlg::processHead( int ins );
-	BOOL CFaDlg::processGenomap( int ins );
-	BOOL CFaDlg::processOccupation( int ins );
-	BOOL CFaDlg::processIndi( int ins );
-	BOOL CFaDlg::processFam( int ins );
-	BOOL CFaDlg::processContact( int ins );
+	void CDragonDlg::getZeroLevel( CString cLine );
+	BOOL CDragonDlg::processHead( int ins );
+	BOOL CDragonDlg::processGenomap( int ins );
+	BOOL CDragonDlg::processOccupation( int ins );
+	BOOL CDragonDlg::processIndi( int ins );
+	BOOL CDragonDlg::processFam( int ins );
+	BOOL CDragonDlg::processContact( int ins );
 
-//	int CFaDlg::getRowid( int index_indi  );
-	int CFaDlg::getTableNumber( CString tableName );
-	int CFaDlg::getIndex( CString tag );
-	void CFaDlg::inputGed( int ins );
+//	int CDragonDlg::getRowid( int index_indi  );
+	int CDragonDlg::getTableNumber( CString tableName );
+	int CDragonDlg::getIndex( CString tag );
+	void CDragonDlg::inputGed( int ins );
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	void getTables( CString caption );
-	int CFaDlg::getYearFromDate( CString date );
-	void CFaDlg::enableMenu();
+	int CDragonDlg::getYearFromDate( CString date );
+	void CDragonDlg::enableMenu();
 	
-	void CFaDlg::crateDatabaseColumns();
-	void CFaDlg::crateMarriagesColumns();
+	void CDragonDlg::crateDatabaseColumns();
+	void CDragonDlg::crateMarriagesColumns();
 	void	fillGATable();
 	void	fillMTable( UINT nItem );
 	void	fillTables();
 	void	fillMRow( int nItem );
-	void CFaDlg::insertRow();
-	void CFaDlg::selectAll( );
-	void CFaDlg::unselectAll( );
+	void CDragonDlg::insertRow();
+	void CDragonDlg::selectAll( );
+	void CDragonDlg::unselectAll( );
 
 	void	EditUpdate( int nItem );
 	BOOL	query( CString command );
@@ -239,35 +239,35 @@ protected:
 	
 	void	push( CString str );
 
-	void CFaDlg::Table_html();
-	CString CFaDlg::getFamilyName( CString cLine );
+	void CDragonDlg::Table_html();
+	CString CDragonDlg::getFamilyName( CString cLine );
 	
-	void CFaDlg::ChangeMenu();
+	void CDragonDlg::ChangeMenu();
 		
-	BOOL CFaDlg::isAncestor();
-	void CFaDlg::predecessors_old();
-	void CFaDlg::predecessors( CString field );
+	BOOL CDragonDlg::isAncestor();
+	void CDragonDlg::predecessors_old();
+	void CDragonDlg::predecessors( CString field );
 	
-	void CFaDlg::TableSpouses( );
-	void CFaDlg::fillSTable( );
-	void CFaDlg::fillPTable( );
-	void CFaDlg::fillRTable( );
+	void CDragonDlg::TableSpouses( );
+	void CDragonDlg::fillSTable( );
+	void CDragonDlg::fillPTable( );
+	void CDragonDlg::fillRTable( );
 
 
-	void CFaDlg::htmlInput0();
-	void CFaDlg::htmlInput();
+	void CDragonDlg::htmlInput0();
+	void CDragonDlg::htmlInput();
 
-	void CFaDlg::selectTable( CString tableNumber );
-	void CFaDlg::extractTable( int tableNumber, CString table_name );	
+	void CDragonDlg::selectTable( CString tableNumber );
+	void CDragonDlg::extractTable( int tableNumber, CString table_name );	
 	void extract( FILE* flOut, int tablePosition, int tableLength );
 
-	void CFaDlg::checkLifespan( int lifespan );
-	void CFaDlg::spousesAgeDiff( int age_diff );
-	void CFaDlg::parentChildDiff( int sex_id, int parentChildMin, int parentChildMax );
-	void CFaDlg::ageAtMarriage( int sex_id, int ageMin, int ageMax );
+	void CDragonDlg::checkLifespan( int lifespan );
+	void CDragonDlg::spousesAgeDiff( int age_diff );
+	void CDragonDlg::parentChildDiff( int sex_id, int parentChildMin, int parentChildMax );
+	void CDragonDlg::ageAtMarriage( int sex_id, int ageMin, int ageMax );
 
 
-	void CFaDlg::OnFilterUnfilter();
+	void CDragonDlg::OnFilterUnfilter();
 
 	virtual BOOL OnInitDialog();
 
@@ -287,7 +287,7 @@ public:
 	void	descendant();
 	void	descendantManual();
 
-	void CFaDlg::newSp();
+	void CDragonDlg::newSp();
 
 
 //modeless dialog boxes////////////////

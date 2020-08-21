@@ -2,9 +2,9 @@
 //
 
 #include "stdafx.h"
-#include "Fa.h"
+#include "Dragon.h"
 #include "gedcomin.h"
-#include "GA_input_parameters.h"
+#include "GAtoDB.h"
 #include <algorithm>
 #include "utilities.h"
 

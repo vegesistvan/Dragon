@@ -2,16 +2,15 @@
 //
 
 #include "stdafx.h"
-#include "Fa.h"
-#include "FaDlg.h"
-#include "GA_input_parameters.h"
+#include "Dragon.h"
+#include "DragonDlg.h"
+#include "GAtoDB.h"
 #include "afxdialogex.h"
 
 IMPLEMENT_DYNAMIC(CGaToDb, CDialogEx)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CGaToDb::CGaToDb(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CGaToDb::IDD, pParent)
-	, m_method(FALSE)
 {
 	m_recordset		= new CSqliteDBRecordSet;
 	REFRESH = FALSE;
@@ -27,7 +26,6 @@ void CGaToDb::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMMENT, colorComment);
 	DDX_Control(pDX, IDC_STATIC_HTML, colorHtml);
 	DDX_Control(pDX, IDC_CHECK_CONTRACTION, CheckContraction);
-	DDX_Radio(pDX, IDC_RADIO_METHOD, m_method);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -45,9 +43,8 @@ BOOL CGaToDb::OnInitDialog()
 	colorHtml.SetTextColor( theApp.m_colorClick );
 
 	
-	m_method = 0;
 
-	 if( m_inputMode == GAHTML )
+	if( m_inputMode == GAHTML )
 	 {
 
 		SetWindowTextW( L"GA.html fájl beolvasása adatbázisba" );

@@ -2,10 +2,10 @@
 //
 
 #include "stdafx.h"
-#include "Fa.h"
+#include "Dragon.h"
 #include "html_Marriages.h"
 #include "afxdialogex.h"
-#include "FaDlg.h"
+#include "DragonDlg.h"
 #include "GA_input.h"
 #include "GetString.h"
 
@@ -337,7 +337,7 @@ BOOL CMarriages::PreTranslateMessage(MSG* pMsg)
 void CMarriages::OnNewtable()
 {
 //	SetWindowPos(&wndNoTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-	CFaDlg dlg;
+	CDragonDlg dlg;
 	if( m_lineNumber != 0 )
 		dlg.OnMarriagesLine();
 	else if( m_tableNumber != 0 )
@@ -351,9 +351,9 @@ void CMarriages::PostNcDestroy()
 	CDialog::PostNcDestroy();
 	if(m_pParent)
 	{		
-		((CFaDlg*)m_pParent)->m_pMarriagesF = NULL;
-		((CFaDlg*)m_pParent)->m_pMarriagesT = NULL;
-		((CFaDlg*)m_pParent)->m_pMarriagesL = NULL;
+		((CDragonDlg*)m_pParent)->m_pMarriagesF = NULL;
+		((CDragonDlg*)m_pParent)->m_pMarriagesT = NULL;
+		((CDragonDlg*)m_pParent)->m_pMarriagesL = NULL;
 	}
 	delete this;
 }

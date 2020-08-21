@@ -45,5 +45,4 @@ public:
 //	CColorStatic colorSameDB;
 	CButton CheckContraction;
 	afx_msg void OnBnClickedOk();
-	BOOL m_method;
 };

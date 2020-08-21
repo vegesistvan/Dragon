@@ -2,7 +2,7 @@
 //
 
 #include "stdafx.h"
-#include "Fa.h"
+#include "Dragon.h"
 #include "Filter.h"
 #include "afxdialogex.h"
 IMPLEMENT_DYNAMIC(CFilter, CDialogEx)

@@ -2,7 +2,7 @@
 //
 
 #include "stdafx.h"
-#include "Fa.h"
+#include "Dragon.h"
 #include "checkLifespan.h"
 #include "afxdialogex.h"
 #include "checkLifespanListCtrl.h"

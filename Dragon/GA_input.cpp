@@ -1,9 +1,9 @@
 #include "stdafx.h"
-#include "Fa.h"
+#include "Dragon.h"
 #include "afxdialogex.h"
 #include "utilities.h"
 #include "GA_input.h"
-#include "GA_input_parameters.h"
+#include "GAtoDB.h"
 #include "SelectTableName.h"
 #include "ConnectCsalad.h"
 #include "InputErrors.h"
@@ -173,8 +173,6 @@ void CGaInput::inputFile()
 	dlgInput.m_caption = caption;
 	if( dlgInput.DoModal() == IDCANCEL ) return;
 
-	m_method = dlgInput.m_method;
-
 	connect = dlgInput.m_connect;
 
 	fileSpec1 = theApp.openHtmlFile( &fh1, fileName1, L"w+" );
@@ -231,13 +229,6 @@ Az alábbi sorokban ismeretlen keresztnevû embereket talált.<br>\
 	if( !rollFile( &file ) ) return;			// eltekeri a fájlt a kívánt pozicióba, 
 												// ami beállítja az m_lineNumber, m_tableNumber, ill. m_familyNUmber értékeket.
 
-	if( m_method == 1 )
-	{
-		inputMethod1();
-	}
-	else
-	{
-
 	CProgressWnd wndP(NULL, caption );
 	wndP.GoModal();
 	wndP.SetRange(0, fileLength );
@@ -279,7 +270,8 @@ Az alábbi sorokban ismeretlen keresztnevû embereket talált.<br>\
 	while(file.ReadString(cLine)) 
 	{
 		cLine.Trim();
-		if( theApp.m_inputCode == UTF8 || theApp.m_inputCode == UTF8BOM ) cLine = Utf8ToAnsi( cLine );
+		if( theApp.m_inputCode == UTF8 || theApp.m_inputCode == UTF8BOM )
+			cLine = Utf8ToAnsi( cLine );
 
 		cLine.Replace( '\'', '|' );	 // a nevekben elõfordulhat az ' jel, amit az SQLite nem szeret
 		++m_lineNumber;
@@ -355,7 +347,7 @@ Az alábbi sorokban ismeretlen keresztnevû embereket talált.<br>\
 	wndP.DestroyWindow();
 	if( !theApp.execute( L"COMMIT" ) ) return;
 
-	}
+//	}
 
 	file.Close();
 	insertIntoFiles( theApp.m_htmlFileSpec );

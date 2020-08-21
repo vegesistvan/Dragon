@@ -2,12 +2,12 @@
 //
 
 #include "stdafx.h"
-#include "Fa.h"
+#include "Dragon.h"
 #include "html_SpouseSpouses.h"
 #include "afxdialogex.h"
 #include "GA_input.h"
 #include "html_Edit.h"
-#include "FaDlg.h"
+#include "DragonDlg.h"
 
 // CSpouseSpouses dialog
 enum
@@ -347,7 +347,7 @@ BOOL CSpouseSpouses::PreTranslateMessage(MSG* pMsg)
 void CSpouseSpouses::OnNewtable()
 {
 //	DestroyWindow();
-	CFaDlg dlg;
+	CDragonDlg dlg;
 	if( m_lineNumber != 0 )
 		dlg.OnSsLine();
 	else if( m_tableNumber != 0 )
@@ -375,9 +375,9 @@ void CSpouseSpouses::PostNcDestroy()
 	CDialog::PostNcDestroy();
 	if(m_pParent)
 	{		
-		((CFaDlg*)m_pParent)->m_pSsF = NULL;
-		((CFaDlg*)m_pParent)->m_pSsT = NULL;
-		((CFaDlg*)m_pParent)->m_pSsL = NULL;
+		((CDragonDlg*)m_pParent)->m_pSsF = NULL;
+		((CDragonDlg*)m_pParent)->m_pSsT = NULL;
+		((CDragonDlg*)m_pParent)->m_pSsL = NULL;
 	}
 	delete this;
 }

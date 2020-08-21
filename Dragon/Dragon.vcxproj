@@ -262,9 +262,9 @@
     <ClInclude Include="SelectParent.h" />
     <ClInclude Include="Relations.h" />
     <ClInclude Include="EditText.h" />
-    <ClInclude Include="Fa.h" />
-    <ClInclude Include="FaDlg.h" />
-    <ClInclude Include="GA_input_parameters.h" />
+    <ClInclude Include="Dragon.h" />
+    <ClInclude Include="DragonDlg.h" />
+    <ClInclude Include="GAtoDB.h" />
     <ClInclude Include="GetString.h" />
     <ClInclude Include="ListBoxEx.h" />
     <ClInclude Include="ListCtrlEx.h" />
@@ -323,7 +323,6 @@
     <ClCompile Include="gedcomTagTable.cpp" />
     <ClCompile Include="Help.cpp" />
     <ClCompile Include="InputErrors.cpp" />
-    <ClCompile Include="inputMethod1.cpp" />
     <ClCompile Include="listPeopleAndFamily.cpp" />
     <ClCompile Include="listPeopleAndSpouses.cpp" />
     <ClCompile Include="checkSpouseAge.cpp" />
@@ -380,7 +379,7 @@
     <ClCompile Include="html_Spouses.cpp" />
     <ClCompile Include="GA_input_common.cpp" />
     <ClCompile Include="checkSameSpouses.cpp" />
-    <ClCompile Include="FaDlg_input.cpp" />
+    <ClCompile Include="DragonDlg_input.cpp" />
     <ClCompile Include="Filter.cpp" />
     <ClCompile Include="Info_db.cpp" />
     <ClCompile Include="EditItem.cpp" />
@@ -389,9 +388,9 @@
     <ClCompile Include="SelectParent.cpp" />
     <ClCompile Include="Relations.cpp" />
     <ClCompile Include="EditText.cpp" />
-    <ClCompile Include="Fa.cpp" />
-    <ClCompile Include="FaDlg.cpp" />
-    <ClCompile Include="ga_input_parameters.CPP" />
+    <ClCompile Include="Dragon.cpp" />
+    <ClCompile Include="DragonDlg.cpp" />
+    <ClCompile Include="GAtoDB.cpp" />
     <ClCompile Include="GetString.cpp" />
     <ClCompile Include="SelectString.cpp" />
     <ClCompile Include="SelectTableHtml.cpp" />
@@ -408,7 +407,7 @@
     <ClCompile Include="html_SpouseSpouses.cpp" />
     <ClCompile Include="Table_tables.cpp" />
     <ClCompile Include="Table_marriages.cpp" />
-    <ClCompile Include="Fa_utilities.cpp" />
+    <ClCompile Include="Dragon_utilites.cpp" />
     <ClCompile Include="ListBoxEx.cpp" />
     <ClCompile Include="ListCtrlEx.cpp" />
     <ClCompile Include="ProgressWnd.cpp" />

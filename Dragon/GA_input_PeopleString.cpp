@@ -1,6 +1,6 @@
 #include "stdafx.h"
-#include "fa.h"
-#include "faDlg.h"
+#include "Dragon.h"
+#include "DragonDlg.h"
 #include "GA_input.h"
 
 

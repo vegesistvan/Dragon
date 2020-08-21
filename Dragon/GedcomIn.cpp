@@ -2,9 +2,9 @@
 //
 
 #include "stdafx.h"
-#include "Fa.h"
+#include "Dragon.h"
 #include "gedcomIn.h"
-#include "GA_input_parameters.h"
+#include "GAtoDB.h"
 #include <algorithm>
 
 // A ga.html listában az egy apához tartozó gyerekek sorrendjét a 'people.orderFather' határozza meg. Ennek hiányában az 

@@ -2,12 +2,12 @@
 //
 
 #include "stdafx.h"
-#include "Fa.h"
+#include "Dragon.h"
 #include "html_Descendants.h"
 #include "afxdialogex.h"
 #include "GA_input.h"
 #include "html_Edit.h"
-#include "FaDlg.h"
+#include "DragonDlg.h"
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 enum
@@ -376,7 +376,7 @@ void CDescendant::OnChangeSearch()
 void CDescendant::OnNewtable()
 {
 //	SetWindowPos(&wndNoTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-	CFaDlg dlg;
+	CDragonDlg dlg;
 	if( m_lineNumber != 0 )
 		dlg.OnDescendantLine();
 	else if( m_tableNumber != 0 )
@@ -406,9 +406,9 @@ void CDescendant::PostNcDestroy()
 	CDialog::PostNcDestroy();
 	if(m_pParent)
 	{		
-		((CFaDlg*)m_pParent)->m_pDescendantsF = NULL;
-		((CFaDlg*)m_pParent)->m_pDescendantsT = NULL;
-		((CFaDlg*)m_pParent)->m_pDescendantsL = NULL;
+		((CDragonDlg*)m_pParent)->m_pDescendantsF = NULL;
+		((CDragonDlg*)m_pParent)->m_pDescendantsT = NULL;
+		((CDragonDlg*)m_pParent)->m_pDescendantsL = NULL;
 	}
 	delete this;
 }

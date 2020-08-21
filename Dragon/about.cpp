@@ -1,6 +1,6 @@
 #include "stdafx.h"
-#include "Fa.h"
-#include "FaDlg.h"
+#include "Dragon.h"
+#include "DragonDlg.h"
 #include <stdio.h>
 #include "about.h"
 #include "version_num.h"

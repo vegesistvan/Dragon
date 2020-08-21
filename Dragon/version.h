@@ -1,5 +1,10 @@
 #pragma once
 #define VERSION L"1.0.8"
+// a fejlécben sorba ányazott <> kimutatása
+// GA fáj beolvasáskor nincs választási lehetõség a felbontás módszerében
+
+
+//#define VERSION L"1.0.8"
 //	Felmenõi listák átalakítása, javítása
 //#define VERSION L"1.1.7.1"
 

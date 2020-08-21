@@ -2,11 +2,11 @@
 //
 
 #include "stdafx.h"
-#include "Fa.h"
+#include "Dragon.h"
 #include "Table_html.h"
 #include "afxdialogex.h"
 #include "GetString.h"
-#include "FaDlg.h"
+#include "DragonDlg.h"
 
 enum
 {
@@ -299,9 +299,9 @@ void CTableHtml::PostNcDestroy()
 	CDialog::PostNcDestroy();
 	if(m_pParent)
 	{		
-		((CFaDlg*)m_pParent)->m_pDescendantsF = NULL;
-		((CFaDlg*)m_pParent)->m_pDescendantsT = NULL;
-		((CFaDlg*)m_pParent)->m_pDescendantsL = NULL;
+		((CDragonDlg*)m_pParent)->m_pDescendantsF = NULL;
+		((CDragonDlg*)m_pParent)->m_pDescendantsT = NULL;
+		((CDragonDlg*)m_pParent)->m_pDescendantsL = NULL;
 	}
 	delete this;
 }
