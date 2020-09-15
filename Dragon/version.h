@@ -1,5 +1,8 @@
 #pragma once
-#define VERSION L"1.1.1"
+#define VERSION L"1.1.2"
+//	ANSI kódolású html fál
+
+// #define VERSION L"1.1.1"
 // A táblafejléc végén lévõ esetleges html formattálást ( <..> ) levágja 
 
 

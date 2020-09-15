@@ -950,6 +950,8 @@ bool checkDate( CString datum)
 	return true;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Addig olvassa a fájlt, amíg a végére nem ér vagy talált benne UTF8BOM-ot vagy UTF8 kódot
+// Default kódolás: ANSI
 int GetInputCode( CString fileSpec )
 {
 	FILE* fl;
@@ -971,7 +973,7 @@ int GetInputCode( CString fileSpec )
 	bool bomFlag = false;
 	int cnt = 1;
 
-#define LEN  1000
+#define LEN  10
 	UCHAR	buffer[ LEN + 1 ];
 	int		length;
 	buffer[LEN] = '\0';
@@ -983,7 +985,6 @@ int GetInputCode( CString fileSpec )
 				bomFlag = true;
 		}
 		cnt = 0;
-
 		if( isUTF8( buffer, length ) )
 		{
 			if( bomFlag )
@@ -995,12 +996,14 @@ int GetInputCode( CString fileSpec )
 		++cnt;
 	}
 	fclose( fl );
+	code = ANSI;
 	return code;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool isUTF8( UCHAR * bytes, int length )
 {
 	int i = 0;
+	UCHAR* b = bytes;
 //	const unsigned char * bytes = (const unsigned char *)string;
 //	while( i < length )
 	while( *bytes )
@@ -1040,9 +1043,9 @@ bool isUTF8( UCHAR * bytes, int length )
 //			i += 4;
 			continue;
 		}
-		return 0;
+		return 0;		// ANSI
 	}
-	return 1;
+	return 1;			// UTF8
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CStringA AnsiToUtf8( CString str )
