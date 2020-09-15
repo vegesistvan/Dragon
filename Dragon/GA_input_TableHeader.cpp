@@ -94,13 +94,13 @@ void CGaInput::splitTableHeader( CString cLine )
 	}
 	else
 		joint = 1;
-
+/*
 	if( ( pos1 = cLine.Find( '<' ) ) != -1 )   // az esetleges html formattálás levágása
 	{
-		if( ( pos2 = cLine.Find( '>' ) ) != -1 )
+		if( ( pos2 = cLine.ReverseFind( '>' ) ) != -1 )
 		{
 			if( pos2 == cLine.GetLength() - 1 )
-				cLine = cLine.Left( pos );
+				cLine = cLine.Left( pos1 );
 			else
 			{
 				str.Format( L"<> jelek a tábla fejlécen belül!!\n%s", cLine  );
@@ -108,6 +108,11 @@ void CGaInput::splitTableHeader( CString cLine )
 				exit(1);
 			}
 		}
+	}
+*/
+	if( ( pos1 = cLine.Find( '<' ) ) != -1 )   // az esetleges html formattálás levágása
+	{
+		cLine = cLine.Left( pos1 );
 	}
 
 	// szögletes zárójelek tartalmának megõrzése és leszedése a cLine-ról
@@ -127,6 +132,8 @@ void CGaInput::splitTableHeader( CString cLine )
 					m_tableHeader.arm = str;
 			}
 		}
+		else
+			break;
 	}
 
 	

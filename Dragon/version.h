@@ -1,5 +1,9 @@
 #pragma once
-#define VERSION L"1.0.8"
+#define VERSION L"1.1.1"
+// A táblafejléc végén lévõ esetleges html formattálást ( <..> ) levágja 
+
+
+//#define VERSION L"1.0.9"
 // a fejlécben sorba ányazott <> kimutatása
 // GA fáj beolvasáskor nincs választási lehetõség a felbontás módszerében
 

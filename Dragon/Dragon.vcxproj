@@ -202,7 +202,6 @@
     <ClInclude Include="checkDateFormat.h" />
     <ClInclude Include="checkSameNameAnd.h" />
     <ClInclude Include="Help.h" />
-    <ClInclude Include="Info.h" />
     <ClInclude Include="InputErrors.h" />
     <ClInclude Include="listPeopleAndFamily.h" />
     <ClInclude Include="listPeopleAndSpouses.h" />
@@ -322,6 +321,7 @@
     <ClCompile Include="checkSameNameAnd.cpp" />
     <ClCompile Include="gedcomTagTable.cpp" />
     <ClCompile Include="Help.cpp" />
+    <ClCompile Include="Info_db.cpp" />
     <ClCompile Include="InputErrors.cpp" />
     <ClCompile Include="listPeopleAndFamily.cpp" />
     <ClCompile Include="listPeopleAndSpouses.cpp" />
@@ -354,7 +354,6 @@
     <ClCompile Include="checkLifespanListCtrl.cpp" />
     <ClCompile Include="checkLifespan.cpp" />
     <ClCompile Include="GA_ascendants.cpp" />
-    <ClCompile Include="Info.cpp" />
     <ClCompile Include="Languages.cpp" />
     <ClCompile Include="Message.cpp" />
     <ClCompile Include="MoreSpouses.cpp" />
@@ -381,7 +380,6 @@
     <ClCompile Include="checkSameSpouses.cpp" />
     <ClCompile Include="DragonDlg_input.cpp" />
     <ClCompile Include="Filter.cpp" />
-    <ClCompile Include="Info_db.cpp" />
     <ClCompile Include="EditItem.cpp" />
     <ClCompile Include="SelectFamily.cpp" />
     <ClCompile Include="SelectFamilyName.cpp" />

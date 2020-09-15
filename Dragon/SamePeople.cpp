@@ -15,6 +15,7 @@
 #include "GetLastFirst.h"
 #include "html_Lines.h"
 
+#include "version.h"
 enum
 {
 	_ROWID = 0,
@@ -1793,7 +1794,7 @@ ident.Format( L"Két azonos nevû embert akkor tekintünk azonosnak, ha a fenti azo
 	fwprintf( fh1, L"<pre>" );
 
 		
-	fwprintf( fh1, L"%-45s %s<br>", L"Program: fa verzió:", VERSION );
+	fwprintf( fh1, L"%-45s %s<br>", L"Program: dragon verzió:", VERSION );
 	fwprintf( fh1, L"%-45s %s<br>", L"Adatbázis:", theApp.m_databaseSpec );
 	fwprintf( fh1, L"%-45s %s<br>", L"Lista készült:", theApp.getPresentDateTime() );
 	fwprintf( fh1, L"%-45s %d<br>",  L"Teljesítendõ kritériumok elõírt száma:", _azonos );
@@ -1805,7 +1806,7 @@ ident.Format( L"Két azonos nevû embert akkor tekintünk azonosnak, ha a fenti azo
 	listColumnHeader(1);
 
 
-	fwprintf( fh2, L"%-45s %s<br>", L"Program: fa verzió:", VERSION );
+	fwprintf( fh2, L"%-45s %s<br>", L"Program: Dragon verzió:", VERSION );
 	fwprintf( fh2, L"%-45s %s<br>", L"Adatbázis:", theApp.m_databaseSpec );
 	fwprintf( fh2, L"%-45s %s<br>", L"Lista készült:", theApp.getPresentDateTime() );
 	fwprintf( fh2, L"%-45s %d<br>",  L"Teljesítendõ kritériumok elõírt száma:", _azonos );

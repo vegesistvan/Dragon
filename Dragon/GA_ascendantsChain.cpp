@@ -5,7 +5,7 @@
 #include "Dragon.h"
 #include "GA_ascendantsChain.h"
 #include "afxdialogex.h"
-
+#include "version.h"
 
 // CGaAscendantsChain dialog
 #define SPOUSES 0
@@ -749,7 +749,7 @@ CString CGaAscendantsChain::openFile()
 	fwprintf( fh1, L"%s\n", head );
 
 	CString program;
-	program.Format( L"Fa version %s", VERSION );
+	program.Format( L"Dragon version %s", VERSION );
 
 /*
 	fwprintf( fh1, L"<HEAD>\n" );

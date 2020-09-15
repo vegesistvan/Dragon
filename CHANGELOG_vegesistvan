@@ -1,4 +1,6 @@
-v. 1.0.8  GA fáj beolvasáskor nincs választási lehetőség a felbontás módszerében
+v. 1.1.1 A táblafejléc végén lévő esetleges html formattálást ( <..> ) levágja 
+
+v. 1.0.9  GA fáj beolvasáskor nincs választási lehetőség a felbontás módszerében
 
 v. 1.0.8 COPenDatabase módosítása
 

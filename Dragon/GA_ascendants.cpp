@@ -6,7 +6,7 @@
 #include "GA_ascendants.h"
 #include <math.h>
 #include <cmath>
-
+#include "version.h"
 
 bool sortByK(const _int64 &v1, const _int64 &v2); 
 bool sortVAByK(const ASCENDANTS &v1, const ASCENDANTS &v2); 
@@ -801,7 +801,7 @@ CString CGaAscendants::openFile()
 
 
 	CString program;
-	program.Format( L"Fa version %s", VERSION );
+	program.Format( L"Dragon version %s", VERSION );
 
 	CString head;
 	head = L"<!DOCTYPE html>\n<html>\n<head>\n</head>\n<body>";

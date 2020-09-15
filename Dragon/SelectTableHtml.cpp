@@ -97,7 +97,8 @@ BOOL CSelectTable::OnInitDialog()
 	while(file.ReadString(cLine))
 	{
 		cLine.Trim();
-		if( theApp.m_inputCode == UTF8 || theApp.m_inputCode == UTF8BOM ) cLine = Utf8ToAnsi( cLine );
+		if( theApp.m_inputCode == UTF8 || theApp.m_inputCode == UTF8BOM )
+			cLine = Utf8ToAnsi( cLine );
 
 		cLine.Replace( '\'', '|' );	 // a nevekben elõfordulhat az ' jel, amit az SQLite nem szeret
 		if( cLine.Left(2) == L"%%" )

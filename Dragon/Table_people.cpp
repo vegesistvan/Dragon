@@ -30,7 +30,6 @@
 #include "GedcomOut.h"
 #include "NewPeople2.h"
 #include "Message.h"
-#include "Info.h"
 // GEDCOM
 enum
 {

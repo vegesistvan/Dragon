@@ -47,7 +47,7 @@ void splitPlaceDateComment( CString placeDateComment, PLACE_DATE_BLOCK* ns )
 	for( i = 0; i < n; ++i )
 	{
 		ret = isDate( &A, i, &datum );
-		if( ret )  // van datum!!
+        if( ret )  // van datum!!
 		{
 			place	= packWords( &A, 0, i );			// dátum elõtt 'place'  (ha van)
 			if( place.Right(1) == ',' )

@@ -221,10 +221,9 @@ CString getSecondWord( CString str )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL isNumeric( CString word )
 {
-//	word.Trim();
-  	CString str;
-	str = word.SpanIncluding( L"0123456789");
-	return( word.SpanIncluding( L"0123456789") == word );
+	if( word.SpanIncluding( L"?" ) == word )  // csak '?' karakter van a szóban 
+		return false;
+	return( word.SpanIncluding( L"0123456789 ") == word );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL isRoman( CString word )
@@ -670,6 +669,7 @@ bool isLastCharacter( CString str, TCHAR kar )
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // a dátum eõtt álló 'kb' ill. a dátum után álló 'után','körül','kb' a dátum része!
+// visszadott ret értéke megadja, hány szóból áll a dátum
 int isDate( CStringArray* A, int i, CString* datum )
 {
 	INT_PTR n = A->GetCount();
@@ -684,6 +684,7 @@ int isDate( CStringArray* A, int i, CString* datum )
 	
 	miez = A->GetAt(i);
 	miez.Replace( '?', ' ' );
+	miez.Replace( '.', ' ' );
 	miez.Trim();
 	if( isNumeric( miez) )
 	{

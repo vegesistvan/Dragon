@@ -337,6 +337,8 @@ void CGaInput::splitMarriageSubstrings()
 	}
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
+// Alsómatyasóc 1827.05.31 Felsõmátyásfalvi Mattyasovszky Jozefa
 void CGaInput::splitSpouseString( CString marriageString, SNAMEBLOCK *snb )
 {
 	snb->place.Empty();
@@ -412,7 +414,8 @@ void CGaInput::splitSpouseString( CString marriageString, SNAMEBLOCK *snb )
 		return;
 	}
 
-	if( i < n )   // megvan a  keresztnév. Ha van utána valami, akkor az comment
+//	if( i < n )   // megvan a  keresztnév. Ha van utána valami, akkor az comment
+	if( i <= n )   // megvan a  keresztnév. Ha van utána valami, akkor az comment
 	{
 		snb->comment = packWords( &A, i, n-i );
 		name = packWords(&A, 0, i );
@@ -454,6 +457,151 @@ void CGaInput::splitSpouseString( CString marriageString, SNAMEBLOCK *snb )
 		}
 	}
 
+
+	if( d.sex_id == sex_id || sex_id == -1 )
+	{
+		splitSpouseStringNew2( marriageString, snb );
+	}
+}
+*/
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Alsómatyasóc 1827.05.31 Felsõmátyásfalvi Mattyasovszky Jozefa
+// Csögle 1924.04.30 ns Demény Elemér
+void CGaInput::splitSpouseString( CString marriageString, SNAMEBLOCK *snb )
+{
+	snb->place.Empty();
+	snb->date.Empty();
+	snb->name.Empty();
+	snb->comment.Empty();
+	
+	if( marriageString.IsEmpty() ) return;
+
+	CStringArray A;
+
+	int	n;
+	int	i;
+	int	j;
+	int	ret;
+	BOOL volt1 = FALSE;
+
+	CString name;
+	CString datum;
+	CString word;
+	CString name_comment;
+
+	int sex_id = -2;
+
+
+	n = wordList( &A, marriageString, ' ', FALSE );
+/*
+	for( i = 0 ; i < n; ++i )			// az elsõ numerikus szót keresi, ami a házasságkötés dátuma lesz
+	{
+		word = A[i];
+		word.Replace( ',', ' ' );						// a név után lehet vesszõ !!
+		word.Replace( '?', ' ' );
+		word.TrimRight();
+		if( (ret = isDate( &A, i, &datum )) )
+		{
+			snb->date = datum;
+			break;
+		}
+	}
+	if( i > 0 )  // a dátum elõtt van a házasságkötés helye
+	{
+		snb->place = packWords( &A, 0, i - ret + 1 );
+
+	}
+*/
+// [place][date] name [[,] [comment]] szétszedése elemeire
+// A name[[,] [comment] elválasztó index keresése.
+// Az elválasztó index biztos nagyobb mint 1, mert vezetéknévnek mindenképpen kell lenni
+// A 'name' vége: 
+// 'name,' vagy 
+//	a balról-jobbra elsõ keresztnév, amit nem keresztnév követ
+
+	for( i = 1 ; i < n; ++i )			// az elsõ keresztmevet keresi, de az lehet helyiség (pl. Gyula is, és lehet családnév is (pl. péter Zoltán
+	{
+		name = A[i];
+		name.Replace( ',', ' ' );						// a név után lehet vesszõ !!
+		name.Replace( '?', ' ' );
+		name.TrimRight();
+		
+		if( ( ret = isFirstName( name ) ) != -1 )			//  =Budaörs 1944.12.17 Richard Rostoczil Mária
+		{
+			sex_id = ret;		// az utolsó keresztnév számít. pl  Behárfalvi Urbán Anna
+			if( A[i-1].Right(1) == ',' ) continue;					// ha az elõzõ szó végén , van
+			if( i+1 < n && A[i+1] == L"és" ) continue;				// Márkus és Batiizfalvi....ez nem keresztnév!
+			if( iswdigit( A[i-1].GetAt(0) ) ) continue;				// ha elõtte szám van, akkor nem fogadja el
+//			if( i > 1 && !iswupper( A[i-1].GetAt(0) ) ) continue;		// csak az a keresztnevet fogadja el, ami elõtt nagybetûs szó áll
+																		// kivéve: van_der_Schmidt Vilmos, ilyen sok van, tehát ez nem jó!!
+//			snb->name	+= name;
+//			snb->name	+= L" "; 
+			volt1 = TRUE;
+			if( isLastCharacter( A[i], ',' ) )
+			{
+				A[i].Replace( ',', ' ' );
+				A[i].TrimRight();
+				++i;
+				break;									// name, : elválasztó index!
+			}
+		}
+		else
+		{
+			if( volt1 ) break;							// keresztnevet követõ elsõ nem kersztnév. Elválasztó index!
+		}
+	}
+	if( !volt1 )
+	{
+		if( fh4 != NULL )  // Privát->Házastársak nem nyitja meg az fh4-et!!!
+		{
+			fwprintf( fh4, L"%6d %s<br>\n", m_lineNumber, marriageString );
+		}
+		++m_error_cnt4;
+		return;
+	}
+
+//	if( i < n )   // megvan a  keresztnév. Ha van utána valami, akkor az comment
+	if( i <= n )   // megvan a  keresztnév. Ha van utána valami, akkor az comment
+	{
+		snb->comment = packWords( &A, i, n-i );
+		name = packWords(&A, 0, i );
+		n = wordList(&A, name, ' ', FALSE );
+	}
+
+	//	[place] [date] name
+	// ami i elõtt van az [place][date] name
+	// Elölrõl keeesi van dátum ?
+	for( j = 0; j < i; ++j )						// j a 'date' és 'name' határa
+	{
+		ret = isDate( &A, j, &datum );
+		if( ret )									// van datum!! és az ret szóból áll!
+		{
+			if( datum.Left(2) == L"kb" ) --j;		// a place 1 szóval kevesebb!  ( kb 1944)
+			snb->place	= packWords( &A, 0, j );	// dátum elõtt 'place'  (ha van)
+ 			snb->date	= datum;
+			snb->name	= packWords( &A, j + ret , i-j - ret );
+			break;
+		}
+	}
+
+
+	// [place] name
+	if( j == i )		// nincs dátum, marad a [place,] name
+	{
+		for( j = 0; j < i; ++j )
+		{
+			if( isLastCharacter( A[j], ',' ) ) break;
+		}
+		if( j < i )			// place, name
+		{
+			snb->place = packWords( &A, 0, j );
+			snb->name  = packWords( &A, j+1, i - j -1 );
+		}
+		else					// name
+		{
+			snb->name = packWords( &A, 0, i );
+		}
+	}
 
 	if( d.sex_id == sex_id || sex_id == -1 )
 	{

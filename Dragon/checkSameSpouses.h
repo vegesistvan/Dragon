@@ -144,7 +144,6 @@ public:
 	afx_msg void OnListPeople();
 	afx_msg void OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
-	afx_msg void OnInfo();
 
 	void CCheckSameSpouses::OnHtmlNotepad();
 	afx_msg void OnHtml();

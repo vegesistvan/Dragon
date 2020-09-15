@@ -762,6 +762,8 @@ void CTableMarriages::OnEditGahtml()
 	
 	for( int i = 0; i < htmlLineNumber; ++i ) file.ReadString( cLine );
 
+	file.Close();
+
 	cLine.Trim();
 	if( theApp.m_inputCode == UTF8 || theApp.m_inputCode == UTF8BOM ) cLine = Utf8ToAnsi( cLine );
 	if( cLine.GetAt(0) != '%' || cLine.Left(3) == L"%%%" )

@@ -137,7 +137,6 @@ protected:
 	int m_numberOfPixelsVertical;
 	CString	str;
 	CString	m_command;
-	void CDragonDlg::OnInfo();
 
 	std::vector<TCHAR*> v_individuals;
 

@@ -3,7 +3,6 @@
 #include "listctrlex.h"
 
 
-// CInfoDb dialog
 
 class CInfoDb : public CDialogEx
 {

@@ -60,6 +60,8 @@
 #include "SamePeople.h"
 #include "GA_ascendantsChain.h"
 
+#include "version.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif

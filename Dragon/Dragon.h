@@ -12,7 +12,6 @@
 #include "utilities.h"
 #include "database.h"
 #include "ProgressWnd.h"
-#include "version.h"
 #include "Color.h"
 #include "ColorStatic.h"
 #include "textfile.h"

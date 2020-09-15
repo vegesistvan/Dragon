@@ -10,6 +10,7 @@
 #include "Message.h"
 #include "html_Edit.h"
 #include "SaveFirstName.h"
+#include "version.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -96,7 +97,7 @@ FILE * CDragonApp::openLogFile(CString fname,CString title)
 		n	= 40 + str.GetLength()/2;
 		fwprintf(fl,L"%*s\n",n,str);
 
-		str.Format(L"fa v. %s",VERSION);
+		str.Format(L"Dragon v. %s",VERSION);
 		n = str.GetLength()/2;	
 		n	= 40 + str.GetLength()/2;
 		fwprintf(fl,L"%*s\n",n,str);
