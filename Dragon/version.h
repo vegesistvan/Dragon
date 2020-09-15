@@ -1,5 +1,9 @@
 #pragma once
-#define VERSION L"1.1.2"
+
+#define VERSION L"1.1.3"
+// ANSI és UTF8 kódolású bemeneti fájl
+
+// #define VERSION L"1.1.2"
 //	ANSI kódolású html fál
 
 // #define VERSION L"1.1.1"

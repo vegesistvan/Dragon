@@ -955,9 +955,7 @@ bool checkDate( CString datum)
 int GetInputCode( CString fileSpec )
 {
 	FILE* fl;
-	int code = ANSI;
 	int errno_t;
-
 	CString str;
 	
 	if(( errno_t = _wfopen_s( &fl, fileSpec, L"rb" ) ))
@@ -966,40 +964,63 @@ int GetInputCode( CString fileSpec )
 		AfxMessageBox(str);
 		return NULL;
 	}
+
 	byte bom1 = 0XEF;
 	byte bom2 = 0XBB;
 	byte bom3 = 0XBF;
 
-	bool bomFlag = false;
 	int cnt = 1;
 
-#define LEN  10
-	UCHAR	buffer[ LEN + 1 ];
+#define LEN  100
+	UCHAR	buffer[ LEN ];
 	int		length;
-	buffer[LEN] = '\0';
 	while( (length = fread( buffer, 1, LEN, fl ) ) ) 
 	{
 		if( cnt )
 		{
 			if( buffer[0] == bom1 && buffer[1] == bom2 && buffer[2] == bom3 )
-				bomFlag = true;
+			{
+				fclose( fl );
+				return UTF8BOM;
+			}
 		}
 		cnt = 0;
 		if( isUTF8( buffer, length ) )
 		{
-			if( bomFlag )
-				code = UTF8BOM;
-			else
-				code = UTF8;
-			break;
+			fclose( fl );
+			return UTF8;
 		}
-		++cnt;
 	}
 	fclose( fl );
-	code = ANSI;
-	return code;
+	return ANSI;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Layout of UTF-8 byte sequences
+// Number of bytes	First code point	Last code point	Byte 1		Byte 2		Byte 3		Byte 4
+// 1				U+0000				U+007F			0xxxxxxx	
+// 2				U+0080				U+07FF			110xxxxx	10xxxxxx	
+// 3				U+0800				U+FFFF			1110xxxx	10xxxxxx	10xxxxxx	
+// 4				U+10000	[nb 2]		U+10FFFF		11110xxx	10xxxxxx	10xxxxxx	10xxxxxx
+bool isUTF8( UCHAR * bytes, int length )
+{
+	int i = 0;
+	UCHAR* b = bytes;
+	UCHAR byte;
+	while( i < length )
+	{
+		byte = bytes[i];
+		if(  (bytes[i] >> 3) == 0X1E && i+3 < length && (bytes[i+1] >> 6 ) == 0X02 && (bytes[i+2] >> 6 ) == 0X02 && (bytes[i+3] >> 6 ) == 0X02 )
+			return UTF8;																			// 4 bytes 
+		if( (bytes[i] >> 4 ) == 0X0E && i+2 < length && (bytes[i+1] >> 6 ) == 0X02 && (bytes[i+2] >> 6 ) == 0X02 )
+			return UTF8;																			// 3 bytes
+		if( (bytes[i] >> 5 ) == 0X06 && i+1 < length && (bytes[i+1] >> 6 ) == 0X02 )
+			return UTF8;																			// 2 bytes
+		++i;
+	}
+	return ANSI;
+}
+
+/*
 bool isUTF8( UCHAR * bytes, int length )
 {
 	int i = 0;
@@ -1047,6 +1068,7 @@ bool isUTF8( UCHAR * bytes, int length )
 	}
 	return 1;			// UTF8
 }
+*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CStringA AnsiToUtf8( CString str )
 {
