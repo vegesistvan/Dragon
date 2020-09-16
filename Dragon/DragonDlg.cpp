@@ -119,7 +119,6 @@ ON_COMMAND(ID_SS_TABLE, &CDragonDlg::OnSsTable)
 ON_COMMAND(ID_SS_LINE, &CDragonDlg::OnSsLine)
 ON_COMMAND(ID_SELECTED_FILES, &CDragonDlg::OnSelectedFiles)
 ON_COMMAND(ID_TITLES, &CDragonDlg::OnTitles)
-//ON_COMMAND(ID_GAHTML, &CDragonDlg::OnGahtml)
 
 ON_WM_HSCROLL()
 ON_COMMAND(ID_OPEN_DB, &CDragonDlg::OnOpenDb)

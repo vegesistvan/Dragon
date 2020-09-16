@@ -486,12 +486,12 @@ void CTableTables::OnGahtml()
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
 	CString lineNumber	= m_ListCtrl.GetItemText( nItem, T_LINENUMBER );
 	CString fileSpec;
-//	CString command;
+	CString command;
 
-//	command.Format( L"%s -n%s -alwaysOnTop -nosession", theApp.m_htmlFileSpec, lineNumber );
-//	ShellExecute(NULL,L"open",theApp.m_editorName, command,theApp.m:_editorFolder,SW_SHOW);
+	command.Format( L"%s -n%s -alwaysOnTop -nosession", theApp.m_htmlFileSpec, lineNumber );
+	ShellExecute(NULL,L"open",theApp.m_editorName, command,theApp.m_editorFolder,SW_SHOW);
 
-	TCHAR command[100];
-	swprintf(command, 100, L"%d", 1 );
+//	TCHAR command[100];
+//	swprintf(command, 100, L"%d", 1 );
 //	ShellExecute(NULL, L"open", L"webApp.exe", NULL, L"d:\\VS2019\\cpp\\webApp\\Release", SW_SHOW);
 }

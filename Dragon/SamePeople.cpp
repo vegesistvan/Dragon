@@ -640,8 +640,8 @@ void CSamePeople::processSame()
 	std::sort( v_kids2.begin(), v_kids2.end(), sortByNameKids );
 
 	CString name = vSame.at(0).name;
-//	if( !vSame.at(0).name.Compare( L"Amadé János" ) )
-//		int z = 1;
+	if( !vSame.at(0).name.Compare( L"Foglár Anna" ) )
+		int z = 1;
 
 	int volt = markGroup();		// a vSame vektorban megjelöli az összevonható emebereket csoportba osztva, vSame.group.al megjelölve
 								// volt == TRUE, ha volt összevonható, megjelölt elem

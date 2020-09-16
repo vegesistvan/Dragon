@@ -131,6 +131,7 @@ void CGaDescendants::OnBnClickedOk()
 	m_ixBgrd	= m_ComboBgrd.GetCurSel();
 	m_colorBgrnd = szin[m_ixBgrd].rgb;
 
+	if( m_woman ) m_connect = true;
 
 	if( m_rowid1.IsEmpty() )
 		treeTables();

@@ -1,6 +1,8 @@
 #pragma once
+#define VERSION L"1.1.4"
+// Leányági leszármazottak listázásánál automatikusan "összeköt", azaz más táblákon is keres
 
-#define VERSION L"1.1.3"
+// #define L"1.1.3"
 // ANSI és UTF8 kódolású bemeneti fájl
 
 // #define VERSION L"1.1.2"
