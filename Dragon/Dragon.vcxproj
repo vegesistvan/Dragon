@@ -242,6 +242,7 @@
     <ClInclude Include="Pictures.h" />
     <ClInclude Include="SameName.h" />
     <ClInclude Include="SamePeople.h" />
+    <ClInclude Include="SameSpouses.h" />
     <ClInclude Include="SaveFirstName.h" />
     <ClInclude Include="Table_blobs.h" />
     <ClInclude Include="Table_people.h" />
@@ -363,6 +364,7 @@
     <ClCompile Include="Pictures.cpp" />
     <ClCompile Include="SameName.cpp" />
     <ClCompile Include="SamePeople.cpp" />
+    <ClCompile Include="SameSpouses.cpp" />
     <ClCompile Include="SaveFirstName.cpp" />
     <ClCompile Include="Table_blobs.cpp" />
     <ClCompile Include="Table_people.cpp" />

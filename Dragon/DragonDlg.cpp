@@ -59,6 +59,8 @@
 
 #include "SamePeople.h"
 #include "GA_ascendantsChain.h"
+#include "SameSpouses.h"
+
 
 #include "version.h"
 
@@ -187,6 +189,8 @@ ON_COMMAND(ID_MOTHER_INDEX, &CDragonDlg::OnMotherIndex)
 ON_COMMAND(ID_DISPLAY_BLOB, &CDragonDlg::OnDisplayBlob)
 ON_COMMAND(ID_GEDCOM_TAGTABLE, &CDragonDlg::OnGedcomTagtable)
 ON_COMMAND(ID_GEDCOM_INDIFAMS, &CDragonDlg::OnGedcomINDIFAMS)
+ON_COMMAND(ID_SAME_SPOUSES, &CDragonDlg::OnSameSpouses)
+ON_COMMAND(ID_SAME_NAMES, &CDragonDlg::OnSameNames)
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CDragonDlg::OnInitDialog()
@@ -1138,4 +1142,16 @@ void CDragonDlg::OnGedcomINDIFAMS()
 {
 	CGedcomIn ged;
 	ged.indiFams();
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDragonDlg::OnSameSpouses()
+{
+	CCheckSameSpouses dlg;
+	dlg.DoModal();
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDragonDlg::OnSameNames()
+{
+	CSameSpouses dlg;
+	dlg.DoModal();
 }

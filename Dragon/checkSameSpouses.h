@@ -5,33 +5,6 @@
 // CCheckSameSpouses dialog
 
 
-// CIdenticalSpouses
-typedef struct
-{
-	CString rowid;
-	CString lineNumber;
-	CString tableNumber;
-	CString sex_id;
-	CString generation;
-	CString source;
-	CString united;
-	CString spouse;
-	CString birthDate;
-	CString deathDate;
-	CString father;
-	CString mother;
-	CString sourceF;
-	CString sourceM;
-	CString birthDateF;
-	CString birthDateM;
-	CString deathDateF;
-	CString deathDateM;
-	CString lineNumberF;
-	CString lineNumberM;
-//	BOOL	unite;
-}MORESPOUSES;
-
-
 class CCheckSameSpouses : public CDialogEx
 {
 	DECLARE_DYNAMIC(CCheckSameSpouses)
@@ -76,7 +49,9 @@ protected:
 
 	CString p_fields;
 	CString _tag;
+	CString _info;
 
+	UINT	m_deleted;
 	std::vector<MORESPOUSES> vSpouses;
 	std::vector<MORESPOUSES>vSameSpouses;
 
@@ -147,4 +122,6 @@ public:
 
 	void CCheckSameSpouses::OnHtmlNotepad();
 	afx_msg void OnHtml();
+	afx_msg void OnInfo();
+	afx_msg void OnSpousesDiff();
 };

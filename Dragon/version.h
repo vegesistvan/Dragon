@@ -1,5 +1,9 @@
 #pragma once
-#define VERSION L"1.1.4"
+
+#define VERSION L"1.1.5"
+// Azonos házastársak összevonása
+
+// #define VERSION L"1.1.4"
 // Leányági leszármazottak listázásánál automatikusan "összeköt", azaz más táblákon is keres
 
 // #define L"1.1.3"

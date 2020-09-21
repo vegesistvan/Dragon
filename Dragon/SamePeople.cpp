@@ -7,8 +7,6 @@
 #include "afxdialogex.h"
 #include "FirstLetter.h"
 #include <algorithm>
-#include "GetString.h"
-
 
 #include "checkParam3.h"
 #include "checkParam4.h"
@@ -736,12 +734,12 @@ int CSamePeople::markGroup()
 // i,j a vSame vektor indexei, amiket vizsgálunk
 BOOL CSamePeople::identical( int i, int j )
 {
-//	if( !vSame.at(i).name.Compare( L"Aba Erzsébet" ) )
-//	{
-//		int z =0;
+	if( !vSame.at(i).name.Compare( L"Lipthay Sándor" ) && vSame.at(i).birth_date == 1767)
+	{
+		int z =0;
 //		if( (i == 18 && j == 19) || (i == 19 && j == 18) )
 //			int k = 0;
-//	}
+	}
 	m_identical.Empty();
 	m_timeconflict.Empty();
 

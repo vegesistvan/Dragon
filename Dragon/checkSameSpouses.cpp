@@ -30,7 +30,7 @@ enum
 	_MOTHER,
 	_LINENUMBERF,
 	_LINENUMBERM,
-	_COLUMNS
+	_COLUMNS,
 };
 
 bool sortBySpouse(const MORESPOUSES &v1, const MORESPOUSES &v2);
@@ -154,19 +154,30 @@ BEGIN_MESSAGE_MAP(CCheckSameSpouses, CDialogEx)
 	ON_WM_SIZE()
 	ON_WM_SIZING()
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST, &CCheckSameSpouses::OnCustomdrawList)
-//	ON_COMMAND(ID_EDITNOTEPAD, &CCheckSameSpouses::OnEditnotepad)
-//	ON_COMMAND(ID_EDIT_NOTPAD_PARENTS, &CCheckSameSpouses::OnEditNotpadParents)
 	ON_COMMAND(ID_LIST_PEOPLE, &CCheckSameSpouses::OnListPeople)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CCheckSameSpouses::OnDblclkList)
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-
 	ON_COMMAND(ID_HTML_EDIT, &CCheckSameSpouses::OnHtmlEdit)
 	ON_COMMAND(ID_HTML_SHOWS, &CCheckSameSpouses::OnHtmlShows)
 	ON_COMMAND(ID_HTML_PEOPLEFATHER, &CCheckSameSpouses::OnHtmlPeoplefather)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CCheckSameSpouses::OnHtmlNotepad)
 
 	ON_COMMAND(ID_HTML, &CCheckSameSpouses::OnHtml)
+	ON_COMMAND(ID_INFO, &CCheckSameSpouses::OnInfo)
+	ON_COMMAND(ID_SPOUSES_DIFF, &CCheckSameSpouses::OnSpousesDiff)
 END_MESSAGE_MAP()
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckSameSpouses::OnSize(UINT nType, int cx, int cy)
+{
+	CDialogEx::OnSize(nType, cx, cy);
+	EASYSIZE_RESIZE()
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckSameSpouses::OnSizing(UINT fwSide, LPRECT pRect)
+{
+	CDialogEx::OnSizing(fwSide, pRect);
+	EASYSIZE_MINSIZE(430,314,fwSide,pRect); 
+}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CCheckSameSpouses::OnInitDialog()
 {
@@ -184,8 +195,8 @@ BOOL CCheckSameSpouses::OnInitDialog()
 		}
 	}
 
-	CString info;
-	info = L"\
+	
+	_info = L"\
 Azokat az embereket listázzuk, akiknek több azonos nevû házastársa van. Egy embernek természetesen lehet két \
 vagy akár több azonos nevû házastársa, azonban legtöbbször hibás adatokra hívja fel a figyelmet.\
 \r\n\
@@ -197,12 +208,14 @@ ha azok egyetlen leszármazotti sorban vannak megadva házastársként.\
 Az azonos emberek összevonása megsokszorozhatja az ilyen eseteket, ugyanis ha emberünk azonossá lett egy vagy több más azonos \
 nevû emberrel, akkor ezek összevonásra kerültek, de azonos nevû házastársaik nem feltétlenül teljesítik az összevonási \
 kritériumot, ezért õk bár azonos nevûek, mégis különbözõ emberként maradnak az adatbázisban.\
-\r\n\
+\r\n\r\n\
+Az a második, harmadik, n. házastérs, amelynek sorában nincs az elsõvel különbséget jelzõ sárga adat, összevonásra került \
+az elsõ házastárssal.\
 ";
 
 	CCheckParam0 dlg;
 	dlg._caption = L"Azonos nevû házastársakkal rendelkezõ emberek listája";
-	dlg._info = info;
+	dlg._info = _info;
 	if( dlg.DoModal() == IDCANCEL )
 	{
 		OnCancel();
@@ -227,7 +240,7 @@ kritériumot, ezért õk bár azonos nevûek, mégis különbözõ emberként maradnak az a
 	CString caption( L"");
 	if( _fullname.IsEmpty() )
 	{
-		caption = L"Emberek. akiknek több azonos nevû házastársa van.";
+		caption = L"Emberek, akiknek több azonos nevû házastársa van.";
 	}
 	else
 		caption.Format( L"%s nevû emberek, akinknek több azonos nevû házastársa van.", _fullname );
@@ -244,19 +257,6 @@ kritériumot, ezért õk bár azonos nevûek, mégis különbözõ emberként maradnak az a
 	return TRUE;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSameSpouses::OnSize(UINT nType, int cx, int cy)
-{
-	CDialogEx::OnSize(nType, cx, cy);
-	EASYSIZE_RESIZE()
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSameSpouses::OnSizing(UINT fwSide, LPRECT pRect)
-{
-	CDialogEx::OnSizing(fwSide, pRect);
-	EASYSIZE_MINSIZE(430,314,fwSide,pRect); 
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckSameSpouses::createColumns()
 {
 
@@ -280,7 +280,6 @@ void CCheckSameSpouses::createColumns()
 	m_ListCtrl.InsertColumn( L_BIRTH_M,		L"születés",	LVCFMT_LEFT,	 80,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_DEATH_M,		L"halál",		LVCFMT_LEFT,	 80,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_LINENUMBERF,	L"line#F",		LVCFMT_RIGHT,	 60,-1,COL_HIDDEN );
-
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckSameSpouses::sameSpouses()
@@ -328,6 +327,11 @@ void CCheckSameSpouses::sameSpouses()
 	str.Format( L"Azonos nevû házastársak keresése..." );
 	wndP.SetText( str );
 #endif
+
+	m_deleted = 0;
+
+	theApp.execute( L"BEGIN" );
+
 	for( i = 0; i < m_recordset->RecordsCount(); ++i, m_recordset->MoveNext() )
 	{
 		rowid		= m_recordset->GetFieldString( P_ROWID );
@@ -345,6 +349,8 @@ cont:	wndP.StepIt();
 		wndP.PeekAndPump();
 		if (wndP.Cancelled()) break;
 	}
+	theApp.execute( L"COMMIT" );
+
 	fwprintf( fh1, L"</pre>" );
 	fclose( fh1 );
 	wndP.DestroyWindow();
@@ -361,6 +367,169 @@ cont:	wndP.StepIt();
 		AfxMessageBox( str );
 
 		return;
+	}
+	if( m_deleted )
+	{
+		str.Format( L"%d ember összevonásra került", m_deleted );
+		AfxMessageBox( str );
+	}
+	else
+		AfxMessageBox( L"Nincs összevonható ember!" );
+
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// rowid emebr összes házastársának összegyûjtése 
+void CCheckSameSpouses::fillSpouses( CString rowid, CString sex_id )
+{
+	CString rowidM;			// rowid marriage
+	CString rowidS;			// rowid sopouse;
+	CString firstNameS;
+	CString lastNameS;
+	CString spouse2;
+	CString fatherId;
+	CString motherId;
+	MORESPOUSES vspouse;
+	CString first_name;
+
+	vSpouses.clear();
+
+	if( sex_id == L"1" )
+	{
+		m_command.Format( L"SELECT rowid, spouse2_id FROM marriages WHERE spouse1_id=%s", rowid );
+	}
+	else
+	{
+		m_command.Format( L"SELECT rowid, spouse1_id FROM marriages WHERE spouse2_id=%s", rowid );
+	}
+	if( !query1( m_command ) ) return;
+
+	if( m_recordset1->RecordsCount() < 2 ) return;
+
+	
+	for( UINT j = 0; j < m_recordset1->RecordsCount(); ++j, m_recordset1->MoveNext() )
+	{
+		rowidM = m_recordset1->GetFieldString( 0 );
+		rowidS = m_recordset1->GetFieldString( 1 );
+
+		m_command.Format( L"SELECT first_name, last_name, generation, source, lineNumber, tableNumber, birth_date, death_date, father_id, mother_id, sex_id, united FROM people WHERE rowid ='%s'", rowidS );
+		if( !query2( m_command ) ) return;
+
+		firstNameS		= m_recordset2->GetFieldString( 0 );
+		lastNameS		= m_recordset2->GetFieldString( 1 );
+		spouse2.Format ( L"%s %s", lastNameS, firstNameS );
+
+		vspouse.rowidM		= rowidM;
+		vspouse.rowid		= rowidS;
+		vspouse.spouse		= spouse2;
+		vspouse.generation	= m_recordset2->GetFieldString( 2 );
+		vspouse.source		= m_recordset2->GetFieldString( 3 );
+		vspouse.lineNumber	= m_recordset2->GetFieldString( 4 );
+		vspouse.tableNumber = m_recordset2->GetFieldString( 5 );
+		vspouse.birthDate	= m_recordset2->GetFieldString( 6 );
+		vspouse.deathDate	= m_recordset2->GetFieldString( 7 );
+			
+		fatherId			= m_recordset2->GetFieldString( 8 );
+		motherId			= m_recordset2->GetFieldString( 9 );
+		vspouse.sex_id		= m_recordset2->GetFieldString( 10 );
+
+		vspouse.united		= m_recordset2->GetFieldString( 11 );
+	
+		m_command.Format( L"SELECT last_name, first_name, lineNumber, source, birth_date, death_date FROM people WHERE rowid ='%s'", fatherId );
+		if( !query3( m_command ) ) return;
+		first_name = getFirstWord( m_recordset3->GetFieldString( 1 ) );
+		vspouse.father.Format( L"%s %s", m_recordset3->GetFieldString( 0 ), first_name );
+		vspouse.lineNumberF.Format( L"%s", m_recordset3->GetFieldString( 2 ) );
+		vspouse.sourceF.Format( L"%s", m_recordset3->GetFieldString( 3 ) );
+		vspouse.birthDateF	= m_recordset3->GetFieldString( 4 );
+		vspouse.deathDateF	= m_recordset3->GetFieldString( 5 );
+
+
+
+		m_command.Format( L"SELECT last_name, first_name, lineNumber,source, birth_date, death_date FROM people WHERE rowid ='%s'", motherId );
+		if( !query3( m_command ) ) return;
+		first_name = getFirstWord( m_recordset3->GetFieldString( 1 ) );
+		vspouse.mother.Format( L"%s %s", m_recordset3->GetFieldString( 0 ), first_name );
+		vspouse.lineNumberM.Format( L"%s", m_recordset3->GetFieldString( 2 ) );
+		vspouse.sourceM.Format( L"%s", m_recordset3->GetFieldString( 3 ) );
+		vspouse.birthDateM	= m_recordset3->GetFieldString( 4 );
+		vspouse.deathDateM	= m_recordset3->GetFieldString( 5 );
+		vSpouses.push_back( vspouse );
+	}
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckSameSpouses::fillSameSpouses( )
+{
+	std::sort( vSpouses.begin(), vSpouses.end(), sortBySpouse );
+
+	MORESPOUSES vspouse;
+	BOOL FIRST	= TRUE;
+
+	vSameSpouses.clear();
+	for( UINT j = 1; j < vSpouses.size(); ++j )
+	{
+		if( !vSpouses.at(j-1).spouse.Compare( vSpouses.at(j).spouse ) )		// ha az egymás utáni  házastársak neve
+		{																	// azonos, akkor beteszi a VSameSpouses
+			if( FIRST )														// vektorba
+			{
+				vspouse.rowidM		= vSpouses.at(j-1).rowidM; 
+				vspouse.birthDate	= vSpouses.at(j-1).birthDate;
+				vspouse.deathDate	= vSpouses.at(j-1).deathDate;
+				vspouse.father		= vSpouses.at(j-1).father;
+				vspouse.lineNumber	= vSpouses.at(j-1).lineNumber;
+				vspouse.mother 		= vSpouses.at(j-1).mother;
+				vspouse.rowid 		= vSpouses.at(j-1).rowid;
+				vspouse.sex_id		= vSpouses.at(j-1).sex_id;
+				vspouse.generation	= vSpouses.at(j-1).generation;
+				vspouse.source		= vSpouses.at(j-1).source;
+				vspouse.spouse		= vSpouses.at(j-1).spouse;
+				vspouse.tableNumber	= vSpouses.at(j-1).tableNumber;
+				vspouse.united		= vSpouses.at(j-1).united;
+				vspouse.lineNumberF	= vSpouses.at(j-1).lineNumberF;
+				vspouse.lineNumberM	= vSpouses.at(j-1).lineNumberM;
+				vspouse.sourceF		= vSpouses.at(j-1).sourceF;
+				vspouse.sourceM		= vSpouses.at(j-1).sourceM;
+				vspouse.birthDateF	= vSpouses.at(j-1).birthDateF;
+				vspouse.birthDateM	= vSpouses.at(j-1).birthDateM;
+				vspouse.deathDateF	= vSpouses.at(j-1).deathDateF;
+				vspouse.deathDateM	= vSpouses.at(j-1).deathDateM;
+
+				vSameSpouses.push_back( vspouse );
+				FIRST = FALSE;
+			}
+			vspouse.rowidM		= vSpouses.at(j).rowidM;
+			vspouse.birthDate	= vSpouses.at(j).birthDate;
+			vspouse.deathDate	= vSpouses.at(j).deathDate;
+			vspouse.father		= vSpouses.at(j).father;
+			vspouse.lineNumber	= vSpouses.at(j).lineNumber;
+			vspouse.mother 		= vSpouses.at(j).mother;
+			vspouse.rowid 		= vSpouses.at(j).rowid;
+			vspouse.sex_id		= vSpouses.at(j).sex_id;
+			vspouse.generation	= vSpouses.at(j).generation;
+			vspouse.source		= vSpouses.at(j).source;
+			vspouse.spouse		= vSpouses.at(j).spouse;
+			vspouse.tableNumber	= vSpouses.at(j).tableNumber;
+			vspouse.united		= vSpouses.at(j).united;
+			vspouse.lineNumberF	= vSpouses.at(j).lineNumberF;
+			vspouse.lineNumberM	= vSpouses.at(j).lineNumberM;
+			vspouse.sourceF		= vSpouses.at(j).sourceF;
+			vspouse.sourceM		= vSpouses.at(j).sourceM;
+			vspouse.birthDateF	= vSpouses.at(j-1).birthDateF;
+			vspouse.birthDateM	= vSpouses.at(j-1).birthDateM;
+			vspouse.deathDateF	= vSpouses.at(j-1).deathDateF;
+			vspouse.deathDateM	= vSpouses.at(j-1).deathDateM;
+
+			vSameSpouses.push_back( vspouse );
+		}
+		else							// egy embernek több pár azonos nevû házastársa is lehetséges!!
+		{
+			if( !FIRST )
+			{
+				same();
+				++m_cnt;
+				vSameSpouses.clear();
+			}
+			FIRST = TRUE;
+		}
 	}
 }
 
@@ -408,20 +577,38 @@ void CCheckSameSpouses::same()
 	printHtml();
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckSameSpouses::printHtml()
 {
-	CString birthDate1;
-	CString birthDate2;
-	CString deathDate1;
-	CString deathDate2;
-	CString father1;
-	CString father2;
-	CString mother1;
-	CString mother2;
-	CString source1;
-	CString source2;
+	CString birthDate0;
+	CString deathDate0;
+	CString father0;
+	CString birthDateF0;
+	CString deathDateF0;
+	CString mother0;
+	CString birthDateM0;
+	CString deathDateM0;
+	CString source0;
 
-//	if( vSameSpouses.at(1).source == L"1" )	return;
+
+	CString birthDateJ;
+	CString deathDateJ;
+	CString fatherJ;
+	CString birthDateFJ;
+	CString deathDateFJ;
+	CString motherJ;
+	CString birthDateMJ;
+	CString deathDateMJ;
+	CString sourceJ;
+
+	int nItemH;
+
+	CString rowidBy;
+	CString sex_id;
+
+
 
 	fwprintf( fh1, L"<br><font color='red'>%4d. %6s %6s %6s %s %s %s %-25s %-15s %-15s %-25s %-15s %-15s %-25s %-15s %-15s</font><br>",\
 m_cnt+1,\
@@ -442,6 +629,8 @@ birthDateM,\
 deathDateM\
 );
 
+	// az ember sora
+
 	str.Format( L"%d", m_cnt + 1 );
 	nItem = m_ListCtrl.InsertItem( nItem, str );
 		
@@ -449,6 +638,7 @@ deathDateM\
 	m_ListCtrl.SetItemText( nItem, L_LINENUMBER, lineNumber );
 	m_ListCtrl.SetItemText( nItem, L_TABLENUMBER, tableNumber );
 	m_ListCtrl.SetItemText( nItem, L_GENERATION, generation );
+
 	m_ListCtrl.SetItemText( nItem, L_SOURCE, source );
 	m_ListCtrl.SetItemText( nItem, L_UNITED, united );
 	m_ListCtrl.SetItemText( nItem, L_NAME, name );
@@ -464,6 +654,7 @@ deathDateM\
 	m_ListCtrl.SetItemText( nItem, L_DEATH_M, deathDateM );
 	m_ListCtrl.SetItemText( nItem, L_LINENUMBERF, lineNumberF );
 
+	nItemH = nItem;
 	m_ListCtrl.SetItemData( nItem, -1 );
 	++nItem;
 
@@ -488,8 +679,10 @@ vSameSpouses.at(0).deathDateM\
 );
 
 	nItem = m_ListCtrl.InsertItem( nItem, L"" );
-		
-	m_ListCtrl.SetItemText( nItem, L_ROWID, vSameSpouses.at(0).rowid );
+	
+	// elsõ házastárs
+	rowidBy = vSameSpouses.at(0).rowid;
+	m_ListCtrl.SetItemText( nItem, L_ROWID, rowidBy );
 	m_ListCtrl.SetItemText( nItem, L_LINENUMBER, vSameSpouses.at(0).lineNumber );
 	m_ListCtrl.SetItemText( nItem, L_TABLENUMBER, vSameSpouses.at(0).tableNumber );
 	m_ListCtrl.SetItemText( nItem, L_UNITED, vSameSpouses.at(0).united );
@@ -509,115 +702,185 @@ vSameSpouses.at(0).deathDateM\
 	m_ListCtrl.SetItemText( nItem, L_DEATH_M, vSameSpouses.at(0).deathDateM );
 	m_ListCtrl.SetItemText( nItem, L_LINENUMBERF, vSameSpouses.at(0).lineNumberF );
 
+	// összehasonlítandó adatok
+	source0		= vSameSpouses.at(0).source;
+	birthDate0	= vSameSpouses.at(0).birthDate.Left(15);
+	deathDate0	= vSameSpouses.at(0).deathDate.Left(15);
+	father0		= vSameSpouses.at(0).father.Left(25);
+	birthDateF0 = vSameSpouses.at(0).birthDateF;
+	deathDateF0 = vSameSpouses.at(0).deathDateF;
+	mother0		= vSameSpouses.at(0).mother.Left(25);
+	birthDateM0 = vSameSpouses.at(0).birthDateM;
+	deathDateM0 = vSameSpouses.at(0).deathDateM;
+
+
+	source0.TrimRight();
+	birthDate0.TrimRight();
+	deathDate0.TrimRight();
+	father0.TrimRight();
+	birthDateF0.TrimRight();
+	deathDateF0.TrimRight();
+	mother0.TrimRight();
+	birthDateM0.TrimRight();
+	deathDateM0.TrimRight();
+
 	++nItem;
 
 
 
 	int col = 0;
 	int cnt = 1;
+	int empty = 0;
+	// további házastársak
 	for( UINT j = 1; j < vSameSpouses.size(); ++j )
 	{
+		col = 0;
+		empty = 0;
 		fwprintf( fh1, L"%12s %6s %6s %s ", vSameSpouses.at(j).rowid, vSameSpouses.at(j).lineNumber, vSameSpouses.at(j).tableNumber, vSameSpouses.at(j).generation );
-		source1 = vSameSpouses.at(j-1).source;
-		source2 = vSameSpouses.at(j).source;
-		if( source1 == L"1" && source2 == L"1" )
+		sourceJ = vSameSpouses.at(j).source;
+		if( source0 == L"1" && sourceJ == L"1" )
 		{
-			fwprintf( fh1, L"<span style=\"background:yellow\">%s</span> ", source2 );
-
+			fwprintf( fh1, L"<span style=\"background:yellow\">%s</span> ", sourceJ );
 		}
 		else
-			fwprintf( fh1, L"%s ", source2 );
+			fwprintf( fh1, L"%s ", sourceJ );
 
 		fwprintf( fh1, L"%s %-25s ", vSameSpouses.at(j).united, vSameSpouses.at(j).spouse );
 
-		birthDate1 = vSameSpouses.at(j-1).birthDate.Left(15);
-		birthDate2 = vSameSpouses.at(j).birthDate.Left(15);
-		if( !birthDate1.IsEmpty() && !birthDate2.IsEmpty() && birthDate1 !=  birthDate2 )
+		sourceJ		= vSameSpouses.at(j).source;
+		birthDateJ	= vSameSpouses.at(j).birthDate.Left(15);
+		deathDateJ	= vSameSpouses.at(j).deathDate.Left(15);
+		fatherJ		= vSameSpouses.at(j).father.Left(25);
+		birthDateFJ = vSameSpouses.at(j).birthDateF;
+		deathDateFJ = vSameSpouses.at(j).deathDateF;
+		motherJ		= vSameSpouses.at(j).mother.Left(25);
+		birthDateMJ = vSameSpouses.at(j).birthDateM;
+		deathDateMJ = vSameSpouses.at(j).deathDateM;
+
+		sourceJ.TrimRight();
+		birthDateJ.TrimRight();
+		deathDateJ.TrimRight();
+		fatherJ.TrimRight();
+		birthDateFJ.TrimRight();
+		deathDateFJ.TrimRight();
+		motherJ.TrimRight();
+		birthDateMJ.TrimRight();
+		deathDateMJ.TrimRight();
+
+
+
+// birthDate
+		if( birthDate0.IsEmpty() || birthDateJ.IsEmpty() )
 		{
-			fwprintf( fh1, L"<span style=\"background:yellow\">%-15s</span> ", birthDate2 );
+			++empty;
+		}
+		if( !!birthDate0.IsEmpty() && birthDateJ.IsEmpty() && birthDate0 != birthDateJ )
+		{
+			fwprintf( fh1, L"<span style=\"background:yellow\">%-15s</span> ", birthDateJ );
 			col = col | 1 << L_BIRTH;
 		}
 		else
-			fwprintf( fh1, L"%-15s ", birthDate2 );
+			fwprintf( fh1, L"%-15s ", birthDateJ );
 
-		deathDate1 = vSameSpouses.at(j-1).deathDate.Left(15);
-		deathDate2 = vSameSpouses.at(j).deathDate.Left(15);
-		if( !deathDate1.IsEmpty() && !deathDate2.IsEmpty() && deathDate1 !=  deathDate2 )
+
+// deathDate
+		if( deathDate0.IsEmpty() || birthDateJ.IsEmpty() )
 		{
-			fwprintf( fh1, L"<span style=\"background:yellow\">%-15s</span> ", deathDate2 );
+			++empty;
+		}
+		if( !deathDate0.IsEmpty() && !deathDateJ.IsEmpty() && deathDate0 != deathDateJ )
+		{
+			fwprintf( fh1, L"<span style=\"background:yellow\">%-15s</span> ", deathDateJ );
 			col = col | 1 << L_DEATH;
 		}
 		else
-			fwprintf( fh1, L"%-15s ", deathDate2 );
+			fwprintf( fh1, L"%-15s ", deathDateJ );
 
-		father1 = vSameSpouses.at(j-1).father.Left(25);
-		father2 = vSameSpouses.at(j).father.Left(25);
-		if( !father1.Trim().IsEmpty() && !father2.Trim().IsEmpty() && father1 !=  father2 )
+// father
+		if( father0.IsEmpty() || fatherJ.IsEmpty() )
 		{
-			fwprintf( fh1, L"<span style=\"background:yellow\">%-25s</span> ", father2 );
+			++empty;
+		}
+		if( !father0.IsEmpty()&& !fatherJ.IsEmpty() && father0 !=  fatherJ )
+		{
+			fwprintf( fh1, L"<span style=\"background:yellow\">%-25s</span> ", fatherJ );
 			col = col | 1 << L_FATHER;
 		}
 		else
-			fwprintf( fh1, L"%-25s ", father2 );
+			fwprintf( fh1, L"%-25s ", fatherJ );
 
-		birthDate1 = vSameSpouses.at(j-1).birthDateF;
-		birthDate2 = vSameSpouses.at(j).birthDateF;
-		if( !birthDate1.Trim().IsEmpty() && !birthDate2.Trim().IsEmpty() && birthDate1 != birthDate2 )
+// father birthdate
+		if( birthDateF0.IsEmpty() || birthDateFJ.IsEmpty() )
 		{
-			fwprintf( fh1, L"<span style=\"background:yellow\">%-15s</span> ", birthDate2 );
-//			unite = FALSE;
+			++empty;
+		}
+		if( !birthDateF0.IsEmpty() && !birthDateJ.IsEmpty() && birthDateF0 != birthDateFJ )
+		{
+			fwprintf( fh1, L"<span style=\"background:yellow\">%-15s</span> ", birthDateFJ );
+			col = col | 1 << L_BIRTH_F;
 		}
 		else
-			fwprintf( fh1, L"%-15s ", birthDate2 );
+			fwprintf( fh1, L"%-15s ", birthDateFJ );
 
-		deathDate1 = vSameSpouses.at(j-1).deathDateF;
-		deathDate2 = vSameSpouses.at(j).deathDateF;
-		if( !deathDate1.Trim().IsEmpty() && !deathDate2.Trim().IsEmpty() && deathDate1 != deathDate2 )
+// father deathdate
+		if( deathDateF0.IsEmpty() || deathDateFJ.IsEmpty() )
 		{
-			fwprintf( fh1, L"<span style=\"background:yellow\">%-15s</span> ", deathDate2 );
-//			unite = FALSE;
+			++empty;
+		}
+		if( !deathDateF0.IsEmpty() && !deathDateFJ.IsEmpty() && deathDateF0 != deathDateFJ )
+		{
+			fwprintf( fh1, L"<span style=\"background:yellow\">%-15s</span> ", deathDateFJ );
+			col = col | 1 << L_DEATH_F;
 		}
 		else
-			fwprintf( fh1, L"%-15s ", deathDate2 );
+			fwprintf( fh1, L"%-15s ", deathDateFJ );
 
-
-		mother1 = vSameSpouses.at(j-1).mother.Left(25);
-		mother2 = vSameSpouses.at(j).mother.Left(25);
-		if( !mother1.TrimRight().IsEmpty() && !mother2.TrimRight().IsEmpty() && mother1 !=  mother2 )
+// mother
+		if( mother0.IsEmpty() || motherJ.IsEmpty() )
 		{
-			fwprintf( fh1, L"<span style=\"background:yellow\">%-15s</span> ", mother2 );
+			++empty;
+		}
+		if( !mother0.IsEmpty() && !motherJ.IsEmpty() && mother0 !=  motherJ )
+		{
+			fwprintf( fh1, L"<span style=\"background:yellow\">%-25s</span> ", motherJ );
 			col = col | 1 << L_MOTHER;
 		}
 		else
-			fwprintf( fh1, L"%-25s ", mother2 );
+			fwprintf( fh1, L"%-25s ", motherJ );
 
-		birthDate1 = vSameSpouses.at(j-1).birthDateM;
-		birthDate2 = vSameSpouses.at(j).birthDateM;
-		if( !birthDate1.Trim().IsEmpty() && !birthDate2.Trim().IsEmpty() && birthDate1 != birthDate2 )
+// mother birthdate
+		if( birthDateM0.IsEmpty() || birthDateMJ.IsEmpty() )
 		{
-			fwprintf( fh1, L"<span style=\"background:yellow\">%-15s</span> ", birthDate2 );
-//			unite = FALSE;
+			++empty;
+		}
+		if( !birthDateM0.IsEmpty() && !birthDateMJ.IsEmpty() && birthDateM0 != birthDateMJ )
+		{
+			fwprintf( fh1, L"<span style=\"background:yellow\">%-15s</span> ", birthDateMJ );
+			col = col | 1 << L_BIRTH_M;
 		}
 		else
-			fwprintf( fh1, L"%-15s ", birthDate2 );
+			fwprintf( fh1, L"%-15s ", birthDateMJ );
 
-		deathDate1 = vSameSpouses.at(j-1).deathDateM;
-		deathDate2 = vSameSpouses.at(j).deathDateM;
-		if( !deathDate1.Trim().IsEmpty() && !deathDate2.Trim().IsEmpty() && deathDate1 != deathDate2 )
+// mother deathdate
+		if( deathDateM0.IsEmpty() || deathDateMJ.IsEmpty() )
 		{
-			fwprintf( fh1, L"<span style=\"background:yellow\">%-15s</span> ", deathDate2 );
-//			unite = FALSE;
+			++empty;
+		}
+		if( !deathDateM0.IsEmpty() && !deathDateMJ.IsEmpty() &&  deathDateM0 != deathDateMJ )
+		{
+			fwprintf( fh1, L"<span style=\"background:yellow\">%-15s</span> ", deathDateMJ );
+			col = col | 1 << L_DEATH_M;
 		}
 		else
-			fwprintf( fh1, L"%-15s ", deathDate2 );
+			fwprintf( fh1, L"%-15s ", deathDateMJ );
 
 
 		fwprintf( fh1, L"<br>" );
-
+////////////////////////////////////////////////////////////////////////////////////////////
 
 		nItem = m_ListCtrl.InsertItem( nItem, L"" );
 		
-		m_ListCtrl.SetItemText( nItem, L_ROWID, vSameSpouses.at(j).rowid );
+		m_ListCtrl.SetItemText( nItem, L_ROWID, rowid );
 		m_ListCtrl.SetItemText( nItem, L_LINENUMBER, vSameSpouses.at(j).lineNumber );
 		m_ListCtrl.SetItemText( nItem, L_TABLENUMBER, vSameSpouses.at(j).tableNumber );
 		m_ListCtrl.SetItemText( nItem, L_UNITED, vSameSpouses.at(j).united );
@@ -628,14 +891,29 @@ vSameSpouses.at(0).deathDateM\
 		m_ListCtrl.SetItemText( nItem, L_DEATH, vSameSpouses.at(j).deathDate );
 
 		m_ListCtrl.SetItemText( nItem, L_SOURCEF, vSameSpouses.at(j).sourceF );
-		m_ListCtrl.SetItemText( nItem, L_FATHER, vSameSpouses.at(j).father );
-		m_ListCtrl.SetItemText( nItem, L_BIRTH_F, vSameSpouses.at(j).birthDateF );
-		m_ListCtrl.SetItemText( nItem, L_DEATH_F, vSameSpouses.at(j).deathDateF );
+		m_ListCtrl.SetItemText( nItem, L_FATHER, fatherJ );
+		m_ListCtrl.SetItemText( nItem, L_BIRTH_F, birthDateFJ );
+		m_ListCtrl.SetItemText( nItem, L_DEATH_F, deathDateFJ );
 		m_ListCtrl.SetItemText( nItem, L_SOURCEM, vSameSpouses.at(j).sourceM );
-		m_ListCtrl.SetItemText( nItem, L_MOTHER, vSameSpouses.at(j).mother );
-		m_ListCtrl.SetItemText( nItem, L_BIRTH_M, vSameSpouses.at(j).birthDateM );
-		m_ListCtrl.SetItemText( nItem, L_DEATH_M, vSameSpouses.at(j).deathDateM );
+		m_ListCtrl.SetItemText( nItem, L_MOTHER, motherJ );
+		m_ListCtrl.SetItemText( nItem, L_BIRTH_M, birthDateMJ );
+		m_ListCtrl.SetItemText( nItem, L_DEATH_M, deathDateMJ );
+
 		m_ListCtrl.SetItemText( nItem, L_LINENUMBERF, vSameSpouses.at(j).lineNumberF );
+
+		
+		
+		if( !col || empty == 8 )  // nincs különbség / mind üres
+		{
+			sex_id = vSameSpouses.at(j).sex_id;
+			theApp.replaceBy( vSameSpouses.at(j).rowid, rowidBy, sex_id, _wtoi( vSameSpouses.at(j).source ) );
+
+			m_command.Format( L"DELETE FROM marriages WHERE rowid ='%s'", vSameSpouses.at(j).rowidM );
+			if( !theApp.execute( m_command ) ) return;
+
+			++m_deleted;
+
+		}
 
 		m_ListCtrl.SetItemData( nItem, col );
 		++nItem;
@@ -913,157 +1191,18 @@ void CCheckSameSpouses::htmlHeader( CString title )
 	str.Format( L"\n%12s %6s %6s %1s %1s %1s %-25s %-15s %-15s %-25s %-25s<br>\n", L"rowid", L"line#", L"table#", L"G", L"S", L"U", L"name", L"születés", L"halál", L"apja neve", L"anyja neve" );
 	fwprintf( fh1, str );
 }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSameSpouses::fillSpouses( CString rowid, CString sex_id )
-{
-	CString rowidS;
-	CString firstNameS;
-	CString lastNameS;
-	CString spouse2;
-	CString fatherId;
-	CString motherId;
-	MORESPOUSES vspouse;
-	CString first_name;
-
-	vSpouses.clear();
-
-	if( sex_id == L"1" )
-	{
-		m_command.Format( L"SELECT spouse2_id FROM marriages WHERE spouse1_id=%s", rowid );
-	}
-	else
-	{
-		m_command.Format( L"SELECT spouse1_id FROM marriages WHERE spouse2_id=%s", rowid );
-	}
-	if( !query1( m_command ) ) return;
-
-	if( m_recordset1->RecordsCount() < 2 ) return;
-
-	
-	for( UINT j = 0; j < m_recordset1->RecordsCount(); ++j, m_recordset1->MoveNext() )
-	{
-		rowidS = m_recordset1->GetFieldString( 0 );
-
-		m_command.Format( L"SELECT first_name, last_name, generation, source, lineNumber, tableNumber, birth_date, death_date, father_id, mother_id, sex_id, united FROM people WHERE rowid ='%s'", rowidS );
-		if( !query2( m_command ) ) return;
-
-		firstNameS		= m_recordset2->GetFieldString( 0 );
-		lastNameS		= m_recordset2->GetFieldString( 1 );
-		spouse2.Format ( L"%s %s", lastNameS, firstNameS );
-
-		vspouse.rowid		= rowidS;
-		vspouse.spouse		= spouse2;
-		vspouse.generation	= m_recordset2->GetFieldString( 2 );
-		vspouse.source		= m_recordset2->GetFieldString( 3 );
-		vspouse.lineNumber	= m_recordset2->GetFieldString( 4 );
-		vspouse.tableNumber = m_recordset2->GetFieldString( 5 );
-		vspouse.birthDate	= m_recordset2->GetFieldString( 6 );
-		vspouse.deathDate	= m_recordset2->GetFieldString( 7 );
-			
-		fatherId			= m_recordset2->GetFieldString( 8 );
-		motherId			= m_recordset2->GetFieldString( 9 );
-		vspouse.sex_id		= m_recordset2->GetFieldString( 10 );
-
-		vspouse.united		= m_recordset2->GetFieldString( 11 );
-	
-		m_command.Format( L"SELECT last_name, first_name, lineNumber, source, birth_date, death_date FROM people WHERE rowid ='%s'", fatherId );
-		if( !query3( m_command ) ) return;
-		first_name = getFirstWord( m_recordset3->GetFieldString( 1 ) );
-		vspouse.father.Format( L"%s %s", m_recordset3->GetFieldString( 0 ), first_name );
-		vspouse.lineNumberF.Format( L"%s", m_recordset3->GetFieldString( 2 ) );
-		vspouse.sourceF.Format( L"%s", m_recordset3->GetFieldString( 3 ) );
-		vspouse.birthDateF	= m_recordset3->GetFieldString( 4 );
-		vspouse.deathDateF	= m_recordset3->GetFieldString( 5 );
-
-
-
-		m_command.Format( L"SELECT last_name, first_name, lineNumber,source, birth_date, death_date FROM people WHERE rowid ='%s'", motherId );
-		if( !query3( m_command ) ) return;
-		first_name = getFirstWord( m_recordset3->GetFieldString( 1 ) );
-		vspouse.mother.Format( L"%s %s", m_recordset3->GetFieldString( 0 ), first_name );
-		vspouse.lineNumberM.Format( L"%s", m_recordset3->GetFieldString( 2 ) );
-		vspouse.sourceM.Format( L"%s", m_recordset3->GetFieldString( 3 ) );
-		vspouse.birthDateM	= m_recordset3->GetFieldString( 4 );
-		vspouse.deathDateM	= m_recordset3->GetFieldString( 5 );
-		vSpouses.push_back( vspouse );
-	}
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSameSpouses::fillSameSpouses( )
-{
-	std::sort( vSpouses.begin(), vSpouses.end(), sortBySpouse );
-
-	MORESPOUSES vspouse;
-	BOOL FIRST = TRUE;
-	vSameSpouses.clear();
-	for( UINT j = 1; j < vSpouses.size(); ++j )
-	{
-		if( !vSpouses.at(j-1).spouse.Compare( vSpouses.at(j).spouse ) )		// ha az egymás utáni  házastársak neve
-		{																	// azonos, akkor beteszi a VSameSpouses
-			if( FIRST )														// vektorba
-			{
-				vspouse.birthDate	= vSpouses.at(j-1).birthDate;
-				vspouse.deathDate	= vSpouses.at(j-1).deathDate;
-				vspouse.father		= vSpouses.at(j-1).father;
-				vspouse.lineNumber	= vSpouses.at(j-1).lineNumber;
-				vspouse.mother 		= vSpouses.at(j-1).mother;
-				vspouse.rowid 		= vSpouses.at(j-1).rowid;
-				vspouse.sex_id		= vSpouses.at(j-1).sex_id;
-				vspouse.generation	= vSpouses.at(j-1).generation;
-				vspouse.source		= vSpouses.at(j-1).source;
-				vspouse.spouse		= vSpouses.at(j-1).spouse;
-				vspouse.tableNumber	= vSpouses.at(j-1).tableNumber;
-				vspouse.united		= vSpouses.at(j-1).united;
-				vspouse.lineNumberF	= vSpouses.at(j-1).lineNumberF;
-				vspouse.lineNumberM	= vSpouses.at(j-1).lineNumberM;
-				vspouse.sourceF		= vSpouses.at(j-1).sourceF;
-				vspouse.sourceM		= vSpouses.at(j-1).sourceM;
-				vspouse.birthDateF	= vSpouses.at(j-1).birthDateF;
-				vspouse.birthDateM	= vSpouses.at(j-1).birthDateM;
-				vspouse.deathDateF	= vSpouses.at(j-1).deathDateF;
-				vspouse.deathDateM	= vSpouses.at(j-1).deathDateM;
-
-//				vspouse.unite		= TRUE;
-				vSameSpouses.push_back( vspouse );
-				FIRST = FALSE;
-			}
-			vspouse.birthDate	= vSpouses.at(j).birthDate;
-			vspouse.deathDate	= vSpouses.at(j).deathDate;
-			vspouse.father		= vSpouses.at(j).father;
-			vspouse.lineNumber	= vSpouses.at(j).lineNumber;
-			vspouse.mother 		= vSpouses.at(j).mother;
-			vspouse.rowid 		= vSpouses.at(j).rowid;
-			vspouse.sex_id		= vSpouses.at(j).sex_id;
-			vspouse.generation	= vSpouses.at(j).generation;
-			vspouse.source		= vSpouses.at(j).source;
-			vspouse.spouse		= vSpouses.at(j).spouse;
-			vspouse.tableNumber	= vSpouses.at(j).tableNumber;
-			vspouse.united		= vSpouses.at(j).united;
-			vspouse.lineNumberF	= vSpouses.at(j).lineNumberF;
-			vspouse.lineNumberM	= vSpouses.at(j).lineNumberM;
-			vspouse.sourceF		= vSpouses.at(j).sourceF;
-			vspouse.sourceM		= vSpouses.at(j).sourceM;
-			vspouse.birthDateF	= vSpouses.at(j-1).birthDateF;
-			vspouse.birthDateM	= vSpouses.at(j-1).birthDateM;
-			vspouse.deathDateF	= vSpouses.at(j-1).deathDateF;
-			vspouse.deathDateM	= vSpouses.at(j-1).deathDateM;
-//			vspouse.unite		= TRUE;
-			vSameSpouses.push_back( vspouse );
-		}
-		else							// egy embernek több pár azonos nevû házastársa is lehetséges!!
-		{
-			if( !FIRST )
-			{
-				same();
-				++m_cnt;
-				vSameSpouses.clear();
-			}
-			FIRST = TRUE;
-		}
-	}
-}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckSameSpouses::OnHtml()
 {
 	theApp.showHtmlFile( fileSpec );
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckSameSpouses::OnInfo()
+{
+	AfxMessageBox( _info );
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckSameSpouses::OnSpousesDiff()
+{
+	// TODO: Add your command handler code here
 }

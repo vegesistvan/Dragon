@@ -426,4 +426,6 @@ public:
 	afx_msg void OnDisplayBlob();
 	afx_msg void OnGedcomTagtable();
 	afx_msg void OnGedcomINDIFAMS();
+	afx_msg void OnSameSpouses();
+	afx_msg void OnSameNames();
 };

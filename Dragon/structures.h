@@ -163,3 +163,55 @@ typedef struct
 
 
 
+// CIdenticalSpouses
+typedef struct
+{
+	CString rowidM;
+	CString rowid;
+	CString lineNumber;
+	CString tableNumber;
+	CString sex_id;
+	CString generation;
+	CString source;
+	CString united;
+	CString spouse;
+	CString birthDate;
+	CString deathDate;
+	CString father;
+	CString mother;
+	CString sourceF;
+	CString sourceM;
+	CString birthDateF;
+	CString birthDateM;
+	CString deathDateF;
+	CString deathDateM;
+	CString lineNumberF;
+	CString lineNumberM;
+	int		diff;
+}MORESPOUSES;
+
+
+typedef struct
+{
+	CString rowidM;
+	CString rowidS1;
+	CString sex_idS1;
+	CString generationS1;
+	CString sourceS1;
+	CString unitedS1;
+	CString lineS1;
+	CString spouse1;
+	CString birthDateS1;
+	CString deathDateS1;
+
+	CString rowidS2;
+	CString sex_idS2;
+	CString generationS2;
+	CString sourceS2;
+	CString unitedS2;
+	CString lineS2;
+	CString spouse2;
+	CString birthDateS2;
+	CString deathDateS2;
+}COUPLES;
+
