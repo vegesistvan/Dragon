@@ -59,7 +59,7 @@
 
 #include "SamePeople.h"
 #include "GA_ascendantsChain.h"
-#include "SameSpouses.h"
+#include "SameCouples.h"
 
 
 #include "version.h"
@@ -1152,6 +1152,6 @@ void CDragonDlg::OnSameSpouses()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnSameNames()
 {
-	CSameSpouses dlg;
+	CSameCouples dlg;
 	dlg.DoModal();
 }

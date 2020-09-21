@@ -203,6 +203,7 @@ typedef struct
 	CString spouse1;
 	CString birthDateS1;
 	CString deathDateS1;
+	CString motherS1;
 
 	CString rowidS2;
 	CString sex_idS2;
@@ -213,5 +214,6 @@ typedef struct
 	CString spouse2;
 	CString birthDateS2;
 	CString deathDateS2;
+	CString motherS2;
 }COUPLES;
 
