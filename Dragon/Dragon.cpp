@@ -254,13 +254,13 @@ BOOL CDragonApp::openDatabase()
 	if( _waccess( m_workingDirectory, 0 ) )
 		_wmkdir( m_workingDirectory );
 
-
+/*
 	if( !query( L"SELECT count() FROM people" ) ) return FALSE;
 	m_cntPeople = _wtoi( m_recordset->GetFieldString( 0 ) );
 
 	if( !m_cntPeople )
 		setUserVersion( 0 );
-
+*/
 	_iterationCount = getUserVersion();
 	m_inputMode = getInputMode();
 	if( m_inputMode.IsEmpty() )
@@ -311,14 +311,22 @@ CString CDragonApp::getInputMode()
 	CString filename;
 	CString ext;
 
-	m_command = L"SELECT rowid FROM people";
-	if( !query( m_command ) ) return L"";
-	if( !m_recordset->RecordsCount() ) 
+	if( !query( L"SELECT count() FROM people" ) ) return FALSE;
+	m_cntPeople = _wtoi( m_recordset->GetFieldString( 0 ) );
+
+	if( !m_cntPeople )
+		setUserVersion( 0 );
+
+//	m_command = L"SELECT rowid FROM people";
+//	if( !query( m_command ) ) return L"";
+
+	if( !m_cntPeople ) 
 	{
 		m_inputMode = URES;
 	}
 	else
 	{
+
 		m_command = L"SELECT filename FROM inputFiles";
 		if( !query( m_command ) ) return L"";
 		if( !m_recordset->RecordsCount() ) 

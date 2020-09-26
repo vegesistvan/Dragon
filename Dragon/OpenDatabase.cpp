@@ -70,6 +70,9 @@ bool COpenDatabase::openDatabase()
 
 	m_tabla		= new CSqliteDBRecordSet;
 	
+
+	return 1;
+
 	m_command = L"SELECT * FROM sqlite_master WHERE type == 'table' ORDER BY tbl_name";  // ez azért is kell, mert ha hiba van, akkor ez ad hibajelzést!!
 	if( !query( m_command ) ) exit( -1 );
 

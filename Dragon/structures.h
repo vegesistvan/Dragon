@@ -191,29 +191,41 @@ typedef struct
 }MORESPOUSES;
 
 
+// VCouples az összes, vSame az azonos nevû házaspárokat tartalmazza
 typedef struct
 {
-	CString rowidM;
-	CString rowidS1;
+	UINT	cnt;
+	UINT	group;				// az azonos nevû házastársak között több összevonható csoport lehet. Ez jelzi, hogy melyik csoportba tartozik
+								// 0 - nem tartozik csoportba, egyedi adatai vannak
+								// 1-n az 1-n csoportba tartozik
+	int		status1;			// férj: 1 = megtartandó, -1 törlendõ 
+	int		status2;			// feleség: 1 = megtartandó, -1 törlendõ 
+	int		contracted;			// false: nincs a csoportban összevont ember, az egész vSame a hibás oldalon listázandó
+								// true: van a VSame-ben összevont ember, az egész vSame az összevontak oldalán listázandó
+	CString rowidM;				// házaság azonosítója
+
+	CString rowidS1;			// férj adatai
 	CString sex_idS1;
 	CString generationS1;
 	CString sourceS1;
 	CString unitedS1;
 	CString lineS1;
 	CString spouse1;
-	CString birthDateS1;
-	CString deathDateS1;
+	CString birthS1;
+	CString deathS1;
+	CString mother_idS1;
 	CString motherS1;
-
-	CString rowidS2;
+	
+	CString rowidS2;			// feleség adatai
 	CString sex_idS2;
 	CString generationS2;
 	CString sourceS2;
 	CString unitedS2;
 	CString lineS2;
 	CString spouse2;
-	CString birthDateS2;
-	CString deathDateS2;
+	CString birthS2;
+	CString deathS2;
+	CString mother_idS2;
 	CString motherS2;
 }COUPLES;
 

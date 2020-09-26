@@ -383,7 +383,59 @@ void CDragonApp::replaceBy( CString rowid, CString rowidBy, CString sex_id, int 
 		m_command.Format( L"UPDATE people SET mother_id = '%s' WHERE mother_id='%s'", rowidBy, rowid );
 	if( !theApp.execute( m_command ) ) return;
 
-	saveInfo( rowid, rowidBy );
+//	saveInfo( rowid, rowidBy );
+
+	m_command.Format( L"DELETE FROM people WHERE rowid ='%s'", rowid );
+	if( !theApp.execute( m_command ) ) return;
+
+// az egyesítések számát 1-el növeli
+	m_command.Format( L"SELECT united, spouse, spouseparent, spousespouse FROM people WHERE rowid='%s'", rowidBy );
+	if( !query1( m_command ) ) return;
+	united			= _wtoi( m_recordset1->GetFieldString( 0 ) ) + 1;
+	spouse			= _wtoi( m_recordset1->GetFieldString( 1 ) );
+	spouseparent	= _wtoi( m_recordset1->GetFieldString( 2 ) );
+	spousespouse	= _wtoi( m_recordset1->GetFieldString( 3 ) );
+
+	switch( source )
+	{
+	case 2:
+		++spouse;
+		break;
+	case 3:
+		++spouseparent;
+		break;
+	case 4:
+		++spouseparent;
+		break;
+	case 5:
+		++spousespouse;
+		break;
+	}
+
+	m_command.Format( L"UPDATE people SET united='%d', spouse='%d', spouseparent='%d', spousespouse='%d' WHERE rowid ='%s'",united, spouse, spouseparent, spousespouse, rowidBy );
+	if( !theApp.execute( m_command ) ) return;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDragonApp::replaceBy( CString rowid, CString rowidBy, CString rowidS1, CString rowidS2, CString sex_id, int source )
+{
+	int united;
+	int	spouse;
+	int	spouseparent;
+	int spousespouse;
+
+	if( sex_id == L"1" )
+		m_command.Format( L"UPDATE marriages SET spouse1_id='%s' WHERE spouse1_id='%s' AND spouse2_id = '%s'", rowidBy, rowidS1, rowidS2 );
+	else
+		m_command.Format( L"UPDATE marriages SET spouse2_id='%s' WHERE spouse1_id='%s' AND spouse2_id='%s'", rowidBy, rowidS2, rowidS1 );
+	if( !theApp.execute( m_command ) ) return;
+
+	if( sex_id == L"1" )
+		m_command.Format( L"UPDATE people SET father_id = '%s' WHERE father_id='%s'", rowidBy, rowid );
+	else
+		m_command.Format( L"UPDATE people SET mother_id = '%s' WHERE mother_id='%s'", rowidBy, rowid );
+	if( !theApp.execute( m_command ) ) return;
+
+	saveInfo( rowidS1, rowidBy );
 
 	m_command.Format( L"DELETE FROM people WHERE rowid ='%s'", rowid );
 	if( !theApp.execute( m_command ) ) return;
@@ -431,7 +483,74 @@ void CDragonApp::saveInfo( CString rowid, CString rowidBy )
 		if( !theApp.execute( m_command ) ) return;
 	}
 }
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDragonApp::replaceBy( CString rowid, CString rowidBy, CString rowidM, CString sex_id, int source )
+{
+	int united;
+	int	spouse;
+	int	spouseparent;
+	int spousespouse;
 
+
+	if( rowid == L"26224" )
+		spouse = 1;
+
+	if( sex_id == L"1" )
+		m_command.Format( L"UPDATE marriages SET spouse1_id='%s' WHERE rowid = '%s'", rowidBy, rowidM );
+	else
+		m_command.Format( L"UPDATE marriages SET spouse2_id='%s' WHERE rowid = '%s'", rowidBy, rowidM );
+	if( !theApp.execute( m_command ) ) return;
+	
+	if( sex_id == L"1" )
+		m_command.Format( L"UPDATE people SET father_id = '%s' WHERE father_id='%s'", rowidBy, rowid );
+	else
+		m_command.Format( L"UPDATE people SET mother_id = '%s' WHERE mother_id='%s'", rowidBy, rowid );
+	if( !theApp.execute( m_command ) ) return;
+
+//	saveInfo( rowid, rowidBy );
+
+	// Ha a törlendõ rowid létezik a házastársak között ( pl. akinek csak 1 házastársaí volt ), akkor azt az embert nem törli!!
+	if( sex_id == L"1" )
+		m_command.Format( L"SELECT rowid FROM marriages WHERE spouse1_id = '%s'", rowid );
+	else
+		m_command.Format( L"SELECT rowid FROM marriages WHERE spouse2_id = '%s'", rowid );
+	if( !query3( m_command ) ) return;
+
+//	if( !m_recordset3->RecordsCount() && source != 5 )
+	if( !m_recordset3->RecordsCount() )
+	{
+		m_command.Format( L"DELETE FROM people WHERE rowid ='%s'", rowid );
+		if( !theApp.execute( m_command ) ) return;
+	}
+/*
+// az egyesítések számát 1-el növeli
+	m_command.Format( L"SELECT united, spouse, spouseparent, spousespouse FROM people WHERE rowid='%s'", rowidBy );
+	if( !query1( m_command ) ) return;
+	united			= _wtoi( m_recordset1->GetFieldString( 0 ) ) + 1;
+	spouse			= _wtoi( m_recordset1->GetFieldString( 1 ) );
+	spouseparent	= _wtoi( m_recordset1->GetFieldString( 2 ) );
+	spousespouse	= _wtoi( m_recordset1->GetFieldString( 3 ) );
+
+	switch( source )
+	{
+	case 2:
+		++spouse;
+		break;
+	case 3:
+		++spouseparent;
+		break;
+	case 4:
+		++spouseparent;
+		break;
+	case 5:
+		++spousespouse;
+		break;
+	}
+
+	m_command.Format( L"UPDATE people SET united='%d', spouse='%d', spouseparent='%d', spousespouse='%d' WHERE rowid ='%s'",united, spouse, spouseparent, spousespouse, rowidBy );
+	if( !theApp.execute( m_command ) ) return;
+*/
+}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
 void CDragonApp::sameMarriages( int iter )
