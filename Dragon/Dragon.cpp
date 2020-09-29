@@ -241,6 +241,8 @@ BOOL CDragonApp::openDatabase()
 
 	if( !open.openDatabase() ) return false;
 
+	m_user_version = open.m_user_version;
+
 	WriteProfileString( L"Settings",L"databasespec", m_databaseSpec ); // jó adatbázis, eltenni
 
 	splitFilespec( m_databaseSpec, &drive, &path,&filename,&ext );

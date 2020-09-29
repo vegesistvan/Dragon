@@ -71,7 +71,7 @@ bool COpenDatabase::openDatabase()
 	m_tabla		= new CSqliteDBRecordSet;
 	
 
-	return 1;
+
 
 	m_command = L"SELECT * FROM sqlite_master WHERE type == 'table' ORDER BY tbl_name";  // ez azért is kell, mert ha hiba van, akkor ez ad hibajelzést!!
 	if( !query( m_command ) ) exit( -1 );
@@ -97,6 +97,11 @@ bool COpenDatabase::openDatabase()
 		if( !checkStructure( m_tabla, m_databaseTables, m_numberOfTables, m_databaseSpec ) ) return false;
 		if( !checkIntegrity() ) return true;
 	}
+
+	
+
+	if( !query( L"PRAGMA user_version" )) return 0;
+	m_user_version = m_tabla->GetFieldString( 0 );
 	return 1;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -240,6 +240,7 @@
     <ClInclude Include="NewPeople2.h" />
     <ClInclude Include="OpenDatabase.h" />
     <ClInclude Include="Pictures.h" />
+    <ClInclude Include="Same.h" />
     <ClInclude Include="SameName.h" />
     <ClInclude Include="SamePeople.h" />
     <ClInclude Include="SameCouples.h" />
@@ -362,6 +363,7 @@
     <ClCompile Include="NewPeople2.cpp" />
     <ClCompile Include="OpenDatabase.cpp" />
     <ClCompile Include="Pictures.cpp" />
+    <ClCompile Include="Same.cpp" />
     <ClCompile Include="SameName.cpp" />
     <ClCompile Include="SamePeople.cpp" />
     <ClCompile Include="SameCouples.cpp" />

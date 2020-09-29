@@ -492,7 +492,7 @@ void CDragonApp::replaceBy( CString rowid, CString rowidBy, CString rowidM, CStr
 	int spousespouse;
 
 
-	if( rowid == L"26224" )
+	if( rowid == L"117308" )
 		spouse = 1;
 
 	if( sex_id == L"1" )

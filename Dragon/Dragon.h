@@ -212,6 +212,7 @@ public:
 	int		m_deletedP;
 	int		m_deletedM;
 	CString m_listFile;
+	CString m_user_version;  // adatbázis user_version-je
 
 	std::vector<FAMS> v_fams;
 	std::vector<CString> v_tables;

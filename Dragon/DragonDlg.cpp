@@ -60,6 +60,7 @@
 #include "SamePeople.h"
 #include "GA_ascendantsChain.h"
 #include "SameCouples.h"
+#include "Same.h"
 
 
 #include "version.h"
@@ -189,8 +190,8 @@ ON_COMMAND(ID_MOTHER_INDEX, &CDragonDlg::OnMotherIndex)
 ON_COMMAND(ID_DISPLAY_BLOB, &CDragonDlg::OnDisplayBlob)
 ON_COMMAND(ID_GEDCOM_TAGTABLE, &CDragonDlg::OnGedcomTagtable)
 ON_COMMAND(ID_GEDCOM_INDIFAMS, &CDragonDlg::OnGedcomINDIFAMS)
-ON_COMMAND(ID_SAME_SPOUSES, &CDragonDlg::OnSameSpouses)
 ON_COMMAND(ID_SAME_NAMES, &CDragonDlg::OnSameNames)
+ON_COMMAND(ID_SAME, &CDragonDlg::OnSame)
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CDragonDlg::OnInitDialog()
@@ -358,7 +359,9 @@ void CDragonDlg::mainTitle( )
 {
 	CString caption;
 
-	caption.Format( L"Dragon v. %s - %s || Családok nyilvántartása || adatbázis: %s || %s ||", BUILT, PLATFORM, theApp.m_databaseSpec, theApp.m_inputMode );
+	query( L"PRAGMA user_version" );
+	theApp.m_user_version = m_recordset->GetFieldString( 0 );
+	caption.Format( L"Dragon v. %s - %s || Családok nyilvántartása || adatbázis: %s (%s) || %s ||", BUILT, PLATFORM, theApp.m_databaseSpec, theApp.m_user_version, theApp.m_inputMode );
 	SetWindowText( caption );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1144,15 +1147,17 @@ void CDragonDlg::OnGedcomINDIFAMS()
 	ged.indiFams();
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragonDlg::OnSameSpouses()
-{
-	CCheckSameSpouses dlg;
-	dlg.DoModal();
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnSameNames()
 {
 	CSameCouples dlg;
 	dlg.DoModal();
+	mainTitle( );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDragonDlg::OnSame()
+{
+	CSame dlg;
+	dlg.DoModal();
+	mainTitle( );
+
+}

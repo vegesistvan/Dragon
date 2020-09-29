@@ -1,6 +1,8 @@
 // CSameCouples.cpp : implementation file
 //
 
+
+
 #include "stdafx.h"
 #include "Dragon.h"
 #include "SameCouples.h"
@@ -164,12 +166,10 @@ void CSameCouples::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CSameCouples, CDialogEx)
 	ON_WM_SIZE()
 	ON_WM_SIZING()
-	ON_COMMAND(ID_HTML, &CSameCouples::OnHtml)
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
 	ON_COMMAND(ID_LINE_HUSBAND, &CSameCouples::OnLineHusband)
 	ON_COMMAND(ID_LINE_WIFE, &CSameCouples::OnLineWife)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST, &CSameCouples::OnCustomdrawList)
-	ON_COMMAND(ID_INFO, &CSameCouples::OnInfo)
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CSameCouples::OnInitDialog()
@@ -179,25 +179,36 @@ BOOL CSameCouples::OnInitDialog()
 	EASYSIZE_ADD( IDC_LIST,	ES_BORDER,	ES_BORDER,		ES_BORDER,		ES_BORDER,	0 );
 	EASYSIZE_INIT();
 
-	CString caption = L"Azonos nevû házaspárok";
-	SetWindowTextW( caption ),
-
-
+// Ha csak egy házaspárt akarsz vizsgálni, akkor add meg a nevüket!
+	_husband	= L"";
+	_wife		= "";
+	
 	createColumns();
+
+	openUnited();
+	openDifferent();
 
 	m_deleted = 0;
 	sameSpouses();
 
+	m_command.Format( L"PRAGMA user_version='1'" );
+	theApp.execute( m_command );
+
 	if( m_deleted )
 	{
-		str.Format( L"%d ember összevonásra került", m_deleted );
+		theApp.execute( L"VACUUM");
+		str.Format( L"%d ember összevonása történt", m_deleted );
 		AfxMessageBox( str );
+		theApp.showHtmlFile( unitedSpec );
+		
+		OnCancel();
 	}
 	else
-		AfxMessageBox( L"Nincs összevonható ember!" );
-
+	{
+		AfxMessageBox( L"Nincs összevonható ember." );
+	}
+	theApp.showHtmlFile( differentSpec );
 	return TRUE;
-
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSameCouples::OnSize(UINT nType, int cx, int cy)
@@ -243,7 +254,6 @@ void CSameCouples::createColumns()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSameCouples::sameSpouses()
 {
-	CString fileName;
 	CString first_name1;
 	
 
@@ -257,13 +267,7 @@ void CSameCouples::sameSpouses()
 	wndP.Create( NULL, L"Azonos nevû házaspárok..." );
 	wndP.GoModal();
 
-	fileName = L"couplesWithSameName_United";
-	fileSpec2 = theApp.openHtmlFile( &fh2, fileName, L"w+" );
-	htmlHeader2();
-
-	fileName = L"couplesWithSameName_Different";
-	fileSpec1 = theApp.openHtmlFile( &fh1, fileName, L"w+" );
-	htmlHeader1();
+	
 
 #ifndef _DEBUG
 	str.Format( L"Házasságok lekérdezése az adatbázisból..." );
@@ -278,13 +282,13 @@ void CSameCouples::sameSpouses()
 	wndP.SetStep(1 );
 
 	vCouples.clear();
-	
 	for( i = 0; i < m_recordset->RecordsCount(); ++i, m_recordset->MoveNext() )
 	{
-		vcouples.contracted	= 0;
+//		vcouples.contracted	= 0;
 		vcouples.group		= 0;
 		vcouples.status1	= 0;
 		vcouples.status2	= 0;
+		m_contracted = 0;
 		
 		vcouples.rowidM	= m_recordset->GetFieldString( MARRIAGES_ROWID );
 		vcouples.rowidS1 = m_recordset->GetFieldString( MARRIAGES_SPOUSE1_ID );
@@ -306,6 +310,8 @@ void CSameCouples::sameSpouses()
 		vcouples.deathS1	= m_recordset1->GetFieldString( P_DEATH_DATE );
 		mother_id				= m_recordset1->GetFieldString( P_MOTHER_ID );
 		vcouples.mother_idS1 = mother_id;
+
+		if( !_husband.IsEmpty() && spouse != _husband ) goto cont;
 
 
 		m_command.Format( L"SELECT last_name, first_name FROM people WHERE rowid='%s'", mother_id );
@@ -337,6 +343,10 @@ void CSameCouples::sameSpouses()
 		spouse.Format( L"%s %s", m_recordset1->GetFieldString( P_LAST_NAME), m_recordset1->GetFieldString( P_FIRST_NAME ) );
 		vcouples.spouse2		= spouse.Trim();;
 		if( vcouples.spouse2.IsEmpty() ) goto cont;
+
+
+		if( !_wife.IsEmpty() && spouse != _wife ) goto cont;
+
 
 		vcouples.birthS2	= m_recordset1->GetFieldString( P_BIRTH_DATE );
 		vcouples.deathS2	= m_recordset1->GetFieldString( P_DEATH_DATE );
@@ -390,12 +400,12 @@ cont:	wndP.StepIt();
 		str.Format( L"%d ember összevonva.", m_deleted );
 	else
 		str = L"Nincs összevonható ember!";
-	fwprintf( fh1, L"\n\n%s\n", str );
-	fwprintf( fh1, L"</pre>" );
-	fwprintf( fh2, L"</pre>" );
-	fclose( fh1 );
-	fclose( fh2 );
-	OnHtml();
+	fwprintf( fU, L"\n\n%s\n", str );
+	fwprintf( fD, L"\n\n%s\n", str );
+	fwprintf( fU, L"</pre>" );
+	fwprintf( fD, L"</pre>" );
+	fclose( fU );
+	fclose( fD );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSameCouples::getSameCouples()
@@ -418,6 +428,7 @@ void CSameCouples::getSameCouples()
 	{
 		spouse1 =  vCouples.at(i).spouse1;
 		spouse2 =  vCouples.at(i).spouse2;
+
 		name.Format( L"%-40s %-40s", spouse1, spouse2 );
 		if( name == namePrev )
 		{
@@ -432,9 +443,7 @@ void CSameCouples::getSameCouples()
 		{
 			if( vSame.size() )
 			{
-//				processSame();
-				processGroup();
-
+				processSame();
 				vSame.clear();
 			}
 			first = true;
@@ -445,18 +454,14 @@ cont:	wndP.StepIt();
 		wndP.PeekAndPump();
 		if (wndP.Cancelled()) break;
 	}
+	if( vSame.size() )
+	{
+		processSame();
+		vSame.clear();
+	}
 	theApp.execute( L"COMMIT" );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSameCouples::processGroup()
-{
-	uniteGroup();
-	if( vSame.at(0).contracted )
-		listContracted();
-	else
-		listGroup();
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Egy vSame-ben adott azonos nevû házastársak rekordjaiban beállítja a group, statusS1 és statusS2 értékeit.
 // A group 0-n értéket vehet fel, és a vSame-en belüli lehetséges csoportokat jelöli. Egy-egy group értékû házaspárok azonosak.  
 // 
@@ -464,6 +469,14 @@ void CSameCouples::processSame()
 {
 	UINT group = 1;
 	UINT db = 0;
+	int z;
+
+	if( vSame.at(0).spouse1 == L"Abaffy Adeodat-Arisztid" )
+		z = 1;
+
+	referenceValues();
+
+	std::sort( vSame.begin(), vSame.end(), sortBySource1 );
 	for( UINT i1 = 0; i1 < vSame.size(); ++i1 )
 	{
 		if( db ) ++group;
@@ -472,6 +485,8 @@ void CSameCouples::processSame()
 		{
 			for( UINT i2 = 0; i2 < vSame.size(); ++i2 )
 			{
+				if( i1 == 1 && i2 == 3 )
+					z = 2;
 				if( i1 != i2 && vSame.at(i2).group == 0 )	// természetesen csak különbözõ házaspárokat vizsgál, amelyeket még nem redneltek hozzá egyik csooprthoz sem
 				{
 					if( identical( i1, i2 ) )
@@ -495,11 +510,9 @@ void CSameCouples::processSame()
 	int sourceMin2;
 	int sourceS1;
 	int sourceS2;
-	int z;
 
-//	std::sort( vSame.begin(), vSame.end(), sortByCnt );
-//	std::sort( vSame.begin(), vSame.end(), sortByGroupSource );
-
+	std::sort( vSame.begin(), vSame.end(), sortByCnt );
+	std::sort( vSame.begin(), vSame.end(), sortByGroup );
 	// csoport legalacsonyabb szerepû indexének meghatározása
 	for( UINT i = 1; i < m_numOfGroups + 1; ++i )
 	{
@@ -535,7 +548,8 @@ void CSameCouples::processSame()
 		}
 	}
 	contract();
-	if( vSame.at(0).contracted )
+//	if( vSame.at(0).contracted )
+	if( m_contracted )
 		listContracted();
 	else
 		listGroup();
@@ -553,11 +567,12 @@ void CSameCouples::contract()
 	CString rowidMD;
 	int group;
 
+	
+	
 
-	vSame.at(0).contracted = 0;
+//	vSame.at(0).contracted = 0;
 
-	if( vSame.at(0).spouse1 == L"Aba Lehel" )
-		source = 1;
+	m_contracted = 0;
 
 	for( UINT i = 0; i < m_numOfGroups; ++i )
 	{
@@ -584,13 +599,15 @@ void CSameCouples::contract()
 					rowid	= vSame.at(j).rowidS1;
 					sex_id	= vSame.at(j).sex_idS1;
 					source	= _wtoi( vSame.at(j).sourceS1 );
-					theApp.replaceBy( rowid, rowidBy, rowidM, sex_id, source );
+					//theApp.replaceBy( rowid, rowidBy, rowidMD, sex_id, source );
+					theApp.replaceBy( rowid, rowidBy, sex_id, source );
 
 					m_command.Format( L"DELETE FROM marriages WHERE rowid ='%s'", rowidMD );
 					if( !theApp.execute( m_command ) ) return;
 
 					++m_deleted;
-					++vSame.at(0).contracted;
+	//				++vSame.at(0).contracted;
+					++m_contracted;
 				}
 			}
 		}
@@ -617,105 +634,68 @@ void CSameCouples::contract()
 					rowid	= vSame.at(j).rowidS2;
 					sex_id	= vSame.at(j).sex_idS2;
 					source	= _wtoi( vSame.at(j).sourceS2 );
-					theApp.replaceBy( rowid, rowidBy, rowidM, sex_id, source );
-
-//					m_command.Format( L"DELETE FROM marriages WHERE rowid ='%s'", rowidMD );
-//					if( !theApp.execute( m_command ) ) return;
+					//theApp.replaceBy( rowid, rowidBy, rowidMD, sex_id, source );
+					theApp.replaceBy( rowid, rowidBy, sex_id, source );
 
 					++m_deleted;
 					++vSame.at(0).contracted;
+					++m_contracted;
 				}
 			}
 		}
 	}
 }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Azonos nevû és születési, halálozási dátumokban nem ellentmondásos házaspárok házassáágainak egyesítése
-// A spouse1-bõl és a spouse2-bõl a legkisebb source-ú embert tartja meg
-void CSameCouples::uniteGroup()
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CSameCouples::referenceValues()
 {
-	std::sort( vSame.begin(), vSame.end(), sortByCnt );
-	std::sort( vSame.begin(), vSame.end(), sortBySource1 );
-	
-	UINT i;
-	int z;
-	CString spouse;
-	bool unite= false;
-	CString rowidM	= vSame.at(0).rowidM; // ezt a házasságot fogja megtartani, de a spouse2 változhat, ha a spouse2 összevonása márt hoz ki!!!
-	vSame.at(0).status1	= 1;  // megtartott férj
-	data0();   // a nulladik rekord adatai ( ..._0 )
-	for( i = 1; i < vSame.size(); ++i )
+	birth1Ref.Empty();
+	death1Ref.Empty();
+	mother1Ref.Empty();
+	birth2Ref.Empty();
+	death2Ref.Empty();
+	mother2Ref.Empty();
+	for( UINT i = 0; i < vSame.size(); ++i )
 	{
-		dataI(i);   // az i. rekord adatai ( ...._I )
+		if( !vSame.at(i).birthS1.IsEmpty() ) birth1Ref = vSame.at(i).birthS1;
+		if( !vSame.at(i).deathS1.IsEmpty() ) death1Ref = vSame.at(i).deathS1;
+		if( !vSame.at(i).motherS1.IsEmpty() ) mother1Ref = vSame.at(i).motherS1;
+		
+		if( !vSame.at(i).birthS2.IsEmpty() ) birth2Ref = vSame.at(i).birthS2;
+		if( !vSame.at(i).deathS2.IsEmpty() ) death2Ref = vSame.at(i).deathS2;
+		if( !vSame.at(i).motherS2.IsEmpty() ) mother2Ref = vSame.at(i).motherS2;
+	}
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Az i1 és i2 indexû házasspárok azonosságát állapíthja meg.
+// return true: azonosak (nincs ellentmondás az adatai között!!!) 
+// return false: különbözõek
+bool CSameCouples::identical( UINT i1, UINT i2 )
+{
+	setData( i1, i2 );
 
-		if( spouse1_I == L"Almásy Sándor" )
-			z = 1;
+	if( !generationS1_1.IsEmpty() && !generationS1_2.IsEmpty() &&  generationS1_1 != generationS1_2 ) return false;	// különbözû generációk,különbözõ emberek.
 
-		if( !generationS1_0.IsEmpty() && !generationS1_I.IsEmpty() && generationS1_0 != generationS1_I )
+/*
+	if( birth1Ref.IsEmpty() || birthS1_1 == birth1Ref )
+	{
+		if( death1Ref.IsEmpty()  ||  deathS1_1 == death1Ref )
 		{
-			// különbözû generációk,különbözõ emberek. Ezt egyelõre nem kezeli
-			break; // nem lehet két azonos generációjú leszármazott egy csoportban!!! Nem foglalkozik ezzel a csoporttal
-		}
-		if( ( birthS1_0.IsEmpty() || birthS1_I.IsEmpty() ) || birthS1_0 == birthS1_I )
-		{
-			if( ( deathS1_0.IsEmpty() || deathS1_I.IsEmpty() ) ||  deathS1_0 == deathS1_I )
+			if( mother1Ref.IsEmpty() ||  motherS1_1 == mother1Ref )
 			{
-				if( ( motherS1_0.IsEmpty() || motherS1_I.IsEmpty() ) ||  motherS1_0 == motherS1_I )
+				if( birth2Ref.IsEmpty()  || birthS2_1 == birth2Ref )
 				{
-					if( ( birthS2_0.IsEmpty() || birthS2_I.IsEmpty() ) || birthS2_0 == birthS2_I )
+					if( death2Ref.IsEmpty() ||  deathS2_1 == death2Ref )
 					{
-						if( ( deathS2_0.IsEmpty() || deathS2_I.IsEmpty() ) ||  deathS2_0 == deathS2_I )
+						if( mother2Ref.IsEmpty() ||  motherS2_1 == mother2Ref )
 						{
-							if( ( motherS2_0.IsEmpty() || motherS2_I.IsEmpty() ) ||  motherS2_0 == motherS2_I )
-							{
-							// a magasabb szerepkörben lévõ férjet tartjuk meg. Ez a sorrenddel megegyezik!
-								theApp.replaceBy( rowidS1_I, rowidS1_0, rowidM_I, sex_idS1_I, sourceS2_I );
-								unite = true;
-
-								m_command.Format( L"DELETE FROM marriages WHERE rowid ='%s'", rowidM_I );
-								if( !theApp.execute( m_command ) ) return;
-								++m_deleted;
-
-								vSame.at(i).status1 = -1, // törölt férj
-								vSame.at(i).status2 = -1;	// minden feleséget is törlünk, majd a ciklus után állítjuk be a kiválasztottat
-
-								++vSame.at(0).contracted; // a group-ban történt törlések száma
-							}
+							return true;
 						}
 					}
 				}
 			}
 		}
 	}
-	if( unite )
-	{
-		int ix = setStatus2();  // beállítja a kiválasztott feleség indexétés az m_rowidMother-t
-		CString rowidBy = vSame.at(ix).rowidS2;
-		for( UINT i = 0; i < vSame.size(); ++i )
-		{
-			dataI( i );
-			if( vSame.at(i).status2 == -1 ) // törölni
-			{
-				theApp.replaceBy( rowidS2_I, rowidBy, rowidM_I, sex_idS2_I, sourceS1_I );
-				++vSame.at(0).contracted; // a group-ban történt törlések száma
-			}
-		}
-	}
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Az i1 és i2 indexû házasspárok azonosságát állapíthja meg.
-// return true: azonosak (nincs ellentmondás az adatai között!!!) 
-// return false: különbözõek
-bool CSameCouples::identical( UINT i1, UINT i2 )
-{
-	std::sort( vSame.begin(), vSame.end(), sortByCnt );
-	std::sort( vSame.begin(), vSame.end(), sortBySource1 );
-
-	if( !vSame.at(i1).generationS1.IsEmpty() && !vSame.at(i2).generationS1.IsEmpty() && vSame.at(i1).generationS1 != vSame.at(i2).generationS1 )
-	{
-		return false;	// különbözû generációk,különbözõ emberek.
-	}
-	setData( i1, i2 );
+*/
 	if( ( birthS1_1.IsEmpty() || birthS1_2.IsEmpty() ) || birthS1_1 == birthS1_2 )
 	{
 		if( ( deathS1_1.IsEmpty() || deathS1_2.IsEmpty() ) ||  deathS1_1 == deathS1_2 )
@@ -735,71 +715,20 @@ bool CSameCouples::identical( UINT i1, UINT i2 )
 			}
 		}
 	}
-	std::sort( vSame.begin(), vSame.end(), sortByCnt );
-	return false;
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSameCouples::data0()
-{
-	rowidM_0		= vSame.at(0).rowidM;
 
-	rowidS1_0		= vSame.at(0).rowidS1;
-	sex_idS1_0		= vSame.at(0).sex_idS1;
-	generationS1_0	= vSame.at(0).generationS1;
-	sourceS1_0		= _wtoi( vSame.at(0).sourceS1 );
-	unitedS1_0		= vSame.at(0).unitedS1;
-	lineS1_0		= vSame.at(0).lineS1;
-	spouse1_0		= vSame.at(0).spouse1;
-	birthS1_0		= vSame.at(0).birthS1;
-	deathS1_0		= vSame.at(0).deathS1;
-	motherS1_0		= vSame.at(0).motherS1;
-	
-	rowidS2_0		= vSame.at(0).rowidS2;
-	sex_idS2_0		= vSame.at(0).sex_idS2;
-	generationS2_0	= vSame.at(0).generationS2;
-	sourceS2_0		= _wtoi( vSame.at(0).sourceS2 );
-	unitedS2_0		= vSame.at(0).unitedS2;
-	lineS2_0		= vSame.at(0).lineS2;
-	spouse2_0		= vSame.at(0).spouse2;
-	birthS2_0		= vSame.at(0).birthS2;
-	deathS2_0		= vSame.at(0).deathS2;
-	motherS2_0		= vSame.at(0).motherS2;
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSameCouples::dataI( UINT i)
-{
-	rowidM_I		= vSame.at(i).rowidM;
-	rowidS1_I		= vSame.at(i).rowidS1;
-	sex_idS1_I		= vSame.at(i).sex_idS1;
-	generationS1_I	= vSame.at(i).generationS1;
-	sourceS1_I		= _wtoi( vSame.at(i).sourceS1 );
-	unitedS1_I		= vSame.at(i).unitedS1;
-	lineS1_I		= vSame.at(i).lineS1;
-	spouse1_I		= vSame.at(i).spouse1;
-	birthS1_I		= vSame.at(i).birthS1;
-	deathS1_I		= vSame.at(i).deathS1;
-	motherS1_I		= vSame.at(i).motherS1;
-	
-	rowidS2_I		= vSame.at(i).rowidS2;
-	sex_idS2_I		= vSame.at(i).sex_idS2;
-	generationS2_I	= vSame.at(i).generationS2;
-	sourceS2_I		= _wtoi( vSame.at(i).sourceS2 );
-	unitedS2_I		= vSame.at(i).unitedS2;
-	lineS2_I		= vSame.at(i).lineS2;
-	spouse2_I		= vSame.at(i).spouse2;
-	birthS2_I		= vSame.at(i).birthS2;
-	deathS2_I		= vSame.at(i).deathS2;
-	motherS2_I		= vSame.at(i).motherS2;
+	return false;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSameCouples::setData( UINT i1, UINT i2 )
 {
+	group_1			= vSame.at(i1).group;
 	rowidM_1		= vSame.at(i1).rowidM;
 
+	statusS1_1		= vSame.at(i1).status1;
 	rowidS1_1		= vSame.at(i1).rowidS1;
 	sex_idS1_1		= vSame.at(i1).sex_idS1;
 	generationS1_1	= vSame.at(i1).generationS1;
-	sourceS1_1		= _wtoi( vSame.at(i1).sourceS1 );
+	sourceS1_1		= vSame.at(i1).sourceS1;
 	unitedS1_1		= vSame.at(i1).unitedS1;
 	lineS1_1		= vSame.at(i1).lineS1;
 	spouse1_1		= vSame.at(i1).spouse1;
@@ -807,10 +736,11 @@ void CSameCouples::setData( UINT i1, UINT i2 )
 	deathS1_1		= vSame.at(i1).deathS1;
 	motherS1_1		= vSame.at(i1).motherS1;
 	
+	statusS2_1		= vSame.at(i1).status2;
 	rowidS2_1		= vSame.at(i1).rowidS2;
 	sex_idS2_1		= vSame.at(i1).sex_idS2;
 	generationS2_1	= vSame.at(i1).generationS2;
-	sourceS2_1		= _wtoi( vSame.at(i1).sourceS2 );
+	sourceS2_1		= vSame.at(i1).sourceS2;
 	unitedS2_1		= vSame.at(i1).unitedS2;
 	lineS2_1		= vSame.at(i1).lineS2;
 	spouse2_1		= vSame.at(i1).spouse2;
@@ -818,12 +748,14 @@ void CSameCouples::setData( UINT i1, UINT i2 )
 	deathS2_1		= vSame.at(i1).deathS2;
 	motherS2_1		= vSame.at(i1).motherS2;
 
+	group_2			= vSame.at(i2).group;
 	rowidM_2		= vSame.at(i2).rowidM;
 
+	statusS1_2		= vSame.at(i2).status1;
 	rowidS1_2		= vSame.at(i2).rowidS1;
 	sex_idS1_2		= vSame.at(i2).sex_idS1;
 	generationS1_2	= vSame.at(i2).generationS1;
-	sourceS1_2		= _wtoi( vSame.at(i2).sourceS1 );
+	sourceS1_2		= vSame.at(i2).sourceS1;
 	unitedS1_2		= vSame.at(i2).unitedS1;
 	lineS1_2		= vSame.at(i2).lineS1;
 	spouse1_2		= vSame.at(i2).spouse1;
@@ -831,43 +763,17 @@ void CSameCouples::setData( UINT i1, UINT i2 )
 	deathS1_2		= vSame.at(i2).deathS1;
 	motherS1_2		= vSame.at(i2).motherS1;
 	
+	statusS1_2		= vSame.at(i2).status1;
 	rowidS2_2		= vSame.at(i2).rowidS2;
 	sex_idS2_2		= vSame.at(i2).sex_idS2;
 	generationS2_2	= vSame.at(i2).generationS2;
-	sourceS2_2		= _wtoi( vSame.at(i2).sourceS2 );
+	sourceS2_2		= vSame.at(i2).sourceS2;
 	unitedS2_2		= vSame.at(i2).unitedS2;
 	lineS2_2		= vSame.at(i2).lineS2;
 	spouse2_2		= vSame.at(i2).spouse2;
 	birthS2_2		= vSame.at(i2).birthS2;
 	deathS2_2		= vSame.at(i2).deathS2;
 	motherS2_2		= vSame.at(i2).motherS2;
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSameCouples::clearStatus2()
-{
-	for( UINT i = 0; i < vSame.size(); ++i )
-		vSame.at(i).status2 = 0;
-
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int CSameCouples::setStatus2()
-{
-	int source;
-	int min = 100;
-	UINT ix;
-	for( UINT i = 0; i < vSame.size(); ++i )
-	{
-		vSame.at(i).status2 = -1;  // ez nem jó mert nem minden sor törlendõ
-		source = _wtoi( vSame.at(i).sourceS2 );
-		if( source < min )
-		{
-			min = source;
-			ix = i;
-		}
-	}
-	m_rowidMother = vSame.at(ix).mother_idS2;
-	vSame.at(ix).status2 = 1;
-	return ix;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 UINT CSameCouples::getNumOfGroups()
@@ -880,67 +786,42 @@ UINT CSameCouples::getNumOfGroups()
 	return max;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// A nem egyesíthetõ házaspárokat listázza, sárga háttárrel jelölve a különbségeket a házaspárok adatai között.
+//
+//
 void CSameCouples::listGroup()
 {
 	int nItem = 0;
-	std::sort( vSame.begin(), vSame.end(), sortByCnt ); 
-	std::sort( vSame.begin(), vSame.end(), sortBySource1 );
 
+	bool first;
+	UINT  ix;
 	for( UINT j = 0; j <= m_numOfGroups; ++j )
 	{
+		first = true;
 		for( UINT i = 0; i < vSame.size();++i )
 		{
 			if( vSame.at(i).group == j )
 			{
-				printDiffI( i, nItem );
-				++nItem;
+				if( first )
+				{
+					ix = i;
+					first = false;
+				}
+				setData( ix, i ); 
+				if( statusS1_2 == 0 )
+				{
+					printYellow( i, nItem );
+					++nItem;
+				}
+				else
+					printBackground( nItem );
 			}
 		}
 	}
 	nItem = m_ListCtrl.InsertItem( nItem, L"" );
 	++nItem;
 
-	fwprintf( fh2, L"\n" );
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSameCouples::printDiffI( UINT i, int nItem )
-{
-	data0();
-
-	rowidM			= vSame.at(i).rowidM;
-
-	group			= vSame.at(i).group;
-	rowidS1			= vSame.at(i).rowidS1;
-	statusS1		= vSame.at(i).status1;
-	generationS1	= vSame.at(i).generationS1;
-	sourceS1		= vSame.at(i).sourceS1;
-	unitedS1		= vSame.at(i).unitedS1;
-	lineS1			= vSame.at(i).lineS1;
-	spouse1			= vSame.at(i).spouse1;
-	birthS1			= vSame.at(i).birthS1;
-	deathS1			= vSame.at(i).deathS1;
-	motherS1		= vSame.at(i).motherS1;
-
-	rowidS2			= vSame.at(i).rowidS2;
-	statusS2		= vSame.at(i).status2;
-	generationS2	= vSame.at(i).generationS2;
-	sourceS2		= vSame.at(i).sourceS2;
-	unitedS2		= vSame.at(i).unitedS2;
-	lineS2			= vSame.at(i).lineS2;
-	spouse2			= vSame.at(i).spouse2;
-	birthS2			= vSame.at(i).birthS2;
-	deathS2			= vSame.at(i).deathS2;
-	motherS2		= vSame.at(i).motherS2;
-
-	if( statusS1 == 0 )
-	{
-		printYellow( i, nItem );
-	}
-	else
-	{
-		printBackground( nItem );
-	}
-
+	fwprintf( fD, L"\n" );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSameCouples::printYellow( UINT i, int nItem )
@@ -953,152 +834,152 @@ void CSameCouples::printYellow( UINT i, int nItem )
 	empty = 0;
 	cnt.Format( L"%d",	m_cnt );
 
-	str.Format( L"%2d %2d %2d %6s %8s ", group, m_numOfGroups, statusS1, rowidM, lineS1 );
-	fwprintf( fh2, L"%s", str );
+	str.Format( L"%2d %2d %2d %6s %8s ", group_2, m_numOfGroups, statusS1_2, rowidM_2, lineS1_2 );
+	fwprintf( fD, L"%s", str );
 
-	if( generationS1_0.IsEmpty() || generationS1.IsEmpty() )
+	if( generationS1_1.IsEmpty() || generationS1_2.IsEmpty() )
 	{
 		++empty;
 	}
-	if( i && !generationS1_0.IsEmpty() && !generationS1.IsEmpty() && generationS1_0 != generationS1 )
+	if( i && !generationS1_1.IsEmpty() && !generationS1_2.IsEmpty() && generationS1_1 != generationS1_2 )
 	{
-		fwprintf( fh2, L"<span style=\"background:yellow\">%1s</span> ", generationS1 );
+		fwprintf( fD, L"<span style=\"background:yellow\">%1s</span> ", generationS1_2 );
 		col = col | 1 << L_GENERATIONS1;
 	}
 	else
-		fwprintf( fh2, L"%1s ", generationS1 );
+		fwprintf( fD, L"%1s ", generationS1_2 );
 
-	str.Format( L"%1s %1s %8s %-30s ", sourceS1, unitedS1, rowidS1, spouse1 );
-	fwprintf( fh2, L"%s", str );
+	str.Format( L"%1s %2s %8s %-30s ", sourceS1_2, unitedS1_2, rowidS1_2, spouse1_2 );
+	fwprintf( fD, L"%s", str );
 
 
 // birthDate1
-	if( birthS1_0.IsEmpty() || birthS1.IsEmpty() )
+	if( birthS1_1.IsEmpty() || birthS1_2.IsEmpty() )
 	{
 		++empty;
 	}
-	if( !birthS1_0.IsEmpty() && !birthS1.IsEmpty() && birthS1_0 != birthS1 )
+	if( !birthS1_1.IsEmpty() && !birthS1_2.IsEmpty() && birthS1_1 != birthS1_2 )
 	{
-		fwprintf( fh2, L"<span style=\"background:yellow\">%-13s</span> ", birthS1 );
+		fwprintf( fD, L"<span style=\"background:yellow\">%-13s</span> ", birthS1_2 );
 		col = col | 1 << L_BIRTHS1;
 	}
 	else
-		fwprintf( fh2, L"%-13s ", birthS1 );
+		fwprintf( fD, L"%-13s ", birthS1_2 );
 
 
 // deathDate1
-	if( deathS1_0.IsEmpty() || deathS1.IsEmpty() )
+	if( deathS1_1.IsEmpty() || deathS1_2.IsEmpty() )
 	{
 		++empty;
 	}
-	if( !deathS1_0.IsEmpty() && !deathS1.IsEmpty() && deathS1_0 != deathS1 )
+	if( !deathS1_1.IsEmpty() && !deathS1_2.IsEmpty() && deathS1_1 != deathS1_2 )
 	{
-		fwprintf( fh2, L"<span style=\"background:yellow\">%-13s</span> ", deathS1 );
+		fwprintf( fD, L"<span style=\"background:yellow\">%-13s</span> ", deathS1_2 );
 		col = col | 1 << L_DEATHS1;
 	}
 	else
-		fwprintf( fh2, L"%-13s ", deathS1 );
+		fwprintf( fD, L"%-13s ", deathS1_2 );
 
 // mother1
-	if( motherS1_0.IsEmpty() || motherS1.IsEmpty() )
+	if( motherS1_1.IsEmpty() || motherS1_2.IsEmpty() )
 	{
 		++empty;
 	}
-	if( !motherS1_0.IsEmpty() && !motherS1.IsEmpty() && motherS1_0 != motherS1 )
+	if( !motherS1_1.IsEmpty() && !motherS1_2.IsEmpty() && motherS1_1 != motherS1_2 )
 	{
-		fwprintf( fh2, L"<span style=\"background:yellow\">%-30s</span> ", motherS1 );
+		fwprintf( fD, L"<span style=\"background:yellow\">%-30s</span> ", motherS1_2 );
 		col = col | 1 << L_MOTHERS1;
 	}
 	else
-		fwprintf( fh2, L"%-30s ", motherS1 );
+		fwprintf( fD, L"%-30s ", motherS1_2 );
 
 
-	str.Format( L"%2d %8s ", statusS2, lineS2 );
-	fwprintf( fh2, L"%s", str );
+	str.Format( L"%2d %8s ", statusS2_2, lineS2_2 );
+	fwprintf( fD, L"%s", str );
 
 // generation
-	if( generationS2_0.IsEmpty() || generationS2.IsEmpty() )
+	if( generationS2_1.IsEmpty() || generationS2_2.IsEmpty() )
 	{
 		++empty;
 	}
-	if( i & !generationS2_0.IsEmpty() && !generationS2.IsEmpty()  && generationS2_0 != generationS2 )
+	if( i & !generationS2_1.IsEmpty() && !generationS2_2.IsEmpty()  && generationS2_1 != generationS2_2 )
 	{
-		fwprintf( fh2, L"<span style=\"background:yellow\">%1s</span> ", generationS2 );
+		fwprintf( fD, L"<span style=\"background:yellow\">%1s</span> ", generationS2_2 );
 		col = col | 1 << L_GENERATIONS2;
 	}
 	else
-		fwprintf( fh2, L"%-1s ", generationS2 );
+		fwprintf( fD, L"%-1s ", generationS2_2 );
 
-	str.Format( L"%1s %1s %8s %-30s ", sourceS2, unitedS2, rowidS2, spouse2 );
-	fwprintf( fh2, L"%s", str );
+	str.Format( L"%1s %2s %8s %-30s ", sourceS2_2, unitedS2_2, rowidS2_2, spouse2_2 );
+	fwprintf( fD, L"%s", str );
 
 // birthDate2
-	if( birthS2_0.IsEmpty() || birthS2.IsEmpty() )
+	if( birthS2_1.IsEmpty() || birthS2_2.IsEmpty() )
 	{
 		++empty;
 	}
-	if( !birthS2_0.IsEmpty() && !birthS2.IsEmpty() && birthS2_0 != birthS2 )
+	if( !birthS2_1.IsEmpty() && !birthS2_2.IsEmpty() && birthS2_1 != birthS2_2 )
 	{
-		fwprintf( fh2, L"<span style=\"background:yellow\">%-13s</span> ", birthS2 );
+		fwprintf( fD, L"<span style=\"background:yellow\">%-13s</span> ", birthS2_2 );
 		col = col | 1 << L_BIRTHS2;
 	}
 	else
-		fwprintf( fh2, L"%-13s ", birthS2 );
+		fwprintf( fD, L"%-13s ", birthS2_2 );
 
 
 // deathDate2
-	if( deathS2_0.IsEmpty() || deathS2.IsEmpty() )
+	if( deathS2_1.IsEmpty() || deathS2_2.IsEmpty() )
 	{
 		++empty;
 	}
-	if( !deathS2_0.IsEmpty() && !deathS2.IsEmpty() && deathS2_0 != deathS2 )
+	if( !deathS2_1.IsEmpty() && !deathS2_2.IsEmpty() && deathS2_1 != deathS2_2 )
 	{
-		fwprintf( fh2, L"<span style=\"background:yellow\">%-13s</span> ", deathS2 );
+		fwprintf( fD, L"<span style=\"background:yellow\">%-13s</span> ", deathS2_2 );
 		col = col | 1 << L_DEATHS2;
 	}
 	else
-		fwprintf( fh2, L"%-13s ", deathS2 );
+		fwprintf( fD, L"%-13s ", deathS2_2 );
 
 // mother2
-	if( motherS2_0.IsEmpty() || motherS2.IsEmpty() )
+	if( motherS2_1.IsEmpty() || motherS2_2.IsEmpty() )
 	{
 		++empty;
 	}
-	if( !motherS2_0.IsEmpty() && !motherS2.IsEmpty() && motherS2_0 != motherS2 )
+	if( !motherS2_1.IsEmpty() && !motherS2_2.IsEmpty() && motherS2_1 != motherS2_2 )
 	{
-		fwprintf( fh2, L"<span style=\"background:yellow\">%-30s</span> ", motherS2 );
+		fwprintf( fD, L"<span style=\"background:yellow\">%-30s</span> ", motherS2_2 );
 		col = col | 1 << L_MOTHERS2;
 	}
 	else
-		fwprintf( fh2, L"%-30s ", motherS2 );
+		fwprintf( fD, L"%-30s ", motherS2_2 );
 
-	fwprintf( fh2, L"\n");
+	fwprintf( fD, L"\n");
 
-	nItem = m_ListCtrl.InsertItem( nItem, cnt );
+	int n = m_ListCtrl.InsertItem( nItem, cnt );
 
-	m_ListCtrl.SetItemText( nItem, L_ROWID, rowidM );
+	m_ListCtrl.SetItemText( n, L_ROWID, rowidM_2 );
 
-	m_ListCtrl.SetItemText( nItem, L_ROWIDS1, rowidS1 );
-	m_ListCtrl.SetItemText( nItem, L_GENERATIONS1, generationS1 );
-	m_ListCtrl.SetItemText( nItem, L_SOURCES1, sourceS1 );
-	m_ListCtrl.SetItemText( nItem, L_UNITEDS1, unitedS1 );
-	m_ListCtrl.SetItemText( nItem, L_LINES1, lineS1 );
-	m_ListCtrl.SetItemText( nItem, L_SPOUSE1, spouse1 );
-	m_ListCtrl.SetItemText( nItem, L_BIRTHS1, birthS1 );
-	m_ListCtrl.SetItemText( nItem, L_DEATHS1, deathS1 );
-	m_ListCtrl.SetItemText( nItem, L_MOTHERS1, motherS1 );
+	m_ListCtrl.SetItemText( n, L_ROWIDS1, rowidS1_2 );
+	m_ListCtrl.SetItemText( n, L_GENERATIONS1, generationS1_2 );
+	m_ListCtrl.SetItemText( n, L_SOURCES1, sourceS1_2 );
+	m_ListCtrl.SetItemText( n, L_UNITEDS1, unitedS1_2 );
+	m_ListCtrl.SetItemText( n, L_LINES1, lineS1_2 );
+	m_ListCtrl.SetItemText( n, L_SPOUSE1, spouse1_2 );
+	m_ListCtrl.SetItemText( n, L_BIRTHS1, birthS1_2 );
+	m_ListCtrl.SetItemText( n, L_DEATHS1, deathS1_2 );
+	m_ListCtrl.SetItemText( n, L_MOTHERS1, motherS1_2 );
 
-	m_ListCtrl.SetItemText( nItem, L_ROWIDS2, rowidS2 );
-	m_ListCtrl.SetItemText( nItem, L_GENERATIONS2, generationS2 );
-	m_ListCtrl.SetItemText( nItem, L_SOURCES2, sourceS2 );
-	m_ListCtrl.SetItemText( nItem, L_UNITEDS2, unitedS2 );
-	m_ListCtrl.SetItemText( nItem, L_LINES2, lineS2 );
-	m_ListCtrl.SetItemText( nItem, L_SPOUSE2, spouse2 );
-	m_ListCtrl.SetItemText( nItem, L_BIRTHS2, birthS2 );
-	m_ListCtrl.SetItemText( nItem, L_DEATHS2, deathS2 );
-	m_ListCtrl.SetItemText( nItem, L_MOTHERS2, motherS2 );
+	m_ListCtrl.SetItemText( n, L_ROWIDS2, rowidS2_2 );
+	m_ListCtrl.SetItemText( n, L_GENERATIONS2, generationS2_2 );
+	m_ListCtrl.SetItemText( n, L_SOURCES2, sourceS2_2 );
+	m_ListCtrl.SetItemText( n, L_UNITEDS2, unitedS2_2 );
+	m_ListCtrl.SetItemText( n, L_LINES2, lineS2_2 );
+	m_ListCtrl.SetItemText( n, L_SPOUSE2, spouse2_2 );
+	m_ListCtrl.SetItemText( n, L_BIRTHS2, birthS2_2 );
+	m_ListCtrl.SetItemText( n, L_DEATHS2, deathS2_2 );
+	m_ListCtrl.SetItemText( n, L_MOTHERS2, motherS2_2 );
 
-	m_ListCtrl.SetItemData( nItem, col );
+	m_ListCtrl.SetItemData( n, col );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSameCouples::printBackground( int nItem )
@@ -1106,52 +987,63 @@ void CSameCouples::printBackground( int nItem )
 	CString cnt;
 	cnt.Format( L"%d",	m_cnt );
 
-	str.Format( L"%2d %2d %2d %6s %8s %1s %1s %1s %8s %-30s %-13s %-13s %-30s", group, m_numOfGroups, statusS1, rowidM, lineS1, generationS1, sourceS1, unitedS1, rowidS1, spouse1, birthS1, deathS1, motherS1 );
-	if( statusS1 == 1 )
-		fwprintf( fh2, L"<span style=\"background:aquamarine\">%s</span> ", str );
-	else if( statusS1 == -1 )
-		fwprintf( fh2, L"<span style=\"background:LightGray\">%s</span> ", str );
+	str.Format( L"\
+%2d %2d %2d %6s \
+%8s %1s %1s %2s \
+%8s %-30s %-13s %-13s %-30s",\
+group_2, m_numOfGroups, statusS1_2, rowidM_2,\
+lineS1_2, generationS1_2, sourceS1_2, unitedS1_2,\
+rowidS1_2, spouse1_2, birthS1_2, deathS1_2, motherS1_2 );
+	if( statusS1_2 == 1 )
+		fwprintf( fD, L"<span style=\"background:aquamarine\">%s</span> ", str );
+	else if( statusS1_2 == -1 )
+		fwprintf( fD, L"<span style=\"background:LightGray\">%s</span> ", str );
 	else
-		fwprintf( fh2, L"%s ", str );
+		fwprintf( fD, L"%s ", str );
 
-	str.Format( L"%2d %8s %1s %1s %1s %8s %-30s %-13s %-13s %-30s", statusS2, lineS2, generationS2, sourceS2, unitedS2, rowidS2, spouse2, birthS2, deathS2, motherS2 );
-	if( statusS2 == 1 )
-		fwprintf( fh2, L"<span style=\"background:aquamarine\">%s</span> ", str );
-	else if( statusS2 == -1 )
-		fwprintf( fh2, L"<span style=\"background:LightGray\">%s</span> ", str );
+	str.Format( L"\
+%2d \
+%8s %1s %1s %2s \
+%8s %-30s %-13s %-13s %-30s",\
+statusS2_2,\
+lineS2_2, generationS2_2, sourceS2_2, unitedS2_2,\
+rowidS2_2, spouse2_2, birthS2_2, deathS2_2, motherS2_2 );
+	if( statusS2_2 == 1 )
+		fwprintf( fD, L"<span style=\"background:aquamarine\">%s</span> ", str );
+	else if( statusS2_2 == -1 )
+		fwprintf( fD, L"<span style=\"background:LightGray\">%s</span> ", str );
 	else
-		fwprintf( fh2, L"%s ", str );
+		fwprintf( fD, L"%s ", str );
 
-	fwprintf( fh2, L"\n");
+	fwprintf( fD, L"\n");
 
 	nItem = m_ListCtrl.InsertItem( nItem, cnt );
 		
-	m_ListCtrl.SetItemText( nItem, L_ROWID, rowidM );
+	m_ListCtrl.SetItemText( nItem, L_ROWID, rowidM_2 );
 
-	m_ListCtrl.SetItemText( nItem, L_ROWIDS1, rowidS1 );
-	m_ListCtrl.SetItemText( nItem, L_GENERATIONS1, generationS1 );
-	m_ListCtrl.SetItemText( nItem, L_SOURCES1, sourceS1 );
-	m_ListCtrl.SetItemText( nItem, L_UNITEDS1, unitedS1 );
-	m_ListCtrl.SetItemText( nItem, L_LINES1, lineS1 );
-	m_ListCtrl.SetItemText( nItem, L_SPOUSE1, spouse1 );
-	m_ListCtrl.SetItemText( nItem, L_BIRTHS1, birthS1 );
-	m_ListCtrl.SetItemText( nItem, L_DEATHS1, deathS1 );
-	m_ListCtrl.SetItemText( nItem, L_MOTHERS1, motherS1 );
+	m_ListCtrl.SetItemText( nItem, L_ROWIDS1, rowidS1_2 );
+	m_ListCtrl.SetItemText( nItem, L_GENERATIONS1, generationS1_2 );
+	m_ListCtrl.SetItemText( nItem, L_SOURCES1, sourceS1_2 );
+	m_ListCtrl.SetItemText( nItem, L_UNITEDS1, unitedS1_2 );
+	m_ListCtrl.SetItemText( nItem, L_LINES1, lineS1_2 );
+	m_ListCtrl.SetItemText( nItem, L_SPOUSE1, spouse1_2 );
+	m_ListCtrl.SetItemText( nItem, L_BIRTHS1, birthS1_2 );
+	m_ListCtrl.SetItemText( nItem, L_DEATHS1, deathS1_2 );
+	m_ListCtrl.SetItemText( nItem, L_MOTHERS1, motherS1_2 );
 	
-	m_ListCtrl.SetItemText( nItem, L_ROWIDS2, rowidS2 );
-	m_ListCtrl.SetItemText( nItem, L_GENERATIONS2, generationS2 );
-	m_ListCtrl.SetItemText( nItem, L_SOURCES2, sourceS2 );
-	m_ListCtrl.SetItemText( nItem, L_UNITEDS2, unitedS2 );
-	m_ListCtrl.SetItemText( nItem, L_LINES2, lineS2 );
-	m_ListCtrl.SetItemText( nItem, L_SPOUSE2, spouse2 );
-	m_ListCtrl.SetItemText( nItem, L_BIRTHS2, birthS2 );
-	m_ListCtrl.SetItemText( nItem, L_DEATHS2, deathS2 );
-	m_ListCtrl.SetItemText( nItem, L_MOTHERS2, motherS2 );
+	m_ListCtrl.SetItemText( nItem, L_ROWIDS2, rowidS2_2 );
+	m_ListCtrl.SetItemText( nItem, L_GENERATIONS2, generationS2_2 );
+	m_ListCtrl.SetItemText( nItem, L_SOURCES2, sourceS2_2 );
+	m_ListCtrl.SetItemText( nItem, L_UNITEDS2, unitedS2_2 );
+	m_ListCtrl.SetItemText( nItem, L_LINES2, lineS2_2 );
+	m_ListCtrl.SetItemText( nItem, L_SPOUSE2, spouse2_2 );
+	m_ListCtrl.SetItemText( nItem, L_BIRTHS2, birthS2_2 );
+	m_ListCtrl.SetItemText( nItem, L_DEATHS2, deathS2_2 );
+	m_ListCtrl.SetItemText( nItem, L_MOTHERS2, motherS2_2 );
 
 	m_ListCtrl.SetItemData( nItem, 0 );
 
 	++nItem;
-
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSameCouples::listContracted()
@@ -1162,6 +1054,7 @@ void CSameCouples::listContracted()
 
 	CString rowidM;
 
+	UINT	group;
 	int		status1;
 	CString rowidS1;
 	CString generationS1;
@@ -1184,10 +1077,8 @@ void CSameCouples::listContracted()
 	CString deathS2;
 	CString motherS2;
 
-	std::sort( vSame.begin(), vSame.end(), sortByCnt ); 
 	UINT numOfGroups = getNumOfGroups();
 
-	std::sort( vSame.begin(), vSame.end(), sortBySource1 );
 	for( UINT i = 0; i < vSame.size();++i )
 	{
 		col = 0;
@@ -1219,99 +1110,98 @@ void CSameCouples::listContracted()
 		deathS2			= vSame.at(i).deathS2;
 		motherS2		= vSame.at(i).motherS2;
 
-		str.Format( L"%2d %2d %2d %6s %8s %1s %1s %1s %8s %-30s %-13s %-13s %-30s", group, numOfGroups, status1, rowidM, lineS1, generationS1, sourceS1, unitedS1, rowidS1, spouse1, birthS1, deathS1, motherS1 );
+		str.Format( L"\
+%2d %2d %2d %6s \
+%8s %1s %1s %2s \
+%8s %-30s %-13s %-13s %-30s",\
+group, numOfGroups, status1, rowidM, \
+lineS1, generationS1, sourceS1, unitedS1,\
+rowidS1, spouse1, birthS1, deathS1, motherS1 );
 		if( status1 == 1 )
-			fwprintf( fh1, L"<span style=\"background:aquamarine\">%s</span> ", str );
+			fwprintf( fU, L"<span style=\"background:aquamarine\">%s</span> ", str );
 		else if( status1 == -1 )
-			fwprintf( fh1, L"<span style=\"background:LightGray\">%s</span> ", str );
+			fwprintf( fU, L"<span style=\"background:LightGray\">%s</span> ", str );
 		else
-			fwprintf( fh1, L"%s ", str );
+			fwprintf( fU, L"%s ", str );
 
-		str.Format( L"%2d %8s %1s %1s %1s %8s %-30s %-13s %-13s %-30s", status2, lineS2, generationS2, sourceS2, unitedS2, rowidS2, spouse2, birthS2, deathS2, motherS2 );
+		str.Format( L"\
+%2d %8s %1s %1s %2s \
+%8s %-30s %-13s %-13s %-30s",\
+status2, lineS2, generationS2, sourceS2, unitedS2, \
+rowidS2, spouse2, birthS2, deathS2, motherS2 );
 		if( status2 == 1 )
-			fwprintf( fh1, L"<span style=\"background:aquamarine\">%s</span> ", str );
+			fwprintf( fU, L"<span style=\"background:aquamarine\">%s</span> ", str );
 		else if( status2 == -1 )
-			fwprintf( fh1, L"<span style=\"background:LightGray\">%s</span> ", str );
+			fwprintf( fU, L"<span style=\"background:LightGray\">%s</span> ", str );
 		else
-			fwprintf( fh1, L"%s ", str );
+			fwprintf( fU, L"%s ", str );
 
-		fwprintf( fh1, L"\n");
-
-		nItem = m_ListCtrl.InsertItem( nItem, cnt );
-		
-		m_ListCtrl.SetItemText( nItem, L_ROWID, rowidM );
-
-		m_ListCtrl.SetItemText( nItem, L_ROWIDS1, rowidS1 );
-		m_ListCtrl.SetItemText( nItem, L_GENERATIONS1, generationS1 );
-		m_ListCtrl.SetItemText( nItem, L_SOURCES1, sourceS1 );
-		m_ListCtrl.SetItemText( nItem, L_UNITEDS1, unitedS1 );
-		m_ListCtrl.SetItemText( nItem, L_LINES1, lineS1 );
-		m_ListCtrl.SetItemText( nItem, L_SPOUSE1, spouse1 );
-		m_ListCtrl.SetItemText( nItem, L_BIRTHS1, birthS1 );
-		m_ListCtrl.SetItemText( nItem, L_DEATHS1, deathS1 );
-		m_ListCtrl.SetItemText( nItem, L_MOTHERS1, motherS1 );
-	
-		m_ListCtrl.SetItemText( nItem, L_ROWIDS2, rowidS2 );
-		m_ListCtrl.SetItemText( nItem, L_GENERATIONS2, generationS2 );
-		m_ListCtrl.SetItemText( nItem, L_SOURCES2, sourceS2 );
-		m_ListCtrl.SetItemText( nItem, L_UNITEDS2, unitedS2 );
-		m_ListCtrl.SetItemText( nItem, L_LINES2, lineS2 );
-		m_ListCtrl.SetItemText( nItem, L_SPOUSE2, spouse2 );
-		m_ListCtrl.SetItemText( nItem, L_BIRTHS2, birthS2 );
-		m_ListCtrl.SetItemText( nItem, L_DEATHS2, deathS2 );
-		m_ListCtrl.SetItemText( nItem, L_MOTHERS2, motherS2 );
-
-		m_ListCtrl.SetItemData( nItem, col );
-
-		++nItem;
+		fwprintf( fU, L"\n");
 	}
-	fwprintf( fh1, L"\n" );
-	nItem = m_ListCtrl.InsertItem( nItem, L"" );
-	++nItem;
+	fwprintf( fU, L"\n" );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSameCouples::htmlHeader1()
+void CSameCouples::openUnited()
 {
+	CString fileName = L"couplesUnited";
+	unitedSpec = theApp.openHtmlFile( &fU, fileName, L"w+" );
+
 	CString title1( L"AZONOS NEVÛ HÁZASPÁROK, AKIK AZONOSAK, EZÉRT ÖSSZEVONHATÓAK" ); 
 	
-	fwprintf( fh1, L"<HEAD>\n" );
-	fwprintf( fh1, L"<style>\n" );
-	fwprintf( fh1, L"</style>\n" );
-	fwprintf( fh1, L"</HEAD>\n" );
-	fwprintf( fh1, L"<BODY>\n" );
-	fwprintf( fh1, L"<center>%s</center><br><br>\n\n", title1 );
-	fwprintf( fh1, m_explanation );
-	fwprintf( fh1, L"<pre>" );
-	fwprintf( fh1, L"\n%-20s %s<br>", L"Adatbázis:", theApp.m_databaseSpec );
-	fwprintf( fh1, L"%-20s %s<br><br><br>\n", L"lista készült:", theApp.getPresentDateTime() );
+	fwprintf( fU, L"<HEAD>\n" );
+	fwprintf( fU, L"<style>\n" );
+	fwprintf( fU, L"</style>\n" );
+	fwprintf( fU, L"</HEAD>\n" );
+	fwprintf( fU, L"<BODY>\n" );
+	fwprintf( fU, L"<center>%s</center><br><br>\n\n", title1 );
+	fwprintf( fU, m_explanation );
+	fwprintf( fU, L"<pre>" );
+	fwprintf( fU, L"\n%-20s %s<br>", L"Adatbázis:", theApp.m_databaseSpec );
+	fwprintf( fU, L"%-20s %s<br><br><br>\n", L"lista készült:", theApp.getPresentDateTime() );
 
-	
-//	str.Format( L"%2d %2d %2d %6s %8s %1s %1s %1s %8s %-30s %-13s %-13s %-30s", group, m_numOfGroups, statusS1, rowidM, lineS1, generationS1, sourceS1, unitedS1, rowidS1, spouse1, birthS1, deathS1, motherS1 );
-	str.Format( L"\n<b>%2s %2s %2s %6s %8s %1s %1s %1s %8s %-30s %-13s %-13s %-30s %2s %8s %1s %1s %1s %8s %-30s %-13s %-13s %-30s</b>\n", L"gr", L"#", L"st", L"marri", L"line", L"G", L"S", L"U", L"rowid", L"husband", L"birth", L"death", L"mother", L"st", L"line", L"G", L"S", L"U", L"rowid", L"wife", L"birth", L"death", L"mother" );
+str.Format( L"\n<b>\
+%2s %2s %2s %6s \
+%8s %1s %1s %2s %8s %-30s %-13s %-13s %-30s \
+%2s \
+%8s %1s %1s %2s %8s %-30s %-13s %-13s %-30s</b>\n", \
+L"gr", L"#", L"st", L"marri", \
+L"line", L"G", L"S", L"U", L"rowid", L"husband", L"birth", L"death", L"mother", \
+L"st", \
+L"line", L"G", L"S", L"U", L"rowid", L"wife", L"birth", L"death", L"mother" );
 
-	fwprintf( fh1, str );
+	fwprintf( fU, str );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSameCouples::htmlHeader2()
+void CSameCouples::openDifferent()
 {
+	CString fileName = L"couplesDifferent";
+	differentSpec = theApp.openHtmlFile( &fD, fileName, L"w+" );
+
 	CString title2( L"AZONOS NEVÛ HÁZASPÁROK, AKIK KÜLÖNBÖZNEK EGYMÁSTÓL" ); 
 
-	fwprintf( fh2, L"<HEAD>\n" );
-	fwprintf( fh2, L"<style>\n" );
-	fwprintf( fh2, L"</style>\n" );
-	fwprintf( fh2, L"</HEAD>\n" );
-	fwprintf( fh2, L"<BODY>\n" );
-	fwprintf( fh2, L"<center>%s</center><br><br>\n\n", title2 );
-	fwprintf( fh2, m_explanation );
-	fwprintf( fh2, L"<pre>" );
-	fwprintf( fh2, L"\n%-20s %s<br>", L"Adatbázis:", theApp.m_databaseSpec );
-	fwprintf( fh2, L"%-20s %s<br><br><br>\n", L"lista készült:", theApp.getPresentDateTime() );
+	fwprintf( fD, L"<HEAD>\n" );
+	fwprintf( fD, L"<style>\n" );
+	fwprintf( fD, L"</style>\n" );
+	fwprintf( fD, L"</HEAD>\n" );
+	fwprintf( fD, L"<BODY>\n" );
+	fwprintf( fD, L"<center>%s</center><br><br>\n\n", title2 );
+	fwprintf( fD, m_explanation );
+	fwprintf( fD, L"<pre>" );
+	fwprintf( fD, L"\n%-20s %s<br>", L"Adatbázis:", theApp.m_databaseSpec );
+	fwprintf( fD, L"%-20s %s<br><br><br>\n", L"lista készült:", theApp.getPresentDateTime() );
 
-	
-//	str.Format( L"%2d %2d %2d %6s %8s %1s %1s %1s %8s %-30s %-13s %-13s %-30s", group, m_numOfGroups, statusS1, rowidM, lineS1, generationS1, sourceS1, unitedS1, rowidS1, spouse1, birthS1, deathS1, motherS1 );
-	str.Format( L"\n<b>%2s %2s %2s %6s %8s %1s %1s %1s %8s %-30s %-13s %-13s %-30s %2s %8s %1s %1s %1s %8s %-30s %-13s %-13s %-30s</b>\n", L"gr", L"#", L"st", L"marri", L"line", L"G", L"S", L"U", L"rowid", L"husband", L"birth", L"death", L"mother", L"st", L"line", L"G", L"S", L"U", L"rowid", L"wife", L"birth", L"death", L"mother" );
 
-	fwprintf( fh2, str );
+	str.Format( L"\n<b>\
+%2s %2s %2s %6s \
+%8s %1s %1s %2s %8s %-30s %-13s %-13s %-30s \
+%2s \
+%8s %1s %1s %2s %8s %-30s %-13s %-13s %-30s</b>\n", \
+L"gr", L"#", L"st", L"marri", \
+L"line", L"G", L"S", L"U", L"rowid", L"husband", L"birth", L"death", L"mother", \
+L"st", \
+L"line", L"G", L"S", L"U", L"rowid", L"wife", L"birth", L"death", L"mother" );
+
+	fwprintf( fD, str );
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1368,14 +1258,6 @@ BOOL CSameCouples::query4( CString command )
 		return FALSE;
 	}
 	return TRUE;
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void CSameCouples::OnHtml()
-{
-	theApp.showHtmlFile( fileSpec1 );
-	theApp.showHtmlFile( fileSpec2 );
-//	OnCancel();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 LRESULT CSameCouples:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
@@ -1452,18 +1334,3 @@ void CSameCouples::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
 	}
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSameCouples::OnInfo()
-{
-	CString info = L"\
-Az azonos nevû házaspárok csoportokban vannak listázva.\n\n\
-Az emeber azonosítására születési és halálozási dátumukat valamint anyjuk nevét használjuk. \
-Ha az azonosításra használt adatokban eltérés van, azt sárga színnel jelöljük. \
-Ha egy csoportban több leszármazott van, akor azt a csoportot nem vonjuk össze. \
-Azokat a csoportok, amelyekben nincs sárga szín, összevonásra kerülnek. \
-A legmagassabb hierarhiájú emberek maradnak meg, és õk alkotnak házaspárt.\n\n\
-A mennyiben a sárgával jelzett eltérések valóban hibás adatok, javítsuk azokat a htm fájlban,\
-majd mindent kezdjünk elõlrõl a htm fájl beolvasásásaval.\
-";
-	AfxMessageBox( info, MB_ICONINFORMATION );
-	
-}

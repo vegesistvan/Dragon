@@ -229,3 +229,22 @@ typedef struct
 	CString motherS2;
 }COUPLES;
 
+typedef struct
+{
+	UINT	cnt;
+	UINT	group;				// 0 - nem tartozik csoportba, egyedi adatai vannak
+								// 1-n az 1-n csoportba tartozik
+	int		status;				// 1 = megtartandó, -1 törlendõ 
+	CString rowid;
+	CString line;
+	CString generation;
+	CString source;
+	CString united;
+	CString	sex_id;
+	CString name;
+	CString birth;
+	CString death;
+	CString mother;
+	int		married;
+}SAMENAMES;
+

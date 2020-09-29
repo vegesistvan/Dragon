@@ -902,7 +902,7 @@ vSameSpouses.at(0).deathDateM\
 		m_ListCtrl.SetItemText( nItem, L_LINENUMBERF, vSameSpouses.at(j).lineNumberF );
 
 		
-		
+	/*	
 		if( !col || empty == 8 )  // nincs különbség / mind üres
 		{
 			sex_id = vSameSpouses.at(j).sex_id;
@@ -914,7 +914,7 @@ vSameSpouses.at(0).deathDateM\
 			++m_deleted;
 
 		}
-
+*/
 		m_ListCtrl.SetItemData( nItem, col );
 		++nItem;
 	}

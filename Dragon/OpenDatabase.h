@@ -45,6 +45,7 @@ public:
 	int				m_numberOfTables;
 	int				m_numberOfIndexes;
 
+	CString			m_user_version;
 
 	bool openDatabase();
 
