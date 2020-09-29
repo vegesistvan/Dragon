@@ -54,6 +54,8 @@ protected:
 
 	UINT	m_numOfGroups;
 	int		m_contracted;
+	CString m_description;
+
 //////////////////////////////////////////////////////////	
 	CString rowidM_1;
 

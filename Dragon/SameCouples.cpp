@@ -151,6 +151,23 @@ father_id,\
 mother_id\
 ";
 
+	m_description = L"\
+Az oszlopok jelentése:\n\n\
+gr     - group, az azonos nevû embercsoprton belül azonosnak éréklelt alcsoportok sorszáma.\n\
+#      - a csoportban található alcsoportok száma.\n\
+st     - status, az azonosítás eredménye: -1 azonos, azaz egyesített, majd törölt, 0: változatlanul hagyott, 1: ez az egyesített bejegyzés.\n\
+marri  - a házasság azonosítója,\n\
+line   - a bejegyzés sorszáma a GA html fájlban.\n\
+G      - generáció, az ember generációs jele a GA fájlban.\n\
+S      - source, a név elõfordulásának hierarchia száma.\n\
+U      - united, az ember u számú realizáció összevonása.\n\
+rowid  - a realizáció azonosítója.\n\
+husband- a férj neve.\n\
+birth  - születési dátum.\n\
+death  - halálozás dátuma.\n\
+mother - a férj anyjának neve.\n\
+wife   - a feleség neve.\n\n";
+
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CSameCouples::~CSameCouples()
@@ -1157,7 +1174,14 @@ void CSameCouples::openUnited()
 	fwprintf( fU, m_explanation );
 	fwprintf( fU, L"<pre>" );
 	fwprintf( fU, L"\n%-20s %s<br>", L"Adatbázis:", theApp.m_databaseSpec );
-	fwprintf( fU, L"%-20s %s<br><br><br>\n", L"lista készült:", theApp.getPresentDateTime() );
+	fwprintf( fU, L"%-20s %s<br><br>", L"lista készült:", theApp.getPresentDateTime() );
+
+	fwprintf( fU, m_description );
+
+	str = L"A szürke hátterû bejegyzéseket egyesítettük a zöld hátterû bejegyzéssel.\n\
+Ha egy azonos nevû csoportban több különbözõ egyesítés lehetséges, akkor azok a 'g'-group oszlopba található számmal vannak meglülönböztetve.\n\n";
+	fwprintf( fU, str );
+
 
 str.Format( L"\n<b>\
 %2s %2s %2s %6s \
@@ -1188,8 +1212,12 @@ void CSameCouples::openDifferent()
 	fwprintf( fD, m_explanation );
 	fwprintf( fD, L"<pre>" );
 	fwprintf( fD, L"\n%-20s %s<br>", L"Adatbázis:", theApp.m_databaseSpec );
-	fwprintf( fD, L"%-20s %s<br><br><br>\n", L"lista készült:", theApp.getPresentDateTime() );
+	fwprintf( fD, L"%-20s %s<br><br>", L"lista készült:", theApp.getPresentDateTime() );
 
+	fwprintf( fD, m_description );
+
+	str.Format( L"A sárga hátterû adat különbözik a csoport elsõ sorában lévõ megfelelõ adattól.\n\n" );
+	fwprintf( fD, str );
 
 	str.Format( L"\n<b>\
 %2s %2s %2s %6s \

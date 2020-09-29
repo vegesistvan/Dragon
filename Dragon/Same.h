@@ -26,7 +26,7 @@ protected:
 	CString str;
 	CString unitedSpec;
 	CString differentSpec;
-	CString m_explanation;
+	CString m_description;
 	FILE* fU;
 	FILE* fD;
 

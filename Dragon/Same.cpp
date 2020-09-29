@@ -85,6 +85,20 @@ death_date,\
 father_id,\
 mother_id\
 ";
+	m_description = L"\
+Az oszlopok jelentése:\n\n\
+gr     - group, az azonos nevû embercsoprton belül azonosnak éréklelt alcsoportok sorszáma.\n\
+st     - status, az azonosítás eredménye: -1 azonos, azaz egyesített, majd törölt, 0: változatlanul hagyott, 1: ez az egyesített bejegyzés.\n\
+line   - a bejegyzés sorszáma a GA html fájlban.\n\
+u      - united, az ember u számú realizáció összevonása.\n\
+m      - married, X: házasember, üres: nem házas.\n\
+G      - generáció, az ember generációs jele a GA fájlban.\n\
+rowid  - a realizáció azonosítója.\n\
+name   - az ember neve.\n\
+birth  - születési dátum.\n\
+death  - halálozás dátuma.\n\
+mother - az ember anyjának neve.\n\n";
+
 
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -521,10 +535,15 @@ void CSame::openUnited()
 	fwprintf( fU, L"</HEAD>\n" );
 	fwprintf( fU, L"<BODY>\n" );
 	fwprintf( fU, L"<center>%s</center><br><br>\n\n", title1 );
-	fwprintf( fU, m_explanation );
 	fwprintf( fU, L"<pre>" );
 	fwprintf( fU, L"\n%-20s %s<br>", L"Adatbázis:", theApp.m_databaseSpec );
-	fwprintf( fU, L"%-20s %s<br><br><br>\n", L"lista készült:", theApp.getPresentDateTime() );
+	fwprintf( fU, L"%-20s %s<br><br>", L"lista készült:", theApp.getPresentDateTime() );
+
+	fwprintf( fU, m_description );
+
+	str = L"A szürke hátterû bejegyzéseket egyesítettük a zöld hátterû bejegyzéssel.\n\
+Ha egy azonos nevû csoportban több különbözõ egyesítés lehetséges, akkor azok a 'g'-group oszlopba található számmal vannak meglülönböztetve.\n\n";
+	fwprintf( fU, str );
 
 
 str.Format( L"\
@@ -551,10 +570,12 @@ void CSame::openDifferent()
 	fwprintf( fD, L"</HEAD>\n" );
 	fwprintf( fD, L"<BODY>\n" );
 	fwprintf( fD, L"<center>%s</center><br><br>\n\n", title2 );
-	fwprintf( fD, m_explanation );
 	fwprintf( fD, L"<pre>" );
 	fwprintf( fD, L"\n%-20s %s<br>", L"Adatbázis:", theApp.m_databaseSpec );
-	fwprintf( fD, L"%-20s %s<br><br><br>\n", L"lista készült:", theApp.getPresentDateTime() );
+	fwprintf( fD, L"%-20s %s<br><br>", L"lista készült:", theApp.getPresentDateTime() );
+
+
+	fwprintf( fD, m_description );
 
 	str.Format( L"\
 \n<b>\

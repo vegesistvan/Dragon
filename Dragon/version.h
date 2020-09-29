@@ -1,5 +1,5 @@
 #pragma once
-#define VERSION L"1.3.0"
+#define VERSION L"1.3.1"
 // Azonos nevû emberek összevonása	
 // #define VERSION L"1.2.0"
 // Azonso nevû házastársak új azonosítása
