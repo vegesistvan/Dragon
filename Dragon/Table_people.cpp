@@ -1509,7 +1509,7 @@ void CTablePeople::OnIndividualDescendants()
 
 	CGaDescendants dlg;
 
-	dlg.m_unordered	= 0;
+	dlg.m_numbering	= 0;
 	dlg.m_code		= ANSI;
 	dlg.m_rowid1 = m_ListCtrl.GetItemText( nItem, G_ROWID );
 	dlg.m_source = 0;
@@ -1545,7 +1545,7 @@ void CTablePeople::OnPrivateDescendants()
 
 	CGaDescendants dlg;
 
-	dlg.m_unordered	= 1;
+	dlg.m_numbering	= 1;
 	dlg.m_code		= ANSI;
 	dlg.m_rowid1 = m_ListCtrl.GetItemText( nItem, G_ROWID );
 	dlg.m_source = 0;

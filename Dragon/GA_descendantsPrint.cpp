@@ -3,8 +3,7 @@
 #include "Ga_descendants.h"
 #include "GA_structures.h"
 
-#define ORDERED 0
-#define UNORDERED 1
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ix a kiirandó leszármazott indexe a vDesc vektorban
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -72,21 +71,27 @@ void CGaDescendants::printBegining( int ix )
 	}
 	m_genPrev = generation;
 
-	gen = TCHAR('A') + TCHAR(generation);				// a generációs karakter-jel ( A,B,C,D.....)
-	if( p.generation.IsEmpty() )    // gedcom vagy kézi feltöltés
+	gen = TCHAR('A') + TCHAR(generation);					// a generációs karakter-jel ( A,B,C,D.....)
+	if( m_generateGenCode )
+//	if( p.generation.IsEmpty() )							// gedcom vagy kézi feltöltés
 	{
 		gen = TCHAR('A') + TCHAR(generation);				// a generációs karakter-jel ( A,B,C,D.....)
-		if( m_unordered == ORDERED )
+		if( m_numbering == OLD )
 			str.Format( L"%s%c&diams;", tags, gen );			// gedcom és kézi bevitelnél nincs generáció, ezt úgy kell beletenni!!
-		else
+		else if( m_numbering == VIL )
 			str.Format( L"%s%c%d ", tags, gen, vDesc.at(ix).children );
+		else if( m_numbering == TUP )
+			str.Format( L"%s%c-%s ", tags, p.generation, p.tupigny );
 	}
 	else   // GAHTM feltöltés
 	{
-		if( m_unordered == ORDERED )
+		if( m_numbering == OLD )
 			str.Format( L"%s%s&diams;", tags, p.generation );
-		else
-			str.Format( L"%s%s%d ", tags, p.generation,  vDesc.at(ix).children );
+		else if( m_numbering == VIL )
+			str.Format( L"%s%s%d&diams; ", tags, p.generation,  vDesc.at(ix).children );
+		else if( m_numbering == TUP )
+			str.Format( L"%s%s-%s&diams; ", tags, p.generation, p.tupigny );
+
 	}
 	print( str );
 }
@@ -106,12 +111,12 @@ void CGaDescendants::printDescendant( int ix )
 	
 	if( vDesc.at(ix).numOfMothers > 1 )
 	{
-		if( m_unordered == UNORDERED )
+		if( m_numbering == OLD || m_numbering == TUP )
 		{
 			if( !p.mother_index2.IsEmpty() && p.mother_index2.Compare( L"0" ) )
 				fwprintf( fl, L"%s. ", p.mother_index2 );
 		}
-		else
+		else if( m_numbering == VIL )
 		{
 			if( !p.mother_index.IsEmpty() && p.mother_index.Compare( L"0" ) )
 			{
@@ -121,7 +126,7 @@ void CGaDescendants::printDescendant( int ix )
 		}
 	}
 	
-	if( m_unordered == UNORDERED )
+	if( m_numbering == OLD || m_numbering == TUP )
 	{
 		str = getPlaceDateBlock( p.birth_place, p.birth_date, '*' );
 		if( !str.IsEmpty() )
@@ -135,7 +140,7 @@ void CGaDescendants::printDescendant( int ix )
 		if( !str.IsEmpty() )
 			cLine.Format( L"%s %s", (CString)cLine, str );
 	}
-	else
+	else if( m_numbering == VIL )
 	{
 		cLine += getPlaceDateBlock( p.birth_place, p.birth_date, '*' );
 		cLine += getPlaceDateBlock( p.death_place, p.death_date, '+' );
@@ -484,6 +489,7 @@ void CGaDescendants::queryPeople( CString rowid, PPEOPLE* p )
 	p->folyt			= m_recordset.GetFieldString( PEOPLE_FOLYT );
 	p->gap				= m_recordset.GetFieldString( PEOPLE_GAP );
 	p->generation		= m_recordset.GetFieldString( PEOPLE_GENERATION );
+	p->tupigny			= m_recordset.GetFieldString( PEOPLE_TUPIGNY );
 	p->known_as			= m_recordset.GetFieldString( PEOPLE_KNOWN_AS );
 	p->last_name		= m_recordset.GetFieldString( PEOPLE_LAST_NAME );
 	p->lineNumber		= m_recordset.GetFieldString( PEOPLE_LINENUMBER );

@@ -42,7 +42,8 @@ CGaDescendants::CGaDescendants(CWnd* pParent /*=NULL*/)
 	,m_tableNumber(L"")
 	, m_CheckLastName(FALSE)
 	, m_code(FALSE)
-	, m_unordered(FALSE)
+	, m_generateGenCode(FALSE)
+	, m_numbering(0)
 {
 
 }
@@ -63,9 +64,8 @@ void CGaDescendants::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_LASTNAME, m_CheckLastName);
 	DDX_Radio(pDX, IDC_ANSI, m_code);
 	DDX_Control(pDX, IDC_COMBO_BGRD, m_ComboBgrd);
-	//  DDX_Control(pDX, IDC_ORDERED, m_ordered);
-	//  DDX_Control(pDX, IDC_ORDERED, m_unordered);
-	DDX_Radio(pDX, IDC_ORDERED, m_unordered);
+	DDX_Radio(pDX, IDC_RADIO_GENERATION, m_generateGenCode);
+	DDX_Radio(pDX, IDC_OLD, m_numbering);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CGaDescendants, CDialogEx)
@@ -74,7 +74,11 @@ BEGIN_MESSAGE_MAP(CGaDescendants, CDialogEx)
 	ON_COMMAND(IDC_RADIO_DEFAULT, &CGaDescendants::OnRadioDefault)
 	ON_WM_CTLCOLOR()
 	ON_MESSAGE( WM_CTLCOLORBTN, OnCtlColorBtn )
+	ON_BN_CLICKED(IDC_CHECK_WOMAN, &CGaDescendants::OnClickedCheckWoman)
+	ON_BN_CLICKED(IDC_CHECK_CONNECT, &CGaDescendants::OnClickedCheckConnect)
+	ON_BN_CLICKED(IDC_RADIO_GENERATION, &CGaDescendants::OnClickedRadioGeneration)
 END_MESSAGE_MAP()
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CGaDescendants::OnInitDialog()
 {
@@ -101,44 +105,9 @@ BOOL CGaDescendants::OnInitDialog()
 		m_connect	= true;
 		m_woman		= true;
 	}
+
+	m_generateGenCode = false;
 	return TRUE;
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CGaDescendants::OnClickedRadioClear()
-{
-	m_setCombo = 0;
-	m_ComboName.SetCurSel( 0 );
-	m_ComboSpec.SetCurSel( 0 );
-	m_ComboComm.SetCurSel( 0 );
-	m_ComboBgrd.SetCurSel( 0 );
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CGaDescendants::OnRadioDefault()
-{
-	m_setCombo = 1;
-	m_ComboName.SetCurSel( 1 );
-	m_ComboSpec.SetCurSel( 0 );
-	m_ComboComm.SetCurSel( 2 );
-	m_ComboBgrd.SetCurSel( 0 );
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CGaDescendants::OnBnClickedOk()
-{
-	UpdateData( FROMSCREEN );
-	m_ixName	= m_ComboName.GetCurSel();
-	m_ixSpec	= m_ComboSpec.GetCurSel();
-	m_ixComment = m_ComboComm.GetCurSel();
-	m_ixBgrd	= m_ComboBgrd.GetCurSel();
-	m_colorBgrnd = szin[m_ixBgrd].rgb;
-
-	if( m_woman ) m_connect = true;
-
-	if( m_rowid1.IsEmpty() )
-		treeTables();
-	else
-		treePeople();
-
-	CDialogEx::OnOK();
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaDescendants::treePeople()
@@ -148,8 +117,9 @@ void CGaDescendants::treePeople()
 	CString table;
 	TCHAR* kicsoda[] = { L"leszármazott", L"leszármazott házastársa", L"Leszármazott házastársának apja", L"leszármazott házastársának anyja", L"leszármazott házastársának továnbbi házastársa" };
 
-
-	if( m_unordered == 0 )  // orderd list
+	
+//	if( m_unordered == 0 )  // orderd list
+	if( m_numbering == OLD ) // orderd list
 	{
 		m_tag1 = L"<ol>";
 		m_tag2 = L"</ol>";
@@ -211,7 +181,7 @@ void CGaDescendants::treeTables()
 	CString familyName;
 	CString father_id;
 
-	if( m_unordered == 0 )
+	if( m_numbering == OLD || m_numbering == VIL )
 	{
 		m_tag1 = L"<ol list-style-type: circle>";
 		m_tag2 = L"</ol>";
@@ -531,4 +501,61 @@ LRESULT CGaDescendants::OnCtlColorBtn( WPARAM wparam, LPARAM lparam )
 
 	return TRUE;
 }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CGaDescendants::OnClickedRadioClear()  // fekete szín beállítása
+{
+	m_setCombo = 0;
+	m_ComboName.SetCurSel( 0 );
+	m_ComboSpec.SetCurSel( 0 );
+	m_ComboComm.SetCurSel( 0 );
+	m_ComboBgrd.SetCurSel( 0 );
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CGaDescendants::OnRadioDefault()		// default szín beállítása
+{
+	m_setCombo = 1;
+	m_ComboName.SetCurSel( 1 );
+	m_ComboSpec.SetCurSel( 0 );
+	m_ComboComm.SetCurSel( 2 );
+	m_ComboBgrd.SetCurSel( 0 );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CGaDescendants::OnClickedCheckWoman()
+{
+	m_woman				= true;
+	m_generateGenCode	= true;
+	m_connect			= true;
+	UpdateData(TOSCREEN);
 
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CGaDescendants::OnClickedCheckConnect()
+{
+
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CGaDescendants::OnClickedRadioGeneration()
+{
+
+
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CGaDescendants::OnBnClickedOk()
+{
+	UpdateData( FROMSCREEN );
+	m_ixName	= m_ComboName.GetCurSel();
+	m_ixSpec	= m_ComboSpec.GetCurSel();
+	m_ixComment = m_ComboComm.GetCurSel();
+	m_ixBgrd	= m_ComboBgrd.GetCurSel();
+	m_colorBgrnd = szin[m_ixBgrd].rgb;
+
+	if( m_woman ) m_connect = true;
+
+	if( m_rowid1.IsEmpty() )
+		treeTables();
+	else
+		treePeople();
+
+	CDialogEx::OnOK();
+}

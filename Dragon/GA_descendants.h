@@ -6,6 +6,13 @@
 #if !defined(AFX_DESCENDANT_H__930379D8_BDD1_4973_93FF_041F3F3811E4__INCLUDED_)
 #define AFX_DESCENDANT_H__930379D8_BDD1_4973_93FF_041F3F3811E4__INCLUDED_
 
+enum 
+{
+	OLD = 0,
+	VIL,
+	TUP,
+};
+
 
 #include "afxwin.h"
 #include "GA_structures.h"
@@ -109,7 +116,11 @@ public:
 
 	BOOL m_connect;
 	BOOL m_woman;
-		
+//	bool	m_generateGenCode;
+
+	int		m_numbering;
+//	int		m_unordered;
+
 	CComboBox m_ComboSpec;
 	int	m_ixName;
 	int	m_ixSpec;
@@ -125,12 +136,17 @@ public:
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnClickedRadioClear();
 	afx_msg void OnRadioDefault();
-//	BOOL m_unordered;
+
 	CComboBox m_ComboBgrd;
-//	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
+
 	afx_msg LRESULT OnCtlColorBtn( WPARAM wparam, LPARAM lparam );
-//	CButton m_ordered;
-//	CButton m_unordered;
-	BOOL m_unordered;
+	BOOL m_generateGenCode;
+	afx_msg void OnClickedCheckWoman();
+	afx_msg void OnClickedCheckConnect();
+	afx_msg void OnClickedRadioGeneration();
+
+	afx_msg void OnClickedOld();
+	afx_msg void OnVillers();
+	afx_msg void OnTupigny();
 };
 #endif // !defined(AFX_DESCENDANT_H__930379D8_BDD1_4973_93FF_041F3F3811E4__INCLUDED_)

@@ -71,6 +71,7 @@ protected:
 	CString birthS1_1;
 	CString deathS1_1;
 	CString motherS1_1;
+	CString fatherS1_1;
 
 	int		statusS2_1;
 	CString rowidS2_1;
@@ -83,6 +84,7 @@ protected:
 	CString birthS2_1;
 	CString deathS2_1;
 	CString motherS2_1;
+	CString fatherS2_1;
 
 	UINT	group_2;
 	CString rowidM_2;
@@ -97,6 +99,7 @@ protected:
 	CString birthS1_2;
 	CString deathS1_2;
 	CString motherS1_2;
+	CString fatherS1_2;
 
 	int		statusS2_2;
 	CString rowidS2_2;
@@ -109,6 +112,7 @@ protected:
 	CString birthS2_2;
 	CString deathS2_2;
 	CString motherS2_2;
+	CString fatherS2_2;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	CString birth1Ref;
@@ -133,6 +137,7 @@ protected:
 	std::vector<COUPLES> vCouples;
 	std::vector<COUPLES> vSame;
 	std::vector<COUPLES> vWife;
+	std::vector<CString> vDeleted;
 
 	void openUnited();
 	void openDifferent();
@@ -146,8 +151,8 @@ protected:
 
 	void referenceValues();
 	void processSame();
-	void listGroup();
-	void listContracted();
+	void listDiff();
+	void listUnited();
 
 	UINT getNumOfGroups();
 	void contract();

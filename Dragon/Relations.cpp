@@ -470,7 +470,6 @@ void CRelations::szulok( CString father_id, CString mother_id )
 
 	m_ListCtrlP.DeleteAllItems();
 	if( !father_id.IsEmpty() && father_id.Compare( L"0" ) )
-//	if( father_id && (father_id < 1000000 ) )
 	{
 		m_command.Format( L"SELECT rowid, * FROM people WHERE rowid = '%s'", father_id );
 		if( !query( m_command ) ) return;

@@ -289,6 +289,16 @@ void CSame::putPeople( UINT i )
 	vpeople.birth		= m_recordset->GetFieldString( P_BIRTH_DATE );
 	vpeople.death		= m_recordset->GetFieldString( P_DEATH_DATE );
 
+
+	CString father_id = m_recordset->GetFieldString( P_FATHER_ID );
+	m_command.Format( L"SELECT last_name, first_name FROM people WHERE rowid = '%s'", father_id );
+	if( !query1( m_command ) ) return;
+
+	name.Empty();
+	if( m_recordset1->RecordsCount() )
+		name.Format( L"%s %s", m_recordset1->GetFieldString( 0 ), m_recordset1->GetFieldString( 1 ) );
+	vpeople.father = name.TrimRight();
+
 	CString mother_id = m_recordset->GetFieldString( P_MOTHER_ID );
 	m_command.Format( L"SELECT last_name, first_name FROM people WHERE rowid = '%s'", mother_id );
 	if( !query1( m_command ) ) return;
@@ -403,12 +413,17 @@ int CSame::identical( UINT i1, UINT i2 )
 	{
 		if( d == 0 ) ++empty;
 	}
+	if( ( m = father() ) == -1 ) return false;	// ellentmondás
+	else
+	{
+		if( m == 0 ) ++empty;
+	}
 	if( ( m = mother() ) == -1 ) return false;	// ellentmondás
 	else
 	{
 		if( m == 0 ) ++empty;
 	}
-	if( empty > 1 ) return false;				// legalább egy egyezés ellentmondás nélkül 
+	if( empty > 2 ) return false;				// legalább egy egyezés ellentmondás nélkül 
 	return true;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -427,6 +442,12 @@ int CSame::death( )
 	if(  !_death.IsEmpty() && !_death2.IsEmpty() && _death != _death2 ) return -1;
 	return 0;
 }
+int CSame::father( )
+{
+	if( !_father.IsEmpty() && _father == _father2 ) return 1;
+	if(  !_father.IsEmpty() && !_father2.IsEmpty() && _father != _father2 ) return -1;
+	return 0;
+}
 int CSame::mother( )
 {
 	if( !_mother.IsEmpty() && _mother == _mother2 ) return 1;
@@ -443,6 +464,12 @@ void CSame::contract( UINT iBy, UINT iDel )
 	int source		= _wtoi( vPeople.at(iBy).source );
 
 	theApp.replaceBy( rowid, rowidBy, sex_id, source );
+
+	if( sex_id == L"1" )
+		m_command.Format( L"DELETE FROM marriages WHERE spouse1_id ='%s'", rowid );
+	else
+		m_command.Format( L"DELETE FROM marriages WHERE spouse2_id ='%s'", rowid );
+	if( !theApp.execute( m_command ) ) return;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSame::listPeople()
@@ -455,9 +482,10 @@ void CSame::listPeople()
 		getData(i);
 		if( _married ) married = L"X";
 
-str.Format( L"%2d %2d %9s %2s %1s %1s %8s %-30s %12s %12s %-30s",\
+str.Format( L"%2d %2d %9s %2s %1s %1s \
+%8s %-30s %12s %12s %-30s %-30s",\
 _group, _status, _line, _united, married, _gen,\
-_rowid, _name, _birth, _death, _mother, married ); 
+_rowid, _name, _birth, _death, _father, _mother ); 
 
 		if( m_contracted )
 		{
@@ -491,6 +519,7 @@ void CSame::getData( UINT i )
 	_name		= vPeople.at(i).name;
 	_birth		= vPeople.at(i).birth;
 	_death		= vPeople.at(i).death;
+	_father		= vPeople.at(i).father;
 	_mother		= vPeople.at(i).mother;
 	_married	= vPeople.at(i).married;
 
@@ -507,6 +536,7 @@ void CSame::getData2( UINT i )
 	_name2		= vPeople.at(i).name;
 	_birth2		= vPeople.at(i).birth;
 	_death2		= vPeople.at(i).death;
+	_father2	= vPeople.at(i).father;
 	_mother2	= vPeople.at(i).mother;
 	_married2	= vPeople.at(i).married;
 
@@ -536,7 +566,7 @@ void CSame::openUnited()
 	fwprintf( fU, L"<BODY>\n" );
 	fwprintf( fU, L"<center>%s</center><br><br>\n\n", title1 );
 	fwprintf( fU, L"<pre>" );
-	fwprintf( fU, L"\n%-20s %s<br>", L"Adatbázis:", theApp.m_databaseSpec );
+	fwprintf( fU, L"\n%-20s %s (%s)<br>", L"Adatbázis:", theApp.m_databaseSpec, theApp.m_user_version  );
 	fwprintf( fU, L"%-20s %s<br><br>", L"lista készült:", theApp.getPresentDateTime() );
 
 	fwprintf( fU, m_description );
@@ -549,10 +579,10 @@ Ha egy azonos nevû csoportban több különbözõ egyesítés lehetséges, akkor azok a 
 str.Format( L"\
 \n<b>\
 %2s %2s %9s %2s %1s %1s \
-%8s %-30s %12s %12s %-30s\
+%8s %-30s %12s %12s %-30s %-30s\
 </b>\n", \
 L"gr", L"st", L"line", L"u", L"m", L"G",\
-L"rowid", L"name", L"birth", L"death", L"mother"\
+L"rowid", L"name", L"birth", L"death", L"father", L"mother"\
 );
 	fwprintf( fU, str );
 }
@@ -571,7 +601,7 @@ void CSame::openDifferent()
 	fwprintf( fD, L"<BODY>\n" );
 	fwprintf( fD, L"<center>%s</center><br><br>\n\n", title2 );
 	fwprintf( fD, L"<pre>" );
-	fwprintf( fD, L"\n%-20s %s<br>", L"Adatbázis:", theApp.m_databaseSpec );
+	fwprintf( fD, L"\n%-20s %s (%s)<br>", L"Adatbázis:", theApp.m_databaseSpec, theApp.m_user_version  );
 	fwprintf( fD, L"%-20s %s<br><br>", L"lista készült:", theApp.getPresentDateTime() );
 
 
@@ -580,10 +610,10 @@ void CSame::openDifferent()
 	str.Format( L"\
 \n<b>\
 %2s %2s %9s %2s %1s %1s \
-%8s %-30s %12s %12s %-30s\
+%8s %-30s %12s %12s %-30s %-30s\
 </b>\n", \
 L"gr", L"st", L"line", L"u", L"m", L"G",\
-L"rowid", L"name", L"birth", L"death", L"mother"\
+L"rowid", L"name", L"birth", L"death", L"father", L"mother"\
 );
 	fwprintf( fD, str );
 }

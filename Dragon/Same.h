@@ -52,6 +52,7 @@ protected:
 	CString _name;
 	CString _birth;
 	CString _death;
+	CString _father;
 	CString _mother;
 	int		_married;
 
@@ -63,7 +64,8 @@ protected:
 	CString _rowid2;
 	CString _name2;
 	CString _birth2;
-	CString _death2;
+	CString _death2;	
+	CString _father2;
 	CString _mother2;
 	int		_married2;
 
@@ -80,9 +82,10 @@ protected:
 	UINT getNumOfGroups();
 	int  identical( UINT i1, UINT i2 );
 	void contract( UINT i1, UINT i2 );
-	int  birth();
-	int  death();
-	int	 mother();
+	int	birth();
+	int	death();
+	int	father();
+	int	mother();
 
 	void openUnited();
 	void openDifferent();

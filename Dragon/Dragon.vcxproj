@@ -185,9 +185,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="about.h" />
+    <ClInclude Include="checkIntegrity.h" />
     <ClInclude Include="EditComment.h" />
     <ClInclude Include="EditMarriage.h" />
     <ClInclude Include="EditPeople.h" />
+    <ClInclude Include="FatherMother.h" />
     <ClInclude Include="GedcomOut.h" />
     <ClInclude Include="GA_ascendantsChain.h" />
     <ClInclude Include="build_defs.h" />
@@ -304,9 +306,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="about.cpp" />
+    <ClCompile Include="checkIntegrity.cpp" />
     <ClCompile Include="EditComment.cpp" />
     <ClCompile Include="EditMarriage.cpp" />
     <ClCompile Include="EditPeople.cpp" />
+    <ClCompile Include="FatherMother.cpp" />
     <ClCompile Include="Gedcom.cpp" />
     <ClCompile Include="GedcomOut.cpp" />
     <ClCompile Include="app_export.cpp" />

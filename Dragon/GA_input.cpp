@@ -65,6 +65,7 @@ spouse,\
 spouseparent,\
 spousespouse,\
 generation,\
+tupigny,\
 sex_id,\
 title,\
 titolo,\
@@ -266,7 +267,7 @@ Az alábbi sorokban ismeretlen keresztnevû embereket talált.<br>\
 	}
 
 
-	if( !theApp.execute( L"BEGIN" ) ) return;			// Ha nme itt lenne, hanem az insertPeoples-ben, akkor nagyon lassú lenne!!!
+	if( !theApp.execute( L"BEGIN" ) ) return;			// Ha nme itt lenne, hanem az insertEntries-ben, akkor nagyon lassú lenne!!!
 	while(file.ReadString(cLine)) 
 	{
 		cLine.Trim();
@@ -289,6 +290,7 @@ Az alábbi sorokban ismeretlen keresztnevû embereket talált.<br>\
 			}
 			processTableHeader( cLine );			// ez beállítja az m_tableNuber-t és az m_familyNumbert-t
 			v_generations.clear();					// új táblánál újrakezdi a generációkat
+			v_tupigny.clear();
 			v_orderFather.clear();					// új tábla
 			theApp.v_mother_index.clear();
 			m_known_as.Empty();						// új táblánál megszûnik a known_as
@@ -318,12 +320,13 @@ Az alábbi sorokban ismeretlen keresztnevû embereket talált.<br>\
 			fillOrderFather();  // apja hanyadik gyermeke ?
 			fillFatherMother();							// az apa-anya azonosítót beteszi a d struktúrába és 
 
-			insertPeoples();
+			insertEntries();
 			m_tableAncestry = FALSE;
 
 			// v_generation vektorban nyilvántartja a most eltett leszármazott adatait
 			for( UINT i = 0; i < 10; ++i )	gen.spouse_id[i] = L"0";	// egy leszármazottnak max 10 házastársának rowid-jét tartja nyilván majd
 			gen.gen					= d.generation;						// generáció
+			gen.tupigny				= d.tupigny;						// Meurgey de Tupigny szám
 			gen.descendant_sex_id	= d.sex_id;							// leszármazott neme
 			gen.descendant_id		= d.rowid;							// leszármazott rowid-je
 			gen.numOfSpouses		= v_marriages.size();				// házastársak száma

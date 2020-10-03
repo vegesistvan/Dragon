@@ -80,6 +80,7 @@ public:
 
 	std::vector<GENERATIONS> v_generations;
 	std::vector<ORDERFATHER> v_orderFather;
+	std::vector<TUPIGNY> v_tupigny;
 
 	PEOPLE d;		// a leszármazott adatai
 	PEOPLE s;		// a leszármazott házastársának adatai						vector lesz belõle (v_spouse)
@@ -123,10 +124,13 @@ public:
 	int		rollFile( CStdioFile* file );
 	
 	void	insertTableHeader();
-	void	insertPeoples();
+	void	insertEntries();
 	void	connectBranches();
 	void	setDummyFather();
 	void	connectCsalad();
+
+	int		getTupigny( TCHAR gen );
+	int		putTupigny( TCHAR gen );
 
 	BOOL	query( CString command );
 	BOOL	query1( CString command );

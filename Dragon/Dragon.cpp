@@ -8,6 +8,7 @@
 #include "locale.h"
 #include "ProgressWnd.h"
 #include "OpenDatabase.h"
+#include "checkIntegrity.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -24,6 +25,7 @@ ON_COMMAND(ID_PLACES, &CDragonApp::OnPlaces)
 ON_COMMAND(ID_PRIVAT_FOLYT, &CDragonApp::OnPrivatFolyt)
 ON_COMMAND(ID_HUSBAND_WIFE, &CDragonApp::OnHusbandWife)
 ON_COMMAND(ID_EMAIL, &CDragonApp::OnEmail)
+ON_COMMAND(ID_CHECK_INEGRITY, &CDragonApp::OnCheckIntegrity)
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CDragonApp::CDragonApp()
@@ -677,4 +679,10 @@ BOOL CDragonApp::executeX( CSqliteDB* db, CString command)
 		return FALSE;
 	}
 	return TRUE;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDragonApp::OnCheckIntegrity()
+{
+	CCheckIntegrity cp;
+	cp.integrity();
 }

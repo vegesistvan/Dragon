@@ -89,7 +89,7 @@ void CGaInput::insertTableHeader()
 ////////////////////////////////////////// I N S E R T   A L L   P E O P L E /////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CGaInput::insertPeoples()
+void CGaInput::insertEntries()
 {
 
 // emberek insertáláa
@@ -99,10 +99,10 @@ void CGaInput::insertPeoples()
 
 	for( UINT i = 0; i < v_marriages.size(); ++i )
 	{
-		insertSpouseF( i );				// elõször a házastárs szüleit insertáljuk, hogy a házastársnak
-		insertSpouseM( i );				// megadhassuk az apa-anya rowid-jét;
+//		insertDescendant();			// minden házastárhoz a leszármazottatt új bejehgyzését hozza létre, hogy más rowid-ja legyen
+		insertSpouseF( i );			// elõször a házastárs szüleit insertáljuk, hogy a házastársnak
+		insertSpouseM( i );			// megadhassuk az apa-anya rowid-jét;
 		insertDescendantSpouse( i );    
-		
 	}
 	for( UINT i = 0; i < v_spouseSpouses.size(); ++i )
 	{
@@ -159,6 +159,7 @@ CString CGaInput::insertDescendantSpouse( UINT i )
 
 	rowid = insertAny( &s );
 	v_marriages.at(i).rowid = rowid;
+	v_marriages.at(i).spouse_id = d.rowid;  // ez új, minden házastárshoz a leszármazott más bejegyzése tartozik. de mégse
 
 	return ( rowid );
 }
@@ -227,6 +228,7 @@ CString CGaInput::insertSpouseM( UINT i )
 	return( rowidM );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// a házastárs további házastársai
 CString CGaInput::insertSpouseS( UINT i )
 {
 	CString  rowid(L"0");
@@ -273,7 +275,7 @@ CString CGaInput::insertAny( PEOPLE* p )
 	}
 
 	CString values;
-	values.Format( L"'%d','%d','%d', '%d', '%d', '%d', '%d', '%d', '%d', '%c','%d','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%d','%d','%s','%d','%s','%s','%d','%d', '%s', '%d' ",
+	values.Format( L"'%d','%d','%d', '%d', '%d', '%d', '%d', '%d','%d','%c','%d','%d','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%d','%d','%s','%d','%s','%s','%d','%d', '%s', '%d' ",
 	m_fileNumber,
 	m_tableHeader.familyNumber,
 	v_tableHeader.size(),
@@ -284,6 +286,7 @@ CString CGaInput::insertAny( PEOPLE* p )
 	0,
 	0,
 	p->generation,
+	p->tupigny,
 	p->sex_id,
 	p->title,
 	p->titolo,
@@ -363,8 +366,8 @@ int CGaInput::insertDescMarriage( UINT i )
 {
 	CString order1(L"1");
 	CString order2(L"1");
-	CString rowid1;
-	CString rowid2;
+	CString spouse1_id;
+	CString spouse2_id;
 	
 	int sex_id1 = d.sex_id;
 	int sex_id2 = v_marriages.at(i).sex_id;
@@ -375,19 +378,21 @@ int CGaInput::insertDescMarriage( UINT i )
 
 	if( d.sex_id == MAN )
 	{
-		rowid1 = d.rowid;
-		rowid2 = v_marriages.at(i).rowid;
+		spouse1_id = d.rowid;
+		spouse1_id = v_marriages.at(i).spouse_id;   // uj: minden házstárshoz a leszármazott más bejegyzése tartozik
+		spouse2_id = v_marriages.at(i).rowid;
 		order2.Format( L"%d", i+1 );
 		source = 1;
 	}
 	else
 	{
-		rowid1 = v_marriages.at(i).rowid;
-		rowid2 = d.rowid;
+		spouse1_id = v_marriages.at(i).rowid;
+		spouse2_id = d.rowid;
+		spouse2_id = v_marriages.at(i).spouse_id;	// uj: minden házstárshoz a leszármazott más bejegyzése tartozik
 		order1.Format( L"%d", i+1 );
 		source = 2;
 	}
-	insertMarriage( rowid1, rowid2, sex_id1, sex_id2, order1, order2, v_marriages.at(i).place, v_marriages.at(i).date, source );
+	insertMarriage( spouse1_id, spouse2_id, sex_id1, sex_id2, order1, order2, v_marriages.at(i).place, v_marriages.at(i).date, source );
 	return 1;
 
 }
@@ -410,8 +415,8 @@ int CGaInput::insertSpouseSpousesMarriage( UINT i )
 {
 	CString rowidS = v_marriages.at( v_spouseSpouses.at(i).spouseIndex ).rowid;
 	CString rowidSS = v_spouseSpouses.at(i).rowid;
-	CString rowid1;
-	CString rowid2;
+	CString spouse1_id;
+	CString spouse2_id;
 	int sex_id1 = s.sex_id;
 	int sex_id2 = v_spouseSpouses.at(i).sex_id;
 
@@ -425,19 +430,19 @@ int CGaInput::insertSpouseSpousesMarriage( UINT i )
 	if( d.sex_id == MAN )
 	{
 		order1.Format( L"%d", v_spouseSpouses.at(i).order );
-		rowid1 = rowidSS;
-		rowid2 = rowidS;
+		spouse1_id = rowidSS;
+		spouse2_id = rowidS;
 		source = 2;
 	}
 	else
 	{
 		order2.Format( L"%d", v_spouseSpouses.at(i).order );
-		rowid1 = rowidS;
-		rowid2 = rowidSS;
+		spouse1_id = rowidS;
+		spouse2_id = rowidSS;
 		source = 5;
 	}
 
-	insertMarriage( rowid1, rowid2, sex_id1, sex_id2, order1, order2, L"", L"", source );
+	insertMarriage( spouse1_id, spouse2_id, sex_id1, sex_id2, order1, order2, L"", L"", source );
 	return 1;
 }
 

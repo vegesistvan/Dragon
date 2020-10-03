@@ -119,7 +119,7 @@ void CGaDescendants::createStyle()
 {
 	
 	fwprintf( fl, L"<style>\n" );
-	if( m_unordered != 0 )
+	if( m_numbering != 0 )
 	{
 	fwprintf( fl, L"ul {\n" );
 	fwprintf( fl, L"display: block;\n" );

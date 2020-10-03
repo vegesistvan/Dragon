@@ -89,13 +89,14 @@ typedef struct
 
 typedef struct 
 {
-	TCHAR gen;
+	TCHAR	gen;
+	int		tupigny;
 	CString	descendant_id;
 	CString spouse_id[10];
-	int mother_index;
-	int descendant_sex_id;
-	int orderFather;
-	int numOfSpouses;
+	int		mother_index;
+	int		descendant_sex_id;
+	int		orderFather;
+	int		numOfSpouses;
 	CString known_as;
 } GENERATIONS;
 
@@ -110,6 +111,7 @@ typedef struct
 	CString tableRoman;	// a tábla fejléc római száma
 	CString	source;				// az ember típusa 1=leszármazott, 2=házastársa, 3=házastárs apja, 4=házastárs anyja, 5=házastárs további házastársa
 	CString	generation;			// generációs karakter leszárazott esetén
+	CString tupigny;
 	CString	sex_id;				// 1=férfi, 2= nõ
 	CString title;				
 	CString titolo;
@@ -146,6 +148,7 @@ typedef struct
 	CString tableRoman;	// a tábla fejléc római száma
 	int		source;				// az ember típusa 1=leszármazott, 2=házastársa, 3=házastárs apja, 4=házastárs anyja, 5=házastárs további házastársa
 	TCHAR	generation;			// generációs karakter leszárazott esetén
+	int		tupigny;
 	int		sex_id;				// 1=férfi, 2= nõ
 	CString title;				
 	CString titolo;
@@ -197,6 +200,8 @@ typedef struct
 	CString date;
 	CString fullname;
 	CString comment;
+
+	CString spouse_id;
 
 	int		sex_id;					// házastárs blokkja
 	CString title;

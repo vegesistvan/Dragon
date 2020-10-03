@@ -388,7 +388,7 @@ void CTableTables::OnDescendantsTable()
 		theApp.v_tableNumbers.push_back( rowid );
 	}
 	CGaDescendants dlg;
-	dlg.m_unordered = 0;
+	dlg.m_numbering = 0;
 	if( dlg.DoModal() == IDCANCEL ) return;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -412,7 +412,7 @@ void CTableTables::OnPrivatDescendantsTable()
 		theApp.v_tableNumbers.push_back( rowid );
 	}
 	CGaDescendants dlg;
-	dlg.m_unordered = 1;
+	dlg.m_numbering = 1;
 	if( dlg.DoModal() == IDCANCEL ) return;
 }
 

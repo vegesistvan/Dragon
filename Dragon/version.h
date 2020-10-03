@@ -1,5 +1,7 @@
 #pragma once
-#define VERSION L"1.3.1"
+#define VERSION L"1.3.2"
+// Meurgey de Tupigny számozási rendszer választható a keszármazotti listáknál
+
 // Azonos nevû emberek összevonása	
 // #define VERSION L"1.2.0"
 // Azonso nevû házastársak új azonosítása

@@ -68,11 +68,16 @@ typedef struct FAMS
 
 typedef struct 
 {
-	TCHAR generation;
-	int mother_index;
+	TCHAR	generation;
+	int		mother_index;
 }MOTHERINDEX;
 
 
+typedef struct
+{
+	TCHAR	generation;
+	int		tupigny;
+}TUPIGNY;
 
 typedef struct
 {
@@ -215,6 +220,8 @@ typedef struct
 	CString deathS1;
 	CString mother_idS1;
 	CString motherS1;
+	CString father_idS1;
+	CString fatherS1;
 	
 	CString rowidS2;			// feleség adatai
 	CString sex_idS2;
@@ -227,6 +234,9 @@ typedef struct
 	CString deathS2;
 	CString mother_idS2;
 	CString motherS2;
+	CString father_idS2;
+	CString fatherS2;
+
 }COUPLES;
 
 typedef struct
@@ -244,6 +254,7 @@ typedef struct
 	CString name;
 	CString birth;
 	CString death;
+	CString father;
 	CString mother;
 	int		married;
 }SAMENAMES;

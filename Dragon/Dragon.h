@@ -354,6 +354,8 @@ public:
 	afx_msg void OnUnite();
 	afx_msg void OnHusbandWife();
 	afx_msg void OnEmail();
+	afx_msg void OnCheckIntegrity();
+
 };
 extern CDragonApp theApp;
 

@@ -117,6 +117,7 @@ const COLUMN people[] =
 	{ L"spouseparent",				L"INT"  },	// hány eredetileg házastársa szülõje van ebben a rekordban egyesítve?
 	{ L"spousespouse",				L"INT"  },	// hány eredetileh házastárs házastársa van ebben a rekordban egysítve?
 	{ L"generation",				L"TEXT" },
+	{ L"Tupigny",					L"INT"	},
 	{ L"sex_id",					L"INT"	},
 	{ L"title",						L"TEXT"	},			// titulus
 	{ L"titolo",					L"TEXT" },			// elõnév
@@ -160,6 +161,7 @@ enum
 	PEOPLE_SPOUSEPARENT,
 	PEOPLE_SPOUSESPOUSE,
 	PEOPLE_GENERATION,
+	PEOPLE_TUPIGNY,
 	PEOPLE_SEX_ID,
 	PEOPLE_TITLE,
 	PEOPLE_TITOLO,
