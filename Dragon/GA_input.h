@@ -80,7 +80,7 @@ public:
 
 	std::vector<GENERATIONS> v_generations;
 	std::vector<ORDERFATHER> v_orderFather;
-	std::vector<TUPIGNY> v_tupigny;
+	
 
 	PEOPLE d;		// a leszármazott adatai
 	PEOPLE s;		// a leszármazott házastársának adatai						vector lesz belõle (v_spouse)
@@ -129,8 +129,8 @@ public:
 	void	setDummyFather();
 	void	connectCsalad();
 
-	int		getTupigny( TCHAR gen );
-	int		putTupigny( TCHAR gen );
+//	int		getTupigny( TCHAR gen );
+//	int		putTupigny( TCHAR gen );
 
 	BOOL	query( CString command );
 	BOOL	query1( CString command );

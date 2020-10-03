@@ -80,6 +80,7 @@ typedef struct
 	BOOL	numOfMothers;				// az apának több felesége van
 	int		sex_id;
 	UINT	gen;					// generáció sorszáma
+	int		tupigny;
 	UINT	numOfChildren;			// hány gyereke van
 	UINT	childrenPrinted;		// hány gyereket listáztunk már
 	BOOL	hidden;					// ha van apja az õsnek ( %%% folyt ), akkor az apát hidden-ként elteszi 
@@ -90,7 +91,6 @@ typedef struct
 typedef struct 
 {
 	TCHAR	gen;
-	int		tupigny;
 	CString	descendant_id;
 	CString spouse_id[10];
 	int		mother_index;
@@ -111,7 +111,6 @@ typedef struct
 	CString tableRoman;	// a tábla fejléc római száma
 	CString	source;				// az ember típusa 1=leszármazott, 2=házastársa, 3=házastárs apja, 4=házastárs anyja, 5=házastárs további házastársa
 	CString	generation;			// generációs karakter leszárazott esetén
-	CString tupigny;
 	CString	sex_id;				// 1=férfi, 2= nõ
 	CString title;				
 	CString titolo;
@@ -148,7 +147,6 @@ typedef struct
 	CString tableRoman;	// a tábla fejléc római száma
 	int		source;				// az ember típusa 1=leszármazott, 2=házastársa, 3=házastárs apja, 4=házastárs anyja, 5=házastárs további házastársa
 	TCHAR	generation;			// generációs karakter leszárazott esetén
-	int		tupigny;
 	int		sex_id;				// 1=férfi, 2= nõ
 	CString title;				
 	CString titolo;
@@ -382,3 +380,9 @@ typedef struct
 	CString name;
 	UINT	rgb;
 }SZIN;
+
+typedef struct
+{
+	UINT gen;
+	UINT tupigny;
+}TUPIGNY;

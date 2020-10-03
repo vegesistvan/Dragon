@@ -46,7 +46,7 @@ void CGaInput::splitDescendantSubstring( CString cLine )
 
 
 	generation = cLine.GetAt(0);				// generáció karakterének leszedése
-	int tupigny = putTupigny( generation );
+//	int tupigny = putTupigny( generation );
 
 	if( generation < m_generationPrev ) m_known_as.Empty();
 
@@ -72,7 +72,6 @@ void CGaInput::splitDescendantSubstring( CString cLine )
 		d.last_name = cLine.Trim();
 		return;
 	}
-	d.tupigny	 = tupigny;
 	d.last_name = m_familyName;
 	d.last_name = m_tableHeader.familyName;
 
@@ -272,6 +271,7 @@ void CGaInput::splitDescNameString( CString nameSubstring )
 	}
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 int CGaInput::getTupigny( TCHAR gen )
 {
 	for( UINT i = 0; i < v_tupigny.size(); ++i )
@@ -299,4 +299,4 @@ int CGaInput::putTupigny( TCHAR gen )
 
 	return v_tupigny.at( v_tupigny.size() - 1 ).tupigny;
 }
-
+*/

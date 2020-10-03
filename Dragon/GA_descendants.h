@@ -73,6 +73,7 @@ protected:
 	FILE* fl;
 
 	std::vector<DESCENDANTS> vDesc;
+	std::vector<TUPIGNY> v_tupigny;
 	DESCENDANTS desc;
 
 	BOOL query( CString command );
@@ -91,6 +92,8 @@ protected:
 	int	 getNumberOfChildren( CString rowid, int ix );
 	CString getNextChildRowid( UINT ix );
 	void descendants();
+	int	 getTupigny( UINT gen );
+	int	 putTupigny( UINT gen );
 
 	void print( CString str );
 	void printGAline( UINT ix );
@@ -116,10 +119,8 @@ public:
 
 	BOOL m_connect;
 	BOOL m_woman;
-//	bool	m_generateGenCode;
 
 	int		m_numbering;
-//	int		m_unordered;
 
 	CComboBox m_ComboSpec;
 	int	m_ixName;
@@ -140,11 +141,8 @@ public:
 	CComboBox m_ComboBgrd;
 
 	afx_msg LRESULT OnCtlColorBtn( WPARAM wparam, LPARAM lparam );
-	BOOL m_generateGenCode;
 	afx_msg void OnClickedCheckWoman();
 	afx_msg void OnClickedCheckConnect();
-	afx_msg void OnClickedRadioGeneration();
-
 	afx_msg void OnClickedOld();
 	afx_msg void OnVillers();
 	afx_msg void OnTupigny();

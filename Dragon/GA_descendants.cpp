@@ -42,7 +42,6 @@ CGaDescendants::CGaDescendants(CWnd* pParent /*=NULL*/)
 	,m_tableNumber(L"")
 	, m_CheckLastName(FALSE)
 	, m_code(FALSE)
-	, m_generateGenCode(FALSE)
 	, m_numbering(0)
 {
 
@@ -64,7 +63,6 @@ void CGaDescendants::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_LASTNAME, m_CheckLastName);
 	DDX_Radio(pDX, IDC_ANSI, m_code);
 	DDX_Control(pDX, IDC_COMBO_BGRD, m_ComboBgrd);
-	DDX_Radio(pDX, IDC_RADIO_GENERATION, m_generateGenCode);
 	DDX_Radio(pDX, IDC_OLD, m_numbering);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -76,7 +74,6 @@ BEGIN_MESSAGE_MAP(CGaDescendants, CDialogEx)
 	ON_MESSAGE( WM_CTLCOLORBTN, OnCtlColorBtn )
 	ON_BN_CLICKED(IDC_CHECK_WOMAN, &CGaDescendants::OnClickedCheckWoman)
 	ON_BN_CLICKED(IDC_CHECK_CONNECT, &CGaDescendants::OnClickedCheckConnect)
-	ON_BN_CLICKED(IDC_RADIO_GENERATION, &CGaDescendants::OnClickedRadioGeneration)
 END_MESSAGE_MAP()
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -106,7 +103,6 @@ BOOL CGaDescendants::OnInitDialog()
 		m_woman		= true;
 	}
 
-	m_generateGenCode = false;
 	return TRUE;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -150,6 +146,7 @@ void CGaDescendants::treePeople()
 
 	queryP( m_rowid1 );
 	desc.gen				= 0;
+	desc.tupigny			= 1;
 	desc.rowid				= m_rowid1;
 	desc.sex_id				= m_sex_id;
 	desc.numOfSpouses		= m_numOfSpouses;
@@ -158,6 +155,8 @@ void CGaDescendants::treePeople()
 	desc.children			= 1;
 	desc.hidden				= false;
 
+	v_tupigny.clear();
+	putTupigny( 0 );
 	vDesc.clear();
 	vDesc.push_back( desc );
 
@@ -235,6 +234,7 @@ void CGaDescendants::treeTables()
 			break;
 		}
 
+		v_tupigny.clear();
 		father_id	= m_recordset.GetFieldString( 3 );
 		if( father_id.IsEmpty() || !father_id.Compare( L"0" ) )  // ha nincs apa, akkor magát az õst teszi be a vDesc-be
 		{
@@ -255,6 +255,7 @@ void CGaDescendants::treeTables()
 			desc.numOfSpouses			= 0;
 			desc.hidden				= false;
 			vDesc.push_back( desc );
+			putTupigny( 0 );
 
 			vDesc.at(0).numOfChildren = getNumberOfChildren( m_rowid1, m_sex_id );
 		}
@@ -278,6 +279,7 @@ void CGaDescendants::treeTables()
 			desc.hidden				= true;
 			vDesc.push_back( desc );
 
+			putTupigny( 0 );
 			vDesc.at(0).numOfChildren = getNumberOfChildren( father_id, m_sex_id );
 		}
 		descendants();
@@ -322,7 +324,7 @@ void CGaDescendants::descendants()
 		{																	// akkor a következõ gyereket is beteszi  
 			// a kinyomtatott ember következõ, még ki nem nyomtatott gyerekét keresi
 			rowid = getNextChildRowid( ix );
-			if( !rowid.IsEmpty() )
+			if( !rowid.IsEmpty() )			// van még gyerek
 			{
 				queryP( rowid );		// lekérdezi a gyereket és elkészíti vDesc-ét
 				desc.gen				= vDesc.size();
@@ -337,6 +339,8 @@ void CGaDescendants::descendants()
 				vDesc.at(ix).childrenPrinted += 1;
 
 				vDesc.push_back( desc );
+				putTupigny( desc.gen );
+
 				ix += 1;
 				vDesc.at( vDesc.size() - 1 ).numOfChildren = getNumberOfChildren( rowid, m_sex_id );
 			}
@@ -371,6 +375,7 @@ void CGaDescendants::descendants()
 				vDesc.at(ix).childrenPrinted += 1;
 
 				vDesc.push_back( desc );
+				putTupigny( desc.gen );
 				ix += 1;
 				vDesc.at( vDesc.size() - 1 ).numOfChildren = getNumberOfChildren( rowid, m_sex_id );
 			}
@@ -523,10 +528,8 @@ void CGaDescendants::OnRadioDefault()		// default szín beállítása
 void CGaDescendants::OnClickedCheckWoman()
 {
 	m_woman				= true;
-	m_generateGenCode	= true;
 	m_connect			= true;
 	UpdateData(TOSCREEN);
-
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaDescendants::OnClickedCheckConnect()
@@ -534,11 +537,11 @@ void CGaDescendants::OnClickedCheckConnect()
 
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CGaDescendants::OnClickedRadioGeneration()
-{
-
-
-}
+//void CGaDescendants::OnClickedRadioGeneration()
+//{
+//
+//
+//}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaDescendants::OnBnClickedOk()

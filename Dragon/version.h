@@ -1,6 +1,9 @@
 #pragma once
-#define VERSION L"1.3.2"
-// Meurgey de Tupigny számozási rendszer választható a keszármazotti listáknál
+#define VERSION L"1.3.3"
+// Mindig A-tól kezdi a leszármazotti lista generáció kódját
+
+//#define VERSION L"1.3.32"
+// Meurgey de Tupigny számozási rendszer választható a leszármazotti listáknál
 
 // Azonos nevû emberek összevonása	
 // #define VERSION L"1.2.0"

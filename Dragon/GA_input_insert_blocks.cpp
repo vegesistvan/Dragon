@@ -275,7 +275,7 @@ CString CGaInput::insertAny( PEOPLE* p )
 	}
 
 	CString values;
-	values.Format( L"'%d','%d','%d', '%d', '%d', '%d', '%d', '%d','%d','%c','%d','%d','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%d','%d','%s','%d','%s','%s','%d','%d', '%s', '%d' ",
+	values.Format( L"'%d','%d','%d', '%d', '%d', '%d', '%d','%d','%c','%d','%d','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%d','%d','%s','%d','%s','%s','%d','%d', '%s', '%d' ",
 	m_fileNumber,
 	m_tableHeader.familyNumber,
 	v_tableHeader.size(),
@@ -286,7 +286,6 @@ CString CGaInput::insertAny( PEOPLE* p )
 	0,
 	0,
 	p->generation,
-	p->tupigny,
 	p->sex_id,
 	p->title,
 	p->titolo,

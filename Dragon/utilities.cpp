@@ -395,7 +395,6 @@ CString cleanHtmlTags( CString cLine )
 void clearPeople( PEOPLE *p)
 {
 	p->generation  = L'';
-	p->tupigny	= 0;
 	p->birth_date.Empty();
 	p->birth_place.Empty();
 	p->comment.Empty();

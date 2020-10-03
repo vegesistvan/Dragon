@@ -43,7 +43,7 @@ void CGaDescendants::printBegining( int ix )
 {
 	CString tags;
 	TCHAR	gen;
-	UINT	generation = vDesc.at(ix).gen;
+	UINT	generation	= vDesc.at(ix).gen;
 	
 	if( generation > m_genPrev || m_genPrev == 0 )
 	{
@@ -70,29 +70,21 @@ void CGaDescendants::printBegining( int ix )
 		tags = L"<li>";
 	}
 	m_genPrev = generation;
-
+	
 	gen = TCHAR('A') + TCHAR(generation);					// a generációs karakter-jel ( A,B,C,D.....)
-	if( m_generateGenCode )
-//	if( p.generation.IsEmpty() )							// gedcom vagy kézi feltöltés
-	{
-		gen = TCHAR('A') + TCHAR(generation);				// a generációs karakter-jel ( A,B,C,D.....)
-		if( m_numbering == OLD )
-			str.Format( L"%s%c&diams;", tags, gen );			// gedcom és kézi bevitelnél nincs generáció, ezt úgy kell beletenni!!
-		else if( m_numbering == VIL )
-			str.Format( L"%s%c%d ", tags, gen, vDesc.at(ix).children );
-		else if( m_numbering == TUP )
-			str.Format( L"%s%c-%s ", tags, p.generation, p.tupigny );
-	}
-	else   // GAHTM feltöltés
-	{
-		if( m_numbering == OLD )
-			str.Format( L"%s%s&diams;", tags, p.generation );
-		else if( m_numbering == VIL )
-			str.Format( L"%s%s%d&diams; ", tags, p.generation,  vDesc.at(ix).children );
-		else if( m_numbering == TUP )
-			str.Format( L"%s%s-%s&diams; ", tags, p.generation, p.tupigny );
+	int tupigny = getTupigny( generation );					// a generációhoz tartozó sorszám
 
-	}
+
+	if( m_numbering == OLD )
+		str.Format( L"%s%c&diams;", tags, gen );			// gedcom és kézi bevitelnél nincs generáció, ezt úgy kell beletenni!!
+	else if( m_numbering == VIL )
+		str.Format( L"%s%c%d ", tags, gen, vDesc.at(ix).children );
+	else if( m_numbering == TUP )
+		str.Format( L"%s%c-%d ", tags, gen, tupigny );
+
+// megnövel a generációhoz tartozó sorszámot
+	putTupigny( gen );
+
 	print( str );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -100,9 +92,6 @@ void CGaDescendants::printDescendant( int ix )
 {
 	CString rowid = vDesc.at( vDesc.size()-1).rowid;
 //	queryPeople( rowid, &p );
-
-	
-
 
 	if( m_CheckLastName )
 		cLine.Format( L"%s %s",  getLastname( &p ), getFirstname( &p ) ); //attrib[m_ixName].code1, p.first_name, attrib[m_ixName].code2 ); 
@@ -489,7 +478,6 @@ void CGaDescendants::queryPeople( CString rowid, PPEOPLE* p )
 	p->folyt			= m_recordset.GetFieldString( PEOPLE_FOLYT );
 	p->gap				= m_recordset.GetFieldString( PEOPLE_GAP );
 	p->generation		= m_recordset.GetFieldString( PEOPLE_GENERATION );
-	p->tupigny			= m_recordset.GetFieldString( PEOPLE_TUPIGNY );
 	p->known_as			= m_recordset.GetFieldString( PEOPLE_KNOWN_AS );
 	p->last_name		= m_recordset.GetFieldString( PEOPLE_LAST_NAME );
 	p->lineNumber		= m_recordset.GetFieldString( PEOPLE_LINENUMBER );
@@ -513,3 +501,32 @@ void CGaDescendants::queryPeople( CString rowid, PPEOPLE* p )
 	if( ( p->comment.Find( L"http" ) ) != -1 ) p->comment.Empty();
 
 }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int CGaDescendants::getTupigny( UINT gen )
+{
+	for( UINT i = 0; i < v_tupigny.size(); ++i )
+	{
+		if( v_tupigny.at(i).gen == gen )
+			return v_tupigny.at(i).tupigny;
+	}
+	return 0;
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int CGaDescendants::putTupigny( UINT gen )
+{
+	TUPIGNY tupigny;
+	for( UINT i = 0; i < v_tupigny.size(); ++i )
+	{
+		if( v_tupigny.at(i).gen == gen )
+		{
+			++v_tupigny.at(i).tupigny;
+			return v_tupigny.at(i).tupigny;
+		}
+	}
+	tupigny.gen			= gen;
+	tupigny.tupigny		= 1;
+	v_tupigny.push_back( tupigny );
+
+	return v_tupigny.at( v_tupigny.size() - 1 ).tupigny;
+}
+

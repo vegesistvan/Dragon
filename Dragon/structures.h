@@ -75,12 +75,6 @@ typedef struct
 
 typedef struct
 {
-	TCHAR	generation;
-	int		tupigny;
-}TUPIGNY;
-
-typedef struct
-{
 	CString m_rowid_table;
 	CString name;
 	CString birth_date;
