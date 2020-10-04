@@ -42,9 +42,11 @@ void CGaDescendants::printGAline( UINT ix )
 void CGaDescendants::printBegining( int ix )
 {
 	CString tags;
-	TCHAR	gen;
+
 	UINT	generation	= vDesc.at(ix).gen;
-	
+	TCHAR	gen			= TCHAR('A') + TCHAR(generation);	// a generációs karakter-jel ( A,B,C,D.....);
+
+	// a generációnak megfelelõ sor-kihúzás, visszatolás
 	if( generation > m_genPrev || m_genPrev == 0 )
 	{
 		tags.Format( L"%s<li>", m_tag1 );
@@ -54,14 +56,6 @@ void CGaDescendants::printBegining( int ix )
 		tags = L"<li>";
 	else if( generation < m_genPrev )						// régi generáció, kijebb hozza a generáció-különbség-szeresen
 	{
-/*
-		for( UINT i = 0; i < (m_genPrev - generation); ++i )
-		{
-			tags += m_tag2;
-			--cnt_ol;
-		}
-		tags += L"<li>";
-*/
 		for( UINT i = 0; i < (m_genPrev - generation); ++i )
 		{
 			fwprintf( fl, L"%s\n", m_tag2 );
@@ -71,41 +65,31 @@ void CGaDescendants::printBegining( int ix )
 	}
 	m_genPrev = generation;
 	
-	gen = TCHAR('A') + TCHAR(generation);					// a generációs karakter-jel ( A,B,C,D.....)
-	int tupigny = getTupigny( generation );					// a generációhoz tartozó sorszám
 
 
-	if( m_numbering == OLD )
+	if( m_numbering == SZLUHA )
 		str.Format( L"%s%c&diams;", tags, gen );			// gedcom és kézi bevitelnél nincs generáció, ezt úgy kell beletenni!!
 	else if( m_numbering == VIL )
 		str.Format( L"%s%c%d ", tags, gen, vDesc.at(ix).children );
 	else if( m_numbering == TUP )
-		str.Format( L"%s%c-%d ", tags, gen, tupigny );
-
-// megnövel a generációhoz tartozó sorszámot
-	putTupigny( gen );
-
+		str.Format( L"%s%c-%d ", tags, gen, vSerial.at( generation ) );
 	print( str );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaDescendants::printDescendant( int ix )
 {
 	CString rowid = vDesc.at( vDesc.size()-1).rowid;
-//	queryPeople( rowid, &p );
 
+// leszármazott neve
 	if( m_CheckLastName )
 		cLine.Format( L"%s %s",  getLastname( &p ), getFirstname( &p ) ); //attrib[m_ixName].code1, p.first_name, attrib[m_ixName].code2 ); 
 	else
 		cLine.Format( L"%s", getFirstname( &p ) ); //attrib[m_ixName].code1, p.first_name, attrib[m_ixName].code2 ); 
 	
+// ha apjának több felkesége volt,a felség sorszámának kiírása
 	if( vDesc.at(ix).numOfMothers > 1 )
 	{
-		if( m_numbering == OLD || m_numbering == TUP )
-		{
-			if( !p.mother_index2.IsEmpty() && p.mother_index2.Compare( L"0" ) )
-				fwprintf( fl, L"%s. ", p.mother_index2 );
-		}
-		else if( m_numbering == VIL )
+		if( m_numbering == SZLUHA || m_numbering == TUP )
 		{
 			if( !p.mother_index.IsEmpty() && p.mother_index.Compare( L"0" ) )
 			{
@@ -113,9 +97,14 @@ void CGaDescendants::printDescendant( int ix )
 				cLine += str;
 			}
 		}
+		else if( m_numbering == VIL )  // felség sorszámának kiírása a név elõtt
+		{
+			if( !p.mother_index2.IsEmpty() && p.mother_index2.Compare( L"0" ) )
+				fwprintf( fl, L"%s. ", p.mother_index2 );
+		}
 	}
 	
-	if( m_numbering == OLD || m_numbering == TUP )
+	if( m_numbering == SZLUHA || m_numbering == TUP )
 	{
 		str = getPlaceDateBlock( p.birth_place, p.birth_date, '*' );
 		if( !str.IsEmpty() )
@@ -501,6 +490,7 @@ void CGaDescendants::queryPeople( CString rowid, PPEOPLE* p )
 	if( ( p->comment.Find( L"http" ) ) != -1 ) p->comment.Empty();
 
 }
+/*
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int CGaDescendants::getTupigny( UINT gen )
 {
@@ -512,6 +502,7 @@ int CGaDescendants::getTupigny( UINT gen )
 	return 0;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// HA a gen mér létezik, akkor 1-el növeli, ha nem, akkor 1-et tesz bele;
 int CGaDescendants::putTupigny( UINT gen )
 {
 	TUPIGNY tupigny;
@@ -529,4 +520,4 @@ int CGaDescendants::putTupigny( UINT gen )
 
 	return v_tupigny.at( v_tupigny.size() - 1 ).tupigny;
 }
-
+*/

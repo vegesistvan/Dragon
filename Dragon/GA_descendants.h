@@ -8,7 +8,7 @@
 
 enum 
 {
-	OLD = 0,
+	SZLUHA = 0,
 	VIL,
 	TUP,
 };
@@ -73,7 +73,8 @@ protected:
 	FILE* fl;
 
 	std::vector<DESCENDANTS> vDesc;
-	std::vector<TUPIGNY> v_tupigny;
+	std::vector<UINT>vSerial;
+
 	DESCENDANTS desc;
 
 	BOOL query( CString command );
@@ -92,8 +93,6 @@ protected:
 	int	 getNumberOfChildren( CString rowid, int ix );
 	CString getNextChildRowid( UINT ix );
 	void descendants();
-	int	 getTupigny( UINT gen );
-	int	 putTupigny( UINT gen );
 
 	void print( CString str );
 	void printGAline( UINT ix );
@@ -143,8 +142,9 @@ public:
 	afx_msg LRESULT OnCtlColorBtn( WPARAM wparam, LPARAM lparam );
 	afx_msg void OnClickedCheckWoman();
 	afx_msg void OnClickedCheckConnect();
-	afx_msg void OnClickedOld();
-	afx_msg void OnVillers();
+
+	afx_msg void OnClickedSzluha();
 	afx_msg void OnTupigny();
+	afx_msg void OnVillers();
 };
 #endif // !defined(AFX_DESCENDANT_H__930379D8_BDD1_4973_93FF_041F3F3811E4__INCLUDED_)

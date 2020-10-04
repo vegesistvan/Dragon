@@ -1,5 +1,8 @@
 #pragma once
-#define VERSION L"1.3.3"
+#define VERSION L"1.3.4"
+// Hibák javítása
+
+//#define VERSION L"1.3.3"
 // Mindig A-tól kezdi a leszármazotti lista generáció kódját
 
 //#define VERSION L"1.3.32"

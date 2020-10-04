@@ -380,9 +380,3 @@ typedef struct
 	CString name;
 	UINT	rgb;
 }SZIN;
-
-typedef struct
-{
-	UINT gen;
-	UINT tupigny;
-}TUPIGNY;

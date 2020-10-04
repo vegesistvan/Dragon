@@ -273,43 +273,53 @@ CString CGaInput::insertAny( PEOPLE* p )
 		other_names.Replace( ')', ' ' );
 		other_names.TrimRight();
 	}
-
+/*
+	m_fieldsP = L"\
+fileNumber,\
+familyNumber,\
+tableNumber,\
+lineNumber,\
+source,\
+united,\
+spouse,\
+spouseparent,\
+spousespouse,\
+generation,\
+sex_id,\
+title,\
+titolo,\
+first_name,\
+last_name,\
+other_names,\
+birth_place,\
+birth_date,\
+death_place,\
+death_date,\
+comment,\
+father_id,\
+mother_id,\
+mother_index,\
+mother_index2,\
+folyt,\
+tableAncestry,\
+tableRoman,\
+arm,\
+orderFather,\
+orderMother,\
+csalad,\
+gap\
+";
+*/
 	CString values;
-	values.Format( L"'%d','%d','%d', '%d', '%d', '%d', '%d','%d','%c','%d','%d','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%d','%d','%s','%d','%s','%s','%d','%d', '%s', '%d' ",
-	m_fileNumber,
-	m_tableHeader.familyNumber,
-	v_tableHeader.size(),
-	m_lineNumber,
-	p->source,
-	1,						//united
-	0,
-	0,
-	0,
-	p->generation,
-	p->sex_id,
-	p->title,
-	p->titolo,
-	p->first_name.Trim(),
-	last_name,
-	other_names,
-	p->birth_place,
-	p->birth_date,
-	p->death_place,
-	p->death_date,
-	p->comment,
-	p->father_id,
-	p->mother_id,
-	p->mother_index,
-	p->mother_index2,
-	p->folyt,
-	p->tableAncestry,
-	p->tableRoman,
-	p->arm,
-	p->orderFather,
-	p->orderMother,
-	p->csalad,
-	p->gap
-	);
+	values.Format( L"\
+'%d','%d','%d','%d','%d','%d','%d','%d','%d',\
+'%c','%d','%s','%s','%s','%s','%s','%s','%s',\
+'%s','%s','%s','%s','%s','%d','%d','%s','%d',\
+'%s','%s','%d','%d', '%s', '%d'",
+m_fileNumber, m_tableHeader.familyNumber,v_tableHeader.size(),m_lineNumber,p->source,1,0,0,0,\
+p->generation,p->sex_id,p->title,p->titolo,p->first_name.Trim(),last_name,other_names,p->birth_place,p->birth_date,\
+p->death_place,p->death_date,p->comment,p->father_id,p->mother_id,p->mother_index,p->mother_index2,p->folyt,p->tableAncestry,
+p->tableRoman,p->arm,p->orderFather,p->orderMother,p->csalad,p->gap );
 
 
     m_command.Format( L"INSERT INTO people (%s) VALUES (%s)", m_fieldsP, values );

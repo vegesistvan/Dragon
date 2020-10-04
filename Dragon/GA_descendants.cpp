@@ -74,6 +74,9 @@ BEGIN_MESSAGE_MAP(CGaDescendants, CDialogEx)
 	ON_MESSAGE( WM_CTLCOLORBTN, OnCtlColorBtn )
 	ON_BN_CLICKED(IDC_CHECK_WOMAN, &CGaDescendants::OnClickedCheckWoman)
 	ON_BN_CLICKED(IDC_CHECK_CONNECT, &CGaDescendants::OnClickedCheckConnect)
+	ON_BN_CLICKED(IDC_SZLUHA, &CGaDescendants::OnClickedSzluha)
+	ON_COMMAND(IDC_TUPIGNY, &CGaDescendants::OnTupigny)
+	ON_COMMAND(IDC_VILLERS, &CGaDescendants::OnVillers)
 END_MESSAGE_MAP()
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -115,7 +118,7 @@ void CGaDescendants::treePeople()
 
 	
 //	if( m_unordered == 0 )  // orderd list
-	if( m_numbering == OLD ) // orderd list
+	if( m_numbering == SZLUHA ) // orderd list
 	{
 		m_tag1 = L"<ol>";
 		m_tag2 = L"</ol>";
@@ -155,12 +158,11 @@ void CGaDescendants::treePeople()
 	desc.children			= 1;
 	desc.hidden				= false;
 
-	v_tupigny.clear();
-	putTupigny( 0 );
+	vSerial.clear();
+	vSerial.push_back(1);
+
 	vDesc.clear();
 	vDesc.push_back( desc );
-
-//	vDesc.at(0).numOfChildren = getNumberOfChildren( m_rowid1, m_sex_id );
 
 	m_genPrev	= 0;
 	cnt_ol		= 0;
@@ -180,7 +182,7 @@ void CGaDescendants::treeTables()
 	CString familyName;
 	CString father_id;
 
-	if( m_numbering == OLD || m_numbering == VIL )
+	if( m_numbering == SZLUHA || m_numbering == VIL )
 	{
 		m_tag1 = L"<ol list-style-type: circle>";
 		m_tag2 = L"</ol>";
@@ -234,7 +236,9 @@ void CGaDescendants::treeTables()
 			break;
 		}
 
-		v_tupigny.clear();
+		vSerial.clear();
+		vSerial.push_back(1);
+
 		father_id	= m_recordset.GetFieldString( 3 );
 		if( father_id.IsEmpty() || !father_id.Compare( L"0" ) )  // ha nincs apa, akkor magát az õst teszi be a vDesc-be
 		{
@@ -255,7 +259,6 @@ void CGaDescendants::treeTables()
 			desc.numOfSpouses			= 0;
 			desc.hidden				= false;
 			vDesc.push_back( desc );
-			putTupigny( 0 );
 
 			vDesc.at(0).numOfChildren = getNumberOfChildren( m_rowid1, m_sex_id );
 		}
@@ -279,7 +282,6 @@ void CGaDescendants::treeTables()
 			desc.hidden				= true;
 			vDesc.push_back( desc );
 
-			putTupigny( 0 );
 			vDesc.at(0).numOfChildren = getNumberOfChildren( father_id, m_sex_id );
 		}
 		descendants();
@@ -339,7 +341,9 @@ void CGaDescendants::descendants()
 				vDesc.at(ix).childrenPrinted += 1;
 
 				vDesc.push_back( desc );
-				putTupigny( desc.gen );
+
+				if( desc.gen < vSerial.size() ) ++vSerial.at(desc.gen);	// már létezõ generáció, 1-el növeli a sorszámot	
+				else	vSerial.push_back( 1 );							// új generáció: sorszám1-el kezdõdik 
 
 				ix += 1;
 				vDesc.at( vDesc.size() - 1 ).numOfChildren = getNumberOfChildren( rowid, m_sex_id );
@@ -375,7 +379,10 @@ void CGaDescendants::descendants()
 				vDesc.at(ix).childrenPrinted += 1;
 
 				vDesc.push_back( desc );
-				putTupigny( desc.gen );
+
+				if( desc.gen < vSerial.size() ) ++vSerial.at(desc.gen);	// már létezõ generáció, 1-el növeli a sorszámot	
+				else	vSerial.push_back( 1 );							// új generáció: sorszám1-el kezdõdik 
+
 				ix += 1;
 				vDesc.at( vDesc.size() - 1 ).numOfChildren = getNumberOfChildren( rowid, m_sex_id );
 			}
@@ -454,55 +461,11 @@ CString CGaDescendants::getNextChildRowid( UINT ix )
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-HBRUSH CGaDescendants::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
-{
-	
-	HBRUSH hbr = CDialogEx::OnCtlColor(pDC, pWnd, nCtlColor);
-	return hbr;
-
-	HBRUSH m_brushBack; 
-
-	HBRUSH hBrush = NULL;
-	switch(nCtlColor)
-	{
-	case CTLCOLOR_DLG:
-		// just return a not NULL brush handle
-//		hBrush = (HBRUSH)m_brushBack;
-		break;
-	case CTLCOLOR_STATIC:
-	{
-		switch (pWnd->GetDlgCtrlID())  
-		{
-			case IDC_YELLOW:
-			  pDC->SetBkColor( YELLOW );
-			  break;
-		}
-//		pDC->SetBkColor( YELLOW );
-//		pDC->SetBkMode(TRANSPARENT);
-	//	hBrush = (HBRUSH)m_brushBack;
-	}
-	break;
-	default:
-		// do the default processing
-		hBrush = CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
-		break;
-	}
-	return hBrush;
-
-
-	return hbr;
-
-}
-*/
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 LRESULT CGaDescendants::OnCtlColorBtn( WPARAM wparam, LPARAM lparam )
 {
 	HDC pDC = (HDC)wparam;
 
 	HWND hand = (HWND)lparam;
-
-
 
 	return TRUE;
 }
@@ -527,22 +490,19 @@ void CGaDescendants::OnRadioDefault()		// default szín beállítása
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaDescendants::OnClickedCheckWoman()
 {
-	m_woman				= true;
-	m_connect			= true;
+	m_woman	= !m_woman;
+	if( m_woman ) m_connect = true;
 	UpdateData(TOSCREEN);
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaDescendants::OnClickedCheckConnect()
 {
-
+	if( m_woman )
+	{
+		m_connect = true;
+		UpdateData(TOSCREEN);
+	}
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//void CGaDescendants::OnClickedRadioGeneration()
-//{
-//
-//
-//}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaDescendants::OnBnClickedOk()
 {
@@ -561,4 +521,18 @@ void CGaDescendants::OnBnClickedOk()
 		treePeople();
 
 	CDialogEx::OnOK();
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Az UpdateData(TOSCREEN) miatt az m_numbering-értéke mindig helyes legyen!!
+void CGaDescendants::OnClickedSzluha()
+{
+	m_numbering = 0;
+}
+void CGaDescendants::OnVillers()
+{
+	m_numbering = 1;
+}
+void CGaDescendants::OnTupigny()
+{
+	m_numbering = 2;
 }
