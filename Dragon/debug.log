@@ -265,3 +265,8 @@
 [0412/150312.853:ERROR:persistent_memory_allocator.cc(845)] Corruption detected in shared-memory segment.
 [0416/065750.704:ERROR:process_info.cc(359)] UncheckedAllocate
 [0416/065754.384:ERROR:process_info.cc(359)] UncheckedAllocate
+[1007/121917.829:ERROR:file_io.cc(90)] ReadExactly: expected 36, observed 0
+[1007/140045.794:ERROR:directory_reader_win.cc(43)] FindFirstFile: A rendszer nem találja a megadott elérési utat. (0x3)
+[1007/151631.928:ERROR:directory_reader_win.cc(43)] FindFirstFile: A rendszer nem találja a megadott elérési utat. (0x3)
+[1007/152828.585:ERROR:directory_reader_win.cc(43)] FindFirstFile: A rendszer nem találja a megadott elérési utat. (0x3)
+[1007/155214.054:ERROR:directory_reader_win.cc(43)] FindFirstFile: A rendszer nem találja a megadott elérési utat. (0x3)

@@ -72,8 +72,8 @@ protected:
 
 	FILE* fl;
 
-	std::vector<DESCENDANTS> vDesc;
-	std::vector<UINT>vSerial;
+	std::vector<DESCENDANTS> vDesc;		// A vDesc vektoban egy leszármazott addig marad benn, amíg minden gyermekét listáztuk
+	std::vector<UINT>vSerial;			// A Meurgey de Tupigny számozáshoz a sorszámok nyilvántartása
 
 	DESCENDANTS desc;
 

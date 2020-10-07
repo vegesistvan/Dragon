@@ -184,6 +184,7 @@ cont1:	m_recordset->MoveNext();
 	wndP.SetText( str );
 #endif
 	first = true;
+	summa = 0;
 	m_recordset->MoveFirst();
 	for( UINT i = 0; i < m_recordset->RecordsCount(); ++i )
 	{

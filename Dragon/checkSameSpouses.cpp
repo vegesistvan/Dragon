@@ -33,7 +33,7 @@ enum
 	_COLUMNS,
 };
 
-bool sortBySpouse(const MORESPOUSES &v1, const MORESPOUSES &v2);
+bool sortBySpouses(const MORESPOUSES &v1, const MORESPOUSES &v2);
 bool sortBySource(const MORESPOUSES &v1, const MORESPOUSES &v2);
 
 enum
@@ -459,7 +459,7 @@ void CCheckSameSpouses::fillSpouses( CString rowid, CString sex_id )
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckSameSpouses::fillSameSpouses( )
 {
-	std::sort( vSpouses.begin(), vSpouses.end(), sortBySpouse );
+	std::sort( vSpouses.begin(), vSpouses.end(), sortBySpouses );
 
 	MORESPOUSES vspouse;
 	BOOL FIRST	= TRUE;
@@ -1106,7 +1106,7 @@ void CCheckSameSpouses::OnHtmlPeoplefather()
 	dlg.DoModal();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool sortBySpouse(const MORESPOUSES &v1, const MORESPOUSES &v2) 
+bool sortBySpouses(const MORESPOUSES &v1, const MORESPOUSES &v2) 
 { 
     return( v1.spouse < v2.spouse ); 
 } 

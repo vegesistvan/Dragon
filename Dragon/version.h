@@ -1,5 +1,7 @@
 #pragma once
-#define VERSION L"1.3.4"
+#define VERSION L"1.3.5"
+
+// #define VERSION L"1.3.4"
 // Hibák javítása
 
 //#define VERSION L"1.3.3"

@@ -416,6 +416,7 @@ void CDragonApp::replaceBy( CString rowid, CString rowidBy, CString sex_id, int 
 	if( !theApp.execute( m_command ) ) return;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 void CDragonApp::replaceBy( CString rowid, CString rowidBy, CString rowidS1, CString rowidS2, CString sex_id, int source )
 {
 	int united;
@@ -467,6 +468,7 @@ void CDragonApp::replaceBy( CString rowid, CString rowidBy, CString rowidS1, CSt
 	m_command.Format( L"UPDATE people SET united='%d', spouse='%d', spouseparent='%d', spousespouse='%d' WHERE rowid ='%s'",united, spouse, spouseparent, spousespouse, rowidBy );
 	if( !theApp.execute( m_command ) ) return;
 }
+*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonApp::saveInfo( CString rowid, CString rowidBy )
 {
@@ -484,6 +486,7 @@ void CDragonApp::saveInfo( CString rowid, CString rowidBy )
 	}
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 void CDragonApp::replaceBy( CString rowid, CString rowidBy, CString rowidM, CString sex_id, int source )
 {
 	int united;
@@ -522,7 +525,7 @@ void CDragonApp::replaceBy( CString rowid, CString rowidBy, CString rowidM, CStr
 		m_command.Format( L"DELETE FROM people WHERE rowid ='%s'", rowid );
 		if( !theApp.execute( m_command ) ) return;
 	}
-/*
+
 // az egyesítések számát 1-el növeli
 	m_command.Format( L"SELECT united, spouse, spouseparent, spousespouse FROM people WHERE rowid='%s'", rowidBy );
 	if( !query1( m_command ) ) return;
@@ -549,8 +552,9 @@ void CDragonApp::replaceBy( CString rowid, CString rowidBy, CString rowidM, CStr
 
 	m_command.Format( L"UPDATE people SET united='%d', spouse='%d', spouseparent='%d', spousespouse='%d' WHERE rowid ='%s'",united, spouse, spouseparent, spousespouse, rowidBy );
 	if( !theApp.execute( m_command ) ) return;
-*/
+
 }
+*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
 void CDragonApp::sameMarriages( int iter )

@@ -70,9 +70,9 @@ void CGaDescendants::printBegining( int ix )
 	if( m_numbering == SZLUHA )
 		str.Format( L"%s%c&diams;", tags, gen );			// gedcom és kézi bevitelnél nincs generáció, ezt úgy kell beletenni!!
 	else if( m_numbering == VIL )
-		str.Format( L"%s%c%d ", tags, gen, vDesc.at(ix).children );
+		str.Format( L"%s%c%d&diams;", tags, gen, vDesc.at(ix).children );
 	else if( m_numbering == TUP )
-		str.Format( L"%s%c-%d ", tags, gen, vSerial.at( generation ) );
+		str.Format( L"%s%c-%d&diams;", tags, gen, vSerial.at( generation ) );
 	print( str );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -103,7 +103,8 @@ void CGaDescendants::printDescendant( int ix )
 				fwprintf( fl, L"%s. ", p.mother_index2 );
 		}
 	}
-	
+	// nem értem, hogy hogy az alábbi if-nek mi az értelme. Ezuért most kikapcsoltam 2020.10.04
+/*	
 	if( m_numbering == SZLUHA || m_numbering == TUP )
 	{
 		str = getPlaceDateBlock( p.birth_place, p.birth_date, '*' );
@@ -119,6 +120,7 @@ void CGaDescendants::printDescendant( int ix )
 			cLine.Format( L"%s %s", (CString)cLine, str );
 	}
 	else if( m_numbering == VIL )
+*/
 	{
 		cLine += getPlaceDateBlock( p.birth_place, p.birth_date, '*' );
 		cLine += getPlaceDateBlock( p.death_place, p.death_date, '+' );

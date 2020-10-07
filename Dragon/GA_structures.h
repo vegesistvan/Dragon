@@ -77,7 +77,7 @@ typedef struct
 	CString rowid;
 	CString	mother_index;
 	BOOL	numOfSpouses;			// az õ házastársainak száma
-	BOOL	numOfMothers;				// az apának több felesége van
+	BOOL	numOfMothers;			// az apának több felesége van
 	int		sex_id;
 	UINT	gen;					// generáció sorszáma
 	int		tupigny;

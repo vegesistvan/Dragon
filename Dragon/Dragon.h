@@ -229,8 +229,8 @@ public:
 	void	insertIntoFiles( CString fileSpec );
 // Implementation
 	void	replaceBy( CString rowid, CString rowidBy, CString sex_id, int source );
-	void CDragonApp::replaceBy( CString rowid, CString rowidBy, CString rowidS1, CString rowidS2, CString sex_id, int source );
-	void CDragonApp::replaceBy( CString rowid, CString rowidBy, CString rowidM_I, CString sex_id, int source );
+//	void CDragonApp::replaceBy( CString rowid, CString rowidBy, CString rowidS1, CString rowidS2, CString sex_id, int source );
+//	void CDragonApp::replaceBy( CString rowid, CString rowidBy, CString rowidM_I, CString sex_id, int source );
 	BOOL	question( CString caption, CString question );
 	void	message( CString caption, CString message );
 	void	inputGed( int ins );
