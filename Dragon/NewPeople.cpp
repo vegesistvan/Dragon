@@ -1,8 +1,15 @@
-// NewPeople.cpp : implementation file
+// Bemenõ adatok:
+// m_caption		Az ablak felirata
+// m_first_name		Az új ember vezetékneve, if any
 //
+// Bekéri az új ember adatait és ellenõrzi, hogy van-e már ilyen nevû ember az adatbázisban.
+// Ha van, akkor felkéri a felhasználót, hogy válasszon az új és a régi emberek küzül.
+// Ha az újat választotta, akkor insertálja az adatbázisba az embert.
+// A megadott/választott ember rowid-ját adja vissz az m_rowid változóban.
+// Ha a felhasználó Cancel-el mégsem akar új embert adni, akkor az m_rowid empty lesz. 
 
 #include "stdafx.h"
-#include "Fa.h"
+#include "Dragon.h"
 #include "NewPeople.h"
 #include "afxdialogex.h"
 #include "SameName.h"
@@ -22,12 +29,15 @@ IMPLEMENT_DYNAMIC(CNewPeople, CDialogEx)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CNewPeople::CNewPeople(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CNewPeople::IDD, pParent)
+	, m_last_name(_T(""))
+	, m_first_name(_T(""))
+	, m_titolo(_T(""))
+	, m_comment(_T(""))
+	, m_death_date(_T(""))
+	, m_death_place(_T(""))
+	, m_birth_date(_T(""))
+	, m_birth_place(_T(""))
 {
-	m_last_name.Empty();
-	m_rowidExists.Empty();
-	m_rowidMain.Empty();
-	m_orderFather = 0;
-	m_orderMother = 0;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CNewPeople::~CNewPeople()
@@ -41,6 +51,14 @@ void CNewPeople::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_BIRTH_COMBO, comboBirth);
 	DDX_Control(pDX, IDC_DEATH_COMBO, comboDeath);
 	DDX_Control(pDX, IDC_COMBO_SEX, comboSex);
+	DDX_Text(pDX, IDC_LAST_NAME, m_last_name);
+	DDX_Text(pDX, IDC_FIRST_NAME, m_first_name);
+	DDX_Text(pDX, IDC_TITOLO, m_titolo);
+	DDX_Text(pDX, IDC_COMMENT, m_comment);
+	DDX_Text(pDX, IDC_DEATH_DATE, m_death_date);
+	DDX_Text(pDX, IDC_DEATH_PLACE, m_death_place);
+	DDX_Text(pDX, IDC_BIRTH_DATE, m_birth_date);
+	DDX_Text(pDX, IDC_BIRTH_PLACE, m_birth_place);
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CNewPeople, CDialogEx)
@@ -53,96 +71,16 @@ END_MESSAGE_MAP()
 BOOL CNewPeople::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-	CString command;
-	CString caption;
-
 	SetWindowText( m_caption );
-	// a megklikkelt ember: 
-//	if( !m_rowidClick.IsEmpty() && m_newPeople != CHILD ) 
-	if( !m_rowidClick.IsEmpty() ) 
-	{
-		command.Format( L"SELECT rowid, * FROM people WHERE rowid='%s'", m_rowidClick );
-		if( !theApp.query( command ) ) return false;
-		
-		m_title			= theApp.m_recordset->GetFieldString( PEOPLE_TITLE );
-		m_titolo		= theApp.m_recordset->GetFieldString( PEOPLE_TITOLO );
-		m_last_name		= theApp.m_recordset->GetFieldString( PEOPLE_LAST_NAME );
-		m_first_name	= theApp.m_recordset->GetFieldString( PEOPLE_FIRST_NAME );
-		m_father_id		= theApp.m_recordset->GetFieldString( PEOPLE_FATHER_ID );
-		m_mother_id		= theApp.m_recordset->GetFieldString( PEOPLE_MOTHER_ID );
-//		m_mother_index	= _wtoi( theApp.m_recordset->GetFieldString( PEOPLE_MOTHER_INDEX ) );
 
-		m_sex_id		= _wtoi( theApp.m_recordset->GetFieldString( PEOPLE_SEX_ID ) );
-		m_birth_place	= theApp.m_recordset->GetFieldString( PEOPLE_BIRTH_PLACE );
-		m_birth_date	= theApp.m_recordset->GetFieldString( PEOPLE_BIRTH_DATE );
-		m_death_place	= theApp.m_recordset->GetFieldString( PEOPLE_DEATH_PLACE );
-		m_death_date	= theApp.m_recordset->GetFieldString( PEOPLE_DEATH_DATE );
-		m_comment		= theApp.m_recordset->GetFieldString( PEOPLE_COMMENT );
+	comboSex.ResetContent();
+	comboSex.AddString( L"" );
+	comboSex.AddString( L"ffi" );
+	comboSex.AddString( L"nõ" );
+	comboSex.SetCurSel( 0);
 
-		m_name.Format( L"%s %s", m_last_name, m_first_name ); 
-
-		comboSex.ResetContent();
-		comboSex.AddString( L"" );
-		comboSex.AddString( L"ffi" );
-		comboSex.AddString( L"nõ" );
-		comboSex.SetCurSel( m_sex_id );
-	}
-
-	if( m_rowidMain.IsEmpty() )			// a megklikkelt ember editálása lesz!!
-	{
-		m_command = L"SELECT title FROM titles ORDER BY title";
-		if( ! theApp.querySystem( m_command ) ) return false;
-
-		CString title;
-		comboTitle.AddString( L"" );
-		for( UINT i = 0; i < theApp.m_recordsetSystem->RecordsCount(); ++i )
-		{
-			title =  theApp.m_recordsetSystem->GetFieldString( 0 ); 
-			comboTitle.AddString( title );
-			if( title == m_title ) 
-				m_titleX = i+1;
-			theApp.m_recordsetSystem->MoveNext();
-		}
-		comboTitle.SetCurSel( m_titleX );
-
-		GetDlgItem( IDC_TITOLO )->SetWindowTextW( m_titolo );
-		GetDlgItem( IDC_LAST_NAME )->SetWindowTextW( m_last_name );
-		GetDlgItem( IDC_FIRST_NAME )->SetWindowTextW( m_first_name );
-		GetDlgItem( IDC_BIRTH_PLACE )->SetWindowTextW( m_birth_place );
-		GetDlgItem( IDC_BIRTH_DATE )->SetWindowTextW( m_birth_date );
-		GetDlgItem( IDC_DEATH_PLACE )->SetWindowTextW( m_death_place );
-		GetDlgItem( IDC_DEATH_DATE )->SetWindowTextW( m_death_date );
-		GetDlgItem( IDC_COMMENT )->SetWindowTextW( m_comment );
-		
-	}
-
-	else
-	{
-//		if( m_newPeople != CHILD )
-		{
-			m_command.Format( L"SELECT rowid, * FROM people WHERE rowid='%s'", m_rowidMain );
-			if( !theApp.query1( m_command ) ) return false;
-				m_sexIdMain		= _wtoi( theApp.m_recordset1->GetFieldString( PEOPLE_SEX_ID ) );
-			m_lastNameMain	= theApp.m_recordset1->GetFieldString( PEOPLE_LAST_NAME );
-			m_firstNameMain	= theApp.m_recordset1->GetFieldString( PEOPLE_FIRST_NAME );
-			m_fatherIdMain	= theApp.m_recordset1->GetFieldString( PEOPLE_FATHER_ID );
-			m_motherIdMain	= theApp.m_recordset1->GetFieldString( PEOPLE_MOTHER_ID );
-			m_nameMain.Format( L"%s %s", m_lastNameMain, m_firstNameMain ); 
-
-			comboSex.ResetContent();
-			comboSex.AddString( L"" );
-			comboSex.AddString( L"ffi" );
-			comboSex.AddString( L"nõ" );
-			comboSex.SetCurSel( m_sexIdMain);
-		}
-	}
-
-
-	
-
-	command = L"SELECT title FROM titles ORDER BY title";
-	if( ! theApp.querySystem( command ) ) return false;
-
+	m_command = L"SELECT title FROM titles ORDER BY title";
+	if( ! theApp.querySystem( m_command ) ) return false;
 	comboTitle.AddString( L"" );
 	for( UINT i = 0; i < theApp.m_recordsetSystem->RecordsCount(); ++i )
 	{
@@ -159,29 +97,7 @@ BOOL CNewPeople::OnInitDialog()
 	comboBirth.SetCurSel( 0 );
 	comboDeath.SetCurSel( 0 );
 
-	switch( m_newPeople )			// milyen rokont akarunk megadni?
-	{
-		case -1:					// senkiét, csak egy új embert akarunk bevinni
-			newPeople();
-			break;
-		case CHILD:
-			newChild();
-			break;
-		case FATHER:
-			newFather();
-			break;
-		case MOTHER:
-			newMother();
-			break;
-		case SIBLING:
-			newSibling();
-			break;
-		case SPOUSE:
-			newSpouse();
-			break;
-	}
-
-
+	m_inserted = false;
 	return TRUE;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -190,313 +106,41 @@ BOOL CNewPeople::OnInitDialog()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CNewPeople::newPeople()
-{
-	SetWindowText( L"Addj meg egy új embert!" );
-}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CNewPeople::newChild()
-{
-	CString caption;
-	caption.Format( L"Add meg %s és %s gyerekét!", m_name, m_nameMain );
-//	SetWindowText( caption );
-	if( m_sexIdMain == MAN )
-	{
-		GetDlgItem( IDC_LAST_NAME )->SetWindowTextW( m_lastNameMain );
-	}
-	else
-	{
-		GetDlgItem( IDC_LAST_NAME )->SetWindowTextW( m_last_name );   // megklikkelt ember neve
-	}
-	comboSex.SetCurSel( 0 );
-	keybd_event(VK_TAB,0x8f,0 , 0);					// Tab Press
-	keybd_event(VK_TAB,0x8f, KEYEVENTF_KEYUP,0);	// Tab Release
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CNewPeople::newFather()
-{
-	CString caption;
-	caption.Format( L"Add meg %s apját!", m_nameMain );
-	SetWindowText( caption );
-	GetDlgItem( IDC_LAST_NAME )->SetWindowTextW( m_lastNameMain );
-	keybd_event(VK_TAB,0x8f,0 , 0);					// Tab Press
-	keybd_event(VK_TAB,0x8f, KEYEVENTF_KEYUP,0);	// Tab Release
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CNewPeople::newMother()
-{
-	CString caption;
-	caption.Format( L"Add meg %s anyját!", m_nameMain );
-	SetWindowText( caption );
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CNewPeople::newSibling()
-{
-	CString caption;
-	caption.Format( L"Add meg %s testvérét!", m_nameMain );
-	SetWindowText( caption );
-
-	GetDlgItem( IDC_LAST_NAME )->SetWindowTextW( m_lastNameMain );
-	keybd_event(VK_TAB,0x8f,0 , 0);					// Tab Press
-	keybd_event(VK_TAB,0x8f, KEYEVENTF_KEYUP,0);	// Tab Release
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CNewPeople::newSpouse()
-{
-	CString caption;
-	caption.Format( L"Add meg %s házastársát!", m_nameMain );
-	SetWindowText( caption );
-}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CNewPeople::OnBnClickedOk()
 {
-	GetDlgItem( IDC_LAST_NAME )->GetWindowText( m_lastNameNew ); 
-
-
-	if( m_lastNameNew.IsEmpty() )
+	UpdateData( FROMSCREEN );
+	if( m_last_name.IsEmpty() )
 	{
 		AfxMessageBox( L"Családnevet meg kell adni!" );
 		return;
 	}
 
-	int n = comboTitle.GetCurSel();
-	comboTitle.GetLBText( comboTitle.GetCurSel(), m_titleNew );
+	int ix = comboTitle.GetCurSel();
+	comboTitle.GetLBText( ix, m_title );
+	m_sex_id = comboSex.GetCurSel();
 
-	GetDlgItem( IDC_TITOLO )->GetWindowText( m_titoloNew ); 
-	GetDlgItem( IDC_FIRST_NAME )->GetWindowText( m_firstNameNew ); 
-	GetDlgItem( IDC_BIRTH_PLACE )->GetWindowText( m_birthPlaceNew );
-	GetDlgItem( IDC_BIRTH_DATE )->GetWindowText( m_birthDateNew );
-	GetDlgItem( IDC_DEATH_PLACE )->GetWindowText( m_deathPlaceNew );
-	GetDlgItem( IDC_DEATH_DATE )->GetWindowText( m_deathDateNew );
-	GetDlgItem( IDC_COMMENT )->GetWindowText( m_commentNew );
+//	comboBirth.GetLBText( comboBirth.GetCurSel(), str );
+//	comboDeath.GetLBText( comboBirth.GetCurSel(), str );
 
-	m_nameNew.Format( L"%s %s", m_lastNameNew, m_firstNameNew );
-
-
-	m_rowidExists = m_rowidClick;	
-	if( !m_rowidMain.IsEmpty() )		// létezõ ember editálása, nem kell azonosítani!!
+	m_rowid.IsEmpty();
+	if( peopleExists() )
 	{
-		if( peopleExists() ) return;
+		if( m_rowid.IsEmpty() )	insertPeople();
 	}
-
-
-	if( m_rowidExists.IsEmpty() )  // nincs ilyen ember
-	{
-		switch( m_newPeople )
-		{
-		case -1:
-			insertPeople();					// csak az embert visszük be
-			break;
-		case SIBLING:
-			if( !insertSibling() ) return;
-			break;
-		case FATHER:
-			if( !insertFather() ) return;
-			break;
-		case MOTHER:
-			if( !insertMother() ) return;
-			break;
-		case CHILD:
-			if( !insertChild() ) return;
-			break;
-		case SPOUSE:
-			if( !insertSpouse() ) return;
-			break;
-		}
-	}
-	else						// van ilyen ember
-	{
-		switch( m_newPeople )
-		{
-		case -1:
-			updatePeople();
-			break;
-		case SIBLING:
-			if( !existingSibling() ) return;
-			break;
-		case FATHER:
-			if( !existingFather() ) return;
-			break;
-		case MOTHER:
-			if( !existingMother() ) return;
-			break;
-		case CHILD:
-			if( !existingChild() ) return;
-			break;
-		case SPOUSE:
-			if( !existingSpouse() ) return;
-			break;
-		}
-	}
-	if( !m_rowidExists.IsEmpty() )
-		m_rowidClick = m_rowidExists;
-	else
-		m_rowidClick = m_rowidNew;
 
 	CDialogEx::OnOK();
 }
+///////////////////////////////////////////////////////////////////////////////////44////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CNewPeople::insertChild()
-{
-	if( m_sexIdMain == MAN )
-	{
-		m_father_id = m_rowidMain;
-		m_mother_id = m_rowidClick;
-	}
-	else
-	{
-		m_father_id = m_rowidClick;
-		m_mother_id = m_rowidMain;
-	}
-	return( insertPeople() );
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// m_rowidClickExist már létezõ ember, aki az m_rowidClick ember 
-bool CNewPeople::existingChild()
-{
-	if( m_sexIdMain == MAN )
-	{
-		m_father_id = m_rowidMain;
-		m_mother_id = getMotherId();
-	}
-	else
-	{
-		m_father_id = getFatherId();
-		m_mother_id = m_rowidMain;
-	}
-	m_command.Format( L"UPDATE people SET father_id='%s', mother_id = '%s', orderFather='%d', orderMother='%d', mother_index='%d', m_mother_index2 = '%d' WHERE rowid = '%s'", m_father_id, m_mother_id, m_orderFather, m_orderMother, m_mother_index, m_mother_index, m_rowidExists );
-	if( !theApp.execute( m_command ) ) return false;
-	return true;
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CNewPeople::insertSibling()
-{
-	if( !insertPeople() ) return false;
-
-	m_command.Format( L"UPDATE people SET father_id = '%s', mother_id='%s' WHERE rowid='%s'", m_fatherIdMain, m_motherIdMain, m_rowidNew );
-	if( !theApp.execute( m_command ) ) return false;
-	return true;
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// m_rowidClickExist már létezõ ember, aki az m_rowidClick ember testvére
-// tehát 
-bool CNewPeople::existingSibling()
-{
-	CString command;
-	CString father_id;
-	CString mother_id;
-	CString name;
-
-	command.Format( L"SELECT father_id, mother_id, last_name, first_name FROM people  WHERE rowid = '%s'", m_rowidExists );
-	if( !theApp.query2( command ) ) return false;
-	name.Format( L"%s %s", theApp.m_recordset2->GetFieldString( 2 ), theApp.m_recordset2->GetFieldString( 3 ) );
-	father_id = theApp.m_recordset2->GetFieldString( 0 ); 
-	if( !father_id.IsEmpty() )
-	{
-		if( father_id == m_father_id )
-			str.Format( L"%s már testvéred!", name );
-		else
-			str.Format( L"%snak  más az apja!", name );
-		AfxMessageBox( str );
-		return false;
-	}
-	mother_id = theApp.m_recordset2->GetFieldString( 1 ); 
-	if( !mother_id.IsEmpty() )
-	{
-		str.Format( L"%snak van más az anyja!", name );
-		AfxMessageBox( str );
-		return false;
-	}
-
-	command.Format( L"UPDATE people SET father_id='%s', mother_id='%s' WHERE rowid = '%s'", m_fatherIdMain, m_motherIdMain, m_rowidExists );
-	theApp.execute( command );
-	return true;
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CNewPeople::insertFather()
-{
-	m_father_id.Empty();
-	m_mother_id.Empty();
-
-	if( !insertPeople() ) return false;
-	m_command.Format( L"UPDATE people SET father_id='%s' WHERE rowid = '%s'", m_rowidNew, m_rowidMain  );
-	theApp.execute( m_command );
-	return true;
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CNewPeople::existingFather()
-{
-	CString command;
-	command.Format( L"UPDATE people SET father_id='%s' WHERE rowid = '%s'", m_rowidExists, m_rowidMain );
-	theApp.execute( command );
-	return true;
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CNewPeople::insertMother()
-{
-	m_father_id.Empty();
-	m_mother_id.Empty();
-	if( !insertPeople() ) return false;
-
-	m_command.Format( L"UPDATE people SET mother_id='%s' WHERE rowid = '%s'", m_rowidNew, m_rowidMain  );
-	theApp.execute( m_command );
-	return true;
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CNewPeople::existingMother()
-{
-	CString command;
-	command.Format( L"UPDATE people SET mother_id='%s' WHERE rowid = '%s'", m_rowidExists, m_rowidMain  );
-	theApp.execute( command );
-	return true;
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CNewPeople::insertSpouse()
-{
-	if( m_sexIdMain == m_sexIdNew )
-	{
-		AfxMessageBox( L"A házaspár azonos nemû!" );
-		return( false );
-	}
-	if( m_firstNameNew.IsEmpty() ) 
-	{
-		AfxMessageBox( L"Keresztnevet meg kell adni!" );
-		return false;
-	}
-	m_father_id.Empty();
-	m_mother_id.Empty();
-
-	if( !insertPeople() ) return false;
-
-	if( m_sexIdMain == MAN )
-		m_command.Format( L"INSERT INTO marriages ( spouse1_id, spouse2_id ) VALUES ('%s', '%s')", m_rowidMain, m_rowidNew );
-	else
-		m_command.Format( L"INSERT INTO marriages ( spouse1_id, spouse2_id ) VALUES ('%s', '%s')", m_rowidNew, m_rowidMain );
-	theApp.execute( m_command );
-
-	return true;
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CNewPeople::existingSpouse()
-{
-	CString command;
-	if( m_sexIdMain == MAN )
-		command.Format( L"INSERT INTO marriages ( spouse1_id, spouse2_id ) VALUES ('%s', '%s')", m_rowidMain, m_rowidExists );
-	else
-		command.Format( L"INSERT INTO marriages ( spouse1_id, spouse2_id ) VALUES ('%s', '%s')", m_rowidExists, m_rowidMain );
-	theApp.execute( command );
-	return true;
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CNewPeople::insertPeople()
 {
 	CString fields;
@@ -504,8 +148,6 @@ bool CNewPeople::insertPeople()
 	CString command;
 	int	sex = comboSex.GetCurSel();
 
-	m_titleX = comboTitle.GetCurSel();
-	comboTitle.GetLBText( m_titleX, m_titleNew );
 
 
 	fields.Format( L"\
@@ -518,74 +160,30 @@ birth_place,\
 birth_date,\
 death_place,\
 death_date,\
-comment,\
-father_id,\
-mother_id,\
-orderFather,\
-orderMother,\
-mother_index\
+comment\
 " );
-	values.Format( L"'%s','%s','%d','%s','%s','%s','%s','%s','%s','%s', '%s', '%s', '%d', '%d', '%d' ",
-m_titleNew,\
-m_titoloNew,\
+	values.Format( L"'%s','%s','%d','%s','%s','%s','%s','%s','%s','%s'",
+m_title,\
+m_titolo,\
 sex,\
-m_firstNameNew,\
-m_lastNameNew,\
-m_birthPlaceNew,\
-m_birthDateNew,\
-m_deathPlaceNew,\
-m_deathDateNew,\
-m_commentNew,\
-m_father_id,\
-m_mother_id,\
-m_orderFather,\
-m_orderMother,\
-m_mother_index\
+m_first_name,\
+m_last_name,\
+m_birth_place,\
+m_birth_date,\
+m_death_place,\
+m_death_date,\
+m_comment\
 );
 
-	m_rowidNew.Empty();
+	m_rowid.Empty();
 	command.Format( L"INSERT INTO people (%s) VALUES (%s)", fields, values );
 	if( theApp.execute( command ) )
 	{
 		command = L"SELECT last_insert_rowid() FROM people";
 		if( theApp.query( command ) )
-			m_rowidNew = theApp.m_recordset->GetFieldString(0);
+			m_rowid = theApp.m_recordset->GetFieldString(0);
 	}
-	return true;
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CNewPeople::updatePeople()
-{
-	m_titleX = comboTitle.GetCurSel();
-	comboTitle.GetLBText( m_titleX, m_titleNew );
-	int sex = comboSex.GetCurSel();
-
-	CString set;
-	set.Format( L"\
-title='%s',\
-titolo='%s',\
-sex_id='%d',\
-first_name='%s',\
-last_name='%s',\
-birth_place='%s',\
-birth_date='%s',\
-death_place='%s',\
-death_date='%s',\
-comment='%s'\
-",\
-m_titleNew,\
-m_titoloNew,\
-sex,\
-m_firstNameNew,\
-m_lastNameNew,\
-m_birthPlaceNew,\
-m_birthDateNew,\
-m_deathPlaceNew,\
-m_deathDateNew,\
-m_commentNew\
-);
-	m_command.Format( L"UPDATE people SET %s WHERE rowid='%s'", set, m_rowidClick );
-	if( !theApp.execute( m_command ) ) return false;
+	m_inserted = true;
 	return true;
 }
 
@@ -600,8 +198,8 @@ m_commentNew\
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CNewPeople::OnKillfocusBirthDate()
 {
-	GetDlgItem( IDC_BIRTH_DATE )->GetWindowText( m_birthDateNew ); 
-	if( !m_birthDateNew.IsEmpty() && !checkDate( m_birthDateNew ) )
+	GetDlgItem( IDC_BIRTH_DATE )->GetWindowText( m_birth_date ); 
+	if( !m_birth_date.IsEmpty() && !checkDate( m_birth_date ) )
 	{
 		GetDlgItem( IDC_BIRTH_DATE )->SetWindowText( L"" ); 
 		GetDlgItem( IDC_BIRTH_DATE )->SetFocus();
@@ -620,115 +218,66 @@ void CNewPeople::OnKillfocusDeathDate()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CNewPeople::OnKillfocusFirstName()
 {
-	GetDlgItem( IDC_FIRST_NAME )->GetWindowText( m_firstNameNew ); 
-	if( m_firstNameNew.IsEmpty() ) return;
+	GetDlgItem( IDC_FIRST_NAME )->GetWindowText( m_first_name ); 
+	if( m_first_name.IsEmpty() ) return;
 
 
-	m_sexIdNew = theApp.isFirstName( m_firstNameNew );
-	if( m_sexIdNew == -1 )
+	m_sex_id = theApp.isFirstName( m_first_name );
+	if( m_sex_id == -1 )
 	{
-		str.Format( L"%s keresztnév nincs a nyilvántartásban!", m_firstNameNew );
+		str.Format( L"%s keresztnév nincs a nyilvántartásban!", m_first_name );
 		AfxMessageBox( str );
 		m_first_name.Empty();
 		GetDlgItem( IDC_FIRST_NAME )->SetWindowText( L"" );
 		GetDlgItem( IDC_FIRST_NAME )->SetFocus();
-		m_sexIdNew = 0;
+		m_sex_id = 0;
 	}
 	comboSex.ResetContent();
 	comboSex.AddString( L"" );
 	comboSex.AddString( L"ffi" );
 	comboSex.AddString( L"nõ" );
-	comboSex.SetCurSel( m_sexIdNew );
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CNewPeople::getMotherId()
-{
-	CString spouse2_id;
-	if( m_sexIdMain == MAN )
-		m_command.Format( L"SELECT spouse2_id FROM marriages WHERE spouse1_id='%s' AND spouse2_id = '%s'", m_rowidMain, m_rowidClick );
-	else
-		m_command.Format( L"SELECT spouse2_id FROM marriages WHERE spouse1_id='%s' AND spouse2_id = '%s'", m_rowidClick, m_rowidMain );
-	if( !theApp.query1( m_command ) ) return( L"");
-	spouse2_id = theApp.m_recordset1->GetFieldString( 0 );
-	return spouse2_id;
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CNewPeople::getFatherId()
-{
-	CString spouse1_id;
-	if( m_sexIdMain == MAN )
-		m_command.Format( L"SELECT spouse1_id FROM marriages WHERE spouse1_id='%s' AND spouse2_id = '%s'", m_rowidMain, m_rowidClick );
-	else
-		m_command.Format( L"SELECT spouse1_id FROM marriages WHERE spouse1_id='%s' AND spouse2_id = '%s'", m_rowidClick, m_rowidMain );
-	if( !theApp.query1( m_command ) ) return( L"");
-	spouse1_id = theApp.m_recordset1->GetFieldString( 0 );
-	return spouse1_id;
+	comboSex.SetCurSel( m_sex_id );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CNewPeople::peopleExists()
 {
 	CString people;
-	CString caption;
-	people.Format( L"%s %s %s %s", m_titleNew, m_titoloNew, m_lastNameNew, m_firstNameNew );
+	people.Format( L"%s %s %s %s", m_title, m_titolo, m_last_name, m_first_name );
 	people.Trim();
-
-	m_rowidExists.Empty();
-	switch( m_newPeople )
-	{
-		case SIBLING:
-			caption.Format( L"Válaszd ki %s testvérét!", m_name ); 
-			break;
-		case FATHER:
-			caption.Format( L"Válaszd ki %s apját!", m_name ); 
-			break;
-		case MOTHER:
-			caption.Format( L"Válaszd ki %s anyját!", m_name ); 
-			break;
-		case CHILD:
-			caption.Format( L"Vélaszd ki %s gyerekét!", m_name ); 
-			break;
-		case SPOUSE:
-			caption.Format( L"Vélaszd ki %s házastársát!", m_name ); 
-			break;
-	}
-
+	
 	CString birth;
 	CString death;
-	birth.Format( L"%s %s", m_birthPlaceNew, m_birthDateNew );
-	death.Format( L"%s %s", m_deathPlaceNew, m_deathDateNew );
+	birth.Format( L"%s %s", m_birth_place, m_birth_date );
+	death.Format( L"%s %s", m_death_place, m_death_date );
 	birth.Trim();
 	death.Trim();
 	if( !birth.IsEmpty() )
 		people.Format( L"%s *%s", (CString)people, birth );
 	if( !death.IsEmpty() )
 		people.Format( L"%s +%s", (CString)people, death );
+	people.Trim();
 
-
-
-	if( m_firstNameNew.IsEmpty() )
-		m_command.Format( L"SELECT rowid, * FROM people WHERE last_name LIKE '%s%c'", m_lastNameNew,'%' );
+	if( m_first_name.IsEmpty() )
+		m_command.Format( L"SELECT rowid, * FROM people WHERE last_name LIKE '%s%c'", m_last_name,'%' );
 	else
-		m_command.Format( L"SELECT rowid, * FROM people WHERE first_name LIKE '%s%c' AND last_name LIKE '%s%c'", m_firstNameNew, '%', m_lastNameNew, '%' );
-
-//	m_command.Format( L"SELECT rowid,* FROM people WHERE last_name='%s' AND first_name = '%s'", m_lastNameNew,	m_firstNameNew );
+		m_command.Format( L"SELECT rowid, * FROM people WHERE first_name LIKE '%s%c' AND last_name LIKE '%s%c'", m_first_name, '%', m_last_name, '%' );
 	if( !theApp.query2( m_command ) ) return false;
-	if( !theApp.m_recordset2->RecordsCount() ) return false;
+	if( theApp.m_recordset2->RecordsCount() )
+	{
+		CSameName dlg;
+		dlg.m_last_name		= m_last_name;
+		dlg.m_first_name	= m_first_name;
+		dlg.m_birth_place	= m_birth_place;
+		dlg.m_birth_date	= m_birth_date;
+		dlg.m_death_place	= m_death_place;
+		dlg.m_death_date	= m_death_date;
+		dlg.m_comment		= m_comment;
+		dlg.m_people		= people;
 
-	CSameName dlg;
-
-	dlg.m_caption		= caption;
-	dlg.m_last_name		= m_lastNameNew;
-	dlg.m_first_name	= m_firstNameNew;
-	dlg.m_birth_place	= m_birthPlaceNew;
-	dlg.m_birth_date	= m_birthDateNew;
-	dlg.m_death_place	= m_deathPlaceNew;
-	dlg.m_death_date	= m_deathDateNew;
-	dlg.m_comment		= m_commentNew;
-
-	dlg.m_people = people.Trim();
-	if( dlg.DoModal() == IDCANCEL ) return true;
-	m_rowidExists = dlg.m_rowid;
-	return false;
+		if( dlg.DoModal() == IDCANCEL ) return false;
+		m_rowid = dlg.m_rowid;
+	}
+	return true;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CNewPeople::checkDate( CString date )

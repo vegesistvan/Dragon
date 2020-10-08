@@ -24,11 +24,11 @@
 #include "GA_descendants.h"
 #include "GA_ascendants.h"
 #include "GA_ascendantsChain.h"
-#include "SamePeople.h"
+#include "SameP.h"
 #include "pictures.h"
 #include "Relations.h"
 #include "GedcomOut.h"
-#include "NewPeople2.h"
+#include "NewPeople.h"
 #include "Message.h"
 // GEDCOM
 enum
@@ -1631,7 +1631,7 @@ void CTablePeople::OnAzonosember()
 
 	firstName	= m_ListCtrl.GetItemText( nItem, H_FIRST_NAME );
 	lastName	= m_ListCtrl.GetItemText( nItem, H_LAST_NAME );
-	CSamePeople same;
+	CSameP same;
 //	CIdenticalPeople identical;
 	same.findSamePeople( firstName, lastName, FALSE );
 }
@@ -1656,7 +1656,7 @@ void CTablePeople::OnAzonosemberConc()
 	lastName	= m_ListCtrl.GetItemText( nItem, H_LAST_NAME );
 
 //	CIdenticalPeople identical;
-	CSamePeople identical;
+	CSameP identical;
 	identical.findSamePeople( firstName, lastName, TRUE );
 
 	

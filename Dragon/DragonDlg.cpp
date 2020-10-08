@@ -57,10 +57,10 @@
 #include "listPeopleAndSpouses.h"
 #include "listPeopleAndFamily.h"
 
-#include "SamePeople.h"
+#include "SameP.h"
 #include "GA_ascendantsChain.h"
 #include "SameCouples.h"
-#include "Same.h"
+#include "SamePeople.h"
 
 
 #include "version.h"
@@ -1109,14 +1109,14 @@ void CDragonDlg::OnListPeopleAndFamily()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnSamePeople()
 {
-	CSamePeople dlg;
+	CSameP dlg;
 	dlg._onlyList = true;
 	dlg.DoModal();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnSamePeopleContract()
 {
-	CSamePeople dlg;
+	CSameP dlg;
 	dlg._onlyList = false;
 	dlg.DoModal();
 }
@@ -1156,7 +1156,7 @@ void CDragonDlg::OnSameNames()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnSame()
 {
-	CSame dlg;
+	CSamePeople dlg;
 	dlg.DoModal();
 	mainTitle( );
 

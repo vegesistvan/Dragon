@@ -15,7 +15,7 @@
 #include "setup.h"
 #include "html_Lines.h"
 #include "pictures.h"
-#include "NewPeople2.h"
+#include "NewPeople.h"
 #include "EditPeople.h"
 #include "EditMarriage.h"
 #include "Help.h"

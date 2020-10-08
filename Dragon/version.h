@@ -1,5 +1,9 @@
 #pragma once
-#define VERSION L"1.3.5"
+
+#define VERSION L"1.3.6"
+// Azonos bejegyzések összevonásának javítása ( a törlendõ bejegyzésben lévõ ember neme)  
+
+//#define VERSION L"1.3.5"
 
 // #define VERSION L"1.3.4"
 // Hibák javítása

@@ -1,6 +1,6 @@
 #pragma once
 #include "listctrlex.h"
-
+#include "ProgressWnd.h"
 
 // CSamePeople dialog
 
@@ -14,67 +14,25 @@ public:
 	virtual ~CSamePeople();
 
 // Dialog Data
-	enum { IDD = IDD_SAMEPEOPLE };
-
-	BOOL	_onlyList;
-	BOOL	_html;
-	BOOL	_unite;
-	BOOL	_loop;
-	CString _fullname;
-	CString _first_name;
-	CString _last_name;
-	
-	int		_azonos;			// azonossági kritériumok fennállásánalk elõírt száma ( default = 1 );
-
-	void	samePeople();
-	void	findSamePeople( CString firstName, CString lastName, BOOL conc );
-	void	sameMarriages( int iter );
-
+	enum { IDD = IDD_SAME };
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	CListCtrlEx m_ListCtrl;
-	
-	CString fileSpec;
-	CString str;
-	CString m_command;
-	CString m_identical;
-	int		m_azonos;			// azonossági kritériumok fennállásánalk aktuális száma 
-	
-	CString m_timeconflict;
+
+	CProgressWnd wndP; 
 
 	CString p_fields;
-	CString s_fields;
-	CString k_fields;
+	CString m_command;
+	CString str;
+	CString unitedSpec;
+	CString differentSpec;
+	CString m_description;
+	FILE* fU;
+	FILE* fD;
 
-	
-	CString _contractions;
-
-	FILE *	fl;
-	FILE* fh1;
-	FILE* fh2;
-	int		m_cnt;
-
-	int		m_inputP;
-	int		m_allP;
-	int		m_unitedP;
-	int		m_maradtP;
-	int		m_deletedP;
-
-	int		m_inputM;
-	int		m_deletedM;
-	int		m_maradtM;
-
-	int		m_numberOfColumns;
-	int		nItem;
-
-	CString _tag;
-
-	CString drive;
-	CString path;
-	CString filename;
-	CString ext;
-
+	int		m_numOfGroups;
+	int		m_deleted;
+	int		m_contracted;
 
 	CSqliteDBRecordSet*	 m_recordset;
 	CSqliteDBRecordSet*	 m_recordset1;
@@ -82,77 +40,66 @@ protected:
 	CSqliteDBRecordSet*	 m_recordset3;
 	CSqliteDBRecordSet*	 m_recordset4;
 
-	CStringArray m_colors;
-	UINT	m_rgb[10];
-	
-	std:: vector<SAME> vSame;
-	std::vector<REPLACE> v_Replace;
-	std::vector<SPOUSES> v_spouses1;
-	std::vector<SPOUSES> v_spouses2;
-	std::vector<KIDS> v_kids1;
-	std::vector<KIDS> v_kids2;
+	std::vector<SAMENAMES> vPeople;
 
-	
-	void same();
-	void listSameVector( CString name );
 
-	void listColumnHeader( int i );
-	BOOL sameLastName();
-	void processSame();
-	void getSpouses( CString rowid, CString sex_id );
-	void getKids( CString rowid, CString sex_id );
+	int		_group;
+	int		_status;
+	CString _gen;
+	CString _united;
+	CString _line;
+	CString _rowid;
+	CString _name;
+	CString _birth;
+	CString _death;
+	CString _father;
+	CString _mother;
+	int		_married;
 
-	int		markGroup();
-	BOOL	identical( int ix, int jx );
-	int		sameBirth( int i, int j );
-	int		sameDeath( int i, int j );
-	int		dateSame( CString date1, CString date2 );
-	int		sameFather( int i, int j );
-	int		sameMother( int i, int j );
-	int		sameSpouse( int ix, int jx );
-	int		sameKids( int ix, int jx );
-	int		timeConflict( int ix, int jx);
-	void	listRecord(  int i, int cnt, int volt );
-	void	to_v_Replace( int replace, int by );
-	void	unite( int i );
-	
-	BOOL	dateDiff(  CString date1, CString date2, int month  );
-	CString	getDateI( CString dateS, int month ) ;
+	int		_group2;
+	int		_status2;
+	CString _gen2;
+	CString _united2;
+	CString _line2;
+	CString _rowid2;
+	CString _name2;
+	CString _birth2;
+	CString _death2;	
+	CString _father2;
+	CString _mother2;
+	int		_married2;
 
-	void	pushSame();
-	void	htmlHeader();
-	void	htmlFooter();
 
 	
-	void	collectSameName( CString name );
 
+	void createColumns();
+	void collectPeople();
+	void putPeople( UINT i );
+	void processPeople();
+	void getData( UINT i );
+	void getData2( UINT i );
+	void listPeople();
+	UINT getNumOfGroups();
+	int  identical( UINT i1, UINT i2 );
+	void contract( UINT i1, UINT i2 );
+	int	birth();
+	int	death();
+	int	father();
+	int	mother();
 
-	BOOL	query( CString command );
-	BOOL	query1( CString command );
-	BOOL	query2( CString command );
-	BOOL	query3( CString command );
-	BOOL	query4( CString command );
+	void openUnited();
+	void openDifferent();
 
-	
-	void	title( int contracted );
-	void	createColumns();
-	void	fillTable( int contracted );
-
-
-
+	BOOL query( CString command );
+	BOOL query1( CString command );
+	BOOL query2( CString command );
+	BOOL query3( CString command );
+	BOOL query4( CString command );
 
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
-	afx_msg void OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
-	afx_msg void OnHtmlEdit();
-	afx_msg void OnHtmlShows();
-	afx_msg void OnHtmlPeoplefather();
-	afx_msg void OnHtmlNotepad();
-	afx_msg void OnContracted();
-	afx_msg void OnNotcontracted();
-	afx_msg void OnAll();
+	CListCtrlEx m_ListCtrl;
 };
