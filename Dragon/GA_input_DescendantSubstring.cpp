@@ -46,7 +46,8 @@ void CGaInput::splitDescendantSubstring( CString cLine )
 
 
 	generation = cLine.GetAt(0);				// generáció karakterének leszedése
-//	int tupigny = putTupigny( generation );
+	
+
 
 	if( generation < m_generationPrev ) m_known_as.Empty();
 

@@ -14,7 +14,7 @@ public:
 	CString str;
 	CString m_command;
 	CString m_cLine;
-	TCHAR m_generationPrev;
+	TCHAR	m_generationPrev;
 
 
 	int		m_error_cnt1;
@@ -62,7 +62,7 @@ public:
 	CString	m_familyName;
 	CString m_tableName;
 	CString m_known_as;
-	TCHAR	m_generationFirst; // egy tábla õsének generációja ( az elágazások összekapcsolásához kell )
+	CString	m_generationFirst; // egy tábla õsének generációja ( az elágazások összekapcsolásához kell )
 	int		m_tableAncestry;			// a táblák elsõ emberét, az õst jelzi ha TRUE; 
 	CString	m_rowidLastDescendant;
 

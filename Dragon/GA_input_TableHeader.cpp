@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Dragon.h"
-//#include "People.h"
 #include "afxdialogex.h"
 #include "utilities.h"
 #include "GA_input.h"
