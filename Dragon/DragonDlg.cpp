@@ -41,10 +41,9 @@
 #include "gedcomin.h"
 
 #include "checkDateFormat.h"
-#include "checkGenerations.h"
-#include "checkLifespan.h"
+#include "checkGenerations1.h"
 #include "CheckMotherDeath.h"
-#include "CheckFatherDeath9.h"
+#include "CheckFatherDeath.h"
 #include "CheckSpousesDiff.h"
 #include "CheckParentChild.h"
 #include "CheckSpouseAge.h"
@@ -61,7 +60,7 @@
 #include "GA_ascendantsChain.h"
 #include "SameCouples.h"
 #include "SamePeople.h"
-
+#include "checkLifespan.h"
 
 #include "version.h"
 
@@ -959,14 +958,14 @@ void CDragonDlg::OnClose()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnGenerationcode()
 {
-	CcheckGenerations dlg;
+	CCheckGenerations1 dlg;
 	if( dlg.DoModal() == IDCANCEL ) return;
 
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnCheckLifespan()
 {
-	CLifespanParam dlg;
+	CLifeSpan dlg;
 	dlg.DoModal();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

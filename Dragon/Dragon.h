@@ -340,7 +340,7 @@ public:
 	int		isFirstName( CString name );
 	int		getNumberOfDb( std::vector<CString>* vE );
 	int		getYearFromDate( CString date );
-
+	CString getHtmlLine( CString lineNumber );
 
 	CWnd* _dlg;
 
@@ -356,6 +356,7 @@ public:
 	afx_msg void OnEmail();
 	afx_msg void OnCheckIntegrity();
 
+	afx_msg void OnCheckGenerations();
 };
 extern CDragonApp theApp;
 

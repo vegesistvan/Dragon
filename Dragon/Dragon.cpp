@@ -9,6 +9,7 @@
 #include "ProgressWnd.h"
 #include "OpenDatabase.h"
 #include "checkIntegrity.h"
+#include "CheckGenerations.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -26,6 +27,7 @@ ON_COMMAND(ID_PRIVAT_FOLYT, &CDragonApp::OnPrivatFolyt)
 ON_COMMAND(ID_HUSBAND_WIFE, &CDragonApp::OnHusbandWife)
 ON_COMMAND(ID_EMAIL, &CDragonApp::OnEmail)
 ON_COMMAND(ID_CHECK_INEGRITY, &CDragonApp::OnCheckIntegrity)
+ON_COMMAND(ID_CHECK_GENERATIONS, &CDragonApp::OnCheckGenerations)
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CDragonApp::CDragonApp()
@@ -685,4 +687,10 @@ void CDragonApp::OnCheckIntegrity()
 {
 	CCheckIntegrity cp;
 	cp.integrity();
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDragonApp::OnCheckGenerations()
+{
+	CCheckGenerations dlg;
+	dlg.DoModal();
 }

@@ -202,6 +202,7 @@ typedef struct
 	int		contracted;			// false: nincs a csoportban összevont ember, az egész vSame a hibás oldalon listázandó
 								// true: van a VSame-ben összevont ember, az egész vSame az összevontak oldalán listázandó
 	CString rowidM;				// házaság azonosítója
+	CString dateM;				// házasság dátuma
 
 	CString rowidS1;			// férj adatai
 	CString sex_idS1;
@@ -249,7 +250,12 @@ typedef struct
 	CString birth;
 	CString death;
 	CString father;
+	CString birthF;
+	CString deathF;
 	CString mother;
+	CString birthM;
+	CString deathM;
+	CString spouses;
 	int		married;
 }SAMENAMES;
 

@@ -210,10 +210,12 @@ void CGaInput::splitDescNameString( CString nameSubstring )
 		if( iswupper( word.GetAt(0) ) && word[m-1] == ',' )	// ha egy nagybetûs szó utolsó karaktere vesszõ, akkor utána már comment következik
 		{
 			str = word.Left( m-1 );
-			if( ( d.sex_id = isFirstName( str ) ) != - 1 )
+			if( ( sex_id = isFirstName( str ) ) != - 1 )
+//			if( ( d.sex_id = isFirstName( str ) ) != - 1 )
 			{
 				first_name		+= str;
 				d.first_name	= first_name;
+				d.sex_id		= sex_id;
 				if( i + 1 < n )
 					d.comment		= packWords(&A, i+1, n - i - 1 );
 
@@ -247,8 +249,6 @@ void CGaInput::splitDescNameString( CString nameSubstring )
 			d.sex_id = sex_id;
 		}
 	}
-	if( d.sex_id == 0 )
-		d.sex_id = 1;
 	first_name.Trim();
 	d.first_name = first_name;
 

@@ -22,15 +22,12 @@ protected:
 	CListCtrlEx m_ListCtrl;
 	CStdioFile gafile;
 
+	std::vector<UINT> vPos;
 	CString m_command;
 	CString str;
 	CString cLine;
 
-	int m_lineNumberPrev;
-
 	CString getHtmlLine( CString lineNumber );
-	CString cleanHtmlLine( CString cLine );
-
 	void OnHtmlEdit();
 	void OnHtmlNotepad();
 

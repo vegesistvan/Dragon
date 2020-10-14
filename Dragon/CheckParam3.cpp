@@ -44,6 +44,7 @@ BOOL CCheckParam3::OnInitDialog()
 
 	SetWindowTextW( _caption );
 
+	m_Combo.AddString( L"0" );
 	m_Combo.AddString( L"1" );
 	m_Combo.AddString( L"2" );
 	m_Combo.AddString( L"3" );
@@ -56,7 +57,7 @@ BOOL CCheckParam3::OnInitDialog()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckParam3::OnBnClickedOk()
 {
-	_azonos = m_Combo.GetCurSel() + 1;
+	_azonos = m_Combo.GetCurSel();
 	_all =  m_RadioAll.GetCheck();
 	_html = m_RadioList.GetCheck();
 	CDialogEx::OnOK();

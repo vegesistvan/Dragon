@@ -1,31 +1,29 @@
 #pragma once
-#include "afxwin.h"
+#include "listctrlex.h"
 
 
-// CLifespanParam dialog
+// CLifeSpan dialog
 
-class CLifespanParam : public CDialogEx
+class CLifeSpan : public CDialogEx
 {
-	DECLARE_DYNAMIC(CLifespanParam)
+	DECLARE_DYNAMIC(CLifeSpan)
+	DECLARE_EASYSIZE
 
 public:
-	CLifespanParam(CWnd* pParent = NULL);   // standard constructor
-	virtual ~CLifespanParam();
+	CLifeSpan(CWnd* pParent = NULL);   // standard constructor
+	virtual ~CLifeSpan();
+
+	CString _fileSpec;
+	CString _caption;
 
 // Dialog Data
 	enum { IDD = IDD_CHECK_LIFESPAN };
 
-	CString _info;
-
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
-	CString str;
-	FILE * fl;
-	CString m_command;
-
 	int _lifespan;
-	BOOL _mfc;
+	CString m_command;
 
 	CSqliteDBRecordSet*	 m_recordset;
 	CSqliteDBRecordSet*	 m_recordset1;
@@ -35,10 +33,22 @@ protected:
 	BOOL query1( CString command );
 	BOOL query2( CString command );
 
+	void createColumns();
+	void fillTable();
+	CString str;
+	void OnHtmlEdit();
+	void OnHtmlNotepad();
+	void OnHtmlShows();
+	void OnRokonsag();
+
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnInitDialog();
-
-	afx_msg void OnBnClickedOk();
-	CButton m_RadioMfc;
+	CListCtrlEx m_ListCtrl;
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
+	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
+	afx_msg void OnGahtmlLine();
+	afx_msg void OnClickList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnList();
 };

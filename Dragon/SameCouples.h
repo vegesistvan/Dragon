@@ -135,6 +135,10 @@ protected:
 
 	CProgressWnd wndP; 
 
+	CString m_info;
+	CString m_head;
+	CString m_description;
+	CString m_columns;
 
 	CString _birth;
 	CString _death;
@@ -169,10 +173,11 @@ protected:
 
 	UINT	m_numOfGroups;
 	int		m_contracted;
-	CString m_description;
-
+	
 //////////////////////////////////////////////////////////	
 	CString rowidM_1;
+	CString dateM_1;
+	
 
 	UINT	group_1;
 	int		statusS1_1;
@@ -203,6 +208,7 @@ protected:
 
 	UINT	group_2;
 	CString rowidM_2;
+	CString dateM_2;
 	int		statusS1_2;
 	CString sex_idS1_2;
 	CString rowidS1_2;
@@ -238,6 +244,7 @@ protected:
 	CString mother2Ref;
 
 	CString m_rowidMother;
+	int		_azonos;
 
 
 	CListCtrlEx m_ListCtrl;
@@ -257,12 +264,12 @@ protected:
 	void openUnited();
 	void openDifferent();
 
+	void createHead( CString title );
 //	void createColumns();
 	void sameSpouses();
 	void getSameCouples();
 	void listCtrlLine( UINT i );
 	void setData( UINT i1, UINT i2 );
-
 
 	void referenceValues();
 	void processSame();
@@ -274,6 +281,16 @@ protected:
 	void printYellow( UINT i, int nItem );
 
 	bool identical( UINT i1, UINT i2 );
+	int		birth1();
+	int		death1();
+	int		mother1( );
+	int		father1();
+
+	int		birth2();
+	int		death2();
+	int		mother2( );
+	int		father2();
+
 	void ReplaceSpouse1( CString rowid, CString rowidBy, CString name, int source );
 	void ReplaceSpouse2( CString rowid, CString rowidBy, CString name, int source );
 

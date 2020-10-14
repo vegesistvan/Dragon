@@ -21,31 +21,48 @@ protected:
 
 	CProgressWnd wndP; 
 
-	CString p_fields;
+	CString m_head;				// html fejléc
+	CString m_description;		// leírás a html fájlban
+	CString m_columns;			// oszlop feliratok a html fájlban
+	CString p_fields;			// lekérdezett people oszlopok
 	CString m_command;
 	CString str;
-	CString unitedSpec;
-	CString differentSpec;
-	CString m_description;
-	FILE* fU;
-	FILE* fD;
+	CString m_name;				// egy ember neve, amit elõírhatunk vizsgélatra
+	
+	CString unitedSpec;			// egyesített bejegyzéseket listázó fájl
+	CString differentSpec;		// különbözü bejegyzéseket listázó fájl
+	
+	FILE* fU;  
+	FILE* fD;  
 
-	int		m_numOfGroups;
-	int		m_deleted;
-	int		m_contracted;
+	int		m_deleted;			// törölt bejegyzések száma
+	int		m_contracted;		// jelzi, hogy vannak összevont bejegyzések a vPeople vektorban
+	int		_azonos;			// az egyesítéshez szükséges azonosságok száma
+
 
 	CSqliteDBRecordSet*	 m_recordset;
 	CSqliteDBRecordSet*	 m_recordset1;
 	CSqliteDBRecordSet*	 m_recordset2;
-	CSqliteDBRecordSet*	 m_recordset3;
-	CSqliteDBRecordSet*	 m_recordset4;
 
 	std::vector<SAMENAMES> vPeople;
 
+// referencia adatok az összehasonlításhoz
+	CString m_birthR;
+	CString m_deathR;
+	CString m_fatherR;
+	CString m_motherR;
+	CString m_birthFR;
+	CString m_deathFR;
+	CString m_birthMR;
+	CString m_deathMR;
+	CString m_spousesR;
+	CString	m_generationR;
 
+// egy rekord adatai
 	int		_group;
 	int		_status;
 	CString _gen;
+	CString _source;
 	CString _united;
 	CString _line;
 	CString _rowid;
@@ -55,10 +72,17 @@ protected:
 	CString _father;
 	CString _mother;
 	int		_married;
+	CString _birthF;
+	CString _deathF;
+	CString _birthM;
+	CString _deathM;
+	CString _spouses;
 
+// egy másik rekord adatai
 	int		_group2;
 	int		_status2;
 	CString _gen2;
+	CString _source2;
 	CString _united2;
 	CString _line2;
 	CString _rowid2;
@@ -68,24 +92,26 @@ protected:
 	CString _father2;
 	CString _mother2;
 	int		_married2;
+	CString _birthF2;
+	CString _deathF2;
+	CString _birthM2;
+	CString _deathM2;
+	CString _spouses2;
 
 
 	
-
-	void createColumns();
+	void createHead( CString title );
 	void collectPeople();
-	void putPeople( UINT i );
+	void putPeople( CString name, UINT i );
 	void processPeople();
 	void getData( UINT i );
 	void getData2( UINT i );
 	void listPeople();
-	UINT getNumOfGroups();
 	int  identical( UINT i1, UINT i2 );
 	void contract( UINT i1, UINT i2 );
-	int	birth();
-	int	death();
-	int	father();
-	int	mother();
+//	int gen();
+	void setRef( int i ) ;
+	void resetRef();
 
 	void openUnited();
 	void openDifferent();
@@ -93,8 +119,6 @@ protected:
 	BOOL query( CString command );
 	BOOL query1( CString command );
 	BOOL query2( CString command );
-	BOOL query3( CString command );
-	BOOL query4( CString command );
 
 	DECLARE_MESSAGE_MAP()
 public:

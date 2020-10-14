@@ -1,9 +1,6 @@
-// CheckFatherDeath9.cpp : implementation file
-//
-
 #include "stdafx.h"
 #include "Dragon.h"
-#include "CheckFatherDeath9.h"
+#include "CheckFatherDeath.h"
 #include "afxdialogex.h"
 #include "html_Lines.h"
 
@@ -112,7 +109,7 @@ BOOL CCheckFatherDeath9::OnInitDialog()
 	CDialogEx::OnInitDialog();
 	EASYSIZE_ADD( IDC_LIST,	ES_BORDER,	ES_BORDER,		ES_BORDER,		ES_BORDER,	0 );
 	EASYSIZE_INIT();
-
+/*
 	CString info = L"\
 Azokat a családokat (apa,anya, gyerekek) listázzuk, akinél az apa halála után több mint 9 hónapra született gyerek.\
 ";
@@ -121,7 +118,7 @@ Azokat a családokat (apa,anya, gyerekek) listázzuk, akinél az apa halála után tö
 		OnCancel();
 		return FALSE;
 	}
-
+*/
 	CString title = L"Az apa halála után több mint 9 hónapra született gyerekek.                               piros: apa            kék: anya             sárga: kritikus dátumok";
 	SetWindowTextW( title );
 	

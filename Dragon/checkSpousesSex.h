@@ -7,7 +7,7 @@
 class CCheckSpousesSex : public CDialogEx
 {
 	DECLARE_DYNAMIC(CCheckSpousesSex)
-	DECLARE_EASYSIZE
+//	DECLARE_EASYSIZE
 
 public:
 	CCheckSpousesSex(CWnd* pParent = NULL);   // standard constructor
@@ -34,10 +34,9 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnInitDialog();
-	afx_msg void OnSize(UINT nType, int cx, int cy);
-	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
 	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnGahtmlLine();
 	afx_msg void OnList();
 
+	afx_msg void OnLvnItemchangedList(NMHDR *pNMHDR, LRESULT *pResult);
 };

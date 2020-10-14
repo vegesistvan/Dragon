@@ -57,11 +57,20 @@ BOOL CCheckMotherIndex::OnInitDialog()
 
 	CString info = L"\
 Sorpárokat láthatunk az alábbi listában. Az elsõ sor a szülõ, a második a gyermek sora a ga-html fájlban.\
-\r\n\
-A gyermek annya-indexe és az apa feleségeinek száma között van ellentmondás.\
+A gyermek annya-indexe és az apa feleségeinek száma között van ellentmondás.\r\n\n\
+Csak összevonás elõtt van értelem ezt a listát elemezni, mert összevonás után a GA.htl-ben való sorok száma \
+összekeveredik.\r\n\r\n\
+Ha leányági leszármazottak gyeremekei is vannak a GA-html-ben, akkor az apa és az anya felcserélõdik. Erre jelenleg nincs felkészülve a program.\
 ";
 	GetDlgItem( IDC_EDIT )->SetWindowTextW( info );
 
+	CProgressWnd wndP( NULL, L"Anya-indexek ellenõrzése..." );
+	wndP.GoModal();
+
+#ifndef _DEBUG
+	str.Format( L"GA-html fájl sorindexeinek elkészítése..." );
+	wndP.SetText( str );
+#endif
 
 	m_ListCtrl.KeepSortOrder(TRUE);
 	m_ListCtrl.SetExtendedStyle(m_ListCtrl.GetExtendedStyle()| LVS_EX_GRIDLINES );
@@ -70,9 +79,15 @@ A gyermek annya-indexe és az apa feleségeinek száma között van ellentmondás.\
 	m_ListCtrl.InsertColumn( 1,	L"line#",	LVCFMT_RIGHT,	 60,-1,COL_NUM );
 	m_ListCtrl.InsertColumn( 2,	L"név",		LVCFMT_LEFT,	200,-1,COL_TEXT);
 
-	CProgressWnd wndP( NULL, L"Anya-indexek ellenõrzése..." );
-	wndP.GoModal();
+	theApp.m_inputCode = GetInputCode( theApp.m_htmlFileSpec );
+	gafile.Open( theApp.m_htmlFileSpec, CFile::modeRead );
+	vPos.clear();
+	vPos.push_back(0);
+	while( 	gafile.ReadString( cLine ) )
+		vPos.push_back( gafile.GetPosition() );
 
+
+	
 	m_command = L"SELECT rowid, lineNumber, mother_index, father_id, first_name, last_name FROM people ORDER BY lineNumber";
 	if( !theApp.query( m_command ) )
 	{
@@ -80,15 +95,15 @@ A gyermek annya-indexe és az apa feleségeinek száma között van ellentmondás.\
 		return false;
 	}
 
-	theApp.m_inputCode = GetInputCode( theApp.m_htmlFileSpec );
-	gafile.Open( theApp.m_htmlFileSpec, CFile::modeRead );
+#ifndef _DEBUG
+	str.Format( L"Gyermek-anya rekordok vizsgálata..." );
+	wndP.SetText( str );
+#endif
 
-	
 	wndP.SetRange(0, theApp.m_recordset->RecordsCount() );
 	wndP.SetPos(0);
 	wndP.SetStep(1);
 
-	m_lineNumberPrev = 1;
 	for( int i = 0; i < theApp.m_recordset->RecordsCount(); ++i, theApp.m_recordset->MoveNext() )
 	{
 		lineNumber		= theApp.m_recordset->GetFieldString( 1 );
@@ -108,16 +123,18 @@ A gyermek annya-indexe és az apa feleségeinek száma között van ellentmondás.\
 			++cnt;
 			cntS.Format( L"%d", cnt );
 			lineNumberF	= theApp.m_recordset1->GetFieldString( 0 );
-
-			str = getHtmlLine( lineNumberF );
+			
 			nItem = m_ListCtrl.InsertItem( nItem, cntS );
 			m_ListCtrl.SetItemText( nItem, 1, lineNumberF);
+			str = getHtmlLine( lineNumberF );
 			m_ListCtrl.SetItemText( nItem, 2, str );
 			++nItem;
 
-			str = getHtmlLine( lineNumber );
+			// gyermek 
+			
 			nItem = m_ListCtrl.InsertItem( nItem, cntS );
-			m_ListCtrl.SetItemText( nItem, 1, lineNumber);
+			m_ListCtrl.SetItemText( nItem, 1, lineNumber );
+			str = getHtmlLine( lineNumber );
 			m_ListCtrl.SetItemText( nItem, 2, str );
 			++nItem;
 
@@ -131,7 +148,7 @@ A gyermek annya-indexe és az apa feleségeinek száma között van ellentmondás.\
 	for(int i = 0;i < m_ListCtrl.GetHeaderCtrl()->GetItemCount();++i)
 		m_ListCtrl.SetColumnWidth(i,LVSCW_AUTOSIZE_USEHEADER);
 	wndP.DestroyWindow();
-
+	vPos.clear();
 	gafile.Close();
 
 
@@ -151,44 +168,16 @@ void CCheckMotherIndex::OnSizing(UINT fwSide, LPRECT pRect)
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CCheckMotherIndex::getHtmlLine( CString lineNumberS )
+CString CCheckMotherIndex::getHtmlLine( CString lineNumber )
 {
-	int lineNumber = _wtoi( lineNumberS );
-	int cnt;
+	int ln = _wtoi( lineNumber );
 
-	cnt = lineNumber - m_lineNumberPrev;
-	if( cnt < 0 )
-		return cLine;
-
-	for( int i = 0; i < cnt; ++i )
-		gafile.ReadString( cLine );		// átugrik cnt sort
-	gafile.ReadString( cLine );			// beolvassa a kért sort
+	gafile.Seek( vPos.at( ln - 1 ), SEEK_SET );
+	gafile.ReadString( cLine );		// átugrik cnt sort
 	cLine.Trim();
 	if( theApp.m_inputCode == UTF8 || theApp.m_inputCode == UTF8BOM ) cLine = Utf8ToAnsi( cLine );
-
-	m_lineNumberPrev = lineNumber + 1;
-
 	cLine = cleanHtmlLine( cLine );
 	return cLine;
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CCheckMotherIndex::cleanHtmlLine( CString cLine )
-{
-	CString htmlLine = cLine;
-	int		pos;
-	TCHAR	gen;
-
-	if( ( pos = cLine.ReverseFind('>') ) != -1 )
-	{
-		cLine = cLine.Mid( pos+1 );
-		gen = cLine[0];
-		if( ( pos = cLine.ReverseFind(';') ) != -1 )
-		{
-			cLine = cLine.Mid( pos+1 );
-			htmlLine.Format( L"%c %s", gen, cLine ); 
-		}
-	}
-	return htmlLine;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 LRESULT CCheckMotherIndex:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)

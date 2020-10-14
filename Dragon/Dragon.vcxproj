@@ -185,6 +185,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="about.h" />
+    <ClInclude Include="CheckGenerations.h" />
     <ClInclude Include="checkIntegrity.h" />
     <ClInclude Include="EditComment.h" />
     <ClInclude Include="EditMarriage.h" />
@@ -197,7 +198,7 @@
     <ClInclude Include="CheckNames.h" />
     <ClInclude Include="checkParam0.h" />
     <ClInclude Include="checkParentChild.h" />
-    <ClInclude Include="checkFatherDeath9.h" />
+    <ClInclude Include="checkFatherDeath.h" />
     <ClInclude Include="checkMotherDeath.h" />
     <ClInclude Include="checkParam.h" />
     <ClInclude Include="checkParam3.h" />
@@ -226,13 +227,11 @@
     <ClInclude Include="EditFirstName.h" />
     <ClInclude Include="EditTable.h" />
     <ClInclude Include="FirstLetter.h" />
-    <ClInclude Include="checkGenerations.h" />
-    <ClInclude Include="checkParam1.h" />
+    <ClInclude Include="checkGenerations1.h" />
     <ClInclude Include="html_Edit.h" />
     <ClInclude Include="html_Lines.h" />
     <ClInclude Include="html_Brackets.h" />
     <ClInclude Include="checkParam4.h" />
-    <ClInclude Include="checkLifespanListCtrl.h" />
     <ClInclude Include="checkLifespan.h" />
     <ClInclude Include="GA_ascendants.h" />
     <ClInclude Include="Languages.h" />
@@ -241,6 +240,7 @@
     <ClInclude Include="namesParam.h" />
     <ClInclude Include="NewPeople.h" />
     <ClInclude Include="OpenDatabase.h" />
+    <ClInclude Include="Param1.h" />
     <ClInclude Include="Pictures.h" />
     <ClInclude Include="SamePeople.h" />
     <ClInclude Include="SameName.h" />
@@ -251,7 +251,6 @@
     <ClInclude Include="Table_blobs.h" />
     <ClInclude Include="Table_people.h" />
     <ClInclude Include="Table_places.h" />
-    <ClInclude Include="checkParam2.h" />
     <ClInclude Include="SelectMother.h" />
     <ClInclude Include="Setup.h" />
     <ClInclude Include="html_Descendants.h" />
@@ -307,6 +306,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="about.cpp" />
+    <ClCompile Include="CheckGenerations.cpp" />
     <ClCompile Include="checkIntegrity.cpp" />
     <ClCompile Include="EditComment.cpp" />
     <ClCompile Include="EditMarriage.cpp" />
@@ -320,7 +320,7 @@
     <ClCompile Include="CheckNames.cpp" />
     <ClCompile Include="checkParam0.cpp" />
     <ClCompile Include="checkParentChild.cpp" />
-    <ClCompile Include="checkFatherDeath9.cpp" />
+    <ClCompile Include="checkFatherDeath.cpp" />
     <ClCompile Include="checkMotherDeath.cpp" />
     <ClCompile Include="checkParam.cpp" />
     <ClCompile Include="checkParam3.cpp" />
@@ -351,14 +351,12 @@
     <ClCompile Include="EditFirstName.cpp" />
     <ClCompile Include="EditTable.cpp" />
     <ClCompile Include="FirstLetter.cpp" />
-    <ClCompile Include="checkGenerations.cpp" />
+    <ClCompile Include="checkGenerations1.cpp" />
     <ClCompile Include="html.cpp" />
-    <ClCompile Include="checkParam1.cpp" />
     <ClCompile Include="html_Edit.cpp" />
     <ClCompile Include="html_Lines.cpp" />
     <ClCompile Include="html_Brackets.cpp" />
     <ClCompile Include="checkParam4.cpp" />
-    <ClCompile Include="checkLifespanListCtrl.cpp" />
     <ClCompile Include="checkLifespan.cpp" />
     <ClCompile Include="GA_ascendants.cpp" />
     <ClCompile Include="Languages.cpp" />
@@ -367,6 +365,7 @@
     <ClCompile Include="namesParam.cpp" />
     <ClCompile Include="NewPeople.cpp" />
     <ClCompile Include="OpenDatabase.cpp" />
+    <ClCompile Include="Param1.cpp" />
     <ClCompile Include="Pictures.cpp" />
     <ClCompile Include="SamePeople.cpp" />
     <ClCompile Include="SameName.cpp" />
@@ -376,7 +375,6 @@
     <ClCompile Include="Table_blobs.cpp" />
     <ClCompile Include="Table_people.cpp" />
     <ClCompile Include="Table_places.cpp" />
-    <ClCompile Include="checkParam2.cpp" />
     <ClCompile Include="SelectMother.cpp" />
     <ClCompile Include="Setup.cpp" />
     <ClCompile Include="GA_input_DescendantSubstring.cpp" />

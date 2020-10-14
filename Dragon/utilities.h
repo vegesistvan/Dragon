@@ -33,6 +33,7 @@ CString getWord( CString str, int n, int *pos );
 CString getFirstWord( CString str );
 CString getSecondWord( CString str );
 CString getLastWord( CString str );
+CString sepFirstName( CString str );
 
 CString lowerToUpper( CString str );
 CString toLower( CString str );

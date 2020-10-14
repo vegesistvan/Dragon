@@ -40,7 +40,7 @@ BOOL CCheckNames::OnInitDialog()
 	EASYSIZE_ADD( IDC_EDIT,	ES_BORDER,	ES_BORDER,		ES_BORDER,		ES_KEEPSIZE,	0 );
 	EASYSIZE_ADD( IDC_LIST,	ES_BORDER,	ES_BORDER,		ES_BORDER,		ES_BORDER,	0 );
 	EASYSIZE_INIT()
-
+/*
 	CString title = L"A ga.html fájl beolvasásakor elõfordulhatnak olyan emberek, akiknek a vezeték vagy keresztnevét nem tudja a \
 program megállapítani, ezért vezeték vagy keresztneve üres marad. Ezeket az eseteket vizsgálhatjuk meg ezzel a funkcióval.\
 ";
@@ -49,7 +49,7 @@ program megállapítani, ezért vezeték vagy keresztneve üres marad. Ezeket az eset
 		OnCancel();
 		return false;
 	}
-
+*/
 	CString caption;
 	caption.Format( L"Név problémák az adatbázisban amely %s GA.htm fájlból lett feltöltve", theApp.m_htmlFileName );
 	SetWindowTextW( caption );

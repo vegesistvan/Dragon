@@ -6,31 +6,7 @@
 #include "SamePeople.h"
 #include "afxdialogex.h"
 #include <algorithm>
-
-enum
-{
-	L_CNT = 0,
-	L_ROWID, 
-	L_GENERATIONS1,
-	L_SOURCES1,
-	L_UNITEDS1,
-	L_LINES1,
-	L_ROWIDS1,
-	L_SPOUSE1,
-	L_BIRTHS1,
-	L_DEATHS1,
-	L_MOTHERS1,
-	L_GENERATIONS2,
-	L_SOURCES2,
-	L_UNITEDS2,
-	L_LINES2,
-	L_ROWIDS2,
-	L_SPOUSE2,
-	L_BIRTHS2,
-	L_DEATHS2,
-	L_MOTHERS2,
-};
-
+#include "Param1.h"
 enum
 {
 	P_ROWID = 0,
@@ -55,9 +31,54 @@ bool sortByGroup(const SAMENAMES &v1, const SAMENAMES &v2)
 {
 	return( v1.group < v2.group );
 }
+bool sortBySource(const SAMENAMES &v1, const SAMENAMES &v2) 
+{
+	return( v1.source < v2.source );
+}
 bool sortByMother(const SAMENAMES &v1, const SAMENAMES &v2) 
 {
 	return( v1.mother < v2.mother );
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// return TRUE ne cseréljen
+// return FALS cseréljen
+bool sortByGroupStatus(const SAMENAMES &v1, const SAMENAMES &v2) 
+{ 
+	if( v1.group > v2.group )
+		return false;
+	if( v1.group == v2.group )
+	{
+		if( v1.status < v2.status )
+			return true;
+		else
+			return false;
+	}
+	return true;
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Ha referencia és par2 is meg van adva, akkor ahhoz hasonlítja par2-t.
+// Ha nincs, de par1 és par2 is adva van, akkor ezeket hasonlítja.
+// par1 vagy par2 üres, akkor return 0;
+//  1 : mindkettõ meg van adva és egyezik;
+//  0 : csak az egyik vagy egy sincs van megadva, így nincs ellentmondás
+//  -1 : mindkettõ meg van adva és nem egyezik
+int same( CString ref, CString par1, CString par2 )
+{
+	if( !ref.IsEmpty() && !par2.IsEmpty() )
+	{
+		if( par1 == par2 )
+			return 1;
+		else
+			return -1;
+	}
+	if( !par1.IsEmpty() && !par2.IsEmpty() )
+	{
+		if( par1 == par2 )
+			return 1;
+		else
+			return -1;
+	}
+	return 0;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 IMPLEMENT_DYNAMIC(CSamePeople, CDialogEx)
@@ -68,8 +89,6 @@ CSamePeople::CSamePeople(CWnd* pParent /*=NULL*/)
 	m_recordset		= new CSqliteDBRecordSet;
 	m_recordset1	= new CSqliteDBRecordSet;
 	m_recordset2	= new CSqliteDBRecordSet;
-	m_recordset3	= new CSqliteDBRecordSet;
-	m_recordset4	= new CSqliteDBRecordSet;
 
 		p_fields = L"\
 rowid,\
@@ -85,21 +104,45 @@ death_date,\
 father_id,\
 mother_id\
 ";
+
+
 	m_description = L"\
 Az oszlopok jelentése:\n\n\
 gr     - group, az azonos nevû embercsoprton belül azonosnak éréklelt alcsoportok sorszáma.\n\
 st     - status, az azonosítás eredménye: -1 azonos, azaz egyesített, majd törölt, 0: változatlanul hagyott, 1: ez az egyesített bejegyzés.\n\
 line   - a bejegyzés sorszáma a GA html fájlban.\n\
-u      - united, az ember u számú realizáció összevonása.\n\
+u      - united, az ember u számú bejegyzés összevonása.\n\
 m      - married, X: házasember, üres: nem házas.\n\
 G      - generáció, az ember generációs jele a GA fájlban.\n\
-rowid  - a realizáció azonosítója.\n\
-name   - az ember neve.\n\
-birth  - születési dátum.\n\
-death  - halálozás dátuma.\n\
-mother - az ember anyjának neve.\n\n";
+S      - az enber elõfordulása ( 1-2-3-4 )\n\
+rowid  - a bejegyzés azonosítója\n\
+name   - az ember neve\n\
+birth  - születési dátum\n\
+death  - halálozás dátuma\n\
+father - apa neve\n\
+mother - anya neve.\n\n\
+";
 
+	m_columns.Format( L"\
+<b>\
+%90s %s %s\n\
+%2s %2s %9s %2s %1s %1s %1s \
+%8s \
+%-30s %12s %12s \
+%-30s %12s %12s \
+%-30s %12s %12s\n\
+</b>\n",\
+L" ",\
+L"___________________ father______________________________",\
+L"____________________mother______________________________",\
+L"gr", L"st", L"line", L"u", L"m", L"G", L"S",\
+L"rowid",\
+L"name", L"birth", L"death",\
+L"father", L"birth", L"death",\
+L"mother", L"birth", L"death"\
+);
 
+//	m_name = L"Balás Anna";   // ha csak egy embert akarunk vizsgálni, itt megadhatjuk a nevét
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CSamePeople::~CSamePeople()
@@ -142,69 +185,80 @@ BOOL CSamePeople::OnInitDialog()
 		return FALSE;
 	}
 
+	CString info;
+	info = L"\
+Az alábbi adatokat vizsgáljuk az azonos nevû emberek azonosságának eldöntéséhez:\r\n\
+\r\n\
+1. születési dátuma\r\n\
+2. halálozási dátuma\r\n\
+3. Férj apja neve\r\n\
+4. Férj anyja neve\r\n\
+\r\n\
+A kettõs keresztnevekbõl csak az elsõ használjuk az összehasoonlításhoz.\r\n\r\n\
+Ha a vizsgált adatok között ellentmondás van, akkor nyilvánvalóan nem azonos személy bejegyzéseirõl van szó.\r\n\
+Ha nincs ellentmondás, akkor a megadott számú adat egyezése szükséges az azonosság megállapításához.\
+\r\n\r\n\
+";
+
+
+	CParam1 dlg;
+	dlg.m_caption	= L"Azonos nevû emberek összevonása";
+	dlg.m_info		= info;
+	dlg.m_text		= L"Az azonossághoz szükséges egyezõ adatok száma:";
+	dlg._default	= 1;
+	if( dlg.DoModal() == IDCANCEL )
+	{
+		OnCancel();
+		return false;
+	}
+	_azonos	= dlg._azonos;
+
+
 	openDifferent();
 	openUnited();
 
 	m_deleted = 0;
-	createColumns();
 	collectPeople();
 
 	m_command.Format( L"PRAGMA user_version='2'" );
 	theApp.execute( m_command );
 
-	fclose( fU );
-	fclose( fD );
-
 	if( m_deleted )
 	{
-		theApp.execute( L"VACUUM");
-		str.Format( L"%d ember összevonása történt", m_deleted );
-		AfxMessageBox( str );
+		if( m_deleted > 100 )
+		{
+#ifndef _DEBUG
+			str.Format( L"Adatbázis tömörítése..." );
+			wndP.SetText( str );
+#endif
+	//		theApp.execute( L"VACUUM");
+		}
+		wndP.DestroyWindow();
+		str.Format( L"\n\n%d bejegyzés került összevonásra.\n\n", m_deleted );
+		fwprintf( fU, str );
+		fclose( fU );
 		theApp.showHtmlFile( unitedSpec );
-		
-		OnCancel();
 	}
 	else
 	{
-		AfxMessageBox( L"Nincs összevonható ember." );
+		wndP.DestroyWindow();
+		fwprintf( fD, L"nincs összevonható bejegyzés.\n\n" );
+		fclose( fU );
 	}
+	fclose( fD );
 	theApp.showHtmlFile( differentSpec );
+	OnCancel();
 	return TRUE;
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSamePeople::createColumns()
-{
-	m_ListCtrl.SetExtendedStyle(m_ListCtrl.GetExtendedStyle()| LVS_EX_GRIDLINES );
-	m_ListCtrl.InsertColumn( L_CNT,				L"cnt",		LVCFMT_RIGHT,	 30,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( L_ROWID,			L"marriage",	LVCFMT_RIGHT,	 60,-1,COL_NUM);
-
-	m_ListCtrl.InsertColumn( L_GENERATIONS1,	L"G",		LVCFMT_RIGHT,	 25,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( L_SOURCES1,		L"S",		LVCFMT_LEFT,	 25,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( L_UNITEDS1,		L"U",		LVCFMT_RIGHT,	 25,-1,COL_NUM );
-	m_ListCtrl.InsertColumn( L_LINES1,			L"lineS1",	LVCFMT_RIGHT,	 60,-1,COL_NUM );
-	m_ListCtrl.InsertColumn( L_ROWIDS1,			L"rowidS1",	LVCFMT_RIGHT,	 60,-1,COL_NUM );
-	m_ListCtrl.InsertColumn( L_SPOUSE1,			L"spouse1",	LVCFMT_LEFT,	200,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( L_BIRTHS1,			L"birthS1",	LVCFMT_LEFT,	 80,-1,COL_TEXT );
-	m_ListCtrl.InsertColumn( L_DEATHS1,			L"deathS1",	LVCFMT_LEFT,	 80,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( L_MOTHERS1,		L"motherS1",LVCFMT_LEFT,	150,-1,COL_TEXT);
-
-	m_ListCtrl.InsertColumn( L_GENERATIONS2,	L"G",		LVCFMT_RIGHT,	 25,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( L_SOURCES2,		L"S",		LVCFMT_LEFT,	 25,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( L_UNITEDS2,		L"U",		LVCFMT_RIGHT,	 25,-1,COL_NUM );
-	m_ListCtrl.InsertColumn( L_LINES2,			L"lineS2",	LVCFMT_RIGHT,	 60,-1,COL_NUM );
-	m_ListCtrl.InsertColumn( L_ROWIDS2,			L"rowidS1",	LVCFMT_RIGHT,	 60,-1,COL_NUM );
-	m_ListCtrl.InsertColumn( L_SPOUSE2,			L"spouse1",	LVCFMT_LEFT,	200,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( L_BIRTHS2,			L"birthS1",	LVCFMT_LEFT,	 80,-1,COL_TEXT );
-	m_ListCtrl.InsertColumn( L_DEATHS2,			L"deathS1",	LVCFMT_LEFT,	 80,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( L_MOTHERS2,		L"motherS1",LVCFMT_LEFT,	150,-1,COL_TEXT);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSamePeople::collectPeople()
 {
 	CString namePrev;
 	CString name;
+	CString lastName;
+	CString firstName;
 	bool	first = true;;
-	
+	int		pos;
 	
 	wndP.Create( NULL, L"Azonos nevû emberek..." );
 	wndP.GoModal();
@@ -228,19 +282,24 @@ void CSamePeople::collectPeople()
 	vPeople.clear();
 	for( UINT i = 0; i < m_recordset->RecordsCount()-1; ++i )
 	{
-		name = m_recordset->GetFieldString( P_LAST_NAME );
-		if( name.IsEmpty() ) goto cont;
-		name.Format( L"%s %s", m_recordset->GetFieldString( P_LAST_NAME ), m_recordset->GetFieldString( P_FIRST_NAME ) );
+		lastName  = m_recordset->GetFieldString( P_LAST_NAME );
+		if( lastName.IsEmpty() ) goto cont;
+
+		firstName = m_recordset->GetFieldString( P_FIRST_NAME );
+
+		name.Format( L"%s %s", lastName, sepFirstName( firstName ) );
 		if( name.TrimRight().IsEmpty() ) goto cont;
+		if( !m_name.IsEmpty() && name != m_name ) goto cont;
+
 		
 		if( name == namePrev )
 		{
 			if( first )
 			{
-				putPeople( i-1 );
+				putPeople( name, i-1 );
 				first = false;
 			}
-			putPeople( i );
+			putPeople( name, i );
 		}
 		else if( vPeople.size() )
 		{
@@ -254,7 +313,6 @@ cont:	m_recordset->MoveNext();
 		wndP.PeekAndPump();
 		if (wndP.Cancelled()) break;
 	}
-	wndP.DestroyWindow();
 	theApp.execute( L"COMMIT" );
 
 	if( vPeople.size() )
@@ -262,27 +320,28 @@ cont:	m_recordset->MoveNext();
 
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSamePeople::putPeople( UINT i )
+void CSamePeople::putPeople( CString name, UINT i )
 {
 	m_recordset->MoveTo( i );
+
 	SAMENAMES vpeople;
-	CString name;
 	CString rowid = m_recordset->GetFieldString( P_ROWID );
+	CString spouses;
+	CString fullname;
+	CString spouse_id;
+
 
 	int z;
 	if( rowid == L"136437" )
 		z = 1;
 
-
-	name.Format( L"%s %s", m_recordset->GetFieldString( P_LAST_NAME ), m_recordset->GetFieldString( P_FIRST_NAME ) );
-	vpeople.name		= name.TrimRight();
-	
+	vpeople.name		= name;
 	vpeople.group		= 0;
 	vpeople.status		= 0;
 	vpeople.rowid		= rowid;
-
 	vpeople.line		= m_recordset->GetFieldString( P_LINE );
 	vpeople.generation	= m_recordset->GetFieldString( P_GENERATION );
+	vpeople.generation.Trim();
 	vpeople.source		= m_recordset->GetFieldString( P_SOURCE );
 	vpeople.united		= m_recordset->GetFieldString( P_UNITED );
 	vpeople.sex_id		= m_recordset->GetFieldString( P_SEX_ID );
@@ -291,23 +350,26 @@ void CSamePeople::putPeople( UINT i )
 
 
 	CString father_id = m_recordset->GetFieldString( P_FATHER_ID );
-	m_command.Format( L"SELECT last_name, first_name FROM people WHERE rowid = '%s'", father_id );
+	m_command.Format( L"SELECT last_name, first_name, birth_date, death_date FROM people WHERE rowid = '%s'", father_id );
 	if( !query1( m_command ) ) return;
 
 	name.Empty();
 	if( m_recordset1->RecordsCount() )
-		name.Format( L"%s %s", m_recordset1->GetFieldString( 0 ), m_recordset1->GetFieldString( 1 ) );
+		name.Format( L"%s %s", m_recordset1->GetFieldString( 0 ), sepFirstName( m_recordset1->GetFieldString( 1 ) ) );
 	vpeople.father = name.TrimRight();
+	vpeople.birthF = m_recordset1->GetFieldString( 2 );
+	vpeople.deathF = m_recordset1->GetFieldString( 3 );
 
 	CString mother_id = m_recordset->GetFieldString( P_MOTHER_ID );
-	m_command.Format( L"SELECT last_name, first_name FROM people WHERE rowid = '%s'", mother_id );
+	m_command.Format( L"SELECT last_name, first_name, birth_date, death_date FROM people WHERE rowid = '%s'", mother_id );
 	if( !query1( m_command ) ) return;
 
 	name.Empty();
 	if( m_recordset1->RecordsCount() )
-		name.Format( L"%s %s", m_recordset1->GetFieldString( 0 ), m_recordset1->GetFieldString( 1 ) );
+		name.Format( L"%s %s", m_recordset1->GetFieldString( 0 ), sepFirstName( m_recordset1->GetFieldString( 1 ) ) );
 	vpeople.mother = name.TrimRight();
-
+	vpeople.birthM = m_recordset1->GetFieldString( 2 );
+	vpeople.deathM = m_recordset1->GetFieldString( 3 );
 
 	if( vpeople.sex_id == L"1" )
 		m_command.Format( L"SELECT count() FROM marriages WHERE spouse1_id = '%s'", rowid );
@@ -316,6 +378,28 @@ void CSamePeople::putPeople( UINT i )
 	if( !query1( m_command ) ) return;
 	int married = _wtoi( m_recordset1->GetFieldString( 0 ) );
 	vpeople.married = married;
+
+
+	if( vpeople.sex_id == L"1" )
+		m_command.Format( L"SELECT spouse2_id FROM marriages WHERE spouse1_id = '%s'", rowid );
+	else
+		m_command.Format( L"SELECT spouse1_id FROM marriages WHERE spouse2_id = '%s'", rowid );
+	if( !query1( m_command ) ) return;
+
+	
+	for( UINT i = 0; i < m_recordset1->RecordsCount(); ++i )
+	{
+		spouse_id = m_recordset1->GetFieldString( 0 );
+		m_command.Format( L"SELECT last_name, first_name FROM people WHERE rowid = '%s'", spouse_id );
+		if( !query2( m_command ) ) return;
+			fullname.Format( L"%s %s", m_recordset2->GetFieldString(0), sepFirstName( m_recordset2->GetFieldString(1) ) );
+		spouses += fullname.Trim();
+		spouses += L", ";
+		m_recordset1->MoveNext();
+	}
+	if( !spouses.IsEmpty() )
+		spouses = spouses.Left( spouses.GetLength() - 2); 
+	vpeople.spouses = spouses;
 	vPeople.push_back( vpeople );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -326,13 +410,25 @@ void CSamePeople::processPeople()
 	int z;
 	CString gen1;
 	CString gen2;
-
-	if( vPeople.at(0).name == L"Abaffy Adeodat-Arisztid" )
+	int source1;
+	int source2;
+	CString line1;
+	CString line2;
+	CString spouse1;
+	CString spouse2;
+	if( vPeople.at(0).name == L"Battyhány Zsigmond" )
 		z = 1;
 	m_contracted = 0;
+	resetRef();
+	std::sort( vPeople.begin(), vPeople.end(), sortBySource );
 	for( UINT i1 = 0; i1 < vPeople.size(); ++i1 )
 	{
-		if( db ) ++group;
+		if( db )
+		{
+			++group;
+			resetRef();  // ha új csoport kezdõdik, akkor üres rf-ek kellenek 
+
+		}
 		db = 0;
 		if( vPeople.at(i1).group == 0 )		// az i1. házaspárt még nem rendelték hozzá egyik csoporthoz sem
 		{
@@ -342,42 +438,42 @@ void CSamePeople::processPeople()
 					z = 2;
 				if( i1 != i2 && vPeople.at(i2).group == 0 )	// természetesen csak különbözõ házaspárokat vizsgál, amelyeket még nem redneltek hozzá egyik csooprthoz sem
 				{
+					spouse1 = vPeople.at(i1).spouses;
+					spouse2 = vPeople.at(i2).spouses;
+					if( spouse1 == L"Kubinyi Erzsébet" && spouse2 == spouse1 )
+						z = 1;
+					gen1 = vPeople.at( i1 ).generation;
+					gen2 = vPeople.at( i2 ).generation;
+					if( !gen1.IsEmpty() && !gen2.IsEmpty() ) continue;
 					if( identical( i1, i2 ) )
 					{
-						vPeople.at( i1 ).group = group;
-						vPeople.at( i2 ).group = group;
+						setRef( i1 );	
+						setRef( i2 );
 
-						if( vPeople.at(i1).generation.IsEmpty() )
-							gen1 = L"Z";
-						else
-							gen1 = vPeople.at( i1 ).generation;
-						if( vPeople.at(i2).generation.IsEmpty() )
-							gen2 = L"Z";
-						else
-							gen2 = vPeople.at( i2 ).generation;
+						gen1 = vPeople.at( i1 ).generation;
+						gen2 = vPeople.at( i2 ).generation;
 
-						if( gen1 < gen2 )
+
+						line1 = vPeople.at(i1).line;
+						line2 = vPeople.at(i2).line;
+						
+						source1 = _wtoi( vPeople.at(i1).source ); 
+						source2 = _wtoi( vPeople.at(i2).source ); 
+
+						if( (line1 == line2) && (source1 == source2) || gen1.IsEmpty() || gen2.IsEmpty() )
 						{
-							vPeople.at( i1 ).status = -1;
-							vPeople.at( i2 ).status = 1;
-							contract( i2, i1 );
-						}
-						else
-						{
+							vPeople.at( i1 ).group = group;
+							vPeople.at( i2 ).group = group;
 							vPeople.at( i1 ).status = 1;
 							vPeople.at( i2 ).status = -1;
 							contract( i1, i2 );
+							++db;
 						}
-						
-						m_contracted = 1;
-						++m_deleted;
-						++db;
 					}
 				}
 			}
 		}
 	}
-	m_numOfGroups = getNumOfGroups();
 	listPeople();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -389,70 +485,52 @@ int CSamePeople::identical( UINT i1, UINT i2 )
 	getData( i1 );
 	getData2( i2 );
 
+	// Ha mindkét ember leszármazott, azok nem lehetnek azonosak !!!
+	if( _source == L"1" && _source2 == L"1" )  return false;
+
 	int z;
 
-
-
-	if( vPeople.at(i1).name == L"Amadé Anna Mária" )
+	if( vPeople.at(i1).name == L"Baloghy Antónia" )
 		z = 1;
 
-	if( (vPeople.at(i1).rowid == L"87423" && vPeople.at(i2).rowid == L"87491") || (vPeople.at(i2).rowid == L"87423" && vPeople.at(i1).rowid == L"87491")  )
+	if( (vPeople.at(i1).rowid == L"154617" && vPeople.at(i2).rowid == L"154617") || (vPeople.at(i2).rowid == L"154617" && vPeople.at(i1).rowid == L"154617")  )
 		z = 1;
-	int	empty = 0;
-	int b;
-	int d;
-	int m;
+	
+	int g;
+	int	good = 0;
+	
+	if( _mother == L"Meiczer Éva" && _mother2 == L"Meiczer Éva" )
+		z = 2;
+	if( ( g = same( m_birthR, _birth, _birth2 ) ) == -1 ) return false;
+	if( g == 1 ) ++good;
 
-	if( ( b = birth() ) == -1 ) return false;  // ellentmondás
-	else
-	{
-		if( b == 0 ) ++empty;
-	}
-	if( ( d = death() ) == -1 ) return false;	// ellentmondás
-	else
-	{
-		if( d == 0 ) ++empty;
-	}
-	if( ( m = father() ) == -1 ) return false;	// ellentmondás
-	else
-	{
-		if( m == 0 ) ++empty;
-	}
-	if( ( m = mother() ) == -1 ) return false;	// ellentmondás
-	else
-	{
-		if( m == 0 ) ++empty;
-	}
-	if( empty > 2 ) return false;				// legalább egy egyezés ellentmondás nélkül 
-	return true;
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//  1 : mindkettõ meg van adva és egyezik;
-//  0 : csak az egyik van megadva, íg ynincs ellentmondás
-//  1 : mindkettõ meg van adva és nem egyezik
-int CSamePeople::birth( )
-{
-	if( !_birth.IsEmpty() && _birth == _birth2 ) return 1;
-	if( !_birth.IsEmpty() && !_birth2.IsEmpty() && _birth != _birth2 ) return -1;
-	return 0;
-}
-int CSamePeople::death( )
-{
-	if(  !_death.IsEmpty() && _death == _death2 ) return 1;
-	if(  !_death.IsEmpty() && !_death2.IsEmpty() && _death != _death2 ) return -1;
-	return 0;
-}
-int CSamePeople::father( )
-{
-	if( !_father.IsEmpty() && _father == _father2 ) return 1;
-	if(  !_father.IsEmpty() && !_father2.IsEmpty() && _father != _father2 ) return -1;
-	return 0;
-}
-int CSamePeople::mother( )
-{
-	if( !_mother.IsEmpty() && _mother == _mother2 ) return 1;
-	if(  !_mother.IsEmpty() && !_mother2.IsEmpty() && _mother != _mother2 ) return -1;
-	return 0;
+	if( ( g = same( m_deathR, _death, _death2 ) ) == -1 ) return false;
+	if( g == 1 ) ++good; 
+
+	if( ( g = same( m_fatherR, _father, _father2 ) ) == -1 ) return false;
+	if( g == 1 ) ++good; 
+
+	if( ( g = same( m_motherR, _mother, _mother2 ) ) == -1 ) return false;
+	if( g == 1 ) ++good; 
+
+	if( ( g = same( m_birthFR, _birthF, _birthF2 ) ) == -1 ) return false;
+	if( g == 1 ) ++good; 
+
+	if( ( g = same( m_deathFR, _deathF, _deathF2 ) ) == -1 ) return false;
+	if( g == 1 ) ++good; 
+
+	if( ( g = same( m_birthMR, _birthM, _birthM2 ) ) == -1 ) return false;
+	if( g == 1 ) ++good; 
+
+	if( ( g = same( m_deathMR, _deathM, _deathM2 ) ) == -1 ) return false;
+	if( g == 1 ) ++good; 
+
+	if( ( g = same( m_spousesR, _spouses, _spouses2 ) ) == -1 ) return false;
+	if( g == 1 ) ++good; 
+
+	
+	if( _azonos <= good ) return true;			// legalább _azonos számú egyezés ellentmondás nélkül 
+	return false;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Az iBy indexû emberrel helyettesíti az iDel indexû embert
@@ -468,6 +546,9 @@ void CSamePeople::contract( UINT iBy, UINT iDel )
 		z = 1;
 
 	theApp.replaceBy( rowid, rowidBy, sex_id, source );
+
+	m_contracted = 1;
+	++m_deleted;
 /*
 // az alábbiak fölöslegesek, mert a replaceBy a házasság rekordban megváltoztatta spouse1_id/spouse2_id-t!!
 	if( sex_id == L"1" )
@@ -480,7 +561,7 @@ void CSamePeople::contract( UINT iBy, UINT iDel )
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSamePeople::listPeople()
 {
-	std::sort( vPeople.begin(), vPeople.end(), sortByMother );
+	std::sort( vPeople.begin(), vPeople.end(), sortByGroupStatus );
 	CString married;
 	for( UINT i = 0; i < vPeople.size(); ++i )
 	{
@@ -488,10 +569,20 @@ void CSamePeople::listPeople()
 		getData(i);
 		if( _married ) married = L"X";
 
-str.Format( L"%2d %2d %9s %2s %1s %1s \
-%8s %-30s %12s %12s %-30s %-30s",\
-_group, _status, _line, _united, married, _gen,\
-_rowid, _name, _birth, _death, _father, _mother ); 
+str.Format( L"\
+%2d %2d %9s %2s %1s %1s %1s \
+%8s \
+%-30s %12s %12s \
+%-30s %12s %12s \
+%-30s %12s %12s \
+%s",\
+_group, _status, _line, _united, married, _gen, _source,\
+_rowid,\
+_name, _birth, _death,\
+_father, _birthF, _deathF,\
+_mother, _birthM, _deathM,
+_spouses\
+); 
 
 		if( m_contracted )
 		{
@@ -507,11 +598,65 @@ _rowid, _name, _birth, _death, _father, _mother );
 		else
 			fwprintf( fD, L"%s\n", str );
 	}
+/*
+str.Format( L"\
+%33s \
+%-30s %12s %12s \
+%-30s %12s %12s \
+%-30s %12s %12s \
+%s",\
+L" ",\
+_name, m_birthR, m_deathR,\
+m_fatherR, m_birthFR, m_deathFR,\
+m_motherR, m_birthMR, m_deathMR,
+m_spousesR\
+);
+	if( m_contracted )
+		fwprintf( fU, L"<span style=\"background:cyan\">%s</span>\n", str );
+*/
 
 	if( m_contracted )
 		fwprintf( fU, L"\n" );
 	else
 		fwprintf( fD, L"\n" );
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CSamePeople::resetRef()
+{
+	m_birthR.Empty();
+	m_deathR.Empty();
+	m_fatherR.Empty();
+	m_motherR.Empty();
+	m_birthFR.Empty();
+	m_birthMR.Empty();
+	m_deathFR.Empty();
+	m_deathMR.Empty();
+	m_spousesR.Empty();
+	m_generationR.Empty();
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CSamePeople::setRef( int i )
+{
+	if( m_birthR.IsEmpty() && !vPeople.at(i).birth.IsEmpty() )
+		m_birthR = vPeople.at(i).birth;
+	if( m_birthFR.IsEmpty() && !vPeople.at(i).birthF.IsEmpty() )
+		m_birthFR = vPeople.at(i).birthF;
+	if( m_birthMR.IsEmpty() && !vPeople.at(i).birthM.IsEmpty() )
+		m_birthMR = vPeople.at(i).birthM;
+	if( m_deathR.IsEmpty() && !vPeople.at(i).death.IsEmpty() )
+		m_deathR = vPeople.at(i).death;
+	if( m_deathFR.IsEmpty() && !vPeople.at(i).deathF.IsEmpty() )
+		m_deathFR = vPeople.at(i).deathF;
+	if( m_deathMR.IsEmpty() && !vPeople.at(i).deathM.IsEmpty() )
+		m_deathMR = vPeople.at(i).deathM;
+	if( m_fatherR.IsEmpty() && !vPeople.at(i).father.IsEmpty() )
+		m_fatherR = vPeople.at(i).father;
+	if( m_motherR.IsEmpty() && !vPeople.at(i).mother.IsEmpty() )
+		m_motherR = vPeople.at(i).mother;
+	if( m_spousesR.IsEmpty() && !vPeople.at(i).spouses.IsEmpty() )
+		m_spousesR = vPeople.at(i).spouses;
+	if( m_generationR.IsEmpty() && !vPeople.at(i).generation.IsEmpty() )
+		m_generationR = vPeople.at(i).generation;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSamePeople::getData( UINT i )
@@ -520,7 +665,8 @@ void CSamePeople::getData( UINT i )
 	_status		= vPeople.at(i).status;
 	_line		= vPeople.at(i).line;
 	_united		= vPeople.at(i).united;
-	_gen		= vPeople.at(i).generation;
+	_gen		= vPeople.at(i).generation.Trim();
+	_source		= vPeople.at(i).source;
 	_rowid		= vPeople.at(i).rowid;
 	_name		= vPeople.at(i).name;
 	_birth		= vPeople.at(i).birth;
@@ -528,7 +674,11 @@ void CSamePeople::getData( UINT i )
 	_father		= vPeople.at(i).father;
 	_mother		= vPeople.at(i).mother;
 	_married	= vPeople.at(i).married;
-
+	_birthF		= vPeople.at(i).birthF;
+	_deathF		= vPeople.at(i).deathF;
+	_birthM		= vPeople.at(i).birthM;
+	_deathM		= vPeople.at(i).deathM;
+	_spouses	= vPeople.at(i).spouses;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSamePeople::getData2( UINT i )
@@ -537,7 +687,8 @@ void CSamePeople::getData2( UINT i )
 	_status2	= vPeople.at(i).status;
 	_line2		= vPeople.at(i).line;
 	_united2	= vPeople.at(i).united;
-	_gen2		= vPeople.at(i).generation;
+	_gen2		= vPeople.at(i).generation.Trim();
+	_source2		= vPeople.at(i).source;
 	_rowid2		= vPeople.at(i).rowid;
 	_name2		= vPeople.at(i).name;
 	_birth2		= vPeople.at(i).birth;
@@ -545,17 +696,11 @@ void CSamePeople::getData2( UINT i )
 	_father2	= vPeople.at(i).father;
 	_mother2	= vPeople.at(i).mother;
 	_married2	= vPeople.at(i).married;
-
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-UINT CSamePeople::getNumOfGroups()
-{
-	UINT max = 0;
-	for( UINT i = 0; i < vPeople.size(); ++i )
-	{ 
-		max = __max( max, vPeople.at(i).group );
-	}
-	return max;
+	_birthF2	= vPeople.at(i).birthF;
+	_deathF2	= vPeople.at(i).deathF;
+	_birthM2	= vPeople.at(i).birthM;
+	_deathM2	= vPeople.at(i).deathM;
+	_spouses2	= vPeople.at(i).spouses;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSamePeople::openUnited()
@@ -563,34 +708,15 @@ void CSamePeople::openUnited()
 	CString fileName = L"peopleUnited";
 	unitedSpec = theApp.openHtmlFile( &fU, fileName, L"w+" );
 
-	CString title1( L"AZONOS NEVÛ EMBEREK, AKIK AZONOSAK IS, EZÉRT ÖSSZEVONHATÓAK" ); 
-	
-	fwprintf( fU, L"<HEAD>\n" );
-	fwprintf( fU, L"<style>\n" );
-	fwprintf( fU, L"</style>\n" );
-	fwprintf( fU, L"</HEAD>\n" );
-	fwprintf( fU, L"<BODY>\n" );
-	fwprintf( fU, L"<center>%s</center><br><br>\n\n", title1 );
-	fwprintf( fU, L"<pre>" );
-	fwprintf( fU, L"\n%-20s %s (%s)<br>", L"Adatbázis:", theApp.m_databaseSpec, theApp.m_user_version  );
-	fwprintf( fU, L"%-20s %s<br><br>", L"lista készült:", theApp.getPresentDateTime() );
-
+	createHead( L"AZONOS NEVÛ EMBEREK, AKIK AZONOSAK IS, EZÉRT BEJEGYZÉSEIK ÖSSZEVONHATÓAK" );
+	fwprintf( fU, m_head );
 	fwprintf( fU, m_description );
 
 	str = L"A szürke hátterû bejegyzéseket egyesítettük a zöld hátterû bejegyzéssel.\n\
 Ha egy azonos nevû csoportban több különbözõ egyesítés lehetséges, akkor azok a 'g'-group oszlopba található számmal vannak meglülönböztetve.\n\n";
 	fwprintf( fU, str );
 
-
-str.Format( L"\
-\n<b>\
-%2s %2s %9s %2s %1s %1s \
-%8s %-30s %12s %12s %-30s %-30s\
-</b>\n", \
-L"gr", L"st", L"line", L"u", L"m", L"G",\
-L"rowid", L"name", L"birth", L"death", L"father", L"mother"\
-);
-	fwprintf( fU, str );
+	fwprintf( fU, m_columns );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSamePeople::openDifferent()
@@ -598,33 +724,37 @@ void CSamePeople::openDifferent()
 	CString fileName = L"peopleDifferent";
 	differentSpec = theApp.openHtmlFile( &fD, fileName, L"w+" );
 
-	CString title2( L"AZONOS NEVÛ EMBEREK, AKIK KÜLÖNBÖZNEK EGYMÁSTÓL" ); 
-
-	fwprintf( fD, L"<HEAD>\n" );
-	fwprintf( fD, L"<style>\n" );
-	fwprintf( fD, L"</style>\n" );
-	fwprintf( fD, L"</HEAD>\n" );
-	fwprintf( fD, L"<BODY>\n" );
-	fwprintf( fD, L"<center>%s</center><br><br>\n\n", title2 );
-	fwprintf( fD, L"<pre>" );
-	fwprintf( fD, L"\n%-20s %s (%s)<br>", L"Adatbázis:", theApp.m_databaseSpec, theApp.m_user_version  );
-	fwprintf( fD, L"%-20s %s<br><br>", L"lista készült:", theApp.getPresentDateTime() );
-
-
+	createHead( L"AZONOS NEVÛ EMBEREK, AKIK KÜLÖNBÖZNEK EGYMÁSTÓ" );
+	fwprintf( fD, m_head );
 	fwprintf( fD, m_description );
-
-	str.Format( L"\
-\n<b>\
-%2s %2s %9s %2s %1s %1s \
-%8s %-30s %12s %12s %-30s %-30s\
-</b>\n", \
-L"gr", L"st", L"line", L"u", L"m", L"G",\
-L"rowid", L"name", L"birth", L"death", L"father", L"mother"\
-);
-	fwprintf( fD, str );
+	fwprintf( fD, m_columns );
 }
-
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CSamePeople::createHead( CString title )
+{
+	m_head.Format( L"\
+<HEAD>\n\
+<style>\n\
+</style>\n\
+</HEAD>\n\
+<BODY>\n\
+<center>%s</center><br><br>\n\n\
+<pre>\n\
+%-20s %s (%s)<br>\
+%-20s %s<br><br>\
+%s %d %s<br><br>\
+",
+title,\
+L"Adatbázis:",\
+theApp.m_databaseSpec,\
+theApp.m_user_version,\
+L"Lista készült:",\
+theApp.getPresentDateTime(),\
+L"Az azonosság megállapításához legalább ",\
+_azonos,\
+L"számú egyezés volt elõírva."\
+);
+}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CSamePeople::query( CString command )
 {
@@ -658,26 +788,3 @@ BOOL CSamePeople::query2( CString command )
 	}
 	return TRUE;
 }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CSamePeople::query3( CString command )
-{
-	if( m_recordset3->Query(command,theApp.mainDB))
-	{
-		str.Format(L"%s\n%s",command,m_recordset3->GetLastError());
-		AfxMessageBox(str);
-		return FALSE;
-	}
-	return TRUE;
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CSamePeople::query4( CString command )
-{
-	if( m_recordset4->Query(command,theApp.mainDB))
-	{
-		str.Format(L"%s\n%s",command,m_recordset4->GetLastError());
-		AfxMessageBox(str);
-		return FALSE;
-	}
-	return TRUE;
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

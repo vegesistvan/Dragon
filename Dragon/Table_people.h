@@ -1,5 +1,6 @@
 #pragma once
 #include "listctrlex.h"
+#include "colorstatic.h"
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -101,7 +102,7 @@ public:
 	afx_msg void OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
 
-	afx_msg void OnChangeSearch();
+//	afx_msg void OnChangeSearch();
 	afx_msg void OnFilterFile();
 	afx_msg void OnFilterMen();
 	afx_msg void OnFilterNodescendant();
@@ -150,4 +151,7 @@ public:
 	afx_msg void OnIndividualDescendants();
 	afx_msg void OnGedcomOutput();
 	afx_msg void OnPrivateDescendants();
+	afx_msg void OnFilterBisex();
+	afx_msg void OnClickedKeres();
+	CColorStatic colorKeres;
 };

@@ -1,15 +1,17 @@
 #pragma once
+#include "listctrlex.h"
 
 
-// CcheckGenerations dialog
+// CCheckGenerations dialog
 
-class CcheckGenerations : public CDialogEx
+class CCheckGenerations : public CDialogEx
 {
-	DECLARE_DYNAMIC(CcheckGenerations)
+	DECLARE_DYNAMIC(CCheckGenerations)
+	DECLARE_EASYSIZE
 
 public:
-	CcheckGenerations(CWnd* pParent = NULL);   // standard constructor
-	virtual ~CcheckGenerations();
+	CCheckGenerations(CWnd* pParent = NULL);   // standard constructor
+	virtual ~CCheckGenerations();
 
 // Dialog Data
 	enum { IDD = IDD_CHECK_GENERATIONS };
@@ -18,10 +20,23 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	CString str;
 	CString m_command;
-	int		m_cnt;
-	FILE*	fh1;
+	int m_cnt;
+
+	void createColumns();
+	void fillTable();
+
+	void OnHtmlEdit();
+	void OnHtmlNotepad();
+	void OnHtmlShows();
+	void OnRokonsag();
+
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnInitDialog();
-	afx_msg void OnBnClickedOk();
+	CListCtrlEx m_ListCtrl;
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
+
+	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
+	afx_msg void OnGahtmlLine();
 };

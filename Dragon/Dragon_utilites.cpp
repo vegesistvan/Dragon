@@ -659,7 +659,7 @@ int CDragonApp::isFirstName( CString name )
 	if( name.IsEmpty() ) return -1;
 
 
-
+	int z;
 	int pos;
 	int i;
 	int n;
@@ -672,10 +672,13 @@ int CDragonApp::isFirstName( CString name )
 	else
 		n = wordList( &A, name, ' ', FALSE );
 
+
 	for( i = 0; i < n; ++i )
 	{
 		m_command.Format( L"SELECT rowid, sex_id FROM firstnames WHERE first_name='%s'", A[i] );
 		if( !theApp.querySystem( m_command ) )	return -1;
+
+
 		if( !theApp.m_recordsetSystem->RecordsCount() ) break;
 	}
 	if( i == n )
@@ -1342,4 +1345,24 @@ void CDragonApp::search( CString search, INT_PTR orderix,  CListCtrlEx* p_ListCt
 		}
 	}
 	
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CString CDragonApp::getHtmlLine( CString lineNumber )
+{
+	theApp.m_inputCode = GetInputCode( theApp.m_htmlFileSpec );
+	CStdioFile file( theApp.m_htmlFileSpec, CFile::modeRead); 
+	
+	CString cLine;
+	int ln = _wtoi( lineNumber );
+
+	for( int i = 0; i < ln - 2; ++i ) file.ReadString( cLine );  // elõzõ sor elé megy
+	file.ReadString( cLine );											// elõzõ sor
+
+	file.ReadString( cLine );											// kérdéses sor
+	cLine.Trim();
+	if( theApp.m_inputCode == UTF8 || theApp.m_inputCode == UTF8BOM ) cLine = Utf8ToAnsi( cLine );
+	
+	cLine = cleanHtmlLine( cLine );
+	file.Close();
+	return cLine;
 }

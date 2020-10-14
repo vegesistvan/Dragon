@@ -311,13 +311,35 @@ void CGaInput::splitMarriageSubstrings()
 		SPOUSESPOUSES ss;
 		std::vector<PEOPLE> v_p;
 
+
+		
 		v_p.clear();
 		if( !v_marriages.at(i).spouses.IsEmpty() )				// vannak házastársak  ez üres!!!!!!
 		{
 			splitSpousesSpouses( v_marriages.at(i).spouses, &v_p );	//v_p-be házastársanként felbontja a stringet
 			
+			
+
+
 			for( UINT j = 0; j < v_p.size(); ++j )
 			{
+				switch( v_p.at(j).sex_id )
+				{
+				case 0:
+					if( v_marriages.at(i).sex_id == 1 )
+						v_p.at(j).sex_id = 2;
+					else if ( v_marriages.at(i).sex_id == 2 )
+						v_p.at(j).sex_id = 1;
+					break;
+				case 1:
+					if( v_marriages.at(i).sex_id == 0 )
+						v_marriages.at(i).sex_id = 2;
+					break;
+				case 2:
+					if( v_marriages.at(i).sex_id == 0 )
+						v_marriages.at(i).sex_id = 1;
+					break;
+				}
 				ss.sex_id		= v_p.at(j).sex_id;
 				ss.title		= v_p.at(j).title;
 				ss.titolo		= v_p.at(j).titolo;

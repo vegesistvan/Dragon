@@ -52,8 +52,8 @@ void CCheckSpousesSex::DoDataExchange(CDataExchange* pDX)
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CCheckSpousesSex, CDialogEx)
-	ON_WM_SIZE()
-	ON_WM_SIZING()
+//	ON_WM_SIZE()
+//	ON_WM_SIZING()
 
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
 	ON_COMMAND(ID_HTML_EDIT, &CCheckSpousesSex::OnHtmlEdit)
@@ -62,40 +62,45 @@ BEGIN_MESSAGE_MAP(CCheckSpousesSex, CDialogEx)
 	ON_COMMAND(ID_ROKONSAG, &CCheckSpousesSex::OnRokonsag)
 	ON_COMMAND(ID_GAHTML_LINE, &CCheckSpousesSex::OnGahtmlLine)
 	ON_COMMAND(ID_LIST, &CCheckSpousesSex::OnList)
+	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LIST, &CCheckSpousesSex::OnLvnItemchangedList)
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CCheckSpousesSex::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-	EASYSIZE_ADD( IDC_LIST,	ES_BORDER,	ES_BORDER,		ES_BORDER,		ES_BORDER,	0 );
-	EASYSIZE_INIT();
+//	EASYSIZE_ADD( IDC_EDIT,	ES_BORDER,	ES_BORDER,		ES_BORDER,		ES_KEEPSIZE,	0 );
+//	EASYSIZE_ADD( IDC_LIST,	ES_BORDER,	ES_BORDER,		ES_BORDER,		ES_BORDER,	0 );
+//	EASYSIZE_INIT();
 
 	CString info = L"\
-Gyakori hiba a html fájlban, hogy a leszármazott házastársának további házastársai a leszármazott és nem a \
-házastárs házastársa. Vagy egyszerûen hibás a további házastárs megadása.\
-\r\n\r\n\
-Annak ellenõrzése, hogy a házastársak neme különbözõ-e, feltárja ezeket a hibákat, hiszen ilyenkor a házastársak \
-neme azonos.\
-\r\n\r\n\
-Persze nem kizárt az azonos nemûek házassága, ilyenkor ez nem hiba, nincs mit tenni, tudomásul kell venni.\
-\r\n\r\n\
+Alább azokat a házaspárokat listázzuk párba szedve, amelykban a házastársak neme azonos.\r\n\r\n\
+Ennek lehet az az oka, hogy a programban nyilvántartott nevekhez rendelt nem helytelen, és lehet hogy \
+hiba van a GA.html fájlban.\r\n\
+A jobb egérgombbal egy sorra klikkelve egy legördülõ menübõl választhatunk kölönbözõ funkciókat a \
+GA-html fájl vizsgálatára, javítására.\r\n\
+Fontos, hogy a hibákat kijavítsuk, mert az azonos emeberhez tartzozó bejegyzések összevonásának \r\n\
+sikere nagymértékben függ az emeberek nevének és nemének helyességétõl.\
 ";
+/*
 	if( AfxMessageBox( info, MB_OKCANCEL|MB_ICONINFORMATION ) == IDCANCEL )
 	{
 		OnCancel();
 		return TRUE;
 	}
+*/
+	GetDlgItem( IDC_EDIT )->SetWindowTextW( info );
 
 	createColumns();
 	fillColumns();
 
 	return TRUE;
 }
+/*
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckSpousesSex::OnSize(UINT nType, int cx, int cy)
 {
 	CDialogEx::OnSize(nType, cx, cy);
-	EASYSIZE_RESIZE()
+//	EASYSIZE_RESIZE()
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckSpousesSex::OnSizing(UINT fwSide, LPRECT pRect)
@@ -103,12 +108,13 @@ void CCheckSpousesSex::OnSizing(UINT fwSide, LPRECT pRect)
 	CDialogEx::OnSizing(fwSide, pRect);
 	EASYSIZE_MINSIZE(430,314,fwSide,pRect); 
 }
+*/
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckSpousesSex::createColumns()
 {
 	m_ListCtrl.SetExtendedStyle(m_ListCtrl.GetExtendedStyle()| LVS_EX_GRIDLINES );
 	m_ListCtrl.InsertColumn( L_CNT,			L"cnt",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( L_ROWID,		L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_ROWID,		L"rowid",		LVCFMT_RIGHT,	 55,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_LINENUMBER,	L"line#",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_GENERATION,	L"G",			LVCFMT_RIGHT,	 25,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_SOURCE,		L"S",			LVCFMT_RIGHT,	 25,-1,COL_TEXT);
@@ -170,10 +176,15 @@ void CCheckSpousesSex::fillColumns()
 			m_command.Format( L"SELECT lineNumber, generation, source, united, sex_id, last_name, first_name FROM people WHERE rowid = '%s'", rowid1 );
 			if( !theApp.query1( m_command ) ) return;
 			sex1 = theApp.m_recordset1->GetFieldString( S_SEX );
+			if( sex1 == MANS )	sex1 = L"ff";
+			else				sex1 = L"nõ";
 
 			m_command.Format( L"SELECT lineNumber, generation, source, united, sex_id, last_name, first_name FROM people WHERE rowid = '%s'", rowid2 );
 			if( !theApp.query2( m_command ) ) return;
 			sex2 = theApp.m_recordset2->GetFieldString( S_SEX );
+			if( sex2 == MANS )	sex2 = L"ff";
+			else				sex2 = L"nõ";
+
 
 			if( sex1 == sex2 )
 			{
@@ -337,3 +348,11 @@ void CCheckSpousesSex::OnRokonsag()
 
 	
 
+
+
+void CCheckSpousesSex::OnLvnItemchangedList(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
+	// TODO: Add your control notification handler code here
+	*pResult = 0;
+}

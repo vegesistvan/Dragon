@@ -4,6 +4,7 @@
 #include "utilities.h"
 #include "GA_input.h"
 #include "GAtoDB.h"
+#include "SaveFirstName.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,7 +63,6 @@ BOOL CGaInput::isTitle( CString cLine )
 	}
 	return FALSE;
 }
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // A _,-,? és ) karaktereket leszedi, a maradékot szétszedi. Csak az elsõ szó létezését vizsgálja 
 // return:
@@ -77,6 +77,7 @@ int CGaInput::isFirstName( CString name )
 	name.Trim();
 	if( name.IsEmpty() ) return -1;
 
+	int z;
 	int pos;
 	int i;
 	int n;
@@ -84,8 +85,25 @@ int CGaInput::isFirstName( CString name )
 
 	if( (pos = name.Find( '_' ) ) != -1 )
 		n = wordList( &A, name, '_', FALSE );
-	else
+	else if( (pos = name.Find( '-' ) ) != -1 )
 		n = wordList( &A, name, '-', FALSE );
+	else
+		n = wordList( &A, name, ' ', FALSE );
+
+
+
+	if( n > 1 && A[1] == L"Nep" )
+		z = 1;
+
+	m_command.Format( L"SELECT rowid, sex_id FROM firstnames WHERE first_name='%s'", A[0] );
+	if( !theApp.querySystem( m_command ) )	return -1;
+	if( theApp.m_recordsetSystem->RecordsCount() )
+		return _wtoi( theApp.m_recordsetSystem->GetFieldString( 1 ) );
+	else
+		return -1;
+
+/*
+
 
 	for( i = 0; i < n; ++i )
 	{
@@ -96,5 +114,5 @@ int CGaInput::isFirstName( CString name )
 	if( i == n )
 		return _wtoi( theApp.m_recordsetSystem->GetFieldString( 1 ) );
 	return -1;
+*/
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

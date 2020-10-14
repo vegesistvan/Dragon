@@ -1,86 +1,147 @@
-// LifespanParam.cpp : implementation file
+// LifespanListCtrl.cpp : implementation file
 //
 
 #include "stdafx.h"
 #include "Dragon.h"
 #include "checkLifespan.h"
 #include "afxdialogex.h"
-#include "checkLifespanListCtrl.h"
+#include "html_Lines.h"
+#include "Relations.h"
+#include "checkParam.h"
+#include "ProgressWnd.h"
 
-// adatbázis mezõk
+// ListCtrl oszlopok
 enum
 {
-	L_ROWID = 0,
+	L_CNT,
+	L_ROWID, 
 	L_LINENUMBER,
 	L_TABLENUMBER,
 	L_GENERATION,
 	L_SOURCE,
 	L_UNITED,
-	L_LAST_NAME,
-	L_FIRST_NAME,
-	L_BIRTH_DATE,
-	L_DEATH_DATE,
+	L_NAME,
+	L_BIRTH,
+	L_DEATH,
+	L_LIFESPAN,
 };
 
-// CLifespanParam dialog
+// adatbázis oszlopok
+enum
+{
+	D_ROWID = 0,
+	D_LINENUMBER,
+	D_TABLENUMBER,
+	D_GENERATION,
+	D_SOURCE,
+	D_UNITED,
+	D_LAST_NAME,
+	D_FIRST_NAME,
+	D_BIRTH_DATE,
+	D_DEATH_DATE,
+};
 
-IMPLEMENT_DYNAMIC(CLifespanParam, CDialogEx)
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CLifespanParam::CLifespanParam(CWnd* pParent /*=NULL*/)
-	: CDialogEx(CLifespanParam::IDD, pParent)
+
+IMPLEMENT_DYNAMIC(CLifeSpan, CDialogEx)
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CLifeSpan::CLifeSpan(CWnd* pParent /*=NULL*/)
+	: CDialogEx(CLifeSpan::IDD, pParent)
 {
 	m_recordset		= new CSqliteDBRecordSet;
 	m_recordset1	= new CSqliteDBRecordSet;
 	m_recordset2	= new CSqliteDBRecordSet;
 
 }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CLifespanParam::~CLifespanParam()
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CLifeSpan::~CLifeSpan()
 {
 }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CLifespanParam::DoDataExchange(CDataExchange* pDX)
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CLifeSpan::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_RADIO_MFC, m_RadioMfc);
+	DDX_Control(pDX, IDC_LIST, m_ListCtrl);
 }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BEGIN_MESSAGE_MAP(CLifespanParam, CDialogEx)
-	ON_BN_CLICKED(IDOK, &CLifespanParam::OnBnClickedOk)
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BEGIN_MESSAGE_MAP(CLifeSpan, CDialogEx)
+	ON_WM_SIZE()
+	ON_WM_SIZING()
+	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
+	ON_COMMAND(ID_HTML_EDIT, &CLifeSpan::OnHtmlEdit)
+	ON_COMMAND(ID_HTML_SHOWS, &CLifeSpan::OnHtmlShows)
+	ON_COMMAND(ID_HTML_NOTEPAD, &CLifeSpan::OnHtmlNotepad)
+	ON_COMMAND(ID_ROKONSAG, &CLifeSpan::OnRokonsag)
+	ON_COMMAND(ID_GAHTML_LINE, &CLifeSpan::OnGahtmlLine)
+
+	ON_NOTIFY(NM_CLICK, IDC_LIST, &CLifeSpan::OnClickList)
+	ON_COMMAND(ID_LIST, &CLifeSpan::OnList)
 END_MESSAGE_MAP()
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CLifespanParam::OnInitDialog()
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BOOL CLifeSpan::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
+	EASYSIZE_ADD( IDC_LIST,	ES_BORDER,	ES_BORDER,		ES_BORDER,		ES_BORDER,	0 );
+
+	EASYSIZE_INIT();
+
+	SetWindowTextW( _caption );
 
 
+	CCheckParam dlg;
 
-	CString info = L"\
-Azokat az embereket listázzuk, akiknek az életkora nagyobb az elõírtnál vagy kisebb mint 0.\
-\r\n\r\n\
-Választani lehet, hogy a kimenet html fájl vagy MFC lista legyen.\
-\r\n\r\n\
-Ha MFC listát kérünk, akkor a jobb egérgombbal történõ kattintással megjelenõ legördülõ menübõl választható \
-funkciókkal lehetõség van a kijelölt emberek eredeti html fájl-sorainak megjelenítésére és azok szerkesztésére.\
-\r\n\
-";
+	dlg.m_title		= L"Azokat az embereket listázzuk, akiknek az életkora nagyobb az elõírtnál vagy kisebb mint 0.";
+	dlg.m_function1 = L"Írd elõ a kort!";
+	dlg.m_value		= 100;
 
-	GetDlgItem( IDC_EDIT )->SetWindowTextW( info );
+	if( dlg.DoModal() == IDCANCEL )
+	{
+		CDialog::OnCancel();
+	}
 
-	_lifespan = 100;
-	str.Format( L"%d", _lifespan );
-	GetDlgItem( IDC_LIFESPAN )->SetWindowTextW( str );
+	_lifespan = dlg.m_value;
 
-	m_RadioMfc.SetCheck( TRUE );
+	str.Format( L"%d évnél idõsebb emeberek, és akiknek a halálozási dátuma korábban van, mint a születési dátumouk.", _lifespan );
+	SetWindowText( str );
+
+	createColumns();
+	fillTable();
 
 	return TRUE;
 }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CLifespanParam::OnBnClickedOk()
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CLifeSpan::OnSize(UINT nType, int cx, int cy)
 {
-	GetDlgItem( IDC_LIFESPAN )->GetWindowTextW( str );
-	_lifespan = _wtoi( str );
-	_mfc = m_RadioMfc.GetCheck();
+	CDialogEx::OnSize(nType, cx, cy);
+	EASYSIZE_RESIZE()
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void CLifeSpan::OnSizing(UINT fwSide, LPRECT pRect)
+{
+	CDialogEx::OnSizing(fwSide, pRect);
+	EASYSIZE_MINSIZE(430,314,fwSide,pRect); 
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CLifeSpan::createColumns()
+{
+	m_ListCtrl.SortByHeaderClick(TRUE);
+	m_ListCtrl.KeepSortOrder(TRUE);
+	m_ListCtrl.SetExtendedStyle(m_ListCtrl.GetExtendedStyle()| LVS_EX_GRIDLINES );
+	m_ListCtrl.InsertColumn( L_CNT,			L"cnt",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_ROWID,		L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_LINENUMBER,	L"line#",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_TABLENUMBER,	L"table#",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_GENERATION,	L"G",			LVCFMT_RIGHT,	 25,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_SOURCE,		L"S",			LVCFMT_RIGHT,	 25,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_UNITED,		L"U",			LVCFMT_LEFT,	 25,-1,COL_NUM );
+	m_ListCtrl.InsertColumn( L_NAME,		L"név",			LVCFMT_LEFT,	200,-1,COL_TEXT );
+	m_ListCtrl.InsertColumn( L_BIRTH,		L"születés",	LVCFMT_LEFT,	 80,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_DEATH,		L"halál",		LVCFMT_LEFT,	 80,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_LIFESPAN,	L"élettartam",	LVCFMT_LEFT,	100,-1,COL_NUM);
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CLifeSpan::fillTable()
+{
 
 	CString fields = L"\
 rowid,\
@@ -95,9 +156,6 @@ birth_date,\
 death_date\
 ";
 
-	CString title	= L"Élettartam ellenõrzése";
-	CString fileName = L"checkLifespan";
-	CString fileSpec;
 
 	CString rowid;
 	CString lineNumber;
@@ -114,6 +172,7 @@ death_date\
 	int lifespan;
 	int cnt = 0;
 	int	diff;
+	int	nItem = 0;
 
 	CProgressWnd wndProgress(NULL,L"Az emberek életkorának ellenõrzése ..." ); 
 	wndProgress.GoModal();
@@ -125,97 +184,178 @@ death_date\
 	wndProgress.SetPos(0);
 	wndProgress.SetStep(1);
 
-	if( _mfc )
-	{
-		if( (fileSpec = theApp.openTextFile( &theApp.fl, fileName, L"w+" ) ) == L"" ) return;
-	}
-	else
-	{
-		if(( fl=theApp.openLogFile( fileName,title ))==NULL)return;
-	}
-
 
 	for( UINT i = 0; i < m_recordset->RecordsCount(); ++i, m_recordset->MoveNext() )
 	{
 
-		birth_date = m_recordset->GetFieldString( L_BIRTH_DATE );
+		birth_date = m_recordset->GetFieldString( D_BIRTH_DATE );
 		birth = theApp.getYearFromDate( birth_date );
-		death_date = m_recordset->GetFieldString( L_DEATH_DATE );
+		death_date = m_recordset->GetFieldString( D_DEATH_DATE );
 		death = theApp.getYearFromDate( death_date );
 		if( birth == 0 || !checkDate( birth_date ) || death == 0 || !checkDate( death_date ) )
 			continue;
 
 		lifespan = death - birth;
 		diff = lifespan - _lifespan;
+
+		rowid		= m_recordset->GetFieldString( D_ROWID );
+		lineNumber	= m_recordset->GetFieldString( D_LINENUMBER );
+		tableNumber	= m_recordset->GetFieldString( D_TABLENUMBER );
+		generation	= m_recordset->GetFieldString( D_GENERATION );
+		source		= m_recordset->GetFieldString( D_SOURCE );
+		united		= m_recordset->GetFieldString( D_UNITED );
+		name.Format( L"%s %s", m_recordset->GetFieldString( D_LAST_NAME ), m_recordset->GetFieldString( D_FIRST_NAME )  );
+
 		if( diff > 0 || lifespan < 0)
 		{
-			if( !cnt && !_mfc )
-			{
-				str.Format( L"Emberek, akiknek az élettartama nagyobb mint %d év:\n\n", _lifespan );
-				fwprintf( fl, str );
-				str.Format( L"%8s %8s %8s %1s %1s %1s %-30s %5s\n", L"rowid", L"line #", L"table#", L"G", L"S", L"U", L"név", L"év" );
-				fwprintf( fl, str );
-			}
-			rowid		= m_recordset->GetFieldString( L_ROWID );
-			lineNumber	= m_recordset->GetFieldString( L_LINENUMBER );
-			tableNumber	= m_recordset->GetFieldString( L_TABLENUMBER );
-			generation	= m_recordset->GetFieldString( L_GENERATION );
-			source		= m_recordset->GetFieldString( L_SOURCE );
-			united		= m_recordset->GetFieldString( L_UNITED );
-			name.Format( L"%s %s", m_recordset->GetFieldString( L_LAST_NAME ), m_recordset->GetFieldString( L_FIRST_NAME )  );
-
-
-			if( _mfc )
-			{
-				str.Format( L"%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t\n", rowid, lineNumber, tableNumber, generation, source, united,name, birth_date, death_date, lifespan ); 
-				fwprintf( theApp.fl, str );
-			}
-			else
-			{
-				str.Format( L"%8s %8s %8s %1s %1s %1s %-30s %12s %12s %5d\n", rowid, lineNumber, tableNumber, generation, source, united,name, birth_date, death_date, lifespan ); 
-				fwprintf( fl, str );
-			}
+			str.Format( L"%d", nItem + 1 );
+			nItem = m_ListCtrl.InsertItem( nItem, str );
+			m_ListCtrl.SetItemText( nItem, L_ROWID, rowid );
+			m_ListCtrl.SetItemText( nItem, L_LINENUMBER, lineNumber );
+			m_ListCtrl.SetItemText( nItem, L_TABLENUMBER, tableNumber );
+			m_ListCtrl.SetItemText( nItem, L_UNITED, united );
+			m_ListCtrl.SetItemText( nItem, L_GENERATION, generation );
+			m_ListCtrl.SetItemText( nItem, L_SOURCE, source );
+			m_ListCtrl.SetItemText( nItem, L_NAME, name );
+			m_ListCtrl.SetItemText( nItem, L_BIRTH, birth_date );
+			m_ListCtrl.SetItemText( nItem, L_DEATH, death_date );	
+			str.Format( L"%d", lifespan );
+			m_ListCtrl.SetItemText( nItem, L_LIFESPAN, str );
+			++nItem;
 			++cnt;
 		}
+
 		wndProgress.StepIt();
 		wndProgress.PeekAndPump();
 		if (wndProgress.Cancelled()) break;
 	}
 	wndProgress.DestroyWindow();
 
-	if( _mfc ) fclose( theApp.fl );
-	if( cnt )
+	if( !cnt )
 	{
-		if( _mfc )
-		{
-
-			CLifespanListCtrl dlg;
-			dlg._fileSpec = fileSpec;
-			dlg._caption.Format( L"%d évnél tovább élt emberek", _lifespan );
-			dlg.DoModal();
-		}
-		else
-		{
-			fwprintf(fl, L"\nElapsed time: %s\n", theApp.get_time_elapsed() );
-			fclose( fl );
-			theApp.showLogFile();
-		}
-	}
-	else
-	{
-		if( !_mfc ) fclose( fl );
 		str.Format( L"Minden ember élettartama kisebb mint %d év.", _lifespan );
 		AfxMessageBox( str );
 	}
-	CDialogEx::OnOK();
+
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+LRESULT CLifeSpan:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
+{
+	CPoint* point=(CPoint*) lParam;
+    CMenu	Menu;
+	CMenu*	pPopup;
+
+
+	if(Menu.LoadMenu( IDR_DROPDOWN_HTML ))
+    {
+		pPopup = Menu.GetSubMenu(0);
+		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
+		{
+			pPopup->EnableMenuItem(ID_HTML_SHOWS, MF_BYCOMMAND | MF_GRAYED);
+			pPopup->EnableMenuItem(ID_HTML_NOTEPAD, MF_BYCOMMAND | MF_GRAYED);
+			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
+		}
+		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
+    }
+	return TRUE;
+}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CLifeSpan::OnHtmlEdit()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	L_LINENUMBER ) );
+	theApp.listHtmlLine( lineNumber );
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CLifeSpan::OnHtmlNotepad()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	CString lineNumber = m_ListCtrl.GetItemText( nItem, 	L_LINENUMBER );
+	if( !lineNumber.IsEmpty() ) 
+		theApp.editNotepad( lineNumber );
+}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CLifeSpan::OnHtmlShows()
+{
+	POSITION	pos = m_ListCtrl.GetFirstSelectedItemPosition();
+	int			nItem;
+	std::vector<CString> vLines;
+
+	int cnt = 0;
+	CString name(L"");
+
+	while( pos )
+	{
+		nItem = m_ListCtrl.GetNextSelectedItem( pos );
+		vLines.push_back( m_ListCtrl.GetItemText( nItem, L_LINENUMBER ) );
+		if( name.Compare( m_ListCtrl.GetItemText( nItem, L_NAME ) ) )
+		{
+			name = m_ListCtrl.GetItemText( nItem, L_NAME );
+			++cnt;
+		}
+	
+
+	}
+
+	CHtmlLines dlg;
+
+	if( cnt == 1 )
+		dlg.child = name;
+	else
+		dlg.child = L"";
+
+	dlg._what = 1;
+	dlg.vLines = &vLines;
+
+	dlg.DoModal();
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CLifeSpan::OnList()
+{
+	CString	logFile(L"lifespan"); 
+	CString	title(L"Emberek élettartama");;
+	
+	theApp.exportAll( logFile, title, &m_ListCtrl );
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CLifeSpan::OnGahtmlLine()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+
+	if( nItem == - 1 )
+	{
+		theApp.message( L"GA.html szerkesztése", L"Nincs kijelölve ember!" );
+		return;
+	}
+	
+
+	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	L_LINENUMBER ) );
+
+	theApp.listHtmlLine( lineNumber );
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CLifeSpan::OnRokonsag()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
+	CRelations dlg;
+
+	dlg.m_rowid = rowid;
+	dlg.DoModal();
+
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CLifeSpan::OnClickList(NMHDR *pNMHDR, LRESULT *pResult)
+{
+//	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+	OnGahtmlLine();
+	*pResult = 0;
+}
+
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CLifespanParam::query( CString command )
+BOOL CLifeSpan::query( CString command )
 {
 	if( m_recordset->Query(command,theApp.mainDB))
 	{
@@ -226,7 +366,7 @@ BOOL CLifespanParam::query( CString command )
 	return TRUE;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CLifespanParam::query1( CString command )
+BOOL CLifeSpan::query1( CString command )
 {
 	if( m_recordset1->Query(command,theApp.mainDB))
 	{
@@ -237,7 +377,7 @@ BOOL CLifespanParam::query1( CString command )
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CLifespanParam::query2( CString command )
+BOOL CLifeSpan::query2( CString command )
 {
 	if( m_recordset2->Query(command,theApp.mainDB))
 	{

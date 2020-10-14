@@ -273,43 +273,7 @@ CString CGaInput::insertAny( PEOPLE* p )
 		other_names.Replace( ')', ' ' );
 		other_names.TrimRight();
 	}
-/*
-	m_fieldsP = L"\
-fileNumber,\
-familyNumber,\
-tableNumber,\
-lineNumber,\
-source,\
-united,\
-spouse,\
-spouseparent,\
-spousespouse,\
-generation,\
-sex_id,\
-title,\
-titolo,\
-first_name,\
-last_name,\
-other_names,\
-birth_place,\
-birth_date,\
-death_place,\
-death_date,\
-comment,\
-father_id,\
-mother_id,\
-mother_index,\
-mother_index2,\
-folyt,\
-tableAncestry,\
-tableRoman,\
-arm,\
-orderFather,\
-orderMother,\
-csalad,\
-gap\
-";
-*/
+
 	CString values;
 	values.Format( L"\
 '%d','%d','%d','%d','%d','%d','%d','%d','%d',\
@@ -385,7 +349,7 @@ int CGaInput::insertDescMarriage( UINT i )
 
 	if( d.rowid==L"0" || v_marriages.at(i).rowid == L"0" ) return 0;
 
-	if( d.sex_id == MAN )
+cont:	if( d.sex_id == MAN )
 	{
 		spouse1_id = d.rowid;
 		spouse1_id = v_marriages.at(i).spouse_id;   // uj: minden házstárshoz a leszármazott más bejegyzése tartozik

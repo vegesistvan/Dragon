@@ -150,6 +150,7 @@ void CTablePeople::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_LIST, m_ListCtrl);
+	DDX_Control(pDX, IDC_KERES, colorKeres);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CTablePeople, CDialogEx)
@@ -164,7 +165,7 @@ BEGIN_MESSAGE_MAP(CTablePeople, CDialogEx)
 //	ON_COMMAND(ID_EDIT_INSERT, &CTablePeople::OnEditInsert)
 //	ON_COMMAND(ID_EDIT_UPDATE, &CTablePeople::OnEditUpdate)
 	ON_COMMAND(ID_RELATIONS, &CTablePeople::OnRelations)
-	ON_EN_CHANGE(IDC_SEARCH, &CTablePeople::OnChangeSearch)
+//	ON_EN_CHANGE(IDC_SEARCH, &CTablePeople::OnChangeSearch)
 	ON_COMMAND(ID_FILTER_FILE, &CTablePeople::OnFilterFile)
 	ON_COMMAND(ID_FILTER_MEN, &CTablePeople::OnFilterMen)
 	ON_COMMAND(ID_FILTER_NODESCENDANT, &CTablePeople::OnFilterNodescendant)
@@ -211,6 +212,8 @@ ON_COMMAND(ID_DESCENDANTS_INDIVIDUAL, &CTablePeople::OnIndividualDescendants)
 ON_COMMAND(ID_ASCENDANTS_CHAIN, &CTablePeople::OnAscendantsChain)
 ON_COMMAND(ID_GEDCOM_OUTPUT, &CTablePeople::OnGedcomOutput)
 ON_COMMAND(ID_PRIVATE_DESCENDANTS, &CTablePeople::OnPrivateDescendants)
+ON_COMMAND(ID_FILTER_BISEX, &CTablePeople::OnFilterBisex)
+ON_STN_CLICKED(IDC_KERES, &CTablePeople::OnClickedKeres)
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CTablePeople::OnInitDialog()
@@ -224,6 +227,7 @@ BOOL CTablePeople::OnInitDialog()
 	caption.Format( L"Emberek" );
 	SetWindowTextW( caption );
 
+	colorKeres.SetTextColor( theApp.m_colorClick );
 
 	ChangeMenu();
 
@@ -482,6 +486,13 @@ void CTablePeople::OnFilterWomen()
 	fillTable(0);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTablePeople::OnFilterBisex()
+{
+	m_filterTextNew.Format(L"Az adatbázisban lévõ bisex emberek");
+	m_filterNew.Format(  L"sex_id=0" );
+	fillTable(0);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTablePeople::OnFilterFolyt()
 {
 	m_filterTextNew.Format(L"Elágazások");
@@ -645,7 +656,7 @@ void CTablePeople::createListColumns( )
 
 		m_ListCtrl.InsertColumn( H_TABLENUMBERROMAN,	L"tábla",			LVCFMT_RIGHT,	 40,-1,COL_TEXT);
 		m_ListCtrl.InsertColumn( H_GENERATION,			L"G",				LVCFMT_LEFT,	 25,-1,COL_TEXT);
-		m_ListCtrl.InsertColumn( H_SEX,					L"nem",				LVCFMT_LEFT,	 40,-1,COL_HIDDEN);
+		m_ListCtrl.InsertColumn( H_SEX,					L"nem",				LVCFMT_LEFT,	 40,-1,COL_NUM);
 		m_ListCtrl.InsertColumn( H_TITLE,				L"tit",				LVCFMT_LEFT,	 30,-1,COL_TEXT);
 		m_ListCtrl.InsertColumn( H_TITOLO,				L"elõnév",			LVCFMT_LEFT,	100,-1,COL_TEXT);
 		m_ListCtrl.InsertColumn( H_LAST_NAME,			L"családnév",		LVCFMT_LEFT,	110,-1,COL_TEXT);
@@ -1421,13 +1432,7 @@ void CTablePeople::updateField( int nItem, int i, CString str )
 	_tcscpy_s(sT,tLen,str.GetBuffer());
 	v_individuals.at( (nItem) * m_columnsCount + i ) = sT;
 }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTablePeople::OnChangeSearch()
-{
-	CString	search;
-	GetDlgItem( IDC_SEARCH )->GetWindowText( search );
-	theApp.search( search, m_orderix,  &m_ListCtrl );
-}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CTablePeople::PreTranslateMessage(MSG* pMsg)
 {
@@ -2014,4 +2019,58 @@ void CTablePeople::OnGedcomOutput()
 	dlg.m_filter = m_filterText;
 	dlg.p_ListCtrl = &m_ListCtrl;
 	dlg.DoModal();
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//void CTablePeople::OnChangeSearch()
+//{
+//	CString	search;
+//	GetDlgItem( IDC_SEARCH )->GetWindowText( search );
+//	theApp.search( search, m_orderix,  &m_ListCtrl );
+//}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTablePeople::OnClickedKeres()
+{
+	if( m_orderix == 0 )
+	{
+		AfxMessageBox( L"Rendezni kell az oszlopot, amelyben keresni akarsz!" );
+		return;
+	}
+	CString	search;
+	GetDlgItem( IDC_SEARCH )->GetWindowText( search );
+	if( search.IsEmpty() )
+	{
+		AfxMessageBox( L"Meg kell adni a keresendõ stringet!");
+		return;
+	}
+
+	int		n				= m_ListCtrl.GetItemCount();
+	int		count_per_page	= m_ListCtrl.GetCountPerPage();
+	int		length			= search.GetLength();
+	int		nItem;
+	int		up;
+	CString	substring;
+	CString	str;
+
+	theApp.unselectAll( &m_ListCtrl );
+	for( nItem = 0; nItem < n; ++nItem )
+	{
+		str = m_ListCtrl.GetItemText( nItem, m_orderix);
+		substring = str.Left(length);						// az aktuális search string hosszával azonos hosszúság leválasztása
+		if( substring == search )
+		{
+			up = nItem + count_per_page - 1;
+			if( up >= n ) up = n-1;
+
+			m_ListCtrl.SetItemState( nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED );
+//			m_ListCtrl.SetSelectionMark( nItem );
+			m_ListCtrl.EnsureVisible( up, FALSE );
+			break;
+		}
+	}
+
+
+
+
+
+
 }

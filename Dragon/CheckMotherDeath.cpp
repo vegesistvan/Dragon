@@ -117,7 +117,7 @@ BOOL CCheckMotherDeath::OnInitDialog()
 
 
 	SetWindowText( L"Családok, amelyekben az anya halálozási dátuma a gyerek születési dátumánál korábbi.       piros: apa        kék: anya      sárga: kritikus dátumok" );
-
+/*
 	CString info = L"\
 Azokat a családokat (apa,anya, gyerekek) listázzuk, akinél az anya halálozási dátuma korábbi, mint egy gyerek születési dátuma.\
 ";
@@ -126,7 +126,7 @@ Azokat a családokat (apa,anya, gyerekek) listázzuk, akinél az anya halálozási dá
 		OnCancel();
 		return FALSE;
 	}
-
+*/
 	CString fileName	= L"checkMotherDeath";
 	if( (fileSpec = theApp.openTextFile( &theApp.fl, fileName, L"w+" ) ) == L"" ) return FALSE;
 

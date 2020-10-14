@@ -14,7 +14,7 @@ public:
 	virtual ~CCheckFatherDeath9();
 
 // Dialog Data
-	enum { IDD = IDD_CHECK_FATHERDEATH9 };
+	enum { IDD = IDD_CHECK_FATHERDEATH };
 
 	
 
