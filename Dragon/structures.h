@@ -256,6 +256,5 @@ typedef struct
 	CString birthM;
 	CString deathM;
 	CString spouses;
-	int		married;
 }SAMENAMES;
 
