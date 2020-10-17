@@ -87,3 +87,4 @@ int GetInputCode( CString fileSpec );
 bool isUTF8( UCHAR * string, int length );
 CStringA AnsiToUtf8( CString str );
 CString Utf8ToAnsi( CString cLine );
+int same( CString ref, CString par1, CString par2 );

@@ -94,10 +94,11 @@ void CCheckIntegrity::couples()
 
 
 	first = true;
+	summa = 0;
 	m_recordset->MoveFirst();
 	for( UINT i = 0; i < m_recordset->RecordsCount(); ++i )
 	{
-		spouse2_id = m_recordset->GetFieldString( 1 );
+		spouse2_id = m_recordset->GetFieldString( 2 );
 		m_command.Format( L"SELECT count() FROM people WHERE rowid='%s'", spouse2_id );
 		if( !query1( m_command ) ) return;
 		db = _wtoi( m_recordset1->GetFieldString( 0 ) );
@@ -111,7 +112,7 @@ void CCheckIntegrity::couples()
 				first = false;
 			}
 			rowid = m_recordset->GetFieldString( 0 );
-			fwprintf( fl, L"%8s %9s\n", rowid, spouse1_id );
+			fwprintf( fl, L"%8s %9s\n", rowid, spouse2_id );
 		}
 		m_recordset->MoveNext();
 		wndP.StepIt();

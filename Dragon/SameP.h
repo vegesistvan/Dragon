@@ -14,7 +14,7 @@ public:
 	virtual ~CSameP();
 
 // Dialog Data
-	enum { IDD = IDD_SAMEPEOPLE };
+	enum { IDD = IDD_SAME_P };
 
 	BOOL	_onlyList;
 	BOOL	_html;

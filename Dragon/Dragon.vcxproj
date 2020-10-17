@@ -240,7 +240,6 @@
     <ClInclude Include="namesParam.h" />
     <ClInclude Include="NewPeople.h" />
     <ClInclude Include="OpenDatabase.h" />
-    <ClInclude Include="Param1.h" />
     <ClInclude Include="Pictures.h" />
     <ClInclude Include="SamePeople.h" />
     <ClInclude Include="SameName.h" />
@@ -365,7 +364,6 @@
     <ClCompile Include="namesParam.cpp" />
     <ClCompile Include="NewPeople.cpp" />
     <ClCompile Include="OpenDatabase.cpp" />
-    <ClCompile Include="Param1.cpp" />
     <ClCompile Include="Pictures.cpp" />
     <ClCompile Include="SamePeople.cpp" />
     <ClCompile Include="SameName.cpp" />

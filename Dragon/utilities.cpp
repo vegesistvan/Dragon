@@ -1091,3 +1091,28 @@ CString Utf8ToAnsi( CString cLine )
 	pBuffer = T2A( cLine );
 	return( Utf8ToUnicode( pBuffer ) ); 
 }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Ha referencia és par2 is meg van adva, akkor ahhoz hasonlítja par2-t.
+// Ha nincs, de par1 és par2 is adva van, akkor ezeket hasonlítja.
+// par1 vagy par2 üres, akkor return 0;
+//  1 : mindkettõ meg van adva és egyezik;
+//  0 : csak az egyik vagy egy sincs van megadva, így nincs ellentmondás
+//  -1 : mindkettõ meg van adva és nem egyezik
+int same( CString ref, CString par1, CString par2 )
+{
+	if( !ref.IsEmpty() && !par2.IsEmpty() )
+	{
+		if( par1 == par2 )
+			return 1;
+		else
+			return -1;
+	}
+	if( !par1.IsEmpty() && !par2.IsEmpty() )
+	{
+		if( par1 == par2 )
+			return 1;
+		else
+			return -1;
+	}
+	return 0;
+}
