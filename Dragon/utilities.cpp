@@ -1102,7 +1102,7 @@ int same( CString ref, CString par1, CString par2 )
 {
 	if( !ref.IsEmpty() && !par2.IsEmpty() )
 	{
-		if( par1 == par2 )
+		if( ref == par2 )
 			return 1;
 		else
 			return -1;

@@ -142,7 +142,7 @@ ON_COMMAND(ID_APP_EXIT, &CDragonDlg::OnAppExit)
 ON_COMMAND(ID_BRACKETS_SQUARE, &CDragonDlg::OnBracketsSquare)
 ON_COMMAND(ID_BRACKETS_ROUND, &CDragonDlg::OnBracketsRound)
 ON_COMMAND(ID_BRACES, &CDragonDlg::OnBraces)
-ON_COMMAND(ID_GENERATIONCODE, &CDragonDlg::OnGenerationcode)
+//ON_COMMAND(ID_GENERATIONCODE, &CDragonDlg::OnGenerationcode)
 ON_COMMAND(ID_FROMTABLE, &CDragonDlg::OnFromtable)
 ON_COMMAND(ID_FROMFAMILY, &CDragonDlg::OnFromfamily)
 ON_COMMAND(ID_CONNECT_CSALAD, &CDragonDlg::OnConnectCsalad)
@@ -360,7 +360,7 @@ void CDragonDlg::mainTitle( )
 
 	query( L"PRAGMA user_version" );
 	theApp.m_user_version = m_recordset->GetFieldString( 0 );
-	caption.Format( L"Dragon v. %s - %s || Családok nyilvántartása || adatbázis: %s (%s) || %s ||", BUILT, PLATFORM, theApp.m_databaseSpec, theApp.m_user_version, theApp.m_inputMode );
+	caption.Format( L"Dragon v. %s - %s || Családok nyilvántartása || adatbázis: %s (%s) || %s ||", BUILT, PLATFORM, theApp.m_databaseName, theApp.m_user_version, theApp.m_inputMode );
 	SetWindowText( caption );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -956,12 +956,12 @@ void CDragonDlg::OnClose()
 	CDialogEx::OnClose();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragonDlg::OnGenerationcode()
-{
-	CCheckGenerations1 dlg;
-	if( dlg.DoModal() == IDCANCEL ) return;
-
-}
+//void CDragonDlg::OnGenerationcode()
+//{
+//	CCheckGenerations1 dlg;
+//	if( dlg.DoModal() == IDCANCEL ) return;
+//
+//}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnCheckLifespan()
 {

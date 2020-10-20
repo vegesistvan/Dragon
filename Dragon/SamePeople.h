@@ -54,7 +54,7 @@ protected:
 	
 	CComboBox ComboCtrl;
 
-		void createHead( CString title );
+	void createHead( CString title );
 	void collectPeople();
 	void putPeople( CString name, UINT i );
 	void processPeople();

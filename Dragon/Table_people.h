@@ -60,7 +60,6 @@ protected:
 
 	void CTablePeople::parent( CString rowid, PARENT* p);
 	void CTablePeople::ChangeMenu();
-	BOOL PreTranslateMessage(MSG* pMsg);
 
 	BOOL CTablePeople::query( CString command );
 	BOOL CTablePeople::query1( CString command );
@@ -153,5 +152,6 @@ public:
 	afx_msg void OnPrivateDescendants();
 	afx_msg void OnFilterBisex();
 	afx_msg void OnClickedKeres();
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	CColorStatic colorKeres;
 };

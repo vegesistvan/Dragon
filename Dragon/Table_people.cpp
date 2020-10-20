@@ -236,10 +236,6 @@ BOOL CTablePeople::OnInitDialog()
 	m_orderix = 0;
 	createListColumns();
 	
-//	if( !theApp.m_cntPeople )
-//	{
-//		OnEditInsert();
-//	}
 	if( !theApp.m_cntPeople )
 		return FALSE;
 		
@@ -1433,27 +1429,6 @@ void CTablePeople::updateField( int nItem, int i, CString str )
 	v_individuals.at( (nItem) * m_columnsCount + i ) = sT;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CTablePeople::PreTranslateMessage(MSG* pMsg)
-{
-	int x=(int)pMsg->wParam;
-
-    if( pMsg->message==WM_KEYDOWN)
-    {
-		switch( x )
-		{
-//		case VK_DELETE:
-//			OnEditDelete();
-//			return TRUE;
-		case VK_RETURN:
-//			OnEditUpdate();
-			return TRUE;
-		case VK_ESCAPE:
-			CDialogEx::OnCancel();
-		}
-	}
-	return CDialog::PreTranslateMessage(pMsg);
-}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTablePeople::ChangeMenu()
 {
@@ -2044,33 +2019,40 @@ void CTablePeople::OnClickedKeres()
 	}
 
 	int		n				= m_ListCtrl.GetItemCount();
-	int		count_per_page	= m_ListCtrl.GetCountPerPage();
 	int		length			= search.GetLength();
 	int		nItem;
-	int		up;
-	CString	substring;
 	CString	str;
 
 	theApp.unselectAll( &m_ListCtrl );
 	for( nItem = 0; nItem < n; ++nItem )
 	{
 		str = m_ListCtrl.GetItemText( nItem, m_orderix);
-		substring = str.Left(length);						// az aktuális search string hosszával azonos hosszúság leválasztása
-		if( substring == search )
+		str = str.Left(length);						// az aktuális search string hosszával azonos hosszúság leválasztása
+		if( str == search )
 		{
-			up = nItem + count_per_page - 1;
-			if( up >= n ) up = n-1;
-
 			m_ListCtrl.SetItemState( nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED );
-//			m_ListCtrl.SetSelectionMark( nItem );
-			m_ListCtrl.EnsureVisible( up, FALSE );
+			m_ListCtrl.EnsureVisible( nItem, FALSE );
 			break;
 		}
 	}
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BOOL CTablePeople::PreTranslateMessage(MSG* pMsg)
+{
+	int x=(int)pMsg->wParam;
 
-
-
-
-
-
+    if( pMsg->message==WM_KEYDOWN)
+    {
+		switch( x )
+		{
+		case VK_RETURN:
+			GetDlgItem( IDC_SEARCH )->GetWindowTextW( str );
+			if( str.GetLength() ) 
+				OnClickedKeres();
+			break;
+		case VK_ESCAPE:
+			CDialogEx::OnCancel();
+		}
+	}
+    return CWnd::PreTranslateMessage(pMsg);
 }

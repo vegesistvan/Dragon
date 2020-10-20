@@ -213,6 +213,8 @@ public:
 	int		m_deletedM;
 	CString m_listFile;
 	CString m_user_version;  // adatbázis user_version-je
+	int		m_contractPeople;
+	int		m_contractMarriages;
 
 	std::vector<FAMS> v_fams;
 	std::vector<CString> v_tables;

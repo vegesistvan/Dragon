@@ -47,6 +47,7 @@ void CTableTables::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_LIST, m_ListCtrl);
+	DDX_Control(pDX, IDC_KERES, colorKeres);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CTableTables, CDialogEx)
@@ -56,7 +57,7 @@ BEGIN_MESSAGE_MAP(CTableTables, CDialogEx)
 
 	ON_WM_SIZE()
 	ON_WM_SIZING()
-	ON_EN_CHANGE(IDC_SEARCH, &CTableTables::OnChangeSearch)
+//	ON_EN_CHANGE(IDC_SEARCH, &CTableTables::OnChangeSearch)
 	ON_MESSAGE(WM_SET_COLUMN_COLOR, OnSetColumnColor)
 	ON_MESSAGE(WM_CLICKED_COLUMN, OnColumnSorted)
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
@@ -74,6 +75,7 @@ BEGIN_MESSAGE_MAP(CTableTables, CDialogEx)
 	ON_COMMAND(ID_FILTER_TABLES, &CTableTables::OnFilterTables)
 //	ON_COMMAND(ID_PRIVAT_DESCENDANTS_TABLE, &CTableTables::OnPrivatDescendantsTable)
 ON_COMMAND(ID_PRIVAT_DESCENDANTS_TABLE, &CTableTables::OnPrivatDescendantsTable)
+ON_STN_CLICKED(IDC_KERES, &CTableTables::OnClickedKeres)
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CTableTables::OnInitDialog()
@@ -112,6 +114,7 @@ BOOL CTableTables::OnInitDialog()
 	m_ListCtrl.InsertColumn( T_KNOWN_AS,	L"ismert",		LVCFMT_LEFT,	 50,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( T_ALIAS,		L"alias",		LVCFMT_LEFT,	 50,-1,COL_TEXT);
 
+	colorKeres.SetTextColor( theApp.m_colorClick );
 
 	if( !m_select )
 	{
@@ -285,12 +288,12 @@ void CTableTables::OnSizing(UINT fwSide, LPRECT pRect)
 	EASYSIZE_MINSIZE(430,314,fwSide,pRect); 
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTableTables::OnChangeSearch()
-{
-	CString	search;
-	GetDlgItem( IDC_SEARCH )->GetWindowText( search );
-	theApp.search( search, m_orderix,  &m_ListCtrl );
-}
+//void CTableTables::OnChangeSearch()
+//{
+//	CString	search;
+//	GetDlgItem( IDC_SEARCH )->GetWindowText( search );
+//	theApp.search( search, m_orderix,  &m_ListCtrl );
+//}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 LRESULT CTableTables::OnSetColumnColor(WPARAM wParam, LPARAM lParam)//wparam: oszlopszam, lparam: a COLUMNCOLOR struktura cime
 {
@@ -455,23 +458,6 @@ void CTableTables::OnBnClickedOk()
 	}
 	CDialogEx::OnOK();
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CTableTables::PreTranslateMessage(MSG* pMsg)
-{
-	int x=(int)pMsg->wParam;
-
-    if( pMsg->message==WM_KEYDOWN)
-    {
-		switch( x )
-		{
-		case VK_RETURN:
-			return TRUE;
-		case VK_ESCAPE:
-			CDialogEx::OnCancel();
-		}
-	}
-    return CWnd::PreTranslateMessage(pMsg);
-}
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTableTables::OnGaline()
@@ -494,4 +480,58 @@ void CTableTables::OnGahtml()
 //	TCHAR command[100];
 //	swprintf(command, 100, L"%d", 1 );
 //	ShellExecute(NULL, L"open", L"webApp.exe", NULL, L"d:\\VS2019\\cpp\\webApp\\Release", SW_SHOW);
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTableTables::OnClickedKeres()
+{
+	if( m_orderix == 0 )
+	{
+		AfxMessageBox( L"Rendezni kell az oszlopot, amelyben keresni akarsz!" );
+		return;
+	}
+	CString	search;
+	GetDlgItem( IDC_SEARCH )->GetWindowText( search );
+	if( search.IsEmpty() )
+	{
+		AfxMessageBox( L"Meg kell adni a keresendõ stringet!");
+		return;
+	}
+
+	int		n				= m_ListCtrl.GetItemCount();
+	int		length			= search.GetLength();
+	int		nItem;
+	CString	str;
+
+	theApp.unselectAll( &m_ListCtrl );
+	for( nItem = 0; nItem < n; ++nItem )
+	{
+		str = m_ListCtrl.GetItemText( nItem, m_orderix);
+		str = str.Left(length);						// az aktuális search string hosszával azonos hosszúság leválasztása
+		if( str == search )
+		{
+			m_ListCtrl.SetItemState( nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED );
+			m_ListCtrl.EnsureVisible( nItem, FALSE );
+			break;
+		}
+	}
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BOOL CTableTables::PreTranslateMessage(MSG* pMsg)
+{
+	int x=(int)pMsg->wParam;
+
+    if( pMsg->message==WM_KEYDOWN)
+    {
+		switch( x )
+		{
+		case VK_RETURN:
+			GetDlgItem( IDC_SEARCH )->GetWindowTextW( str );
+			if( str.GetLength() )
+				OnClickedKeres();
+			break;
+		case VK_ESCAPE:
+			CDialogEx::OnCancel();
+		}
+	}
+    return CWnd::PreTranslateMessage(pMsg);
 }

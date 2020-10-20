@@ -246,6 +246,8 @@ BOOL CDragonApp::openDatabase()
 	if( !open.openDatabase() ) return false;
 
 	m_user_version = open.m_user_version;
+	m_contractPeople = open.m_contractPeople;
+	m_contractMarriages = open.m_contractMarriages;
 
 	WriteProfileString( L"Settings",L"databasespec", m_databaseSpec ); // jó adatbázis, eltenni
 
