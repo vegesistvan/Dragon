@@ -139,8 +139,8 @@ ki kel javítani!.\r\n\
 Erre szolgálnak az \"Ellenõrzése egyesítés elõtt\" funkciók, de az egyesítés során az azonosítás erdményét tartalmazó \
 fájlok is felfedhetnek hibákat.\r\n\
 \r\n\
-Elõírhatjuk, hogy az ellentmondásmentes adatok mellett hány adat azonosságát követeljük meg az azonosság elfogadásához.\
-Javasolt értéke: 0.\r\n\
+Elõírhatjuk, hogy az ellentmondásmentes adatok mellett hány adatpár létezését és egyenlõségét követeljük meg az \
+azonosság elfogadásához. Javasolt értéke: 0.\r\n\
 \r\n\r\n\
 ";
 
@@ -171,8 +171,8 @@ L"rowid", L"feleség", L"születés", L"halál", L"apja", L"anyja" \
 
 //Ha csak egy házaspárt akatsz vizsgálni, add meg a nevüket
 
-//	_husband	= L"Amadé Lénárd";
-//	_wife		= L"Martonfalvay Júlia";
+//	_husband	= L"Czompó Sándor";
+//	_wife		= L"Mórocz Teréz";
 
 
 }
@@ -210,6 +210,7 @@ BOOL CSameCouples::OnInitDialog()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSameCouples::OnBnClickedOk()
 {
+	theApp.setStartTime();
 	_azonos	= ComboCtrl.GetCurSel();
 
 	openUnited();
@@ -234,10 +235,21 @@ void CSameCouples::OnBnClickedOk()
 	fwprintf( fD, L"\n\n%s\n", str );
 	fwprintf( fU, L"</pre>" );
 	fwprintf( fD, L"</pre>" );
+	fwprintf( fU, L"Eltelt idõ: %s<br><br>", theApp.get_time_elapsed() );
+	fwprintf( fD, L"Eltelt idõ: %s<br><br>", theApp.get_time_elapsed() );
+//	fwprintf( fD, L"</BODY>\n" );
+
 	fclose( fU );
 	fclose( fD );
 
-	theApp.execute( L"PRAGMA user_version='1'" );
+
+//	int n = theApp.m_contractMarriages;
+	int n = _wtoi( theApp.m_user_version );
+	int i = n*10+1;
+	m_command.Format( L"PRAGMA user_version='%d'", i );
+	theApp.execute( m_command );
+	theApp.m_contractMarriages = n + 1;
+
 	wndP.DestroyWindow();		
 
 	theApp.showHtmlFile( differentSpec );
@@ -485,12 +497,14 @@ void CSameCouples::processSame()
 	UINT group = 1;
 	UINT db = 0;
 	int z;
-
-
+	CString rowid1;
+	CString rowid2;
 	
 	resetRef();		// ez kell, hogy a korábbi ref-et törölje!!
 	for( UINT i1 = 0; i1 < vSame.size(); ++i1 )
 	{
+		rowid1 = vSame.at(i1).rowidS1;
+		
 		if( db ) 
 		{
 			resetRef();
@@ -501,6 +515,7 @@ void CSameCouples::processSame()
 		{
 			for( UINT i2 = 0; i2 < vSame.size(); ++i2 )
 			{
+				rowid2 = vSame.at(i2).rowidS1;
 				if( i1 != i2 && vSame.at(i2).group == 0 )	// természetesen csak különbözõ házaspárokat vizsgál, amelyeket még nem redneltek hozzá egyik csooprthoz sem
 				{
 					if( identical( i1, i2 ) )
@@ -569,7 +584,6 @@ void CSameCouples::processSame()
 		}
 	}
 	contract();
-
 	if( m_contracted )
 		listUnited();
 	else
@@ -578,6 +592,7 @@ void CSameCouples::processSame()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSameCouples::resetRef()
 {
+
 	r.birthS1.Empty();
 	r.birthS2.Empty();
 	r.cnt = 0;
@@ -613,19 +628,23 @@ void CSameCouples::resetRef()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSameCouples::setRef( int i )
 {
-	COUPLES a = vCouples.at(i );
+	COUPLES a = vSame.at(i );
+
+	r.rowidS1 = a.rowidS1;
+	r.rowidS2 = a.rowidS2;
 
 	if( r.birthS1.IsEmpty() && !a.birthS1.IsEmpty() )				r.birthS1 = a.birthS1;
 	if( r.deathS1.IsEmpty() && !a.deathS1.IsEmpty() )				r.deathS1 = a.deathS1;
 	if( r.fatherS1.IsEmpty() && !a.fatherS1.IsEmpty() )				r.fatherS1 = a.fatherS1;
+	if( r.father_idS1.IsEmpty() && !a.father_idS1.IsEmpty() )				r.father_idS1 = a.father_idS1;
 	if( r.motherS1.IsEmpty() && !a.motherS1.IsEmpty() )				r.motherS1 = a.motherS1;
+	if( r.mother_idS1.IsEmpty() && !a.mother_idS1.IsEmpty() )		r.mother_idS1 = a.mother_idS1;
 
 	if( r.birthS2.IsEmpty() && !a.birthS2.IsEmpty() )				r.birthS2 = a.birthS2;
 	if( r.deathS2.IsEmpty() && !a.deathS2.IsEmpty() )				r.deathS2 = a.deathS2;
-	if( r.fatherS2.IsEmpty() && !a.fatherS2.IsEmpty() )				r.fatherS2 = a.fatherS2;
+	if( r.fatherS2.IsEmpty() && !a.fatherS2.IsEmpty() )				
+		r.fatherS2 = a.fatherS2;
 	if( r.motherS2.IsEmpty() && !a.motherS2.IsEmpty() )				r.motherS2 = a.motherS2;
-
-
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Az i1 és i2 indexû házasspárok azonosságát állapíthja meg.
@@ -727,6 +746,7 @@ void CSameCouples::contract()
 					{ 
 						if( rowid == L"266154" )
 							z = 1;
+// törli people.rowid-t és replace-eli a spouse1_id/spouse2_id = rowid-t  és father/mother_id = rowid-t rowidBy-ra
 						ReplaceSpouse1( rowid, rowidBy, vSame.at(j).spouse1, source );
 						theApp.replaceBy( rowid, rowidBy, sex_id, source );
 
@@ -738,6 +758,7 @@ void CSameCouples::contract()
 					++m_deleted;
 					++m_contracted;
 				}
+
 			}
 		}
 

@@ -377,7 +377,7 @@ public:
 	afx_msg void OnBracketsSquare();
 	afx_msg void OnBracketsRound();
 	afx_msg void OnBraces();
-	afx_msg void OnGenerationcode();
+//	afx_msg void OnGenerationcode();
 	afx_msg void OnFromtable();
 	afx_msg void OnFromfamily();
 	afx_msg void OnConnectCsalad();

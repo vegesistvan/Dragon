@@ -227,7 +227,6 @@
     <ClInclude Include="EditFirstName.h" />
     <ClInclude Include="EditTable.h" />
     <ClInclude Include="FirstLetter.h" />
-    <ClInclude Include="checkGenerations1.h" />
     <ClInclude Include="html_Edit.h" />
     <ClInclude Include="html_Lines.h" />
     <ClInclude Include="html_Brackets.h" />
@@ -350,7 +349,6 @@
     <ClCompile Include="EditFirstName.cpp" />
     <ClCompile Include="EditTable.cpp" />
     <ClCompile Include="FirstLetter.cpp" />
-    <ClCompile Include="checkGenerations1.cpp" />
     <ClCompile Include="html.cpp" />
     <ClCompile Include="html_Edit.cpp" />
     <ClCompile Include="html_Lines.cpp" />

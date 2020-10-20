@@ -46,6 +46,8 @@ public:
 	int				m_numberOfIndexes;
 
 	CString			m_user_version;
+	int				m_contractPeople;
+	int				m_contractMarriages;
 
 	bool openDatabase();
 

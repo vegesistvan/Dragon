@@ -54,7 +54,7 @@ public:
 	afx_msg void OnEditUpdate();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
-	afx_msg void OnChangeSearch();
+//	afx_msg void OnChangeSearch();
 	afx_msg LRESULT OnSetColumnColor(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnColumnSorted(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
@@ -71,4 +71,8 @@ public:
 	afx_msg void OnFilterTables();
 //	afx_msg void OnPrivatDescendantsTable();
 	afx_msg void OnPrivatDescendantsTable();
+//	CColorStatic colorKeres;
+//	CColorStatic colorKeres;
+	afx_msg void OnClickedKeres();
+	CColorStatic colorKeres;
 };

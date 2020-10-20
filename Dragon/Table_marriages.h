@@ -52,7 +52,7 @@ public:
 	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
 	afx_msg LRESULT OnSetColumnColor(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnColumnSorted(WPARAM wParam, LPARAM lParam);
-	afx_msg void OnChangeSearch();
+//	afx_msg void OnChangeSearch();
 	afx_msg void OnExportAll();
 	afx_msg void OnExportSelected();
 	afx_msg void OnAzonosMarriagelist();
@@ -73,4 +73,6 @@ public:
 	afx_msg void OnEditUpdate();
 	afx_msg void OnEditDelete();
 	afx_msg void OnEditGahtml();
+	CColorStatic colorKeres;
+	afx_msg void OnClickedKeres();
 };

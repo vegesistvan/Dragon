@@ -56,6 +56,7 @@ void CTableMarriages::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_LIST, m_ListCtrl);
+	DDX_Control(pDX, IDC_KERES, colorKeres);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CTableMarriages, CDialogEx)
@@ -64,7 +65,7 @@ BEGIN_MESSAGE_MAP(CTableMarriages, CDialogEx)
 	ON_WM_SIZE()
 	ON_WM_SIZING()
 	ON_COMMAND(ID_FILTER_HLASTNAME, &CTableMarriages::OnFilterHlastname)
-	ON_EN_CHANGE(IDC_SEARCH, &CTableMarriages::OnChangeSearch)
+//	ON_EN_CHANGE(IDC_SEARCH, &CTableMarriages::OnChangeSearch)
 	ON_COMMAND(ID_EXPORT_ALL, &CTableMarriages::OnExportAll)
 	ON_COMMAND(ID_EXPORT_SELECTED, &CTableMarriages::OnExportSelected)
 	ON_COMMAND(ID_AZONOS_MARRIAGELIST, &CTableMarriages::OnAzonosMarriagelist)
@@ -85,6 +86,7 @@ BEGIN_MESSAGE_MAP(CTableMarriages, CDialogEx)
 	ON_COMMAND(ID_EDIT_UPDATE, &CTableMarriages::OnEditUpdate)
 	ON_COMMAND(ID_EDIT_DELETE, &CTableMarriages::OnEditDelete)
 	ON_COMMAND(ID_EDIT_GAHTML, &CTableMarriages::OnEditGahtml)
+	ON_STN_CLICKED(IDC_KERES, &CTableMarriages::OnClickedKeres)
 END_MESSAGE_MAP()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CTableMarriages::OnInitDialog()
@@ -126,6 +128,7 @@ BOOL CTableMarriages::OnInitDialog()
 
 	enableMenu( MF_GRAYED );
 
+	colorKeres.SetTextColor( theApp.m_colorClick ); 
 	m_command.Format( L"SELECT count(*) FROM marriages" );
 	if( !theApp.query( m_command ) ) return false;
 
@@ -421,12 +424,12 @@ LRESULT CTableMarriages::OnColumnSorted(WPARAM wParam, LPARAM lParam) //wparam: 
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTableMarriages::OnChangeSearch()
-{
-	CString	search;
-	GetDlgItem( IDC_SEARCH )->GetWindowText( search );
-	theApp.search( search, m_orderix,  &m_ListCtrl );
-}
+//void CTableMarriages::OnChangeSearch()
+//{
+//	CString	search;
+//	GetDlgItem( IDC_SEARCH )->GetWindowText( search );
+//	theApp.search( search, m_orderix,  &m_ListCtrl );
+//}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
 void CTableMarriages::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
@@ -550,23 +553,7 @@ void CTableMarriages::PostNcDestroy()
 	}
 	delete this;
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CTableMarriages::PreTranslateMessage(MSG* pMsg)
-{
-	int x=(int)pMsg->wParam;
 
-    if( pMsg->message==WM_KEYDOWN)
-    {
-		switch( x )
-		{
-		case VK_RETURN:
-			return TRUE;
-		case VK_ESCAPE:
-			CDialogEx::OnCancel();
-		}
-	}
-    return CWnd::PreTranslateMessage(pMsg);
-}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTableMarriages::OnClose()
 {
@@ -773,4 +760,58 @@ void CTableMarriages::OnEditGahtml()
 	dlg.m_line = cLine;
 	dlg.DoModal();
 
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTableMarriages::OnClickedKeres()
+{
+	if( m_orderix == 0 )
+	{
+		AfxMessageBox( L"Rendezni kell az oszlopot, amelyben keresni akarsz!" );
+		return;
+	}
+	CString	search;
+	GetDlgItem( IDC_SEARCH )->GetWindowText( search );
+	if( search.IsEmpty() )
+	{
+		AfxMessageBox( L"Meg kell adni a keresendõ stringet!");
+		return;
+	}
+
+	int		n				= m_ListCtrl.GetItemCount();
+	int		length			= search.GetLength();
+	int		nItem;
+	CString	str;
+
+	theApp.unselectAll( &m_ListCtrl );
+	for( nItem = 0; nItem < n; ++nItem )
+	{
+		str = m_ListCtrl.GetItemText( nItem, m_orderix);
+		str = str.Left(length);						// az aktuális search string hosszával azonos hosszúság leválasztása
+		if( str == search )
+		{
+			m_ListCtrl.SetItemState( nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED );
+			m_ListCtrl.EnsureVisible( nItem, FALSE );
+			break;
+		}
+	}
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BOOL CTableMarriages::PreTranslateMessage(MSG* pMsg)
+{
+	int x=(int)pMsg->wParam;
+
+    if( pMsg->message==WM_KEYDOWN)
+    {
+		switch( x )
+		{
+		case VK_RETURN:
+			GetDlgItem( IDC_SEARCH )->GetWindowTextW( str );
+			if( str.GetLength() )
+				OnClickedKeres();
+			break;
+		case VK_ESCAPE:
+			CDialogEx::OnCancel();
+		}
+	}
+    return CWnd::PreTranslateMessage(pMsg);
 }
