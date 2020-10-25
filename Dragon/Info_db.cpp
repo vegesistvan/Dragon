@@ -35,9 +35,6 @@ CInfoDb::~CInfoDb()
 void CInfoDb::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_DATABASE, colorDatabase);
-	DDX_Control(pDX, IDC_SYSTEMDATABASE, colorSystemDatabase);
-	DDX_Control(pDX, IDC_BLOBDB, colorBlobSpec);
 
 	DDX_Control(pDX, IDC_FREELIST_COUNT, colorFreeCount);
 	DDX_Control(pDX, IDC_FREELISTBLOB_COUNT, colorFreeCountBlob);
@@ -76,10 +73,10 @@ BOOL CInfoDb::OnInitDialog()
 
 	fileSpec.Format( L"%s\\integrityError.txt", theApp.m_workingDirectory );
 
-	colorDatabase.SetTextColor( theApp.m_colorClick );
-	colorSystemDatabase.SetTextColor( theApp.m_colorClick );
-	colorBlobSpec.SetTextColor( theApp.m_colorClick );
-	
+	GetDlgItem( IDC_STATIC_DB )->SetWindowText( theApp.m_databaseSpec );
+	GetDlgItem( IDC_STATIC_BLOB )->SetWindowText( theApp.m_blobSpec );
+	GetDlgItem( IDC_STATIC_SYSTEM )->SetWindowText( theApp.m_systemDatabaseSpec );
+
 	CProgressWnd pW(NULL, L"Az adatbázis integritásának ellenõrzése...");
 	pW.GoModal();
 
@@ -153,7 +150,6 @@ BOOL CInfoDb::OnInitDialog()
 	marriages = thousend( _wtoi( theApp.m_recordset->GetFieldString(0) ));
 
 
-	GetDlgItem( IDC_DATABASE )->SetWindowTextW( theApp.m_databaseSpec );
 	GetDlgItem( IDC_PEOPLES )->SetWindowTextW( people );
 	GetDlgItem( IDC_FAMILIES )->SetWindowTextW( families );
 	GetDlgItem( IDC_TABLES )->SetWindowTextW( tables );
@@ -194,7 +190,7 @@ BOOL CInfoDb::OnInitDialog()
 	str.Format( L"%d", iterationCount );
 	GetDlgItem( IDC_ITERATIONS_COUNT )->SetWindowTextW( str );
 
-	GetDlgItem( IDC_BLOBDB )->SetWindowTextW( theApp.m_blobSpec );
+
 	if( CFile::GetStatus( theApp.m_blobSpec, status) )
 	{
 		mtime	= status.m_mtime.Format( L"%Y.%m.%d %H:%M:%S" );
@@ -244,8 +240,6 @@ BOOL CInfoDb::OnInitDialog()
 		}
 	}
 */
-
-	GetDlgItem( IDC_SYSTEMDATABASE )->SetWindowTextW( theApp.m_systemDatabaseSpec );
 
 	if( CFile::GetStatus( theApp.m_systemDatabaseSpec, status) )
 	{

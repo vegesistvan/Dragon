@@ -28,6 +28,7 @@ protected:
 	CString m_command;
 	CString str;
 	CString m_name;				// egy ember neve, amit elõírhatunk vizsgélatra
+	int		m_match;			// az egyezõ adazpárok száma;
 	
 	CString unitedSpec;			// egyesített bejegyzéseket listázó fájl
 	CString differentSpec;		// különbözü bejegyzéseket listázó fájl
@@ -37,11 +38,13 @@ protected:
 
 	int		m_deleted;			// törölt bejegyzések száma
 	int		m_contracted;		// jelzi, hogy vannak összevont bejegyzések a vPeople vektorban
-	int		_azonos;			// az egyesítéshez szükséges azonosságok száma
+	int		m_azonos;			// az egyesítéshez szükséges azonosságok száma
+	int		m_loop;
 
 	CString m_info;				// információs szöveg a programról
 	bool	m_contract;			// végrehajtsa-e az összevonást
 	std::vector<SAMENAMES> vPeople;
+	std::vector<CONTRACT> vContract;
 	SAMENAMES r;				// referencia adatok az összehasonlításnál
 	
 	CStringArray m_colors;
@@ -52,22 +55,24 @@ protected:
 	CSqliteDBRecordSet*	 m_recordset2;
 
 	
-	CComboBox ComboCtrl;
+//	CComboBox ComboCtrl;
 
-	void createHead( CString title );
-	void collectPeople();
+	void createHead( CString title, int loop  );
+	void core( int loop );
 	void putPeople( CString name, UINT i );
 	void processPeople();
 	void listPeople();
 	int	 sameSpouses( CString spouse1, CString spouse2 );
 	int  identical( UINT i1, UINT i2 );
 	void contract( UINT i1, UINT i2 );
+	void contractFull( int loop );
+	void clearMarriages( int loop );
 	void setRef( int i ) ;
 	void resetRef();
 	void printRef( int group );
 
-	void openUnited();
-	void openDifferent();
+	void openUnited( int loop );
+	void openDifferent( int loop );
 
 	BOOL query( CString command );
 	BOOL query1( CString command );

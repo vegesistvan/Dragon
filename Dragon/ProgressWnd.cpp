@@ -77,7 +77,7 @@ void CProgressWnd::CommonConstruct()
     m_nMinValue      = 0;
     m_nMaxValue      = 100;
 
-    m_strTitle       = L"Progress"; 
+	m_strTitle       = L"Progress"; 
     m_strCancelLabel = L" Cancel "; 
     m_bCancelled     = FALSE;
     m_bModal         = FALSE;

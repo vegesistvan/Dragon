@@ -101,10 +101,7 @@ bool COpenDatabase::openDatabase()
 	
 
 	if( !query( L"PRAGMA user_version" )) return 0;
-	m_user_version = m_tabla->GetFieldString( 0 );
-	m_contractPeople = _wtoi( m_user_version.Right( 2 ) );
-	m_contractMarriages = _wtoi( m_user_version.Mid( 4, 2 ) );
-
+	m_user_version = _wtoi( m_tabla->GetFieldString( 0 ) );
 	return 1;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

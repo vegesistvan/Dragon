@@ -67,8 +67,6 @@ class CDragonApp : public CWinApp
 public:
 	CDragonApp();
 
-//	static char THIS_FILE[]=__FILE__;
-
 // Overrides
 public:
 	virtual BOOL InitInstance();
@@ -212,10 +210,8 @@ public:
 	int		m_deletedP;
 	int		m_deletedM;
 	CString m_listFile;
-	CString m_user_version;  // adatbázis user_version-je
-	int		m_contractPeople;
-	int		m_contractMarriages;
-
+	int		m_user_version;  // adatbázis user_version-je
+	
 	std::vector<FAMS> v_fams;
 	std::vector<CString> v_tables;
 	std::vector<MOTHERINDEX> v_mother_index;

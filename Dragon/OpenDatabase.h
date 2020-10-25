@@ -45,10 +45,8 @@ public:
 	int				m_numberOfTables;
 	int				m_numberOfIndexes;
 
-	CString			m_user_version;
-	int				m_contractPeople;
-	int				m_contractMarriages;
-
+	int				m_user_version;
+	
 	bool openDatabase();
 
 	

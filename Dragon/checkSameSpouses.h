@@ -51,7 +51,6 @@ protected:
 	CString _tag;
 	CString _info;
 
-	UINT	m_deleted;
 	std::vector<MORESPOUSES> vSpouses;
 	std::vector<MORESPOUSES>vSameSpouses;
 

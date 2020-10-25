@@ -29,7 +29,10 @@ enum
 	P_FATHER_ID,
 	P_MOTHER_ID,
 };
-
+bool sortByC(const CONTRACT &v1, const CONTRACT &v2) 
+{
+	return( v1.rowidBy < v2.rowidBy );
+}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // return TRUE ne cseréljen
 // return FALS cseréljen
@@ -139,10 +142,10 @@ ki kel javítani!.\r\n\
 Erre szolgálnak az \"Ellenõrzése egyesítés elõtt\" funkciók, de az egyesítés során az azonosítás erdményét tartalmazó \
 fájlok is felfedhetnek hibákat.\r\n\
 \r\n\
-Elõírhatjuk, hogy az ellentmondásmentes adatok mellett hány adatpár létezését és egyenlõségét követeljük meg az \
-azonosság elfogadásához. Javasolt értéke: 0.\r\n\
-\r\n\r\n\
 ";
+
+//Elõírhatjuk, hogy az ellentmondásmentes adatok mellett hány adatpár létezését és egyenlõségét követeljük meg az \
+//azonosság elfogadásához. Javasolt értéke: 0.\r\n\
 
 	m_columns.Format( L"\n<b>\
 %6s %12s \
@@ -171,10 +174,12 @@ L"rowid", L"feleség", L"születés", L"halál", L"apja", L"anyja" \
 
 //Ha csak egy házaspárt akatsz vizsgálni, add meg a nevüket
 
-//	_husband	= L"Czompó Sándor";
-//	_wife		= L"Mórocz Teréz";
-
-
+//	_husband	= L"Ajkay István";
+//	_wife		= L"N N";
+	m_contract	= false;
+	m_contract	= true;			// végrejatsa-e az összevonásokat	
+	m_loop		= 3;
+	m_azonos	= 0;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CSameCouples::~CSameCouples()
@@ -184,7 +189,7 @@ CSameCouples::~CSameCouples()
 void CSameCouples::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_COMBO, ComboCtrl);
+	//  DDX_Control(pDX, IDC_COMBO, ComboCtrl);
 	DDX_Text(pDX, IDC_EDIT, m_info);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -196,7 +201,7 @@ BOOL CSameCouples::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-
+/*
 	for( UINT i = 0; i < 10; ++i )
 	{
 		str.Format( L"%d", i );
@@ -205,60 +210,71 @@ BOOL CSameCouples::OnInitDialog()
 	ComboCtrl.SetCurSel( 0 );
 
 	UpdateData( TOSCREEN );
+*/
 	return TRUE;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSameCouples::OnBnClickedOk()
 {
-	theApp.setStartTime();
-	_azonos	= ComboCtrl.GetCurSel();
-
-	openUnited();
-	openDifferent();
-
-	m_deleted = 0;
-	sameSpouses();
-
-	if( m_deleted )
+//	_azonos	= ComboCtrl.GetCurSel();
+	int loop = 1;
+	
+	
+	wndP.Create( NULL, L"Azonos nevû házaspárok..." );
+	wndP.GoModal();
+	
+	while( true )
 	{
-		str.Format( L"%d ember összevonva.", m_deleted );
-#ifndef _DEBUG
-		wndP.SetText( L"Az adatbázis tömörítése..." );
-#endif
-		theApp.execute( L"VACUUM");
+		theApp.setStartTime();
+		openUnited();
+		openDifferent();
+
+		m_deleted = 0;
+		core( loop );
+
+		if( m_deleted )
+			str.Format( L"%d ember összevonva.", m_deleted );
+		else
+			str = L"Nincs összevonható ember!";
+
+		fwprintf( fU, L"\n\n%s\n", str );
+		fwprintf( fD, L"\n\n%s\n", str );
+		fwprintf( fU, L"</pre>" );
+		fwprintf( fD, L"</pre>" );
+		fwprintf( fU, L"Eltelt idõ: %s<br><br>", theApp.get_time_elapsed() );
+		fwprintf( fD, L"Eltelt idõ: %s<br><br>", theApp.get_time_elapsed() );
+
+		fclose( fU );
+		fclose( fD );
+
+			if( m_deleted )
+		{
+			theApp.m_user_version = theApp.m_user_version*10+1;
+			m_command.Format( L"PRAGMA user_version='%d'", theApp.m_user_version );
+			theApp.execute( m_command );
+
+			theApp.showHtmlFile( unitedSpec );
+			theApp.showHtmlFile( differentSpec );
+		}
+		else
+		{
+			theApp.showHtmlFile( differentSpec );
+			break;
+		}
+		if( loop == m_loop ) break;
+		++loop;
 	}
-	else
-	{
-		str = L"Nincs összevonható ember!";
-	}
-	fwprintf( fU, L"\n\n%s\n", str );
-	fwprintf( fD, L"\n\n%s\n", str );
-	fwprintf( fU, L"</pre>" );
-	fwprintf( fD, L"</pre>" );
-	fwprintf( fU, L"Eltelt idõ: %s<br><br>", theApp.get_time_elapsed() );
-	fwprintf( fD, L"Eltelt idõ: %s<br><br>", theApp.get_time_elapsed() );
-//	fwprintf( fD, L"</BODY>\n" );
-
-	fclose( fU );
-	fclose( fD );
-
-
-//	int n = theApp.m_contractMarriages;
-	int n = _wtoi( theApp.m_user_version );
-	int i = n*10+1;
-	m_command.Format( L"PRAGMA user_version='%d'", i );
-	theApp.execute( m_command );
-	theApp.m_contractMarriages = n + 1;
-
 	wndP.DestroyWindow();		
 
-	theApp.showHtmlFile( differentSpec );
-	theApp.showHtmlFile( unitedSpec );
+#ifndef _DEBUG
+	wndP.SetText( L"Az adatbázis tömörítése..." );
+#endif
+	theApp.execute( L"VACUUM");
 
 	CDialogEx::OnOK();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSameCouples::sameSpouses()
+void CSameCouples::core( int loop )
 {
 	CString first_name1;
 	CString	lastName;
@@ -270,15 +286,16 @@ void CSameCouples::sameSpouses()
 
 	int		z;
 
-	wndP.Create( NULL, L"Azonos nevû házaspárok..." );
-	wndP.GoModal();
-
-	
+	str.Format( L"Azonos nevû emberek házasságainak vizsgálata és összevonása - %d. iteráció", loop );
+	wndP.m_strTitle = str;
 
 #ifndef _DEBUG
 	str.Format( L"Házasságok lekérdezése az adatbázisból..." );
 	wndP.SetText( str );
 #endif
+
+
+	vContract.clear();
 
 	m_command.Format( L"SELECT rowid,* FROM marriages" );
 	if( !query( m_command ) ) return;
@@ -404,14 +421,13 @@ void CSameCouples::sameSpouses()
 		}
 		vcouples.fatherS2 = str;
 		
-		vcouples.generationS2.Trim();;
+		vcouples.generationS2.Trim();
 		vcouples.cnt = i;
 		vCouples.push_back( vcouples );
 cont:	wndP.StepIt();
 		wndP.PeekAndPump();
 		if (wndP.Cancelled()) break;
 	}
-
 	
 
 #ifndef _DEBUG
@@ -427,12 +443,12 @@ cont:	wndP.StepIt();
 	wndP.SetText( str );
 #endif
 
-	getSameCouples();
+//	getSameCouples( loop );
 	wndP.SetPos(0);
-}
+//}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSameCouples::getSameCouples()
-{
+//void CSameCouples::getSameCouples( int loop )
+//{
 
 	CString spouse1;
 	CString spouse2;
@@ -440,21 +456,20 @@ void CSameCouples::getSameCouples()
 	CString namePrev(L"");
 	bool	first = true;
 	
-	theApp.execute( L"BEGIN" );
-
+	
 	wndP.SetRange( 0, vCouples.size() );
 	wndP.SetPos(0 );
 	wndP.SetStep(1 );
 
 	vSame.clear();
-	vDeleted.clear();
+	
 	for( ic = 0; ic < vCouples.size(); ++ic )
 	{
 		spouse1 =  vCouples.at(ic).spouse1;
 		spouse2 =  vCouples.at(ic).spouse2;
 
-		if( !_husband.IsEmpty()  && _husband != spouse1 ) goto cont;
-		if( !_wife.IsEmpty() && _wife != spouse2 ) goto cont;
+		if( !_husband.IsEmpty()  && _husband != spouse1 ) goto cont2;
+		if( !_wife.IsEmpty() && _wife != spouse2 ) goto cont2;
 		name.Format( L"%-40s %-40s", spouse1, spouse2 );
 		if( name == namePrev )
 		{
@@ -476,7 +491,7 @@ void CSameCouples::getSameCouples()
 		}
 		namePrev = name;
 
-cont:	wndP.StepIt();
+cont2:	wndP.StepIt();
 		wndP.PeekAndPump();
 		if (wndP.Cancelled()) break;
 	}
@@ -485,6 +500,10 @@ cont:	wndP.StepIt();
 		processSame();
 		vSame.clear();
 	}
+
+	theApp.execute( L"BEGIN" );
+	contractFull( loop );
+	clearMarriages( loop );
 	theApp.execute( L"COMMIT" );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -654,9 +673,13 @@ bool CSameCouples::identical( UINT i1, UINT i2 )
 {
 	COUPLES a = vSame.at(i1);
 	COUPLES b = vSame.at(i2);
-	
+
+	if( !a.generationS1.IsEmpty() && !b.generationS1.IsEmpty() ) return false;
+
 	int	good = 0;
 	int g;
+
+
 
 	if( ( g = same( r.birthS1, a.birthS1, b.birthS1 ) ) == -1 ) return false;
 	if( g == 1 ) ++good;
@@ -683,7 +706,7 @@ bool CSameCouples::identical( UINT i1, UINT i2 )
 	if( ( g = same( r.motherS2, a.motherS2, b.motherS2 ) ) == -1 ) return false;
 	if( g == 1 ) ++good;
 
-	if( _azonos <= good ) return true;				// legalább _azonos egyezés ellentmondás nélkül 
+	if( m_azonos <= good ) return true;				// legalább _azonos egyezés ellentmondás nélkül 
 	return false;
 }
 
@@ -701,6 +724,7 @@ void CSameCouples::contract()
 	CString rowidMD;
 	int		group;
 	int		z;
+	CONTRACT vcontract;
 
 	if( vSame.at(0).spouse1 == L"Barkóczy László"  && vSame.at(0).spouse2 == L"Krucsay Klára" )
 		z = 1;
@@ -737,28 +761,15 @@ void CSameCouples::contract()
 					rowid	= vSame.at(j).rowidS1;
 					sex_id	= vSame.at(j).sex_idS1;
 
-// Lajos +Késmárk 1924 vasúti fõellenõr 1=N N 2=N N
-// Két házasság, amelyben Lajos rowid-ja ugyanaz, a feleségeké különbözõ, de a két házasság egy csoportban van!!
-// Ugynazt a rowid-t meg akrjuk tartani és törölni is akarjuk! Megáll az ész!!
-// Ezeket nem lehet összevonni!!!
-//
 					if( rowid != rowidBy )  // akkor fordulhat elõ, ha egy korábban házasságban rowid-t már felülírták rowidBy-al
 					{ 
-						if( rowid == L"266154" )
-							z = 1;
-// törli people.rowid-t és replace-eli a spouse1_id/spouse2_id = rowid-t  és father/mother_id = rowid-t rowidBy-ra
-						ReplaceSpouse1( rowid, rowidBy, vSame.at(j).spouse1, source );
-						theApp.replaceBy( rowid, rowidBy, sex_id, source );
-
-						vDeleted.push_back( rowid );	// a törölt rowid-k gyûjtése
+						vcontract.rowid		= rowid;
+						vcontract.rowidBy	= rowidBy;
+						vcontract.sex_id	= sex_id;
+						vContract.push_back( vcontract );
 					}
-					m_command.Format( L"DELETE FROM marriages WHERE rowid ='%s'", rowidMD );
-					if( !theApp.execute( m_command ) ) return;
-
-					++m_deleted;
 					++m_contracted;
 				}
-
 			}
 		}
 
@@ -790,16 +801,11 @@ void CSameCouples::contract()
 
 					if( rowid != rowidBy )
 					{
-						ReplaceSpouse2( rowid, rowidBy, vSame.at(j).spouse2, source );
-						theApp.replaceBy( rowid, rowidBy, sex_id, source );
+						vcontract.rowid		= rowid;
+						vcontract.rowidBy	= rowidBy;
+						vcontract.sex_id	= sex_id;
+						vContract.push_back( vcontract );
 					}
-
-// ez mindh anem kellene//
-					// ha a férj rowid-ja ugynanaz volt, de a feleségé különbözõ, akkor a házasságot is most kell törölni!
-					m_command.Format( L"DELETE FROM marriages WHERE rowid ='%s'", rowidMD );
-//					if( !theApp.execute( m_command ) ) return;
-
-					++m_deleted;
 					++vSame.at(0).contracted;
 					++m_contracted;
 				}
@@ -807,38 +813,113 @@ void CSameCouples::contract()
 		}
 	}
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Ha a házaspárok között talál olyan bejegyzést, ahol a férj azonosítója megegyezik a törlendõ bejegyzés azonosítójával, 
-// akkor annak rowid-ját a megmaradó bejegyzés azonosítójára módosítja 
-// A vCouples spouse1 szerint van rendezve, ezért elegendõ a pillanatnyi bejegyzástõl kezdeni és addig pörögni,
-// amíg a férj neve azonos.
-void CSameCouples::ReplaceSpouse1( CString rowid, CString rowidBy, CString name, int source )
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CSameCouples::contractFull( int loop )
 {
-	int z;
-	if( rowid == L"266154" )
-		z = 1;
-	for( UINT i = 0; i < vCouples.size(); ++i )  // 0-tól kell vizsgálni, mert elõtte is lehet ugyazon névhez tartozó bejeygzés
+	if( !m_contract ) return;
+
+	CString rowid;
+	CString rowidBy;
+	CString sex_id;
+
+#ifndef _DEBUG
+	str.Format( L"Törlendõ bejegyzések vizsgálata..." );
+	wndP.SetText( str );
+#endif
+	wndP.SetRange( 0, vContract.size() );
+	wndP.SetPos(0 );
+	wndP.SetStep(1 );
+
+	std::sort( vContract.begin(), vContract.end(), sortByC );
+	for( UINT i = 0; i < vContract.size(); ++i )
 	{
-		if( vCouples.at(i).rowidS1 == rowid )
-		{ 
-			vCouples.at(i).rowidS1	= rowidBy;
-			str.Format( L"%d", source );
-			vCouples.at(i).sourceS1	= str;
+		rowid	= vContract.at(i).rowid;
+		rowidBy = vContract.at(i).rowidBy;
+		for( UINT j = 0; j < vContract.size(); ++j )
+		{
+			if( vContract.at(j).rowidBy == rowid ) 
+				vContract.at(j).rowidBy = rowidBy;
+			else if( rowid  < vContract.at(j).rowidBy ) break;
 		}
+		wndP.StepIt();
+		wndP.PeekAndPump();
+		if (wndP.Cancelled()) break;
+	}
+
+
+#ifndef _DEBUG
+	str.Format( L"Törlés...", loop );
+	wndP.SetText( str );
+#endif
+	wndP.SetRange( 0, vContract.size() );
+	wndP.SetPos(0 );
+	wndP.SetStep(1 );
+
+	for( UINT i = 0; i < vContract.size(); ++i )
+	{
+		rowid	= vContract.at(i).rowid;
+		rowidBy = vContract.at(i).rowidBy;
+		sex_id	= vContract.at(i).sex_id;
+
+		m_command.Format( L"DELETE FROM people WHERE rowid ='%s'", rowid );
+		if( !theApp.execute( m_command ) ) return;
+
+		if( sex_id == L"1" )
+			m_command.Format( L"UPDATE people SET father_id = '%s' WHERE father_id='%s'", rowidBy, rowid );
+		else
+			m_command.Format( L"UPDATE people SET mother_id = '%s' WHERE mother_id='%s'", rowidBy, rowid );
+		if( !theApp.execute( m_command ) ) return;
+
+		if( sex_id == L"1" )
+			m_command.Format( L"UPDATE marriages SET spouse1_id='%s' WHERE spouse1_id ='%s'", rowidBy, rowid );
+		else
+			m_command.Format( L"UPDATE marriages SET spouse2_id='%s' WHERE spouse2_id ='%s'", rowidBy, rowid );
+		if( !theApp.execute( m_command ) ) return;
+
+		++m_deleted;			// az összes összevonást számolja
+		
+		wndP.StepIt();
+		wndP.PeekAndPump();
+		if (wndP.Cancelled()) break;
 	}
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSameCouples::ReplaceSpouse2( CString rowid, CString rowidBy, CString name, int source )
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CSameCouples::clearMarriages( int loop )
 {
-	for( UINT i = 0; i < vCouples.size(); ++i )
+
+#ifndef _DEBUG
+	str.Format( L"Házasságok ellenõrzése és törlése..." );
+	wndP.SetText( str );
+#endif
+
+	m_command = L"SELECT rowid, spouse1_id, spouse2_id FROM marriages ORDER BY spouse1_id, spouse2_id";
+	if( !query( m_command ) ) return;
+
+	CString rowid11;
+	CString rowid21;
+	CString rowid12;
+	CString rowid22;
+
+	wndP.SetRange( 0, m_recordset->RecordsCount() );
+	wndP.SetPos(0 );
+	wndP.SetStep(1 );
+	for( UINT i = 0; i < m_recordset->RecordsCount()-1; ++i )
 	{
-		if( vCouples.at(i).rowidS2 == rowid )
+		rowid11 = m_recordset->GetFieldString( 1 );
+		rowid21 = m_recordset->GetFieldString( 2 );
+		m_recordset->MoveNext();
+		rowid12 = m_recordset->GetFieldString( 1 );
+		rowid22 = m_recordset->GetFieldString( 2 );
+		if( rowid11 == rowid12 && rowid21 == rowid22 )
 		{
-			vCouples.at(i).rowidS2 = rowidBy;
-			str.Format( L"%d", source );
-			vCouples.at(i).sourceS2 = str;
+			m_command.Format( L"DELETE FROM marriages WHERE rowid = '%s'", m_recordset->GetFieldString( 0 ) );
+			if( !theApp.execute( m_command ) ) return;
 		}
+		wndP.StepIt();
+		wndP.PeekAndPump();
+		if (wndP.Cancelled()) break;
 	}
+	wndP.SetPos(0 );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 UINT CSameCouples::getNumOfGroups()
@@ -1032,7 +1113,8 @@ a.rowidS2, a.spouse2, a.birthS2, a.deathS2, a.fatherS2, a.motherS2 );
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSameCouples::openUnited()
 {
-	CString fileName = L"couplesUnited";
+	CString fileName;
+	fileName.Format( L"couplesUnited_%d", theApp.m_user_version );
 	unitedSpec = theApp.openHtmlFile( &fU, fileName, L"w+" );
 
 	createHead( L"AZONOS NEVÛ HÁZASPÁROK, AKIK AZONOSAK, EZÉRT ÖSSZEVONHATÓAK" ); 
@@ -1049,7 +1131,8 @@ Ha egy azonos nevû csoportban több különbözõ egyesítés lehetséges, akkor azok a 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSameCouples::openDifferent()
 {
-	CString fileName = L"couplesDifferent";
+	CString fileName;
+	fileName.Format( L"couplesDifferent_%d", theApp.m_user_version );
 	differentSpec = theApp.openHtmlFile( &fD, fileName, L"w+" );
 
 	createHead( L"AZONOS NEVÛ HÁZASPÁROK, AKIK KÜLÖNBÖZNEK EGYMÁSTÓL" ); 
@@ -1072,9 +1155,9 @@ void CSameCouples::createHead( CString title )
 <BODY>\n\
 <center>%s</center><br><br>\n\n\
 <pre>\n\
-%-20s %s (%s)<br>\
-%-20s %s<br><br>\
-%s %d %s<br><br>\
+%-21s %s (%d)<br>\
+%-21s %s<br><br>\
+%-21s %d<br><br>\
 ",
 title,\
 L"Adatbázis:",\
@@ -1082,9 +1165,8 @@ theApp.m_databaseSpec,\
 theApp.m_user_version,\
 L"Lista készült:",\
 theApp.getPresentDateTime(),\
-L"Az azonosság megállapításához legalább ",\
-_azonos,\
-L"számú egyezés volt elõírva."\
+L"Egyezések min. száma:",\
+m_azonos\
 );
 }
 

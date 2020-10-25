@@ -27,9 +27,9 @@ protected:
 	CColorStatic colorFreeCount;
 
 
-	CColorStatic colorSystemDatabase;
-	CColorStatic colorBlobSpec;
-	CColorStatic colorDatabase;
+//	CColorStatic colorSystemDatabase;
+//	CColorStatic colorBlobSpec;
+//	CColorStatic colorDatabase;
 //	CColorStatic colorHtml;
 
 //	CListCtrlEx m_ListCtrl;

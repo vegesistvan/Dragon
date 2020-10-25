@@ -328,9 +328,6 @@ void CCheckSameSpouses::sameSpouses()
 	wndP.SetText( str );
 #endif
 
-	m_deleted = 0;
-
-	theApp.execute( L"BEGIN" );
 
 	for( i = 0; i < m_recordset->RecordsCount(); ++i, m_recordset->MoveNext() )
 	{
@@ -349,7 +346,6 @@ cont:	wndP.StepIt();
 		wndP.PeekAndPump();
 		if (wndP.Cancelled()) break;
 	}
-	theApp.execute( L"COMMIT" );
 
 	fwprintf( fh1, L"</pre>" );
 	fclose( fh1 );
@@ -368,13 +364,6 @@ cont:	wndP.StepIt();
 
 		return;
 	}
-	if( m_deleted )
-	{
-		str.Format( L"%d ember összevonásra került", m_deleted );
-		AfxMessageBox( str );
-	}
-	else
-		AfxMessageBox( L"Nincs összevonható ember!" );
 
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -902,19 +891,6 @@ vSameSpouses.at(0).deathDateM\
 		m_ListCtrl.SetItemText( nItem, L_LINENUMBERF, vSameSpouses.at(j).lineNumberF );
 
 		
-	/*	
-		if( !col || empty == 8 )  // nincs különbség / mind üres
-		{
-			sex_id = vSameSpouses.at(j).sex_id;
-			theApp.replaceBy( vSameSpouses.at(j).rowid, rowidBy, sex_id, _wtoi( vSameSpouses.at(j).source ) );
-
-			m_command.Format( L"DELETE FROM marriages WHERE rowid ='%s'", vSameSpouses.at(j).rowidM );
-			if( !theApp.execute( m_command ) ) return;
-
-			++m_deleted;
-
-		}
-*/
 		m_ListCtrl.SetItemData( nItem, col );
 		++nItem;
 	}

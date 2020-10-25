@@ -46,11 +46,12 @@ void CCheckIntegrity::couples()
 
 	CString spouse1_id;
 	CString spouse2_id;
+	CString line;
 	int		db;
 	int summa = 0;
 
 
-	m_command = L"SELECT rowid, spouse1_id, spouse2_id FROM marriages";
+	m_command = L"SELECT rowid, spouse1_id, spouse2_id, linenumber FROM marriages";
 	if( !query( m_command ) ) return;
 
 	wndP.SetRange( 0, m_recordset->RecordsCount()*2 );
@@ -77,11 +78,12 @@ void CCheckIntegrity::couples()
 			if( first )
 			{
 				fwprintf( fl, L"Az alábbiak nemlétezõ férjre való hivatkozások a házaspárok táblában.\n\n" );
-				fwprintf( fl, L"%8s %9s\n", L"marriage", L"spouse_id" ); 
+				fwprintf( fl, L"%10s %8s %9s\n", L"line", L"marriage", L"spouse_id" ); 
 				first = false;
 			}
-			rowid = m_recordset->GetFieldString( 0 );
-			fwprintf( fl, L"%8s %9s\n", rowid, spouse1_id );
+			rowid	= m_recordset->GetFieldString( 0 );
+			line	= m_recordset->GetFieldString( 3 );
+			fwprintf( fl, L"%10s %8s %9s\n", line, rowid, spouse1_id );
 		}
 		m_recordset->MoveNext();
 		wndP.StepIt();
@@ -120,7 +122,7 @@ void CCheckIntegrity::couples()
 		if (wndP.Cancelled()) break;
 	}
 	fwprintf( fl, L"\n" );
-	if( !summa )
+	if( !summa	 )
 		fwprintf( fl, L"Minden feleség létezik!\n\n" );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

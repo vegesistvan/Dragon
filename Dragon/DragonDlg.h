@@ -373,11 +373,9 @@ public:
 	afx_msg void OnInputKeyboard();
 
 	afx_msg void OnPaint();
-	afx_msg void OnAppExit();
 	afx_msg void OnBracketsSquare();
 	afx_msg void OnBracketsRound();
 	afx_msg void OnBraces();
-//	afx_msg void OnGenerationcode();
 	afx_msg void OnFromtable();
 	afx_msg void OnFromfamily();
 	afx_msg void OnConnectCsalad();
@@ -399,7 +397,6 @@ public:
 	afx_msg void OnListFamilyByName();
 	afx_msg void OnGedcomVindi();
 	afx_msg void OnNewFamilies();
-	afx_msg void OnClose();
 	afx_msg void OnCheckFather9();
 
 	afx_msg void OnCheckSpousesDiff();
@@ -428,4 +425,6 @@ public:
 	afx_msg void OnGedcomINDIFAMS();
 	afx_msg void OnSameNames();
 	afx_msg void OnSame();
+	afx_msg void OnClose();
+	afx_msg void OnSamenameandspouse();
 };

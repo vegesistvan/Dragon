@@ -28,6 +28,7 @@ protected:
 	
 	CString	_husband;		// csak ezt a házaspárt vizsgájuk!!
 	CString _wife;
+	int		m_loop;
 
 	CString str;
 	CString m_command;
@@ -37,7 +38,7 @@ protected:
 	CString unitedSpec;
 	CString differentSpec;
 	CString p_fields;
-
+	bool	m_contract;			// végrehajtsa-e az összevonást
 	CStringArray m_colors;
 
 	FILE* fU;
@@ -48,9 +49,9 @@ protected:
 	UINT	ic;			// vCouples indexe
 	UINT	m_numOfGroups;
 	int		m_contracted;
-	int		_azonos;
+	int		m_azonos;
 
-	CComboBox ComboCtrl;
+//	CComboBox ComboCtrl;
 	
 	CSqliteDBRecordSet*	 m_recordset;
 	CSqliteDBRecordSet*	 m_recordset1;
@@ -59,15 +60,15 @@ protected:
 	std::vector<COUPLES> vCouples;
 	std::vector<COUPLES> vSame;
 	std::vector<COUPLES> vWife;
-	std::vector<CString> vDeleted;
+	std::vector<CONTRACT> vContract;
 	COUPLES r;
 
 	void openUnited();
 	void openDifferent();
 
 	void createHead( CString title );
-	void sameSpouses();
-	void getSameCouples();
+	void core( int loop );
+	void getSameCouples( int loop );
 	
 	void resetRef();
 	void setRef( int i );
@@ -77,6 +78,8 @@ protected:
 
 	UINT getNumOfGroups();
 	void contract();
+	void contractFull( int loop );
+	void clearMarriages( int loop );
 	void printYellow( UINT i );
 
 	bool identical( UINT i1, UINT i2 );

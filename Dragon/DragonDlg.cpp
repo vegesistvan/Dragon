@@ -85,6 +85,7 @@ CDragonDlg::CDragonDlg(CWnd* pParent /*=NULL*/)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CDragonDlg::~CDragonDlg()
 {
+
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::DoDataExchange(CDataExchange* pDX)
@@ -138,11 +139,10 @@ ON_COMMAND(ID_INPUT_GAHTML_TABLE, &CDragonDlg::OnInputGahtmlTable)
 ON_COMMAND(ID_CONNECT_BRANCHES, &CDragonDlg::OnConnectBranches)
 ON_COMMAND(ID_INPUT_KEYBOARD, &CDragonDlg::OnInputKeyboard)
 ON_WM_PAINT()
-ON_COMMAND(ID_APP_EXIT, &CDragonDlg::OnAppExit)
+//ON_COMMAND(ID_APP_EXIT, &CDragonDlg::OnAppExit)
 ON_COMMAND(ID_BRACKETS_SQUARE, &CDragonDlg::OnBracketsSquare)
 ON_COMMAND(ID_BRACKETS_ROUND, &CDragonDlg::OnBracketsRound)
 ON_COMMAND(ID_BRACES, &CDragonDlg::OnBraces)
-//ON_COMMAND(ID_GENERATIONCODE, &CDragonDlg::OnGenerationcode)
 ON_COMMAND(ID_FROMTABLE, &CDragonDlg::OnFromtable)
 ON_COMMAND(ID_FROMFAMILY, &CDragonDlg::OnFromfamily)
 ON_COMMAND(ID_CONNECT_CSALAD, &CDragonDlg::OnConnectCsalad)
@@ -163,7 +163,6 @@ ON_COMMAND(ID_GEDCOM_INPUT, &CDragonDlg::OnGedcomInput)
 ON_COMMAND(ID_GEDCOM_FAMILIES, &CDragonDlg::OnListFamilyByName)
 ON_COMMAND(ID_GEDCOM_VINDI, &CDragonDlg::OnGedcomVindi)
 ON_COMMAND(ID_NEW_FAMILIES, &CDragonDlg::OnNewFamilies)
-ON_WM_CLOSE()
 ON_COMMAND(ID_CHECK_FATHER9, &CDragonDlg::OnCheckFather9)
 ON_COMMAND(ID_CHECK_SPOUSEDIFF, &CDragonDlg::OnCheckSpousesDiff)
 ON_COMMAND(ID_FATHERCHILD_GREATER, &CDragonDlg::OnFatherchildGreater)
@@ -191,6 +190,8 @@ ON_COMMAND(ID_GEDCOM_TAGTABLE, &CDragonDlg::OnGedcomTagtable)
 ON_COMMAND(ID_GEDCOM_INDIFAMS, &CDragonDlg::OnGedcomINDIFAMS)
 ON_COMMAND(ID_SAME_NAMES, &CDragonDlg::OnSameNames)
 ON_COMMAND(ID_SAME, &CDragonDlg::OnSame)
+ON_WM_CLOSE()
+ON_COMMAND(ID_SAMENAMEANDSPOUSE, &CDragonDlg::OnSamenameandspouse)
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CDragonDlg::OnInitDialog()
@@ -205,7 +206,6 @@ BOOL CDragonDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
-//	m_htmlDlg		= NULL;
 	m_pIndividuals	= NULL;
 	m_pMarriages	= NULL;
 
@@ -359,8 +359,8 @@ void CDragonDlg::mainTitle( )
 	CString caption;
 
 	query( L"PRAGMA user_version" );
-	theApp.m_user_version = m_recordset->GetFieldString( 0 );
-	caption.Format( L"Dragon v. %s - %s || Családok nyilvántartása || adatbázis: %s (%s) || %s ||", BUILT, PLATFORM, theApp.m_databaseName, theApp.m_user_version, theApp.m_inputMode );
+	theApp.m_user_version = _wtoi( m_recordset->GetFieldString( 0 ) );
+	caption.Format( L"Dragon v. %s - %s || Családok nyilvántartása || adatbázis: %s (%d) || %s ||", BUILT, PLATFORM, theApp.m_databaseSpec, theApp.m_user_version, theApp.m_inputMode );
 	SetWindowText( caption );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -640,31 +640,6 @@ void CDragonDlg::displayTree()
 
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragonDlg::OnAppExit()
-{
-
-	if( m_pIndividuals != NULL ) m_pIndividuals->DestroyWindow();
-	if( m_pMarriages )
-		m_pMarriages->DestroyWindow();
-	
-	m_pDescendantsF->DestroyWindow();
-	m_pDescendantsT->DestroyWindow();
-	m_pDescendantsL->DestroyWindow();
-	m_pMarriagesF->DestroyWindow();
-	m_pMarriagesT->DestroyWindow();
-	m_pMarriagesL->DestroyWindow();
-
-	m_pSpousesF->DestroyWindow();
-	m_pSpousesT->DestroyWindow();
-	m_pSpousesL->DestroyWindow();
-
-	m_pSsF->DestroyWindow();
-	m_pSsT->DestroyWindow();
-	m_pSsL->DestroyWindow();
-
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnBracketsSquare()
 {
 	CHtmlBrackets dlg;
@@ -946,15 +921,15 @@ család->törzs kapcsolatokról. Az alábbi felsorolásokban megtaláljuk a nemlétezõ 
 
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragonDlg::OnClose()
-{
-	if( m_pIndividuals != NULL )
-		m_pIndividuals->CloseWindow();
-	if( m_pMarriages )
-		m_pMarriages->CloseWindow();
-
-	CDialogEx::OnClose();
-}
+//void CDragonDlg::OnClose()
+//{
+//	if( m_pIndividuals != NULL )
+//		m_pIndividuals->CloseWindow();
+//	if( m_pMarriages )
+//		m_pMarriages->CloseWindow();
+//
+//	CDialogEx::OnClose();
+//}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //void CDragonDlg::OnGenerationcode()
 //{
@@ -1087,6 +1062,12 @@ void CDragonDlg::OnSameNameAndMother()
 	dlg.and = L"mother";
 	dlg.DoModal();
 }
+void CDragonDlg::OnSamenameandspouse()
+{
+	CcheckSameNameAnd dlg;
+	dlg.and = L"spouse";
+	dlg.DoModal();
+}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnCheckSameSpouseName()
 {
@@ -1160,3 +1141,27 @@ void CDragonDlg::OnSame()
 	mainTitle( );
 
 }
+void CDragonDlg::OnClose()
+{
+
+	if( m_pIndividuals != NULL )	m_pIndividuals->CloseWindow();
+	if( m_pMarriages != NULL )		m_pMarriages->CloseWindow();
+	if( m_pMarriagesF  != NULL )	m_pMarriagesF->CloseWindow();
+	if( m_pMarriagesT  != NULL )	m_pMarriagesT->CloseWindow();
+	if( m_pMarriagesL  != NULL )	m_pMarriagesL->CloseWindow();
+
+	if( m_pDescendantsF != NULL )	m_pDescendantsF->CloseWindow();
+	if( m_pDescendantsT != NULL )	m_pDescendantsT->CloseWindow();
+	if( m_pDescendantsL != NULL )	m_pDescendantsL->CloseWindow();
+
+	if( m_pSpousesF != NULL )		m_pSpousesF->CloseWindow();
+	if( m_pSpousesT != NULL )		m_pSpousesT->CloseWindow();
+	if( m_pSpousesL != NULL )		m_pSpousesL->CloseWindow();
+
+	if( m_pSsF != NULL )			m_pSsF->CloseWindow();
+	if( m_pSsT != NULL )			m_pSsT->CloseWindow();
+	if( m_pSsL != NULL )			m_pSsL->CloseWindow();
+
+	CDialogEx::OnClose();
+}
+

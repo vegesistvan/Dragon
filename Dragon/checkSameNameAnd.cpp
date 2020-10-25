@@ -109,6 +109,7 @@ BEGIN_MESSAGE_MAP(CcheckSameNameAnd, CDialogEx)
 
 	ON_COMMAND(ID_HTML, &CcheckSameNameAnd::OnHtml)
 	ON_COMMAND(ID_EDIT_NOTEPAD_PARENTS, &CcheckSameNameAnd::OnEditNotepadParents)
+	ON_WM_CLOSE()
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CcheckSameNameAnd::OnInitDialog()
@@ -992,6 +993,7 @@ void CcheckSameNameAnd::listSameVector()
 		else
 			fatherNamePrint = fatherName.Left(25);
 		fatherSource	= m_recordset2->GetFieldString(3);
+		if( fatherSource.IsEmpty() ) fatherSource = " ";
 		lineNumberF		= m_recordset2->GetFieldString(0);
 
 		m_command.Format( L"SELECT lineNumber, first_name, last_name, source FROM people WHERE rowid = '%s'", mother_id );
@@ -1003,6 +1005,7 @@ void CcheckSameNameAnd::listSameVector()
 		else
 			motherNamePrint = motherName.Left(25);
 		motherSource	= m_recordset2->GetFieldString(3);
+		if( motherSource.IsEmpty() ) motherSource = " ";
 		lineNumberM		= m_recordset2->GetFieldString(0);
 		motherName.Trim();
 
@@ -1022,7 +1025,7 @@ void CcheckSameNameAnd::listSameVector()
 		else
 			fwprintf( fh1, L"%-15s ", birthDate.Left(25 ) );
 
-		if( i && deathDatePrev != deathDate )
+		if( i && deathDatePrev != deathDate && !deathDate.IsEmpty() )
 		{
 			fwprintf( fh1, L"<span style=\"background:yellow\">%-15s</span> ", deathDate.Left(15) );
 			col = col | 1 << L_DEATH;
@@ -1030,7 +1033,7 @@ void CcheckSameNameAnd::listSameVector()
 		else
 			fwprintf( fh1, L"%-15s ", deathDate.Left(25 ) );
 
-		if( i && fatherNamePrev != fatherName )
+		if( i && fatherNamePrev != fatherName && !fatherNamePrint.IsEmpty() )
 		{
 			fwprintf( fh1, L"<span style=\"background:yellow\">%s %-25s</span> ", fatherSource, fatherNamePrint );
 			col = col | 1 << L_FATHER;
@@ -1039,7 +1042,7 @@ void CcheckSameNameAnd::listSameVector()
 			fwprintf( fh1, L"%s %-25s ", fatherSource, fatherNamePrint );
 
 
-		if( i && motherNamePrev != motherName )
+		if( i && motherNamePrev != motherName && !motherNamePrint.IsEmpty() )
 		{
 			fwprintf( fh1, L"<span style=\"background:yellow\">%s %-25s</span> ", motherSource, motherNamePrint );
 			col = col | 1 << L_MOTHER;
@@ -1208,4 +1211,3 @@ void CcheckSameNameAnd::OnHtml()
 	theApp.showHtmlFile( fileSpec );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-

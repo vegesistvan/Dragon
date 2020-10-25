@@ -239,7 +239,9 @@ typedef struct
 	UINT	cnt;
 	UINT	group;				// 0 - nem tartozik csoportba, egyedi adatai vannak
 								// 1-n az 1-n csoportba tartozik
+	UINT	group2;				// más csoporttól vette el
 	int		status;				// 1 = megtartandó, -1 törlendõ 
+	UINT	match;
 	CString rowid;
 	CString line;
 	CString generation;
@@ -249,12 +251,21 @@ typedef struct
 	CString name;
 	CString birth;
 	CString death;
-	CString father;
+	CString father;				// father
+	CString rowidF;
 	CString birthF;
 	CString deathF;
-	CString mother;
+	CString mother;				// mother
+	CString rowidM;			
 	CString birthM;
 	CString deathM;
 	CString spouses;
+	CString rowidS;				// spouse 
 }SAMENAMES;
 
+typedef struct
+{
+	CString rowid;
+	CString rowidBy;
+	CString sex_id;
+}CONTRACT;
