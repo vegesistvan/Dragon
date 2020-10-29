@@ -12,8 +12,10 @@
 #include "checkParam4.h"
 #include "GetLastFirst.h"
 #include "html_Lines.h"
-
+#include "ProgressWnd.h"
 #include "version.h"
+#include "utilities.h"
+
 enum
 {
 	_ROWID = 0,
@@ -207,6 +209,7 @@ ON_COMMAND(ID_HTML_NOTEPAD, &CSameP::OnHtmlNotepad)
 ON_COMMAND(ID_CONTRACTED, &CSameP::OnContracted)
 ON_COMMAND(ID_NOTCONTRACTED, &CSameP::OnNotcontracted)
 ON_COMMAND(ID_ALL, &CSameP::OnAll)
+ON_COMMAND(ID_HTML, &CSameP::OnHtml)
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CSameP::OnInitDialog()
@@ -216,9 +219,7 @@ BOOL CSameP::OnInitDialog()
 	EASYSIZE_INIT();
 
 	CString fileName1( L"sameNameSamePeople" );
-	CString fileSpec1;
 	CString fileName2( L"sameNameDiffPeople" );
-	CString fileSpec2;
 
 	fileName1.Format( L"%s_contracted", theApp.m_databaseName );
 	fileName2.Format( L"%s_differenet", theApp.m_databaseName );
@@ -2366,4 +2367,10 @@ void CSameP::fillTable( int contracted )
 
 	file.Close();
 	title( contracted );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CSameP::OnHtml()
+{
+	theApp.showHtmlFile( fileSpec1 );
+	theApp.showHtmlFile( fileSpec2 );	
 }

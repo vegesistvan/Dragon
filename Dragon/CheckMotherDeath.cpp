@@ -7,7 +7,8 @@
 #include "afxdialogex.h"
 #include "Relations.h"
 #include "html_Lines.h"
-
+#include "ProgressWnd.h"
+#include "utilities.h"
 // txt fájl oszlopok
 enum
 {

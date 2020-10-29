@@ -104,7 +104,7 @@ public:
 
 //	CFile* m_file;
 	CStdioFile file;
-	CTextFileWrite *m_txtfile;
+//	CTextFileWrite *m_txtfile;
 	CMenu menu;
 
 
@@ -174,9 +174,7 @@ protected:
 	int		m_tableNumberSelected;
 	CString m_tableNameSelected;
 
-
 	std::vector<TCHAR*> v_peoples;
-//	std::vector<FAMS> v_fams;
 	
 	HMENU	m_hMenuDefault;
 
@@ -199,7 +197,6 @@ protected:
 
 
 	void CDragonDlg::extractChildren( int fams, int motherIndex );
-//	void	fillFams( int fams, int husb, int wife, ORDERS* orders );
 	void CDragonDlg::getZeroLevel( CString cLine );
 	BOOL CDragonDlg::processHead( int ins );
 	BOOL CDragonDlg::processGenomap( int ins );
@@ -208,7 +205,7 @@ protected:
 	BOOL CDragonDlg::processFam( int ins );
 	BOOL CDragonDlg::processContact( int ins );
 
-//	int CDragonDlg::getRowid( int index_indi  );
+
 	int CDragonDlg::getTableNumber( CString tableName );
 	int CDragonDlg::getIndex( CString tag );
 	void CDragonDlg::inputGed( int ins );
@@ -216,7 +213,7 @@ protected:
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	void getTables( CString caption );
-	int CDragonDlg::getYearFromDate( CString date );
+	//int CDragonDlg::getYearFromDate( CString date );
 	void CDragonDlg::enableMenu();
 	
 	void CDragonDlg::crateDatabaseColumns();
@@ -368,7 +365,7 @@ public:
 	afx_msg void OnInputGahtmlFromline();
 	afx_msg void OnInputGahtmlLine();
 	afx_msg void OnInputGahtmlTable();
-	afx_msg void OnConnectBranches();
+//	afx_msg void OnConnectBranches();
 	afx_msg void OnManualInputDialog();
 	afx_msg void OnInputKeyboard();
 
@@ -414,8 +411,8 @@ public:
 	afx_msg void OnSameNameAndFather();
 	afx_msg void OnSameNameAndMother();
 	afx_msg void OnCheckSameSpouseName();
-	afx_msg void OnCheckSameNamesSpouses();
-	afx_msg void OnListPeopleAndFamily();
+//	afx_msg void OnCheckSameNamesSpouses();
+//	afx_msg void OnListPeopleAndFamily();
 	afx_msg void OnSamePeople();
 	afx_msg void OnSamePeopleContract();
 	afx_msg void OnNameProblems();

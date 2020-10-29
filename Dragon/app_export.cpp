@@ -1,7 +1,110 @@
 #include "stdafx.h"
 #include "Dragon.h"
 #include "ProgressWnd.h"
-#include "ColumnsList.h"
+
+#include "listctrlex.h"
+
+
+// CColumnsList dialog
+
+class CColumnsList : public CDialogEx
+{
+	DECLARE_DYNAMIC(CColumnsList)
+
+public:
+	CColumnsList(CWnd* pParent = NULL);   // standard constructor
+	virtual ~CColumnsList();
+	int	m_selected;
+// Dialog Data
+	enum { IDD = IDD_COLUMNSLIST };
+	int		m_numberOfColumns;
+	CListCtrl* p_ListCtrl;
+//	BOOL * selected;
+	std::vector<BOOL>* selected;
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+
+	CString	str;
+	DECLARE_MESSAGE_MAP()
+public:
+	virtual BOOL OnInitDialog();
+	CListCtrlEx m_ListCtrl;
+	afx_msg void OnBnClickedOk();
+	afx_msg void OnClickedCheckUnderline();
+	BOOL m_underline;
+};
+
+
+IMPLEMENT_DYNAMIC(CColumnsList, CDialogEx)
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CColumnsList::CColumnsList(CWnd* pParent /*=NULL*/)
+	: CDialogEx(CColumnsList::IDD, pParent)
+	, m_underline(FALSE)
+{
+
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CColumnsList::~CColumnsList()
+{
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CColumnsList::DoDataExchange(CDataExchange* pDX)
+{
+	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_LISTCOLUMNS, m_ListCtrl);
+	DDX_Check(pDX, IDC_CHECK_UNDERLINE, m_underline);
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BEGIN_MESSAGE_MAP(CColumnsList, CDialogEx)
+	ON_BN_CLICKED(IDOK, &CColumnsList::OnBnClickedOk)
+	ON_BN_CLICKED(IDC_CHECK_UNDERLINE, &CColumnsList::OnClickedCheckUnderline)
+END_MESSAGE_MAP()
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BOOL CColumnsList::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+	
+//	SetWindowPos(&wndTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+	
+	int i;
+	m_numberOfColumns = p_ListCtrl->GetHeaderCtrl()->GetItemCount();
+	HDITEM hditem = {0};
+	TCHAR  lpBuffer[100];
+	hditem.pszText		= lpBuffer;
+	hditem.mask			= HDI_TEXT;
+	hditem.cchTextMax	= 100;
+
+
+	str.Format( L"List %d selected lines", m_selected );
+	SetWindowText( str );
+
+	m_ListCtrl.EnableHeaderChkbox( TRUE );
+	m_ListCtrl.InsertColumn( 0, L"column name", LVCFMT_LEFT, 100, -1, COL_TEXT );
+	for( i=0; i < m_numberOfColumns; i++ )
+	{
+		VERIFY( p_ListCtrl->GetHeaderCtrl()->GetItem(i, &hditem ));
+		m_ListCtrl.InsertItem( i, lpBuffer );
+		m_ListCtrl.SetCheck( i, 1 );
+	}
+	return TRUE;
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CColumnsList::OnBnClickedOk()
+{
+	for( int i = 0; i < m_numberOfColumns; i++ )
+	{
+//		selected[i] = m_ListCtrl.GetCheck( i );
+		selected->push_back( m_ListCtrl.GetCheck( i ) );
+	}
+	CDialogEx::OnOK();
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CColumnsList::OnClickedCheckUnderline()
+{
+	m_underline = !m_underline;
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonApp::exportAll( CString logFile, CString title, CListCtrlEx* p_ListCtrl )
 {
@@ -191,74 +294,4 @@ void CDragonApp::header( FILE * fl, std::vector<BOOL>* selected, std::vector<COL
 	fwprintf(fl,L"\n" );
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-int selectFromTextFile( CListCtrlEx* p_ListCtrl, int column, CString caption  )
-{
-	CSelectTxtFile dlg;
 
-	CStringArray	A;
-
-	CString		fileSpec;
-	CString		cLine;
-	CString		line;
-	BOOL		FOUND;
-
-	int			nItem;
-	int			n = 0;
-	int			numberoflines_requested = 0;
-
-
-	str.Format(L"Select text file containing %s!", caption ); 
-	dlg.m_caption		= str;
-	str.Format(L"The text file should contain 1 column containing %s names!", caption ); 
-	dlg.m_description	= str;   
-
-	if( dlg.DoModal() == IDCANCEL ) return 0;
-	fileSpec = dlg.m_txtfile;
-
-	CStdioFile file(fileSpec, CFile::modeRead); 
-	while(file.ReadString(cLine))++n; 
-
-	// unselect all lines
-	for( int i=0; i < p_ListCtrl->GetItemCount(); ++i)
-	{
-		p_ListCtrl->SetItemState(i, 0, LVIS_SELECTED|LVIS_FOCUSED);
-	}
-	m_requested = 0;
-	v_notfound.clear();
-	CProgressWnd wndProgress(NULL,L"Searching for selected lines..." ); 
-	wndProgress.GoModal();
-	wndProgress.SetRange(0,n);
-	wndProgress.SetPos(0);
-	wndProgress.SetStep(1);
-
-	file.SeekToBegin();
-	while(file.ReadString(cLine)) 
-	{
-		if(cLine.GetLength() == 0) continue;
-		A.RemoveAll();
-		n = wordList( &A,cLine,' ',MORE );				// sor értékeinek felbontása a dataA tömbbe 
-		if( n != 1) continue;
-		line = A[0];
-		FOUND = FALSE;
-		++numberoflines_requested;
-		++m_requested;
-		for( nItem=0; nItem < p_ListCtrl->GetItemCount(); nItem++ )		// ha egy keresett elembõl több van, mindet kijelöli!!
-		{
-			if( line == p_ListCtrl->GetItemText( nItem, column ) )
-			{
-				p_ListCtrl->SetItemState( nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED );
-				FOUND = TRUE;
-			}
-		}
-		if( !FOUND )
-			v_notfound.push_back( line );
-		wndProgress.StepIt();
-		wndProgress.PeekAndPump();
-		if (wndProgress.Cancelled()) break;
-	}
-	wndProgress.DestroyWindow();
-	return numberoflines_requested;
-}
-*/

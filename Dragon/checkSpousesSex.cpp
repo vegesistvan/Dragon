@@ -7,6 +7,7 @@
 #include "afxdialogex.h"
 #include "html_Lines.h"
 #include "Relations.h"
+#include "ProgressWnd.h"
 
 // CCheckSpousesSex dialog
 

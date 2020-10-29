@@ -6,6 +6,8 @@
 #include "gedcomIn.h"
 #include "GAtoDB.h"
 #include <algorithm>
+#include "utilities.h"
+#include "ProgressWnd.h"
 
 // A ga.html listában az egy apához tartozó gyerekek sorrendjét a 'people.orderFather' határozza meg. Ennek hiányában az 
 // adatbázisban elfoglalt sorrendben lesznek a gyerekek.

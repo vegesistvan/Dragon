@@ -6,6 +6,8 @@
 #include "GA_ascendantsChain.h"
 #include "afxdialogex.h"
 #include "version.h"
+#include "ProgressWnd.h"
+#include "utilities.h"
 
 // CGaAscendantsChain dialog
 #define SPOUSES 0

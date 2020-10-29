@@ -7,7 +7,7 @@
 #include "GA_descendants.h"
 #include "GA_structures.h"
 #include "version.h"
-
+#include "utilities.h"
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CGaDescendants::query( CString command )
 {

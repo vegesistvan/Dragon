@@ -5,11 +5,13 @@
 #include "stdafx.h"
 #include "Dragon.h"
 #include "DragonDlg.h"
+#include "utilities.h"
 #include "locale.h"
 #include "ProgressWnd.h"
 #include "OpenDatabase.h"
 #include "checkIntegrity.h"
 #include "CheckGenerations.h"
+
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

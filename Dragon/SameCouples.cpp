@@ -11,8 +11,8 @@
 #include "GetLastFirst.h"
 #include <algorithm>
 #include <vector> 
-
-
+#include "ProgressWnd.h"
+#include "utilities.h"
 // lekérdezett oszlopok a people táblából
 enum
 {
@@ -189,7 +189,6 @@ CSameCouples::~CSameCouples()
 void CSameCouples::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	//  DDX_Control(pDX, IDC_COMBO, ComboCtrl);
 	DDX_Text(pDX, IDC_EDIT, m_info);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -200,40 +199,29 @@ END_MESSAGE_MAP()
 BOOL CSameCouples::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-
-/*
-	for( UINT i = 0; i < 10; ++i )
-	{
-		str.Format( L"%d", i );
-		ComboCtrl.AddString( str );
-	}
-	ComboCtrl.SetCurSel( 0 );
-
-	UpdateData( TOSCREEN );
-*/
 	return TRUE;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSameCouples::OnBnClickedOk()
 {
-//	_azonos	= ComboCtrl.GetCurSel();
 	int loop = 1;
-	
 	
 	wndP.Create( NULL, L"Azonos nevû házaspárok..." );
 	wndP.GoModal();
 	
 	while( true )
 	{
+
 		theApp.setStartTime();
 		openUnited();
 		openDifferent();
 
-		m_deleted = 0;
+		vContract.clear();
+
 		core( loop );
 
-		if( m_deleted )
-			str.Format( L"%d ember összevonva.", m_deleted );
+		if( vContract.size() )
+			str.Format( L"%d ember összevonva.", vContract.size() );
 		else
 			str = L"Nincs összevonható ember!";
 
@@ -247,7 +235,7 @@ void CSameCouples::OnBnClickedOk()
 		fclose( fU );
 		fclose( fD );
 
-			if( m_deleted )
+		if( vContract.size() )
 		{
 			theApp.m_user_version = theApp.m_user_version*10+1;
 			m_command.Format( L"PRAGMA user_version='%d'", theApp.m_user_version );
@@ -294,8 +282,6 @@ void CSameCouples::core( int loop )
 	wndP.SetText( str );
 #endif
 
-
-	vContract.clear();
 
 	m_command.Format( L"SELECT rowid,* FROM marriages" );
 	if( !query( m_command ) ) return;
@@ -443,12 +429,7 @@ cont:	wndP.StepIt();
 	wndP.SetText( str );
 #endif
 
-//	getSameCouples( loop );
 	wndP.SetPos(0);
-//}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//void CSameCouples::getSameCouples( int loop )
-//{
 
 	CString spouse1;
 	CString spouse2;
@@ -462,7 +443,8 @@ cont:	wndP.StepIt();
 	wndP.SetStep(1 );
 
 	vSame.clear();
-	
+
+	// leszedi a vSame vektorba az azaonos nevû házaspárokat és azt feldolgozza
 	for( ic = 0; ic < vCouples.size(); ++ic )
 	{
 		spouse1 =  vCouples.at(ic).spouse1;
@@ -503,7 +485,7 @@ cont2:	wndP.StepIt();
 
 	theApp.execute( L"BEGIN" );
 	contractFull( loop );
-	clearMarriages( loop );
+	deleteMarriages( loop );
 	theApp.execute( L"COMMIT" );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -557,7 +539,7 @@ void CSameCouples::processSame()
 	// status1 = 1, a legalacsonyabb szerepre, ami megtartásra kerül
 	// status1 = -1, az össze stöbbi, ami törlésre kerül.
 
-	m_numOfGroups = getNumOfGroups();
+	m_numOfGroups = group - 1;
 	UINT ix1;
 	UINT ix2;
 	int sourceMin1;
@@ -729,7 +711,7 @@ void CSameCouples::contract()
 	if( vSame.at(0).spouse1 == L"Barkóczy László"  && vSame.at(0).spouse2 == L"Krucsay Klára" )
 		z = 1;
 
-	m_contracted = 0;
+	m_contracted = false;
 	// csoporton belül keresi a törlendõ és megtartandó sorokat
 
 	for( UINT i = 0; i < m_numOfGroups; ++i )
@@ -768,7 +750,7 @@ void CSameCouples::contract()
 						vcontract.sex_id	= sex_id;
 						vContract.push_back( vcontract );
 					}
-					++m_contracted;
+					m_contracted = true;
 				}
 			}
 		}
@@ -807,7 +789,7 @@ void CSameCouples::contract()
 						vContract.push_back( vcontract );
 					}
 					++vSame.at(0).contracted;
-					++m_contracted;
+					m_contracted = true;
 				}
 			}
 		}
@@ -876,15 +858,13 @@ void CSameCouples::contractFull( int loop )
 			m_command.Format( L"UPDATE marriages SET spouse2_id='%s' WHERE spouse2_id ='%s'", rowidBy, rowid );
 		if( !theApp.execute( m_command ) ) return;
 
-		++m_deleted;			// az összes összevonást számolja
-		
 		wndP.StepIt();
 		wndP.PeekAndPump();
 		if (wndP.Cancelled()) break;
 	}
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSameCouples::clearMarriages( int loop )
+void CSameCouples::deleteMarriages( int loop )
 {
 
 #ifndef _DEBUG
@@ -920,16 +900,6 @@ void CSameCouples::clearMarriages( int loop )
 		if (wndP.Cancelled()) break;
 	}
 	wndP.SetPos(0 );
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-UINT CSameCouples::getNumOfGroups()
-{
-	UINT max = 0;
-	for( UINT i = 0; i < vSame.size(); ++i )
-	{ 
-		max = __max( max, vSame.at(i).group );
-	}
-	return max;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSameCouples::listDiff()

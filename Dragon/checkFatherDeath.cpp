@@ -3,7 +3,8 @@
 #include "CheckFatherDeath.h"
 #include "afxdialogex.h"
 #include "html_Lines.h"
-
+#include "ProgressWnd.h"
+#include "utilities.h"
 // CCheckFatherDeath9 dialog
 // txt fájl oszlopok
 enum

@@ -6,7 +6,7 @@
 #include "GetPeople.h"
 #include "afxdialogex.h"
 #include "GetLastFirst.h"
-
+#include "ProgressWnd.h"
 
 enum
 {

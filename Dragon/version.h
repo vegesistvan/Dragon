@@ -1,5 +1,5 @@
 #pragma once
-#define VERSION  L"1.3.11"
+#define VERSION  L"1.3.12"
 // Összevonásokon dolgoztam 
 
 //#define VERSION L"1.3.6"

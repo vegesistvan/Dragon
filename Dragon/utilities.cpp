@@ -1116,3 +1116,36 @@ int same( CString ref, CString par1, CString par2 )
 	}
 	return 0;
 }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int getYearFromDate( CString date )
+{
+	date.Replace( '?', ' ' );
+	date.Trim();
+	if( date.Left(2) == L"kb" )
+		date = date.Mid( 3 );
+	date = date.Left(4);
+	date.Trim();
+	int year = _wtoi( date );
+	if( year < 1000 ) year = 0;
+	return( year );
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CString getTimeTag()
+{
+	return( CTime::GetCurrentTime().Format("%Y%m%d%H%M") );
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bool openFileSpec( FILE** ff, CString fileSpec, CString mode )
+{
+	int		errno_t;
+	TCHAR buffer[100];
+	CString str;
+	if((errno_t=_wfopen_s( ff, fileSpec, mode ) )!=0)  // w+ = reading and writing, existing file destroyed
+	{	
+		_wcserror_s( buffer, sizeof( buffer ) );
+		str.Format(L"%s\nmegnyitási hiba!\n%s", fileSpec, buffer );
+		AfxMessageBox(str);
+		return false;
+	}
+	return true;
+}

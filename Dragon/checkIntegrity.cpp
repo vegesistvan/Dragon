@@ -26,7 +26,7 @@ END_MESSAGE_MAP()
 void CCheckIntegrity::integrity()
 {
 	CString fname = L"integrity";
-	CString title = L"Az adatbázis integritásának ellenõrzése";
+	CString title = L"Az szülõkre és házastársakra történõ hivatkozások létezésének ellenõrzése";
 	fl = theApp.openLogFile( fname, title);
 
 

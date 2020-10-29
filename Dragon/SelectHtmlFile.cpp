@@ -5,7 +5,7 @@
 #include "Dragon.h"
 #include "SelectHtmlFile.h"
 #include "afxdialogex.h"
-
+#include "utilities.h"
 
 // CSelectHtmlFile dialog
 

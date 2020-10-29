@@ -13,7 +13,7 @@
 #include "SelectOne.h"
 #include "SelectedFiles.h"
 #include "SelectHtmlFile.h"
-#include "SelectCodesystem.h"
+//#include "SelectCodesystem.h"
 #include "ProgressWnd.h"
 #include "Table_titles.h"
 #include "Table_html.h"
@@ -28,7 +28,7 @@
 #include "Table_GaTables.h"
 #include "GetString.h"
 #include "SelectTableName.h"
-#include "textfile.h"
+//#include "textfile.h"
 #include "Table_people.h"
 #include "Setup.h"
 #include "Filter.h"
@@ -41,7 +41,6 @@
 #include "gedcomin.h"
 
 #include "checkDateFormat.h"
-#include "checkGenerations1.h"
 #include "CheckMotherDeath.h"
 #include "CheckFatherDeath.h"
 #include "CheckSpousesDiff.h"
@@ -53,8 +52,8 @@
 #include "checkSameNameAnd.h"
 #include "checkSameSpouses.h"
 
-#include "listPeopleAndSpouses.h"
-#include "listPeopleAndFamily.h"
+//#include "listPeopleAndSpouses.h"
+//#include "listPeopleAndFamily.h"
 
 #include "SameP.h"
 #include "GA_ascendantsChain.h"
@@ -136,7 +135,7 @@ ON_COMMAND(ID_INPUT_GAHTML_FAMILY, &CDragonDlg::OnInputGahtmlFamily)
 ON_COMMAND(ID_INPUT_GAHTML_FROMLINE, &CDragonDlg::OnInputGahtmlFromline)
 ON_COMMAND(ID_INPUT_GAHTML_LINE, &CDragonDlg::OnInputGahtmlLine)
 ON_COMMAND(ID_INPUT_GAHTML_TABLE, &CDragonDlg::OnInputGahtmlTable)
-ON_COMMAND(ID_CONNECT_BRANCHES, &CDragonDlg::OnConnectBranches)
+//ON_COMMAND(ID_CONNECT_BRANCHES, &CDragonDlg::OnConnectBranches)
 ON_COMMAND(ID_INPUT_KEYBOARD, &CDragonDlg::OnInputKeyboard)
 ON_WM_PAINT()
 //ON_COMMAND(ID_APP_EXIT, &CDragonDlg::OnAppExit)
@@ -179,8 +178,6 @@ ON_COMMAND(ID_SAMENAMEANDDEATH2, &CDragonDlg::OnSameNameAndDeath)
 ON_COMMAND(ID_SAMENAMEANDFATHER2, &CDragonDlg::OnSameNameAndFather)
 ON_COMMAND(ID_SAMENAMEANDMOTHER2, &CDragonDlg::OnSameNameAndMother)
 ON_COMMAND(ID_CHECK_SAMESPOUSENAME, &CDragonDlg::OnCheckSameSpouseName)
-ON_COMMAND(ID_CHECK_SAMENAMES_SPOUSES, &CDragonDlg::OnCheckSameNamesSpouses)
-ON_COMMAND(ID_LIST_PEOPLEANDFAMILY, &CDragonDlg::OnListPeopleAndFamily)
 ON_COMMAND(ID_SAME_PEOPLE, &CDragonDlg::OnSamePeople)
 ON_COMMAND(ID_SAME_PEOPLE_CONTRACT, &CDragonDlg::OnSamePeopleContract)
 ON_COMMAND(ID_NAME_PROBLEMS, &CDragonDlg::OnNameProblems)
@@ -456,6 +453,7 @@ void CDragonDlg::OnDisplayFilestable()
 	dlg.DoModal();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 void CDragonDlg::OnListUtf8()
 {
 	CString filespec;
@@ -478,6 +476,7 @@ void CDragonDlg::OnListUtf8()
 	myfile.Close();
 	theApp.showFile( filespec );
 }
+*/
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnOpenDb()
 {
@@ -583,12 +582,12 @@ void CDragonDlg::OnMenuManual()
 	DrawMenuBar();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragonDlg::OnConnectBranches()
-{
-	CGaInput split;
-	split.connectBranches();
-	split.setDummyFather();
-}
+//void CDragonDlg::OnConnectBranches()
+//{
+//	CGaInput split;
+//	split.connectBranches();
+//	split.setDummyFather();
+//}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnInputKeyboard()
 {
@@ -1072,18 +1071,6 @@ void CDragonDlg::OnSamenameandspouse()
 void CDragonDlg::OnCheckSameSpouseName()
 {
 	CCheckSameSpouses dlg;
-	dlg.DoModal();
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragonDlg::OnCheckSameNamesSpouses()
-{
-	CListPeopleAndSpouses dlg;
-	dlg.DoModal();
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragonDlg::OnListPeopleAndFamily()
-{
-	CListPeopleAndFamily dlg;
 	dlg.DoModal();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

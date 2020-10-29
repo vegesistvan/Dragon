@@ -1,7 +1,7 @@
 #pragma once
 #include "listctrlex.h"
 #include "afxwin.h"
-
+#include "ProgressWnd.h"
 
 class CSameCouples : public CDialogEx
 {
@@ -44,11 +44,9 @@ protected:
 	FILE* fU;
 	FILE* fD;
 
-	int m_deleted;
-
 	UINT	ic;			// vCouples indexe
 	UINT	m_numOfGroups;
-	int		m_contracted;
+	bool	m_contracted;
 	int		m_azonos;
 
 //	CComboBox ComboCtrl;
@@ -76,10 +74,9 @@ protected:
 	void listDiff();
 	void listUnited();
 
-	UINT getNumOfGroups();
 	void contract();
 	void contractFull( int loop );
-	void clearMarriages( int loop );
+	void deleteMarriages( int loop );
 	void printYellow( UINT i );
 
 	bool identical( UINT i1, UINT i2 );

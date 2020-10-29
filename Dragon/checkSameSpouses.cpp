@@ -10,6 +10,8 @@
 #include "CheckParam0.h"
 #include <algorithm>
 #include "GetLastFirst.h"
+#include "ProgressWnd.h"
+#include "utilities.h"
 
 // txt fájl oszlopok
 enum

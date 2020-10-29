@@ -1,6 +1,6 @@
 #pragma once
 #include "afxwin.h"
-
+#include "ListBoxEx.h"
 
 // CLanguages dialog
 

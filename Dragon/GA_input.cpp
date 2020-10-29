@@ -7,6 +7,7 @@
 #include "SelectTableName.h"
 #include "ConnectCsalad.h"
 #include "InputErrors.h"
+#include "ProgressWnd.h"
 //
 // Egy leszármazotti string felbontása több lépésben történik, elõször kisebb substringekre, majd azokat elemeire szedjük szét
 

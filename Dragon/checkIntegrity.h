@@ -1,5 +1,5 @@
 #pragma once
-
+#include "ProgressWnd.h"
 
 // CCheckIntegrity
 

@@ -6,7 +6,7 @@
 #include "InputErrors.h"
 #include "afxdialogex.h"
 #include "html_Lines.h"
-
+#include "utilities.h"
 
 // CInputErrors dialog
 

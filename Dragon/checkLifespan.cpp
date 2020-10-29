@@ -9,6 +9,7 @@
 #include "Relations.h"
 #include "checkParam.h"
 #include "ProgressWnd.h"
+#include "utilities.h"
 
 // ListCtrl oszlopok
 enum
@@ -189,9 +190,9 @@ death_date\
 	{
 
 		birth_date = m_recordset->GetFieldString( D_BIRTH_DATE );
-		birth = theApp.getYearFromDate( birth_date );
+		birth = getYearFromDate( birth_date );
 		death_date = m_recordset->GetFieldString( D_DEATH_DATE );
-		death = theApp.getYearFromDate( death_date );
+		death = getYearFromDate( death_date );
 		if( birth == 0 || !checkDate( birth_date ) || death == 0 || !checkDate( death_date ) )
 			continue;
 
@@ -235,6 +236,7 @@ death_date\
 	{
 		str.Format( L"Minden ember élettartama kisebb mint %d év.", _lifespan );
 		AfxMessageBox( str );
+		CDialog::OnCancel();
 	}
 
 }

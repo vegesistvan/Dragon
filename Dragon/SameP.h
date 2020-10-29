@@ -23,7 +23,9 @@ public:
 	CString _fullname;
 	CString _first_name;
 	CString _last_name;
-	
+	CString fileSpec1;
+	CString fileSpec2;
+
 	int		_azonos;			// azonossági kritériumok fennállásánalk elõírt száma ( default = 1 );
 
 	void	samePeople();
@@ -155,4 +157,5 @@ public:
 	afx_msg void OnContracted();
 	afx_msg void OnNotcontracted();
 	afx_msg void OnAll();
+	afx_msg void OnHtml();
 };

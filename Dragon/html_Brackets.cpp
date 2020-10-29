@@ -5,6 +5,8 @@
 #include "Dragon.h"
 #include "html_Brackets.h"
 #include "afxdialogex.h"
+#include "ProgressWnd.h"
+#include "utilities.h"
 
 enum
 {

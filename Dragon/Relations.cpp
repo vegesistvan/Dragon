@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "Dragon.h"
 #include "DragonDlg.h"
+#include "utilities.h"
 #include "Relations.h"
 #include "afxdialogex.h"
 #include "SelectParent.h"
@@ -21,6 +22,7 @@
 #include "Help.h"
 #include "EditComment.h"
 #include "MoreSpouses.h"
+
 
 #define BISEX 0
 #define MAN   1

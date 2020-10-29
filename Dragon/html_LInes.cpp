@@ -5,7 +5,8 @@
 #include "Dragon.h"
 #include "html_Lines.h"
 #include "afxdialogex.h"
-
+#include "ProgressWnd.h"
+#include "utilities.h"
 
 // CHtmlLines dialog
 

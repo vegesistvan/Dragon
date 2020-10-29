@@ -8,7 +8,8 @@
 #include "DragonDlg.h"
 #include "GA_input.h"
 #include "GetString.h"
-
+#include "ProgressWnd.h"
+#include "utilities.h"
 
 enum
 {

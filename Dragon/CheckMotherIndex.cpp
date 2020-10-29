@@ -5,7 +5,8 @@
 #include "Dragon.h"
 #include "CheckMotherIndex.h"
 #include "afxdialogex.h"
-
+#include "ProgressWnd.h"
+#include "utilities.h"
 // CCheckMotherIndex dialog
 
 IMPLEMENT_DYNAMIC(CCheckMotherIndex, CDialogEx)

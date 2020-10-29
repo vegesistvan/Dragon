@@ -8,7 +8,8 @@
 #include "CheckParam.h"
 #include "html_Lines.h"
 #include "Relations.h"
-
+#include "ProgressWnd.h"
+#include "utilities.h"
 
 // CCheckSpouseAge dialog
 
@@ -217,13 +218,13 @@ void CCheckSpouseAge::fillColumns()
 			rowid		= theApp.m_recordset->GetFieldString( MARRIAGES_SPOUSE2_ID );
 
 		marriage	= theApp.m_recordset->GetFieldString( MARRIAGES_DATE );
-		m			= theApp.getYearFromDate( marriage );
+		m			= getYearFromDate( marriage );
 		if( !rowid.IsEmpty() && !marriage.IsEmpty() && checkDate( marriage )) 
 		{
 			m_command.Format( L"SELECT lineNumber, generation, source, united, last_name, first_name, birth_date, death_date FROM people WHERE rowid = '%s'", rowid );
 			if( !theApp.query1( m_command ) ) return;
 			birth	= theApp.m_recordset1->GetFieldString( S_BIRTH );
-			b		= theApp.getYearFromDate( birth );
+			b		= getYearFromDate( birth );
 			if( !birth.IsEmpty() && checkDate( birth ))
 			{
 				diff = m- b;

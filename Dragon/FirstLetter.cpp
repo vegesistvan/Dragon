@@ -5,7 +5,7 @@
 #include "Dragon.h"
 #include "FirstLetter.h"
 #include "afxdialogex.h"
-
+#include "utilities.h"
 
 // CFirstLetter dialog
 

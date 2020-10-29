@@ -6,8 +6,8 @@
 #include "SelectTableHtml.h"
 #include "afxdialogex.h"
 #include "GA_input.h"
-
-
+#include "ProgressWnd.h"
+#include "utilities.h"
 // CSelectTable dialog
 
 IMPLEMENT_DYNAMIC(CSelectTable, CDialogEx)

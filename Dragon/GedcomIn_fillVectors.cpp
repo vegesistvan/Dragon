@@ -7,8 +7,8 @@
 #include "GAtoDB.h"
 #include <algorithm>
 #include "utilities.h"
-
-_Bool is_utf8( UCHAR * string, _int64 length );
+#include "ProgressWnd.h"
+//_Bool is_utf8( UCHAR * string, _int64 length );
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // INDI rekordokat megkeresi a ged-fájlban és mindegyikre meghívja a recordINDI függvényt
 void CGedcomIn::fillVectors()

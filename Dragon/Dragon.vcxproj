@@ -206,8 +206,6 @@
     <ClInclude Include="checkSameNameAnd.h" />
     <ClInclude Include="Help.h" />
     <ClInclude Include="InputErrors.h" />
-    <ClInclude Include="listPeopleAndFamily.h" />
-    <ClInclude Include="listPeopleAndSpouses.h" />
     <ClInclude Include="checkSpouseAge.h" />
     <ClInclude Include="checkSpousesDiff.h" />
     <ClInclude Include="checkSpousesSex.h" />
@@ -219,7 +217,6 @@
     <ClInclude Include="gedcomIn.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="ColorStatic.h" />
-    <ClInclude Include="ColumnsList.h" />
     <ClInclude Include="ComboItem.h" />
     <ClInclude Include="ConnectCsalad.h" />
     <ClInclude Include="database.h" />
@@ -271,7 +268,6 @@
     <ClInclude Include="ListCtrlEx.h" />
     <ClInclude Include="ProgressWnd.h" />
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="SelectCodesystem.h" />
     <ClInclude Include="SelectHtmlFile.h" />
     <ClInclude Include="SelectOne.h" />
     <ClInclude Include="SelectPeople.h" />
@@ -294,7 +290,6 @@
     <ClInclude Include="Table_tables.h" />
     <ClInclude Include="Table_marriages.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="textfile.h" />
     <ClInclude Include="Table_titles.h" />
     <ClInclude Include="SameParams.h" />
     <ClInclude Include="utilities.h" />
@@ -328,8 +323,6 @@
     <ClCompile Include="Help.cpp" />
     <ClCompile Include="Info_db.cpp" />
     <ClCompile Include="InputErrors.cpp" />
-    <ClCompile Include="listPeopleAndFamily.cpp" />
-    <ClCompile Include="listPeopleAndSpouses.cpp" />
     <ClCompile Include="checkSpouseAge.cpp" />
     <ClCompile Include="checkSpousesDiff.cpp" />
     <ClCompile Include="checkSpousesSex.cpp" />
@@ -342,7 +335,6 @@
     <ClCompile Include="GedcomIn.cpp" />
     <ClCompile Include="GedcomIn_fillVectors.cpp" />
     <ClCompile Include="ColorStatic.cpp" />
-    <ClCompile Include="ColumnsList.cpp" />
     <ClCompile Include="ComboItem.cpp" />
     <ClCompile Include="ConnectCsalad.cpp" />
     <ClCompile Include="Date.cpp" />
@@ -412,7 +404,6 @@
     <ClCompile Include="ListBoxEx.cpp" />
     <ClCompile Include="ListCtrlEx.cpp" />
     <ClCompile Include="ProgressWnd.cpp" />
-    <ClCompile Include="SelectCodesystem.cpp" />
     <ClCompile Include="SelectHtmlFile.cpp" />
     <ClCompile Include="SelectOne.cpp" />
     <ClCompile Include="SelectPeople.cpp" />
@@ -426,7 +417,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="textfile.cpp" />
     <ClCompile Include="Table_titles.cpp" />
     <ClCompile Include="SameParams.cpp" />
     <ClCompile Include="utilities.cpp" />

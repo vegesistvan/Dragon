@@ -7,15 +7,18 @@
 #include "EasySizeHD.h"
 #include "SqliteDBEx.h"
 #include "ListCtrlEx.h"
-#include "ListBoxEx.h"
 #include "structures.h"
-#include "utilities.h"
+#include "GA_structures.h"
 #include "database.h"
-#include "ProgressWnd.h"
 #include "Color.h"
-#include "ColorStatic.h"
-#include "textfile.h"
 #include "WM_USER.h"
+#include "resource.h"		// main symbols
+#ifndef __AFXWIN_H__
+	#error "include 'stdafx.h' before including this file for PCH"
+#endif
+
+
+
 
 #define	TOSCREEN FALSE
 #define	FROMSCREEN TRUE
@@ -27,7 +30,7 @@
 #define WOMANS L"2"
 
 
-#define FATHERID 1000000
+#define FATHERID 1000000	// ha a táblában olyan leszármazottak vannak, akiknek nincs apjuk, de testvérek, és ezért kell nekik egy dummy apa
 
 
 #define MANUAL	L"kézi adatbevitel"
@@ -40,23 +43,6 @@
 #else 
 #define PLATFORM L"32 bites"
 #endif
-
-
-#ifndef __AFXWIN_H__
-	#error "include 'stdafx.h' before including this file for PCH"
-#endif
-
-#include "resource.h"		// main symbols
-
-
-enum
-{
-	M_TYPE = 0,
-	M_NAME,
-	M_TABLE_NAME,
-	M_ROOTPAGE,
-	M_SQL
-};
 
 bool openFileSpec( FILE** ff, CString fileSpec, CString mode );
 CString getTimeTag();
@@ -284,8 +270,6 @@ public:
 	BOOL	openSystemDatabase();
 	BOOL	openBlob();
 	FILE*	openLogFile(CString fname,CString title);
-//	CString openFile( CString fileName, CString mode );
-//	bool	openFileSpec( FILE** ff, CString fileSpec, CString mode );
 	CString openHtmlFile( FILE** fh,  CString fileName, CString mode );
 	CString	openTextFile( FILE** fl,  CString fileName, CString mode );
 
@@ -337,7 +321,6 @@ public:
 
 	int		isFirstName( CString name );
 	int		getNumberOfDb( std::vector<CString>* vE );
-	int		getYearFromDate( CString date );
 	CString getHtmlLine( CString lineNumber );
 
 	CWnd* _dlg;

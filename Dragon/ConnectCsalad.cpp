@@ -5,7 +5,8 @@
 #include "Dragon.h"
 #include "DragonDlg.h"
 #include "ConnectCsalad.h"
-
+#include "ProgressWnd.h"
+#include "utilities.h"
 
 // CConnectCsalad
 

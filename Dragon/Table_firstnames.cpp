@@ -12,6 +12,7 @@
 #include "EditFirstName.h"
 #include "Languages.h"
 #include "NamesParam.h"
+#include "ProgressWnd.h"
 
 // CTableFirstnames dialog
 enum

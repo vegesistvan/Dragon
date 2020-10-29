@@ -5,8 +5,8 @@
 #include "Dragon.h"
 #include "GetLastFirst.h"
 #include "afxdialogex.h"
-
-
+#include "ProgressWnd.h"
+#include "utilities.h"
 // CGetLastFirst dialog
 
 IMPLEMENT_DYNAMIC(CGetLastFirst, CDialogEx)

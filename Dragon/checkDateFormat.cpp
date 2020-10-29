@@ -7,6 +7,8 @@
 #include "checkDateFormat.h"
 #include "afxdialogex.h"
 #include "html_Lines.h"
+#include "ProgressWnd.h"
+#include "utilities.h"
 
 enum
 {

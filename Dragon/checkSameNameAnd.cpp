@@ -9,6 +9,8 @@
 #include "Relations.h"
 #include "CheckParam0.h"
 #include "GetLastFirst.h"
+#include "ProgressWnd.h"
+#include "utilities.h"
 
 // txt fájl oszlopok
 //	fwprintf( theApp.fl, L"%d\t%s\t%s\t%s\t%s\t%s\t%s\t", m_cnt, rowid, lineNumber, tableNumber, source, united, namePrint );

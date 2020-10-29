@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "Dragon.h"
+#include "utilities.h"
 #include "EditPeople.h"
 #include "afxdialogex.h"
 #include "Table_tables.h"
@@ -12,6 +13,7 @@
 #include "GetPeople.h"
 #include "GetMarriage.h"
 #include "Pictures.h"
+
 
 enum
 {

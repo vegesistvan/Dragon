@@ -6,6 +6,7 @@
 #include "version_num.h"
 #include "build_defs.h"
 #include "version.h"
+#include "utilities.h"
 
 // want something like: 1.4.1432.2234
 

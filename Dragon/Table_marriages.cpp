@@ -14,6 +14,8 @@
 #include "GetLastFirst.h"
 #include "EditMarriage.h"
 #include "windows.h"
+#include "ProgressWnd.h"
+#include "utilities.h"
 
 enum
 {

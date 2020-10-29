@@ -5,7 +5,7 @@
 #include "Dragon.h"
 #include "SelectedFiles.h"
 #include "afxdialogex.h"
-
+#include "utilities.h"
 
 
 IMPLEMENT_DYNAMIC(CSelectedFiles, CDialogEx)

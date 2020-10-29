@@ -1,5 +1,6 @@
 
 #include "stdafx.h"
+#include "utilities.h"
 #include "Dragon.h"
 #include "afxdialogex.h"
 #include <algorithm>
@@ -7,6 +8,7 @@
 #include <math.h>
 #include <cmath>
 #include "version.h"
+#include "ProgressWnd.h"
 
 bool sortByK(const _int64 &v1, const _int64 &v2); 
 bool sortVAByK(const ASCENDANTS &v1, const ASCENDANTS &v2); 

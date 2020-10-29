@@ -7,6 +7,7 @@
 #include "afxdialogex.h"
 #include "GA_input.h"
 #include "utilities.h"
+#include "ProgressWnd.h"
 
 enum
 {

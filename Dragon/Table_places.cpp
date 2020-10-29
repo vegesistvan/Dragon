@@ -6,7 +6,7 @@
 #include "Table_places.h"
 #include "afxdialogex.h"
 #include "GetString.h"
-
+#include "ProgressWnd.h"
 
 // CTablePlaces dialog
 

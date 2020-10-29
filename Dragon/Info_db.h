@@ -21,18 +21,11 @@ protected:
 	CString m_command;
 	CString str;
 
-//	CColorStatic colorIntegrityBlob;
+	HBRUSH m_brush;
 	CColorStatic colorFreeCountBlob;
-//	CColorStatic colorInterity;
+	CColorStatic colorInterity;
 	CColorStatic colorFreeCount;
 
-
-//	CColorStatic colorSystemDatabase;
-//	CColorStatic colorBlobSpec;
-//	CColorStatic colorDatabase;
-//	CColorStatic colorHtml;
-
-//	CListCtrlEx m_ListCtrl;
 
 	DECLARE_MESSAGE_MAP()
 public:
@@ -41,15 +34,14 @@ public:
 	afx_msg void OnClickedReindex();
 	afx_msg void OnClickedVacuum();
 	afx_msg void OnClickedVacuumBlob();
-	CColorStatic colorIntegrity;
-//	CColorStatic colorIntegritySystem;
-//	CColorStatic colorFreeCountSystem;
 	afx_msg void OnClickedVacuumSystem();
 	afx_msg void OnClickedReindexSystem();
-//	CColorStatic colorIntegityBlob;
-//	CColorStatic colorIntegritySystem;
+
 	CColorStatic colorFreeCountSystem;
 	CColorStatic colorIntegrityBlob;
 	CColorStatic colorIntegritySystem;
 	afx_msg void OnBnClickedOk();
+	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
+
+	CColorStatic colorIntegrity;
 };

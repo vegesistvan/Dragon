@@ -8,6 +8,8 @@
 #include "CheckParam.h"
 #include "html_Lines.h"
 #include "Relations.h"
+#include "ProgressWnd.h"
+#include "utilities.h"
 
 // CCheckSpousesDiff dialog
 
@@ -191,7 +193,7 @@ void CCheckSpousesDiff::spousesDiff()
 		rowid1		= theApp.m_recordset->GetFieldString( MARRIAGES_SPOUSE1_ID );
 		rowid2		= theApp.m_recordset->GetFieldString( MARRIAGES_SPOUSE2_ID );
 		marriage	= theApp.m_recordset->GetFieldString( MARRIAGES_DATE );
-		m			= theApp.getYearFromDate( marriage );
+		m			= getYearFromDate( marriage );
 		if( !rowid1.IsEmpty() && !rowid2.IsEmpty() && checkDate( marriage ) )
 		{
 			m_command.Format( L"SELECT lineNumber, generation, source, united, last_name, first_name, birth_date, death_date FROM people WHERE rowid = '%s'", rowid1 );
@@ -199,14 +201,14 @@ void CCheckSpousesDiff::spousesDiff()
 			birth1 = theApp.m_recordset1->GetFieldString( S_BIRTH );
 			if( !birth1.IsEmpty() && checkDate( birth1 ))
 			{
-				b1	= theApp.getYearFromDate( birth1 );
+				b1	= getYearFromDate( birth1 );
 				m_command.Format( L"SELECT lineNumber, generation, source, united, last_name, first_name, birth_date,death_date FROM people WHERE rowid = '%s'", rowid2 );
 				if( !theApp.query2( m_command ) ) return;
 	
 				birth2		= theApp.m_recordset2->GetFieldString( S_BIRTH );
 				if( !birth2.IsEmpty() && checkDate( birth2 ) )
 				{
-					b2	= theApp.getYearFromDate( birth2 );
+					b2	= getYearFromDate( birth2 );
 					diff = abs( b1-b2 );
 					if( diff > m_diff )
 					{

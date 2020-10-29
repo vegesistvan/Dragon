@@ -2,7 +2,7 @@
 #include "Dragon.h"
 #include "DragonDlg.h"
 #include "GA_input.h"
-
+#include "utilities.h"
 
 
 

@@ -8,7 +8,8 @@
 #include "GA_input.h"
 #include "html_Edit.h"
 #include "DragonDlg.h"
-
+#include "ProgressWnd.h"
+#include "utilities.h"
 // CSpouseSpouses dialog
 enum
 {
@@ -127,12 +128,12 @@ void CSpouseSpouses::fillTable( )
 	CString last_name;
 	CString first_name;
 	CString comment;
-	}SPOUSES;
+	}SPOUSES1;
 
 	CGaInput split;
 	std::vector<CString> v_Spouses;		// leszármazott házastársai
 	std::vector<MARRIAGES> v_M;			// leszármazott házasságai
-	std::vector<SPOUSES> v_sps;		// házastárs házastársai
+	std::vector<SPOUSES1> v_sps;		// házastárs házastársai
 	std::vector<PEOPLE> v_p;
 
 	PEOPLE p;

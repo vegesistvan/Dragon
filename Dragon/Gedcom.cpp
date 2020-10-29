@@ -3,8 +3,8 @@
 #include "gedcomIn.h"
 #include "GAtoDB.h"
 #include <algorithm>
-
-
+#include "ProgressWnd.h"
+#include "utilities.h"
 
 // Nem értelmezett TAG-ek listáját készíti el
 void CGedcomIn::checkTags()

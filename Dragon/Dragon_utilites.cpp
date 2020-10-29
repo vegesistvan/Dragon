@@ -11,35 +11,14 @@
 #include "html_Edit.h"
 #include "SaveFirstName.h"
 #include "version.h"
+#include "ProgressWnd.h"
+
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
 bool sortByName1(const CString &v1, const CString &v2);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString getTimeTag()
-{
-	return( CTime::GetCurrentTime().Format("%Y%m%d%H%M") );
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool openFileSpec( FILE** ff, CString fileSpec, CString mode )
-{
-	int		errno_t;
-	TCHAR buffer[100];
-	CString str;
-	if((errno_t=_wfopen_s( ff, fileSpec, mode ) )!=0)  // w+ = reading and writing, existing file destroyed
-	{	
-		_wcserror_s( buffer, sizeof( buffer ) );
-		str.Format(L"%s\nmegnyitási hiba!\n%s", fileSpec, buffer );
-		AfxMessageBox(str);
-		return false;
-	}
-	return true;
-}
-
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CDragonApp::openTextFile( FILE ** fl, CString fileName, CString mode )
 {
@@ -87,8 +66,6 @@ FILE * CDragonApp::openLogFile(CString fname,CString title)
 		LPCSTR szTemp = (LPCSTR)(LPCTSTR)multi;
 
 		utf8 = MultiToUtf8( (LPCSTR)szTemp );
-
-//		fwprintf(fl,L"%*s\n",n,utf8 );
 
 		fwprintf(fl,L"%*s\n",n,title);
 
@@ -148,18 +125,6 @@ void CDragonApp::notepad( CString file, CString option )
 	fileSpec.Format( L"\"%s\" %s",  file, option );
 	ShellExecute(NULL,L"open",m_editorName, fileSpec, m_editorFolder,SW_SHOW);
 }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-CString CDragonApp::getTimeTag() 
-{
-	CString		dateTime;
-
-	m_command = L"SELECT strftime( '%Y%m%d%H%M', 'now', 'localtime' )";
-	if( !query( m_command ) ) return L""; 
-	dateTime= m_recordset->GetFieldString(0);
-	return dateTime;
-}
-*/
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CDragonApp::getPresentDateTime() 
 {
@@ -322,45 +287,6 @@ void CDragonApp::setUserVersion( int iterationCount )
 	m_command.Format(L"PRAGMA user_version=%d", iterationCount );
 	if( !theApp.execute( m_command ) ) return;
 }
-/*
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// a v_Replace vektorban összegyûjtött emberek törlése 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// a v_Replace vektorban összegyûjtött emberek törlése 
-void CDragonApp::unite( UINT iter )
-{
-	CString	sex_id;
-	CString rowid;
-	int		source;
-	CString rowidBy;
-
-	str.Format( L"Azonos emberek összevonása (%d. iteráció)... ", iter );
-	CProgressWnd wndProgress(NULL, str ); 
-	wndProgress.GoModal();
-	wndProgress.SetRange(0, (int)v_Replace.size() );
-	wndProgress.SetPos(0);
-	wndProgress.SetStep(1);
-
-	if( !theApp.execute( L"BEGIN" ) ) return;
-	for( UINT i = 0; i < v_Replace.size(); ++i )
-	{
-		source	= v_Replace.at(i).source ;
-		sex_id	= v_Replace.at(i).sex_id;
-		rowid	= v_Replace.at(i).rowid;
-		rowidBy	= v_Replace.at(i).rowidBy;
-
-		theApp.replaceBy( rowid, rowidBy, sex_id, source );
-
-		wndProgress.StepIt();
-		wndProgress.PeekAndPump();
-		if (wndProgress.Cancelled()) break;
-	}
-	if( !theApp.execute( L"COMMIT" ) ) return;
-	wndProgress.DestroyWindow();
-	m_deletedP = (int)v_Replace.size();
-	sameMarriages( iter );
-}
-*/
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // a rowid emberre történõ hivatkozásokat kicseréli rowidBy-ra és magát a rowid-t törli
 // 
@@ -415,60 +341,6 @@ void CDragonApp::replaceBy( CString rowid, CString rowidBy, CString sex_id, int 
 	m_command.Format( L"UPDATE people SET united='%d', spouse='%d', spouseparent='%d', spousespouse='%d' WHERE rowid ='%s'",united, spouse, spouseparent, spousespouse, rowidBy );
 	if( !theApp.execute( m_command ) ) return;
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-void CDragonApp::replaceBy( CString rowid, CString rowidBy, CString rowidS1, CString rowidS2, CString sex_id, int source )
-{
-	int united;
-	int	spouse;
-	int	spouseparent;
-	int spousespouse;
-
-	if( sex_id == L"1" )
-		m_command.Format( L"UPDATE marriages SET spouse1_id='%s' WHERE spouse1_id='%s' AND spouse2_id = '%s'", rowidBy, rowidS1, rowidS2 );
-	else
-		m_command.Format( L"UPDATE marriages SET spouse2_id='%s' WHERE spouse1_id='%s' AND spouse2_id='%s'", rowidBy, rowidS2, rowidS1 );
-	if( !theApp.execute( m_command ) ) return;
-
-	if( sex_id == L"1" )
-		m_command.Format( L"UPDATE people SET father_id = '%s' WHERE father_id='%s'", rowidBy, rowid );
-	else
-		m_command.Format( L"UPDATE people SET mother_id = '%s' WHERE mother_id='%s'", rowidBy, rowid );
-	if( !theApp.execute( m_command ) ) return;
-
-	saveInfo( rowidS1, rowidBy );
-
-	m_command.Format( L"DELETE FROM people WHERE rowid ='%s'", rowid );
-	if( !theApp.execute( m_command ) ) return;
-
-// az egyesítések számát 1-el növeli
-	m_command.Format( L"SELECT united, spouse, spouseparent, spousespouse FROM people WHERE rowid='%s'", rowidBy );
-	if( !query1( m_command ) ) return;
-	united			= _wtoi( m_recordset1->GetFieldString( 0 ) ) + 1;
-	spouse			= _wtoi( m_recordset1->GetFieldString( 1 ) );
-	spouseparent	= _wtoi( m_recordset1->GetFieldString( 2 ) );
-	spousespouse	= _wtoi( m_recordset1->GetFieldString( 3 ) );
-
-	switch( source )
-	{
-	case 2:
-		++spouse;
-		break;
-	case 3:
-		++spouseparent;
-		break;
-	case 4:
-		++spouseparent;
-		break;
-	case 5:
-		++spousespouse;
-		break;
-	}
-
-	m_command.Format( L"UPDATE people SET united='%d', spouse='%d', spouseparent='%d', spousespouse='%d' WHERE rowid ='%s'",united, spouse, spouseparent, spousespouse, rowidBy );
-	if( !theApp.execute( m_command ) ) return;
-}
-*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonApp::saveInfo( CString rowid, CString rowidBy )
 {
@@ -485,150 +357,6 @@ void CDragonApp::saveInfo( CString rowid, CString rowidBy )
 		if( !theApp.execute( m_command ) ) return;
 	}
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-void CDragonApp::replaceBy( CString rowid, CString rowidBy, CString rowidM, CString sex_id, int source )
-{
-	int united;
-	int	spouse;
-	int	spouseparent;
-	int spousespouse;
-
-
-	if( rowid == L"117308" )
-		spouse = 1;
-
-	if( sex_id == L"1" )
-		m_command.Format( L"UPDATE marriages SET spouse1_id='%s' WHERE rowid = '%s'", rowidBy, rowidM );
-	else
-		m_command.Format( L"UPDATE marriages SET spouse2_id='%s' WHERE rowid = '%s'", rowidBy, rowidM );
-	if( !theApp.execute( m_command ) ) return;
-	
-	if( sex_id == L"1" )
-		m_command.Format( L"UPDATE people SET father_id = '%s' WHERE father_id='%s'", rowidBy, rowid );
-	else
-		m_command.Format( L"UPDATE people SET mother_id = '%s' WHERE mother_id='%s'", rowidBy, rowid );
-	if( !theApp.execute( m_command ) ) return;
-
-//	saveInfo( rowid, rowidBy );
-
-	// Ha a törlendõ rowid létezik a házastársak között ( pl. akinek csak 1 házastársaí volt ), akkor azt az embert nem törli!!
-	if( sex_id == L"1" )
-		m_command.Format( L"SELECT rowid FROM marriages WHERE spouse1_id = '%s'", rowid );
-	else
-		m_command.Format( L"SELECT rowid FROM marriages WHERE spouse2_id = '%s'", rowid );
-	if( !query3( m_command ) ) return;
-
-//	if( !m_recordset3->RecordsCount() && source != 5 )
-	if( !m_recordset3->RecordsCount() )
-	{
-		m_command.Format( L"DELETE FROM people WHERE rowid ='%s'", rowid );
-		if( !theApp.execute( m_command ) ) return;
-	}
-
-// az egyesítések számát 1-el növeli
-	m_command.Format( L"SELECT united, spouse, spouseparent, spousespouse FROM people WHERE rowid='%s'", rowidBy );
-	if( !query1( m_command ) ) return;
-	united			= _wtoi( m_recordset1->GetFieldString( 0 ) ) + 1;
-	spouse			= _wtoi( m_recordset1->GetFieldString( 1 ) );
-	spouseparent	= _wtoi( m_recordset1->GetFieldString( 2 ) );
-	spousespouse	= _wtoi( m_recordset1->GetFieldString( 3 ) );
-
-	switch( source )
-	{
-	case 2:
-		++spouse;
-		break;
-	case 3:
-		++spouseparent;
-		break;
-	case 4:
-		++spouseparent;
-		break;
-	case 5:
-		++spousespouse;
-		break;
-	}
-
-	m_command.Format( L"UPDATE people SET united='%d', spouse='%d', spouseparent='%d', spousespouse='%d' WHERE rowid ='%s'",united, spouse, spouseparent, spousespouse, rowidBy );
-	if( !theApp.execute( m_command ) ) return;
-
-}
-*/
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-void CDragonApp::sameMarriages( int iter )
-{
-	CString spouse1_id;
-	CString spouse2_id;
-	CString spouses1;
-	CString spouses2;
-
-	CString rowid;
-
-	std::vector<CString> v_rowid;
-
-	str.Format( L"Azonos házasságok keresése (%d. iteráció)...", iter );
-	CProgressWnd wndProgress(NULL, str ); 
-	wndProgress.GoModal();
-
-	m_command = L"SELECT rowid, spouse1_id, spouse2_id FROM marriages ORDER BY spouse1_id, spouse2_id";
-	if( !query( m_command ) ) return;
-	wndProgress.SetRange(0, m_recordset->RecordsCount());
-	wndProgress.SetPos(0);
-	wndProgress.SetStep(1);
-
-	// azonos rowid-párral rendelkezõ házasságok összegyõjtése
-	v_rowid.clear();
-	for( UINT i = 0; i < m_recordset->RecordsCount()-1; ++i )
-	{
-		spouse1_id = m_recordset->GetFieldString( 1 );
-		spouse2_id = m_recordset->GetFieldString( 2 );
-		spouses1.Format( L"%s%s", spouse1_id, spouse2_id );
-		m_recordset->MoveNext();
-
-		spouse1_id = m_recordset->GetFieldString( 1 );
-		spouse2_id = m_recordset->GetFieldString( 2 );
-		spouses2.Format( L"%s%s", spouse1_id, spouse2_id );
-
-		rowid = m_recordset->GetFieldString( 0 );
-		if( !spouses1.Compare( spouses2 ) )
-		{
-			v_rowid.push_back( rowid );
-		}
-
-		wndProgress.StepIt();
-		wndProgress.PeekAndPump();
-		if (wndProgress.Cancelled()) break;
-	}
-	wndProgress.DestroyWindow();
-
-
-	str.Format( L"Azonos házasságok törlése (%d. iteráció)...", iter );
-	CProgressWnd wndP(NULL, str ); 
-	wndP.GoModal();
-	wndP.SetRange(0, (int)v_rowid.size() );
-	wndP.SetPos(0);
-	wndP.SetStep(1);
-
-//	str.Format( L"%d azonos nevû házaspár kerül összevonásra!", v_rowid.size() );
-//	AfxMessageBox( str );
-
-	if( !theApp.execute( L"BEGIN" ) ) return;
-	for( UINT i = 0; i < v_rowid.size(); ++i )
-	{
-		m_command.Format( L"DELETE FROM marriages WHERE rowid='%s'", v_rowid.at(i) );
-		if( !theApp.execute( m_command ) ) return;
-
-		wndP.StepIt();
-		wndP.PeekAndPump();
-		if (wndP.Cancelled()) break;
-	}
-	if( !theApp.execute( L"COMMIT" ) ) return;
-	m_deletedM = (int)v_rowid.size();
-	wndP.DestroyWindow();
-}
-*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CDragonApp::contractions()
 {
@@ -677,8 +405,6 @@ int CDragonApp::isFirstName( CString name )
 	{
 		m_command.Format( L"SELECT rowid, sex_id FROM firstnames WHERE first_name='%s'", A[i] );
 		if( !theApp.querySystem( m_command ) )	return -1;
-
-
 		if( !theApp.m_recordsetSystem->RecordsCount() ) break;
 	}
 	if( i == n )
@@ -688,7 +414,7 @@ int CDragonApp::isFirstName( CString name )
 	dlg.m_first_name = name;
 	if( dlg.DoModal() == IDCANCEL ) return -1;
 
-	m_command.Format( L"INSERT INTO firstnames (first_name) VALUES ('%s')", name );
+	m_command.Format( L"INSERT INTO firstnames (first_name, sexc_id ) VALUES ('%s', '%d' )", name, dlg.m_sex_id );
 	if( !executeSys( m_command ) ) return -1;
 	return ( dlg.m_sex_id );
 
@@ -785,27 +511,6 @@ void CDragonApp::newDatabase( CString tag )
 	theApp.WriteProfileStringW( L"Settings", L"database", theApp.m_databaseSpec );
 	if( !theApp.openDatabase() ) return;
 }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int CDragonApp::getYearFromDate( CString date )
-{
-//	int pos;
-
-//	if( ( pos = date.Find( '?' ) ) != -1 ) return 0;
-	date.Replace( '?', ' ' );
-	if( date.GetAt(0) == 'k' )
-	{
-		str = date.Mid( 3 );
-		date = str;
-	}
-
-	date = date.Left(4);
-	date.Trim();
-
-	int year = _wtoi( date );
-
-	if( year < 1000 ) year = 0;
-	return( year );
-}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonApp::insertIntoFiles( CString fileSpec )
 {
@@ -878,49 +583,7 @@ bool CDragonApp::selectFile(  CString fileSpec, BLOBSTAT* stat)
 	stat->ext		= ext;
 	return true;
 }
-/*
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CDragonApp::selectFiles( )
-{
-	BLOBSTAT stat;
-	CString fileSpec;
-	CString drive;
-	CString dir;
-	CString filename;
-	CString ext;
-
-	CString str;
-	int		ix;
-	int rc;
-	int		nItem;
-	CFileStatus status;
-
-	vBlobs.clear();
-
-	CFileDialog dlg( TRUE, L".*", NULL, OFN_HIDEREADONLY | OFN_EXPLORER | OFN_ALLOWMULTISELECT,
-	L"jpg files(*.jpg)|*.jpg|pdf files(*.pdf)|*.pdf|All Files (*.*)|*.*||" );
-	dlg.m_ofn.lpstrTitle = L"Válaszd ki a beolvasni kívánt képeket!";
-	
-
-	if( dlg.DoModal( ) == IDCANCEL ) return false;
-	POSITION pos = dlg.GetStartPosition( );
-
-	while( pos )
-	{
-		fileSpec = dlg.GetNextPathName(pos);
-		splitFilespec( fileSpec, &drive,&dir,&filename,&ext );
-		CFile::GetStatus( fileSpec, status);
-
-		stat.filename	= filename;
-		stat.fileSpec	= fileSpec;
-		stat.size		= status.m_size; 
-		stat.ext		= ext;
-		vBlobs.push_back( stat );
-	}
-	return true;
-}
-*/
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CDragonApp::selectFiles( )
 {
 	#define MAX_CFileDialog_FILE_COUNT 99
@@ -982,19 +645,6 @@ void CDragonApp::OnEmail()
 	ShellExecute(NULL, str1, str2, NULL , NULL, SW_SHOWNORMAL);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-CString CDragonApp::rootExists( CString root )
-{
-	m_command.Format( L"SELECT rowid, familyName FROM tables WHERE familyName = '%s'", root );
-	if( !query1( m_command ) ) return L"";
-
-	CString table;
-
-	table = m_recordset1->GetFieldString( 1 );
-	return table;
-}
-*/
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonApp::OnPrivatFolyt()
 {
 
@@ -1292,31 +942,6 @@ void CDragonApp::unselectAll( CListCtrlEx * p_ListCtrl )
 		p_ListCtrl->SetItemState(i, 0, LVIS_SELECTED|LVIS_FOCUSED);
 	}
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-void CDragonApp::changeTime()
-{
-	m_command.Format( L"SELECT rowid,* FROM people" );
-	if( !query( m_command ) ) return;
-
-	CString	rowid;
-	CString	datum;
-	CString	datum_new;
-
-	if( !execute( L"BEGIN" ) ) return;
-	for( UINT i = 0; i < m_recordset->RecordsCount(); ++i )
-	{
-		rowid = m_recordset->GetFieldString( PEOPLE_ROWID );
-		datum = m_recordset->GetFieldString( PEOPLE_BIRTH_DATE );
-		datum_new = getDateIFromStr( datum );
-		m_command.Format( L"UPDATE people SET birth_date = '%s' WHERE rowid='%s'", datum_new, rowid );
-		if( !execute( m_command ) )
-			return;
-		m_recordset->MoveNext();
-	}
-	if( !execute( L"COMMIT" ) ) return;
-}
-*/
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonApp::search( CString search, INT_PTR orderix,  CListCtrlEx* p_ListCtrl )
 {

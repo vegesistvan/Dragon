@@ -9,7 +9,7 @@
 #include "GA_descendants.h"
 #include "GA_structures.h"
 #include <winuser.h>
-
+#include "ProgressWnd.h"
 
 SZIN szin[] =
 { 

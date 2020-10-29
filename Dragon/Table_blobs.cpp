@@ -3,10 +3,13 @@
 
 #include "stdafx.h"
 #include "Dragon.h"
+#include "utilities.h"
 #include "Table_blobs.h"
 #include "afxdialogex.h"
 #include "Filter.h"
 #include "Pictures.h"
+#include "ProgressWnd.h"
+
 
 #define PEOPLE		1
 #define	MARRIAGE	2
@@ -364,7 +367,7 @@ void CTableBlobs::OnEditDelete()
 	str.Format( L"Tényleg töröni akarsz %d képet?", uSelectedCount );
 	if( AfxMessageBox( str, MB_YESNO ) == IDNO ) return;
 	
-	std:vector<CString> vRowid;
+	std::vector<CString> vRowid;
 	// Update all of the selected items.
 	vRowid.clear();
 	if (uSelectedCount > 0)

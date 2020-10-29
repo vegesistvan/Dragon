@@ -5,7 +5,8 @@
 #include "Dragon.h"
 #include "Info_db.h"
 #include "afxdialogex.h"
-
+#include "ProgressWnd.h"
+#include "utilities.h"
 
 enum
 {
@@ -26,6 +27,7 @@ CInfoDb::CInfoDb(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CInfoDb::IDD, pParent)
 {
 
+
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CInfoDb::~CInfoDb()
@@ -43,6 +45,8 @@ void CInfoDb::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_INTEGRITY, colorIntegrity);
 	DDX_Control(pDX, IDC_INTEGRITYBLOB, colorIntegrityBlob);
 	DDX_Control(pDX, IDC_INTEGRITYSYSTEM, colorIntegritySystem);
+
+	DDX_Control(pDX, IDC_INTEGRITY, colorIntegrity);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -54,12 +58,21 @@ BEGIN_MESSAGE_MAP(CInfoDb, CDialogEx)
 	ON_BN_CLICKED(IDC_VACUUM_SYSTEM, &CInfoDb::OnClickedVacuumSystem)
 	ON_BN_CLICKED(IDC_REINDEX_SYSTEM, &CInfoDb::OnClickedReindexSystem)
 	ON_BN_CLICKED(IDOK, &CInfoDb::OnBnClickedOk)
+	ON_WM_CTLCOLOR()
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CInfoDb::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
+
+#ifndef _DEBUG
+	SetWindowTheme(GetDlgItem(IDC_STATIC_DB)->GetSafeHwnd(), L"", L"");
+	SetWindowTheme(GetDlgItem(IDC_STATIC_BLOB)->GetSafeHwnd(), L"", L"");
+	SetWindowTheme(GetDlgItem(IDC_STATIC_SYSTEM)->GetSafeHwnd(), L"", L"");
+#endif
+	m_brush = GetSysColorBrush( COLOR_BTNFACE );
+
 
 	CString command;
 	CString people;
@@ -80,6 +93,7 @@ BOOL CInfoDb::OnInitDialog()
 	CProgressWnd pW(NULL, L"Az adatbázis integritásának ellenõrzése...");
 	pW.GoModal();
 
+//	colorIntegrity.SetTextColor( theApp.m_colorClick );
 
 	command =  L"PRAGMA freelist_count";
 	if( !theApp.query( command ) ) return 0;
@@ -363,4 +377,33 @@ void CInfoDb::OnBnClickedOk()
 {
 
 	CDialogEx::OnOK();
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+// This OnCtlColor handler will change the color of a static control
+// with the ID of IDC_MYSTATIC. The code assumes that the CPenWidthsDlg
+// class has an initialized and created CBrush member named m_brush.
+// The control will be painted with red text and a background
+// color of m_brush.
+HBRUSH CInfoDb::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
+{
+	HBRUSH hbr = CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
+
+	if( pWnd->GetDlgCtrlID() == IDC_STATIC_DB )
+	{
+		pDC->SetTextColor(RGB(255, 0, 0));
+		pDC->SetBkMode(TRANSPARENT);
+	
+	}
+	if( pWnd->GetDlgCtrlID() == IDC_STATIC_BLOB )
+	{
+		pDC->SetTextColor(RGB(255, 0, 0));
+		pDC->SetBkMode(TRANSPARENT);
+	}
+	if( pWnd->GetDlgCtrlID() == IDC_STATIC_SYSTEM )
+	{
+		pDC->SetTextColor(RGB(255, 0, 0));
+		pDC->SetBkMode(TRANSPARENT);
+	}
+	hbr = m_brush;
+	return hbr;
 }

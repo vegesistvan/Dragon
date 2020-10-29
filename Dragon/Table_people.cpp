@@ -6,6 +6,7 @@
 #include "stdafx.h"
 #include "Dragon.h"
 #include "DragonDlg.h"
+#include "utilities.h"
 #include "Table_people.h"
 #include "afxdialogex.h"
 #include "Filter.h"
@@ -30,6 +31,8 @@
 #include "GedcomOut.h"
 #include "NewPeople.h"
 #include "Message.h"
+#include "ProgressWnd.h"
+
 // GEDCOM
 enum
 {

@@ -7,6 +7,8 @@
 #include "afxdialogex.h"
 #include "GetString.h"
 #include "DragonDlg.h"
+#include "ProgressWnd.h"
+#include "utilities.h"
 
 enum
 {

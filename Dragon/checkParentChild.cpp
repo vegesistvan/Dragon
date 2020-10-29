@@ -8,8 +8,8 @@
 #include "CheckParam.h"
 #include "html_Lines.h"
 #include "Relations.h"
-
-
+#include "ProgressWnd.h"
+#include "utilities.h"
 // CCheckParentChild dialog
 
 enum
@@ -217,7 +217,7 @@ void CCheckParentChild::fillColumns()
 	{
 		rowidC = theApp.m_recordset1->GetFieldString( S_ROWID );
 		birthC = theApp.m_recordset1->GetFieldString( S_BIRTH );
-		birthDateC = theApp.getYearFromDate( birthC );
+		birthDateC = getYearFromDate( birthC );
 		if( birthDateC  && checkDate( birthC ))
 		{
 			rowidP	= theApp.m_recordset1->GetFieldString( S_PARENT_ID );
@@ -228,7 +228,7 @@ void CCheckParentChild::fillColumns()
 				if( !theApp.query2( m_command ) ) return;
 
 				birthP = theApp.m_recordset2->GetFieldString( S_BIRTH );
-				birthDateP = theApp.getYearFromDate( birthP ); 
+				birthDateP = getYearFromDate( birthP ); 
 				if( birthDateP && checkDate( birthP ) )
 				{
 					diff = birthDateC - birthDateP;

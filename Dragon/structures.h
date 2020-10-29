@@ -16,7 +16,7 @@
     BUILD_SEC_CH0, BUILD_SEC_CH1,
     '\0'
 };
-
+/*
 typedef struct
 {
 	TCHAR	*name;
@@ -36,7 +36,7 @@ typedef struct
 	TCHAR	*column;
 	TCHAR	*name;
 }INDEXES;
-
+*/
 
 typedef struct
 {
@@ -261,6 +261,7 @@ typedef struct
 	CString deathM;
 	CString spouses;
 	CString rowidS;				// spouse 
+	CString lineF;
 }SAMENAMES;
 
 typedef struct
