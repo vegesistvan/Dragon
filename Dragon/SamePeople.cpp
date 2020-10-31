@@ -11,6 +11,7 @@
 #include <algorithm>
 #include "utilities.h"
 #include "html_Lines.h"
+#include "SamePeopleInfo.h"
 
 // lekérdezett mezõk a people táblából
 enum
@@ -36,7 +37,7 @@ enum
 	S_MATCH,
 	S_GROUP2,
 	S_STATUS,
-	S_LINENUMBER,
+	S_LINE,
 	S_UNITED,
 	S_GENERATION,
 	S_SOURCE,
@@ -46,15 +47,15 @@ enum
 	S_DEATH,
 	S_ROWIDF,
 	S_FATHER,
-	S_FATHER_BIRTH,
-	S_FATHER_DEATH,
+	S_BIRTHF,
+	S_DEATHF,
 	S_ROWIDM,
 	S_MOTHER,
-	S_MOTHER_BIRTH,
-	S_MOTHER_DEATH,
+	S_BIRTHM,
+	S_DEATHM,
 	S_ROWIDS,
 	S_SPOUSES,
-	S_LINENUMBERF,
+	S_LINEF,
 };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool sortBySource(const SAMENAMES &v1, const SAMENAMES &v2) 
@@ -108,29 +109,21 @@ father_id,\
 mother_id\
 ";
 
-	m_columns.Format( L"\
-%2s %2s %2s %2s \
-%9s %2s %1s %1s \
-%s %s %s %s",\
-L"gr",L"mt",L"gp",L"st",\
-L"line", L"u", L"G", L"S",\
-L"   rowid-név----------------------------- születés---- halál---- ",\
-L"   rowid-apa----------------------------- születés---- halál---- ",\
-L"   rowid-anya---------------------------- születés---- halál---- ",\
-L"   rowid-házastársak---------------"\
-);
 
 
-	m_description = L"\
+	m_description1 = L"\
 Az oszlopok jelentése:\n\n\
 gr       - group, az azonos nevû embercsoprton belül azonosnak éréklelt alcsoportok sorszáma.\n\
-mt		 - match, az azonosnak talált adatpárok száma\n\
+mt       - match, az azonosnak talált adatpárok száma\n\
 gp       - groupP, korábban a gp csoporthoz tartozott, de elvette, mert több azonosság van ezzel a bejegyzéssel\n\
 st       - status, az azonosítás eredménye: -1 azonos, azaz egyesített, majd törölt, 0: változatlanul hagyott, 1: ez az egyesített bejegyzés.\n\
+";
+
+	m_description2 = L"\
 line     - a bejegyzés sorszáma a GA html fájlban.\n\
 u        - united, az ember u számú bejegyzés összevonása.\n\
 G        - generáció, az ember generációs jele a GA fájlban.\n\
-S        - az enber elõfordulása ( 1-2-3-4 )\n\
+S        - az enber elõfordulása a GA.html fájlban ( 1-2-3-4 )\n\
 rowid    - a bejegyzés azonosítója\n\
 név      - az ember neve\n\
 születés - születési dátum\n\
@@ -140,57 +133,29 @@ anya     - neve, majd adatai\n\
 házastársak\n\n\
 ";
 
-m_info = L"\
-Az alábbi adatokat vizsgáljuk az azonos nevû emberek azonosságának eldöntéséhez:\r\n\
-\r\n\
-1. születési dátuma\r\n\
-2. halálozási dátuma\r\n\
-3. apa neve\r\n\
-4. apa születési dátuma\r\n\
-5. apa halálozási dátuma\r\n\
-6. anya neve\r\n\
-7. anya születési dátuma\r\n\
-8. anya halálozási dátuma\r\n\
-9. házastárs neve\r\n\
-\r\n\
-A kettõs keresztnevekbõl csak az elsõ használjuk az összehasonlításhoz.\r\n\
-\r\n\
-Ha a vizsgált adatok között ellentmondás van, akkor nyilvánvalóan nem azonos személy bejegyzéseirõl van szó.\r\n\
-Ha nincs ellentmondás, akkor a megadott számú adat létezése és egyezése szükséges az azonosság megállapításához.\r\n\
-Leszármazottakat akkor sem egyesítünk, ha mindenben megfelelel az összevonási kritériumoknak, mert leszármazottként \n\
-csak egyszer szerepelhet egy ember.\r\n\
-Az adathibák nyilván egyesítési hibákhoz vezetnek, valójában különbözõ emberekhez tartozó bejegyzésket tévesen \
-egyesítünk, vagy azonos emberek bejegyzéseinek összevonása elmarad. Ezért az egyesítés elõtt minden hibát \
-ki kel javítani!.\r\n\
-Erre szolgálnak az \"Ellenõrzése egyesítés elõtt\" funkciók, de az egyesítés során az azonosítás erdményét tartalmazó \
-fájlok is felfedhetnek hibákat.\r\n\
-\r\n\
-";
-
 	m_colors.Add( L"bisque" );
-	m_colors.Add( L"aquamarine" );
-	m_colors.Add( L"yellow" );
-	m_colors.Add( L"deepskyblue" );
-	m_colors.Add( L"greenyellow" );
-	m_colors.Add( L"thistle" ); 
-	m_colors.Add( L"hotpink" );
-	m_colors.Add( L"lightyellow" );
-	m_colors.Add( L"aqua" );
-	m_colors.Add( L"moccasin" );
+	m_colors.Add( L"aquamarine" );		//127,255,212
+	m_colors.Add( L"yellow" );			//255,255,0
+	m_colors.Add( L"deepskyblue" );		//0,191,255
+	m_colors.Add( L"greenyellow" );		//173,255,47
+	m_colors.Add( L"thistle" );			//216,191,216
+	m_colors.Add( L"hotpink" );			//255,105,180
+	m_colors.Add( L"lightyellow" );		//255,255,224
+	m_colors.Add( L"aqua" );			//0,255,255
+	m_colors.Add( L"lightGray" );		//211,211,211
 
 	m_rgb[0] = 0;
-	m_rgb[1] = RGB( 255, 255, 102 );
-	m_rgb[2] = RGB( 102, 255, 255 );
-	m_rgb[3] = RGB( 255, 204, 255 );
-	m_rgb[4] = RGB( 153, 255, 204 );
-	m_rgb[5] = RGB( 255, 255, 204 );
-	m_rgb[6] = RGB( 255, 255, 102 );
-	m_rgb[7] = RGB( 102, 255, 255 );
-	m_rgb[8] = RGB( 255, 204, 255 );
-	m_rgb[9] = RGB( 153, 255, 204 );
-	m_rgb[9] = RGB( 225, 225, 225 );
-
-//	m_name = L"Abaffy Miklós";   // ha csak egy embert akarunk vizsgálni, itt megadhatjuk a nevét
+	m_rgb[1] = RGB( 127, 255, 212 );
+	m_rgb[2] = RGB( 255, 255, 0 );
+	m_rgb[3] = RGB( 0, 191, 255 );
+	m_rgb[4] = RGB( 173, 255, 47 );
+	m_rgb[5] = RGB( 216,191,216 );
+	m_rgb[6] = RGB( 255, 105,180 );
+	m_rgb[7] = RGB( 255, 255, 224 );
+	m_rgb[8] = RGB( 0,255,255 );
+	m_rgb[9] = RGB( 211,211,211 );
+	
+//	m_name = L"Balassa";   // ha csak egy embert akarunk vizsgálni, itt megadhatjuk a nevét
 	m_contract	= false;
 	m_contract	= true;			// végrehajtsa-e az összevonásokat	
 	m_azonos	= 1;			// az azonos adatpárok elõírt száma
@@ -204,7 +169,6 @@ CSamePeople::~CSamePeople()
 void CSamePeople::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	//	DDX_Text(pDX, IDC_EDIT, m_info);
 	DDX_Control(pDX, IDC_LIST, m_ListCtrl);
 	DDX_Control(pDX, IDC_SEARCH_TXT, colorSearch);
 	DDX_Text(pDX, IDC_SEARCH, m_search);
@@ -224,6 +188,8 @@ BEGIN_MESSAGE_MAP(CSamePeople, CDialogEx)
 	ON_COMMAND(ID_HTML_PEOPLEFATHER, &CSamePeople::OnHtmlPeoplefather)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CSamePeople::OnHtmlNotepad)
 
+	ON_COMMAND(ID_INFO, &CSamePeople::OnInfo)
+	ON_WM_CTLCOLOR()
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CSamePeople::OnInitDialog()
@@ -243,6 +209,7 @@ BOOL CSamePeople::OnInitDialog()
 	openDifferent();
 	openUnited();
 
+	tableLines.clear();
 	vContract.clear();
 
 	core();
@@ -251,12 +218,22 @@ BOOL CSamePeople::OnInitDialog()
 
 	if( vContract.size() )
 	{
-		theApp.m_user_version = theApp.m_user_version * 10 + 2;
-		m_command.Format( L"PRAGMA user_version='%d'", theApp.m_user_version );
-		theApp.execute( m_command );
+		if( m_contract )
+		{
+			theApp.m_user_version = theApp.m_user_version * 10 + 2;
+			m_command.Format( L"PRAGMA user_version='%d'", theApp.m_user_version );
+			theApp.execute( m_command );
 
-		str.Format( L"\n\n%d bejegyzés került összevonásra.\n\n", vContract.size() );
-		fwprintf( fU, str );
+			if( vContract.size() > 200 )
+			{
+#ifndef _DEBUG
+				wndP.SetText( L"Adatbázis tömörítése..." );
+#endif
+				theApp.execute( L"VACUUM");
+			}
+		}
+		str.Format( L"%d bejegyzés került összevonásra.", vContract.size() );
+		fwprintf( fU, L"\n\n%s\n\n", str );
 	
 		fwprintf( fU, L"Eltelt idõ: %s<br><br>", theApp.get_time_elapsed() );
 		fclose( fU );
@@ -264,14 +241,11 @@ BOOL CSamePeople::OnInitDialog()
 		fwprintf( fD, L"Eltelt idõ: %s<br><br>", theApp.get_time_elapsed() );
 		fclose( fD );
 
-		if( m_contract )
-		{
-#ifndef _DEBUG
-			wndP.SetText( L"Adatbázis tömörítése..." );
-#endif
-			theApp.execute( L"VACUUM");
-		}
 		GetDlgItem( IDC_CAPTION )->SetWindowTextW( str );
+
+		m_ListCtrl.SetItemCountEx( nItem + 1 );
+		m_ListCtrl.AttachDataset( &tableLines );
+		CDialogEx::ShowWindow( SW_SHOW );
 	}
 	else
 	{
@@ -525,15 +499,7 @@ void CSamePeople::processPeople()
 
 							mi2 = vPeople.at(i2).match;
 							g = vPeople.at(i2).group;
-							/*
-							if( vPeople.at(i2).group && vPeople.at(i2).match < m_match )
-								vPeople.at(i2).group2	= vPeople.at(i2).group;				// ezt jelzi a group2-ben
-							vPeople.at( i1 ).group = group;
-							vPeople.at( i2 ).group = group;
-							vPeople.at( i1 ).status = 1;
-							vPeople.at( i2 ).status = -1;
- 							vPeople.at( i2 ).match	= m_match;
-							*/
+
 							if( vPeople.at(i2).group )
 							{
 								if( vPeople.at(i2).match < m_match )
@@ -542,9 +508,6 @@ void CSamePeople::processPeople()
 								}
 								else
 								{
-//									vPeople.at( i2 ).group = 0;							// ez egy korábbi téves egyezés volt
-//									vPeople.at( i2 ).status = 0;
-//									vPeople.at( i2 ).match	= 0;
 									continue;
 								}
 							}
@@ -735,11 +698,12 @@ void CSamePeople::contract( UINT iBy, UINT iDel )
 	int		source	= _wtoi( vPeople.at(iBy).source );
 	CONTRACT vcontract;
 
-	if( m_contract ) 
+// if( m_contract ) 
 	{
 		vcontract.rowid		= rowid;
 		vcontract.rowidBy	= rowidBy;
 		vcontract.sex_id	= sex_id;
+		vcontract.source	= source;
 		vContract.push_back( vcontract );
 	}
 	m_contracted = true;		// csak a csoportra jelzi, hogy volt összevonás, az annak megfelleõ fájlba kell listázni
@@ -752,9 +716,17 @@ void CSamePeople::contractFull()
 	CString rowid;
 	CString rowidBy;
 	CString sex_id;
+	int		source;
+
+
+	int united;	
+	int spouse;
+	int spouseparent;
+	int spousespouse;
+
 
 #ifndef _DEBUG
-	str.Format( L"Törlendõ bejegyzések vizsgálata..." );
+	str.Format( L"Törlendõ-megtartandó azonosítók korrigálása..." );
 	wndP.SetText( str );
 #endif
 	wndP.SetRange( 0, vContract.size() );
@@ -794,6 +766,7 @@ void CSamePeople::contractFull()
 		rowid	= vContract.at(i).rowid;
 		rowidBy = vContract.at(i).rowidBy;
 		sex_id	= vContract.at(i).sex_id;
+		source	= vContract.at(i).source;
 
 		m_command.Format( L"DELETE FROM people WHERE rowid ='%s'", rowid );
 		if( !theApp.execute( m_command ) ) return;
@@ -810,6 +783,39 @@ void CSamePeople::contractFull()
 			m_command.Format( L"UPDATE marriages SET spouse2_id='%s' WHERE spouse2_id ='%s'", rowidBy, rowid );
 		if( !theApp.execute( m_command ) ) return;
 
+
+
+		
+// az egyesítések számát 1-el növeli
+	m_command.Format( L"SELECT united, spouse, spouseparent, spousespouse FROM people WHERE rowid='%s'", rowidBy );
+	if( !query1( m_command ) ) return;
+	united			= _wtoi( m_recordset1->GetFieldString( 0 ) ) + 1;
+	spouse			= _wtoi( m_recordset1->GetFieldString( 1 ) );
+	spouseparent	= _wtoi( m_recordset1->GetFieldString( 2 ) );
+	spousespouse	= _wtoi( m_recordset1->GetFieldString( 3 ) );
+
+	
+
+	switch( source )
+	{
+	case 2:
+		++spouse;
+		break;
+	case 3:
+		++spouseparent;
+		break;
+	case 4:
+		++spouseparent;
+		break;
+	case 5:
+		++spousespouse;
+		break;
+	}
+
+	m_command.Format( L"UPDATE people SET united='%d', spouse='%d', spouseparent='%d', spousespouse='%d' WHERE rowid ='%s'",united, spouse, spouseparent, spousespouse, rowidBy );
+	if( !theApp.execute( m_command ) ) return;
+
+	
 		wndP.StepIt();
 		wndP.PeekAndPump();
 		if (wndP.Cancelled()) break;
@@ -858,6 +864,7 @@ void CSamePeople::deleteMarriages()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSamePeople::listPeople()
 {
+
 	int index;
 	int z;
 	SAMENAMES x;
@@ -906,13 +913,13 @@ x.rowidS, x.spouses\
 				fwprintf( fU, L"%s\n", ident );
 		}
 		else
-			fwprintf( fD, L"%s\n", ident );
+			fwprintf( fD, L"%s\n", str );
 	}
 
 	if( m_contracted )
 	{
 		fwprintf( fU, L"\n" );
-		fillTable();
+		list();
 	}
 	else
 		fwprintf( fD, L"\n" );
@@ -996,12 +1003,27 @@ void CSamePeople::openUnited()
 
 	createHead( L"AZONOS NEVÛ EMBEREK, AKIK AZONOSAK IS, EZÉRT BEJEGYZÉSEIK ÖSSZEVONHATÓAK" );
 	fwprintf( fU, m_head );
-	fwprintf( fU, m_description );
-
+	fwprintf( fU, m_description1 );
+	fwprintf( fU, m_description2 );
 	str = L"A szürke hátterû bejegyzéseket egyesítettük a zöld hátterû bejegyzéssel.\n\
 Ha egy azonos nevû csoportban több különbözõ egyesítés lehetséges, akkor azok a 'g'-group oszlopba található számmal vannak meglülönböztetve.\n\n";
 	fwprintf( fU, str );
-	fwprintf( fU, L"<font color='red'>%s</font><br>", m_columns );
+
+	CString columns;
+	columns.Format( L"\
+%2s %2s %2s %2s \
+%9s %2s %1s %1s    \
+%s %s %s %s",\
+L"gr",L"mt",L"gp",L"st",\
+L"line", L"u", L"G", L"S",\
+L"rowid-név----------------------------- születés---- halál------- ",\
+L"rowid-apa----------------------------- születés---- halál------- ",\
+L"rowid-anya---------------------------- születés---- halál------- ",\
+L"rowid-házastársak---------------"\
+);
+
+
+	fwprintf( fU, L"<font color='red'>%s</font><br>", columns );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSamePeople::openDifferent()
@@ -1012,8 +1034,22 @@ void CSamePeople::openDifferent()
 
 	createHead( L"AZONOS NEVÛ EMBEREK, AKIK KÜLÖNBÖZNEK EGYMÁSTÓ" );
 	fwprintf( fD, m_head );
-	fwprintf( fD, m_description );
-	fwprintf( fD, L"<font color='red'>%s</font><br>", m_columns );
+	fwprintf( fD, m_description2 );
+
+
+	CString columns;
+	columns.Format( L"\
+%9s %2s %1s %1s    \
+%s %s %s %s",\
+L"line", L"u", L"G", L"S",\
+L"rowid-név----------------------------- születés---- halál------- ",\
+L"rowid-apa----------------------------- születés---- halál------- ",\
+L"rowid-anya---------------------------- születés---- halál------- ",\
+L"rowid-házastársak---------------"\
+);
+
+	fwprintf( fD, L"<font color='red'>%s</font><br>", columns );
+
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSamePeople::createHead( CString title  )
@@ -1091,11 +1127,11 @@ void CSamePeople::createColumns()
 	m_ListCtrl.SetExtendedStyle(m_ListCtrl.GetExtendedStyle()| LVS_EX_GRIDLINES );
 	
 	m_ListCtrl.InsertColumn( S_CNT,				L"cnt",			LVCFMT_RIGHT,	 20,-1,COL_HIDDEN);
-	m_ListCtrl.InsertColumn( S_GROUP,			L"gr",		LVCFMT_RIGHT,	 20,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( S_GROUP,			L"gr",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( S_MATCH,			L"m#",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( S_GROUP2,			L"gr2",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( S_STATUS,			L"st",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_LINENUMBER,		L"line#",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( S_LINE,			L"line#",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( S_UNITED,			L"U",			LVCFMT_LEFT,	 20,-1,COL_NUM );
 	m_ListCtrl.InsertColumn( S_SOURCE,			L"S",			LVCFMT_RIGHT,	 20,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( S_GENERATION,		L"G",			LVCFMT_RIGHT,	 20,-1,COL_NUM);
@@ -1105,15 +1141,16 @@ void CSamePeople::createColumns()
 	m_ListCtrl.InsertColumn( S_DEATH,			L"halálozás",	LVCFMT_LEFT,	 70,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( S_ROWIDF,			L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( S_FATHER,			L"apa",			LVCFMT_LEFT,	200,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( S_FATHER_BIRTH,	L"születés",	LVCFMT_LEFT,	 70,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_FATHER_DEATH,	L"halál",		LVCFMT_LEFT,	 70,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( S_BIRTHF,			L"születés",	LVCFMT_LEFT,	 70,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( S_DEATHF,			L"halál",		LVCFMT_LEFT,	 70,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( S_ROWIDM,			L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( S_MOTHER,			L"anya",		LVCFMT_LEFT,	200,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( S_MOTHER_BIRTH,	L"születés",	LVCFMT_LEFT,	 70,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_MOTHER_DEATH,	L"halál",		LVCFMT_LEFT,	 70,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( S_BIRTHM,			L"születés",	LVCFMT_LEFT,	 70,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( S_DEATHM,			L"halál",		LVCFMT_LEFT,	 70,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( S_ROWIDS,			L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( S_SPOUSES,			L"házastársak",	LVCFMT_LEFT,	500,-1,COL_TEXT );
-	m_ListCtrl.InsertColumn( S_LINENUMBERF,		L"line#F",		LVCFMT_LEFT,	 60,-1,COL_HIDDEN );
+	m_ListCtrl.InsertColumn( S_LINEF,			L"line#F",		LVCFMT_LEFT,	 60,-1,COL_HIDDEN );
+	m_columnsCount	= m_ListCtrl.GetHeaderCtrl()->GetItemCount();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSamePeople::fillTable()
@@ -1122,6 +1159,7 @@ void CSamePeople::fillTable()
 	int status;
 	int colorIndex;
 	CString grp;
+
 
 	for( UINT i = 0; i < vPeople.size(); ++i )
 	{
@@ -1137,12 +1175,13 @@ void CSamePeople::fillTable()
 		
 		str.Format( L"%d", vPeople.at(i).group2 );
 		m_ListCtrl.SetItemText( nItem, S_GROUP2, str );
-
+		
 		status = vPeople.at(i).status;
 		str.Format( L"%d", status );
 		m_ListCtrl.SetItemText( nItem, S_STATUS, str );
 
-		m_ListCtrl.SetItemText( nItem, S_LINENUMBER, vPeople.at(i).line );
+		m_ListCtrl.SetItemText( nItem, S_LINE, vPeople.at(i).line );
+		m_ListCtrl.SetItemText( nItem, S_UNITED, vPeople.at(i).united );
 		m_ListCtrl.SetItemText( nItem, S_SOURCE, vPeople.at(i).source );
 		m_ListCtrl.SetItemText( nItem, S_GENERATION, vPeople.at(i).generation );
 		m_ListCtrl.SetItemText( nItem, S_ROWID, vPeople.at(i).rowid );
@@ -1151,15 +1190,15 @@ void CSamePeople::fillTable()
 		m_ListCtrl.SetItemText( nItem, S_DEATH, vPeople.at(i).death );
 		m_ListCtrl.SetItemText( nItem, S_ROWIDF, vPeople.at(i).rowidF );
 		m_ListCtrl.SetItemText( nItem, S_FATHER, vPeople.at(i).father );
-		m_ListCtrl.SetItemText( nItem, S_FATHER_BIRTH, vPeople.at(i).birthF );
-		m_ListCtrl.SetItemText( nItem, S_FATHER_DEATH, vPeople.at(i).deathF );
+		m_ListCtrl.SetItemText( nItem, S_BIRTHF, vPeople.at(i).birthF );
+		m_ListCtrl.SetItemText( nItem, S_DEATHF, vPeople.at(i).deathF );
 		m_ListCtrl.SetItemText( nItem, S_ROWIDM, vPeople.at(i).rowidM );
 		m_ListCtrl.SetItemText( nItem, S_MOTHER, vPeople.at(i).mother );
-		m_ListCtrl.SetItemText( nItem, S_MOTHER_BIRTH, vPeople.at(i).birthM );
-		m_ListCtrl.SetItemText( nItem, S_MOTHER_DEATH, vPeople.at(i).deathM );
+		m_ListCtrl.SetItemText( nItem, S_BIRTHM, vPeople.at(i).birthM );
+		m_ListCtrl.SetItemText( nItem, S_DEATHM, vPeople.at(i).deathM );
 		m_ListCtrl.SetItemText( nItem, S_ROWIDS, vPeople.at(i).rowidS );
 		m_ListCtrl.SetItemText( nItem, S_SPOUSES, vPeople.at(i).spouses );
-		m_ListCtrl.SetItemText( nItem, S_LINENUMBERF, vPeople.at(i).lineF );
+		m_ListCtrl.SetItemText( nItem, S_LINEF, vPeople.at(i).lineF );
 
 		m_ListCtrl.SetItemData( nItem, 0 );
 
@@ -1170,13 +1209,6 @@ void CSamePeople::fillTable()
 		}
 		else if( status == -1 )
 			m_ListCtrl.SetItemData( nItem, 9 );
-/*
-		if( group )
-		{
-			colorIndex = group % 10;
-			m_ListCtrl.SetItemData( nItem, colorIndex );
-		}
-*/
 		++nItem;
 	}
 	nItem = m_ListCtrl.InsertItem( nItem, L" " );
@@ -1209,7 +1241,7 @@ void CSamePeople::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
 	case CDDS_ITEMPREPAINT|CDDS_SUBITEM:
 		nItem	= pLVCD->nmcd.dwItemSpec;
 		nCol	= pLVCD->iSubItem;
-		iData	= m_ListCtrl.GetItemData( nItem );
+		iData   = vColor.at(nItem);
 		if( iData  )
 		{
 			pLVCD->clrTextBk = m_rgb[iData];
@@ -1292,13 +1324,13 @@ LRESULT CSamePeople::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 void CSamePeople::OnHtmlEdit()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	S_LINENUMBER ) );
+	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	S_LINE ) );
 	theApp.listHtmlLine( lineNumber );
 }
 void CSamePeople::OnHtmlNotepad()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	CString lineNumber = m_ListCtrl.GetItemText( nItem, 	S_LINENUMBER );
+	CString lineNumber = m_ListCtrl.GetItemText( nItem, 	S_LINE );
 	if( !lineNumber.IsEmpty() ) 
 		theApp.editNotepad( lineNumber );
 }
@@ -1315,7 +1347,7 @@ void CSamePeople::OnHtmlShows()
 	while( pos )
 	{
 		nItem = m_ListCtrl.GetNextSelectedItem( pos );
-		vLines.push_back( m_ListCtrl.GetItemText( nItem, S_LINENUMBER ) );
+		vLines.push_back( m_ListCtrl.GetItemText( nItem, S_LINE ) );
 		if( name.Compare( m_ListCtrl.GetItemText( nItem, S_NAME ) ) )
 		{
 			name = m_ListCtrl.GetItemText( nItem, S_NAME );
@@ -1341,8 +1373,8 @@ void CSamePeople::OnHtmlShows()
 void CSamePeople::OnHtmlPeoplefather()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	CString lineNumber	= m_ListCtrl.GetItemText( nItem, 	S_LINENUMBER );
-	CString lineNumberF	= m_ListCtrl.GetItemText( nItem, 	S_LINENUMBERF );
+	CString lineNumber	= m_ListCtrl.GetItemText( nItem, 	S_LINE );
+	CString lineNumberF	= m_ListCtrl.GetItemText( nItem, 	S_LINEF );
 	if( lineNumberF.IsEmpty() )
 	{
 		AfxMessageBox( L"A kijelölt embernek nem ismerjük az apját!" );
@@ -1361,4 +1393,110 @@ void CSamePeople::OnHtmlPeoplefather()
 	dlg.child	= m_ListCtrl.GetItemText( nItem,S_NAME );
 	dlg.vLines	= &vLines;
 	dlg.DoModal();
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CSamePeople::OnInfo()
+{
+	CSamePeopleInfo dlg;
+	dlg.DoModal();
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CSamePeople::list()
+{
+	int status;
+	int	group;
+	int colorIndex;
+
+	
+
+	for( UINT i = 0; i < vPeople.size(); ++i )
+	{
+		push( vPeople.at(i).sex_id );
+
+		group = vPeople.at(i).group;
+		str.Format( L"%d", group );
+		push( str );
+
+		str.Format( L"%d", vPeople.at(i).match );
+		push( str );
+		
+		str.Format( L"%d", vPeople.at(i).group2 );
+		push( str );
+
+		status = vPeople.at(i).status;
+		str.Format( L"%d", status );
+		push( str );
+
+		push( vPeople.at(i).line );
+		push( vPeople.at(i).united );
+		push( vPeople.at(i).generation );
+		push( vPeople.at(i).source );
+
+		push( vPeople.at(i).rowid );
+		push( vPeople.at(i).name );
+		push( vPeople.at(i).birth );
+		push( vPeople.at(i).death );
+		push( vPeople.at(i).rowidF );
+		push( vPeople.at(i).father );
+		push( vPeople.at(i).birthF );
+		push( vPeople.at(i).deathF );
+		push( vPeople.at(i).rowidM );
+		push( vPeople.at(i).mother );
+		push( vPeople.at(i).birthM );
+		push( vPeople.at(i).deathM );
+		push( vPeople.at(i).rowidS );
+		push( vPeople.at(i).spouses );
+		push( vPeople.at(i).lineF );
+
+		
+		switch( status )
+		{
+		case 0:
+			colorIndex = 0;
+			break;
+		case 1:
+			colorIndex = group % 10;
+			break;
+		case -1:
+			colorIndex = 9;
+			break;
+		}
+		vColor.push_back( colorIndex );
+		/*
+		m_ListCtrl.SetItemData( nItem, 0 );
+		if( status == 1 )
+		{
+			colorIndex = group % 10;
+			m_ListCtrl.SetItemData( nItem, colorIndex );
+		}
+		else if( status == -1 )
+			m_ListCtrl.SetItemData( nItem, 9 );
+			*/
+
+		++nItem;
+	}
+	vColor.push_back( 0 );
+	for( int i = 0; i < m_columnsCount; i++ )  // eg yüres sor az azonos nevû emberek után
+		push( L" " );
+	++nItem;
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CSamePeople::push( CString item )
+{
+	int tLen;
+	TCHAR* sT;
+	tLen	= item.GetLength()+1;
+	sT		= new TCHAR[tLen];
+	_tcscpy_s( sT, tLen, item.GetBuffer() );
+	tableLines.push_back( sT );
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+HBRUSH CSamePeople::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
+{
+	HBRUSH hbr = CDialogEx::OnCtlColor(pDC, pWnd, nCtlColor);
+
+	// TODO:  Change any attributes of the DC here
+
+	// TODO:  Return a different brush if the default is not desired
+	return hbr;
 }

@@ -23,14 +23,15 @@ protected:
 	CProgressWnd wndP; 
 
 	CString m_head;				// html fejléc
-	CString m_description;		// leírás a html fájlban
-	CString m_columns;			// oszlop feliratok a html fájlban
+	CString m_description1;		// leírás a html fájlban
+	CString m_description2;		// leírás a html fájlban
 	CString p_fields;			// lekérdezett people oszlopok
 	CString m_command;
 	CString str;
 	CString m_name;				// egy ember neve, amit elõírhatunk vizsgélatra
 	int		m_match;			// az egyezõ adazpárok száma;
 	int		nItem;
+	int		m_columnsCount;
 
 	CString unitedSpec;			// egyesített bejegyzéseket listázó fájl
 	CString differentSpec;		// különbözü bejegyzéseket listázó fájl
@@ -40,11 +41,11 @@ protected:
 
 	bool	m_contracted;		// jelzi, hogy vannak összevont bejegyzések a vPeople vektorban
 	int		m_azonos;			// az egyesítéshez szükséges azonosságok száma
-
-	CString m_info;				// információs szöveg a programról
 	bool	m_contract;			// végrehajtsa-e az összevonást
 	std::vector<SAMENAMES> vPeople;
 	std::vector<CONTRACT> vContract;
+	std::vector<int> vColor;
+	std::vector<TCHAR*> tableLines; 
 	SAMENAMES r;				// referencia adatok az összehasonlításnál
 	
 	CStringArray m_colors;
@@ -81,6 +82,9 @@ protected:
 	void openUnited( );
 	void openDifferent();
 
+	void push( CString item );
+	void list();
+
 	BOOL query( CString command );
 	BOOL query1( CString command );
 	BOOL query2( CString command );
@@ -104,4 +108,6 @@ public:
 	afx_msg void OnHtmlPeoplefather();
 	afx_msg void OnHtmlNotepad();
 
+	afx_msg void OnInfo();
+	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 };

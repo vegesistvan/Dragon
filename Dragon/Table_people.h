@@ -117,9 +117,9 @@ public:
 	afx_msg void OnExportSelected();
 	afx_msg void OnExportAll();
 	afx_msg void OnFilterFolyt();
-	afx_msg void OnAzonosember();
+	//afx_msg void OnAzonosember();
 	afx_msg void OnClose();
-	afx_msg void OnAzonosemberConc();
+	//afx_msg void OnAzonosemberConc();
 	afx_msg void OnAzonosemberIdent();
 	afx_msg void OnGroupbyBirthplace();
 	afx_msg void OnGroupbyDeathplace();

@@ -25,7 +25,6 @@
 #include "GA_descendants.h"
 #include "GA_ascendants.h"
 #include "GA_ascendantsChain.h"
-#include "SameP.h"
 #include "pictures.h"
 #include "Relations.h"
 #include "GedcomOut.h"
@@ -185,9 +184,9 @@ BEGIN_MESSAGE_MAP(CTablePeople, CDialogEx)
 	ON_COMMAND(ID_EXPORT_SELECTED, &CTablePeople::OnExportSelected)
 	ON_COMMAND(ID_EXPORT_ALL, &CTablePeople::OnExportAll)
 ON_COMMAND(ID_FILTER_FOLYT, &CTablePeople::OnFilterFolyt)
-ON_COMMAND(ID_AZONOSEMBER, &CTablePeople::OnAzonosember)
+//ON_COMMAND(ID_AZONOSEMBER, &CTablePeople::OnAzonosember)
 ON_WM_CLOSE()
-ON_COMMAND(ID_AZONOSEMBER_CONC, &CTablePeople::OnAzonosemberConc)
+//ON_COMMAND(ID_AZONOSEMBER_CONC, &CTablePeople::OnAzonosemberConc)
 ON_COMMAND(ID_AZONOSEMBER_IDENT, &CTablePeople::OnAzonosemberIdent)
 ON_COMMAND(ID_GROUPBY_BIRTHPLACE, &CTablePeople::OnGroupbyBirthplace)
 ON_COMMAND(ID_GROUPBY_DEATHPLACE, &CTablePeople::OnGroupbyDeathplace)
@@ -1598,6 +1597,7 @@ void CTablePeople::enableMenu( BOOL flag)
 ///////// K I J E L Ö L T   E M B E R R E L   A Z O N O S   N E V Û E M B E R E K   L I S T Á Z Á S A ///////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 void CTablePeople::OnAzonosember()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
@@ -1618,11 +1618,13 @@ void CTablePeople::OnAzonosember()
 //	CIdenticalPeople identical;
 	same.findSamePeople( firstName, lastName, FALSE );
 }
+*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////// K I J E L Ö L T   E M B E R R E L   A Z O N O S   E M B E R E K   Ö S S Z E V O N Á S A ///////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 void CTablePeople::OnAzonosemberConc()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
@@ -1644,6 +1646,7 @@ void CTablePeople::OnAzonosemberConc()
 
 	
 }
+*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTablePeople::OnAzonosemberIdent()
 {

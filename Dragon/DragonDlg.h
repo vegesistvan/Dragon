@@ -413,8 +413,8 @@ public:
 	afx_msg void OnCheckSameSpouseName();
 //	afx_msg void OnCheckSameNamesSpouses();
 //	afx_msg void OnListPeopleAndFamily();
-	afx_msg void OnSamePeople();
-	afx_msg void OnSamePeopleContract();
+//	afx_msg void OnSamePeople();
+//	afx_msg void OnSamePeopleContract();
 	afx_msg void OnNameProblems();
 	afx_msg void OnMotherIndex();
 	afx_msg void OnDisplayBlob();
@@ -424,4 +424,5 @@ public:
 	afx_msg void OnSame();
 	afx_msg void OnClose();
 	afx_msg void OnSamenameandspouse();
+//	afx_msg void OnInfo();
 };

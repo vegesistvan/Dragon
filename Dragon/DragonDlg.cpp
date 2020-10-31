@@ -52,14 +52,13 @@
 #include "checkSameNameAnd.h"
 #include "checkSameSpouses.h"
 
-//#include "listPeopleAndSpouses.h"
-//#include "listPeopleAndFamily.h"
 
-#include "SameP.h"
 #include "GA_ascendantsChain.h"
 #include "SameCouples.h"
 #include "SamePeople.h"
 #include "checkLifespan.h"
+
+#include "SamePeopleInfo.h"
 
 #include "version.h"
 
@@ -178,8 +177,8 @@ ON_COMMAND(ID_SAMENAMEANDDEATH2, &CDragonDlg::OnSameNameAndDeath)
 ON_COMMAND(ID_SAMENAMEANDFATHER2, &CDragonDlg::OnSameNameAndFather)
 ON_COMMAND(ID_SAMENAMEANDMOTHER2, &CDragonDlg::OnSameNameAndMother)
 ON_COMMAND(ID_CHECK_SAMESPOUSENAME, &CDragonDlg::OnCheckSameSpouseName)
-ON_COMMAND(ID_SAME_PEOPLE, &CDragonDlg::OnSamePeople)
-ON_COMMAND(ID_SAME_PEOPLE_CONTRACT, &CDragonDlg::OnSamePeopleContract)
+//ON_COMMAND(ID_SAME_PEOPLE, &CDragonDlg::OnSamePeople)
+//ON_COMMAND(ID_SAME_PEOPLE_CONTRACT, &CDragonDlg::OnSamePeopleContract)
 ON_COMMAND(ID_NAME_PROBLEMS, &CDragonDlg::OnNameProblems)
 ON_COMMAND(ID_MOTHER_INDEX, &CDragonDlg::OnMotherIndex)
 ON_COMMAND(ID_DISPLAY_BLOB, &CDragonDlg::OnDisplayBlob)
@@ -189,6 +188,7 @@ ON_COMMAND(ID_SAME_NAMES, &CDragonDlg::OnSameNames)
 ON_COMMAND(ID_SAME, &CDragonDlg::OnSame)
 ON_WM_CLOSE()
 ON_COMMAND(ID_SAMENAMEANDSPOUSE, &CDragonDlg::OnSamenameandspouse)
+//ON_COMMAND(ID_INFO, &CDragonDlg::OnInfo)
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CDragonDlg::OnInitDialog()
@@ -1074,19 +1074,19 @@ void CDragonDlg::OnCheckSameSpouseName()
 	dlg.DoModal();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragonDlg::OnSamePeople()
-{
-	CSameP dlg;
-	dlg._onlyList = true;
-	dlg.DoModal();
-}
+//void CDragonDlg::OnSamePeople()
+//{
+//	CSameP dlg;
+//	dlg._onlyList = true;
+//	dlg.DoModal();
+//}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragonDlg::OnSamePeopleContract()
-{
-	CSameP dlg;
-	dlg._onlyList = false;
-	dlg.DoModal();
-}
+//void CDragonDlg::OnSamePeopleContract()
+//{
+//	CSameP dlg;
+//	dlg._onlyList = false;
+//	dlg.DoModal();
+//}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnNameProblems()
 {
@@ -1152,3 +1152,10 @@ void CDragonDlg::OnClose()
 	CDialogEx::OnClose();
 }
 
+
+
+//void CDragonDlg::OnInfo()
+//{
+//	CSamePeopleInfo dlg;
+//	dlg.DoModal();
+//}
