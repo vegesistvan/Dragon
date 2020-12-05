@@ -59,6 +59,7 @@ protected:
 	std::vector<COUPLES> vSame;
 	std::vector<COUPLES> vWife;
 	std::vector<CONTRACT> vContract;
+
 	COUPLES r;
 
 	void openUnited();

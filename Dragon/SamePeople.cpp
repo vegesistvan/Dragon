@@ -155,9 +155,9 @@ házastársak\n\n\
 	m_rgb[8] = RGB( 0,255,255 );
 	m_rgb[9] = RGB( 211,211,211 );
 	
-//	m_name = L"Balassa";   // ha csak egy embert akarunk vizsgálni, itt megadhatjuk a nevét
+	m_name = L"Balassa";   // ha csak egy embert akarunk vizsgálni, itt megadhatjuk a nevét
 	m_contract	= false;
-	m_contract	= true;			// végrehajtsa-e az összevonásokat	
+//	m_contract	= true;			// végrehajtsa-e az összevonásokat	
 	m_azonos	= 1;			// az azonos adatpárok elõírt száma
 	nItem		= 0;
 }
@@ -1483,12 +1483,14 @@ void CSamePeople::list()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSamePeople::push( CString item )
 {
+
 	int tLen;
 	TCHAR* sT;
 	tLen	= item.GetLength()+1;
 	sT		= new TCHAR[tLen];
 	_tcscpy_s( sT, tLen, item.GetBuffer() );
 	tableLines.push_back( sT );
+
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 HBRUSH CSamePeople::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)

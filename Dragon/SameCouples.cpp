@@ -805,7 +805,7 @@ void CSameCouples::contractFull( int loop )
 	CString sex_id;
 
 #ifndef _DEBUG
-	str.Format( L"Törlendõ bejegyzések vizsgálata..." );
+	str.Format( L"Törlendõ-megtartandó azonosítók korrigálása ..." );
 	wndP.SetText( str );
 #endif
 	wndP.SetRange( 0, vContract.size() );

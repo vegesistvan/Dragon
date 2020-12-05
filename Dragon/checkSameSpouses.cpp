@@ -765,7 +765,7 @@ vSameSpouses.at(0).deathDateM\
 		{
 			++empty;
 		}
-		if( !!birthDate0.IsEmpty() && birthDateJ.IsEmpty() && birthDate0 != birthDateJ )
+		if( !birthDate0.IsEmpty() && !birthDateJ.IsEmpty() && birthDate0 != birthDateJ )
 		{
 			fwprintf( fh1, L"<span style=\"background:yellow\">%-15s</span> ", birthDateJ );
 			col = col | 1 << L_BIRTH;
@@ -805,13 +805,14 @@ vSameSpouses.at(0).deathDateM\
 		{
 			++empty;
 		}
-		if( !birthDateF0.IsEmpty() && !birthDateJ.IsEmpty() && birthDateF0 != birthDateFJ )
+		if( !birthDateF0.IsEmpty() && !birthDateFJ.IsEmpty() && birthDateF0 != birthDateFJ )
 		{
 			fwprintf( fh1, L"<span style=\"background:yellow\">%-15s</span> ", birthDateFJ );
 			col = col | 1 << L_BIRTH_F;
 		}
 		else
 			fwprintf( fh1, L"%-15s ", birthDateFJ );
+
 
 // father deathdate
 		if( deathDateF0.IsEmpty() || deathDateFJ.IsEmpty() )
@@ -883,8 +884,10 @@ vSameSpouses.at(0).deathDateM\
 
 		m_ListCtrl.SetItemText( nItem, L_SOURCEF, vSameSpouses.at(j).sourceF );
 		m_ListCtrl.SetItemText( nItem, L_FATHER, fatherJ );
-		m_ListCtrl.SetItemText( nItem, L_BIRTH_F, birthDateFJ );
-		m_ListCtrl.SetItemText( nItem, L_DEATH_F, deathDateFJ );
+//		m_ListCtrl.SetItemText( nItem, L_BIRTH_F, birthDateFJ );
+		m_ListCtrl.SetItemText( nItem, L_BIRTH_F, vSameSpouses.at(j).birthDateF );
+//		m_ListCtrl.SetItemText( nItem, L_DEATH_F, deathDateFJ );
+		m_ListCtrl.SetItemText( nItem, L_DEATH_F, vSameSpouses.at(j).deathDateF );
 		m_ListCtrl.SetItemText( nItem, L_SOURCEM, vSameSpouses.at(j).sourceM );
 		m_ListCtrl.SetItemText( nItem, L_MOTHER, motherJ );
 		m_ListCtrl.SetItemText( nItem, L_BIRTH_M, birthDateMJ );
