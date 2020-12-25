@@ -1,6 +1,7 @@
-31e4d967df59ea5e04277e5de7cfd3ab13e982d2 2020111710:19:42-UTC ./Dragon/x64/Release/Dragon.log
-e7286d05b78a29d74dee98a520a9bcbdb4f2ad52 2020111710:18:18-UTC ./Dragon/x64/Release/CL.write.1.tlog
-3adb52614f790355794e2d2ef3bb7904143fac39 2020111710:18:18-UTC ./Dragon/x64/Release/cl.command.1.tlog
+35c707d3ef22a205bcca403869d1fc3254d9b961 2020122508:10:21-UTC ./Dragon/x64/Release/Dragon.log
+e69cc5020df50431e6dfc666c252c25a82149ca3 2020122508:09:03-UTC ./Dragon/x64/Release/cl.command.1.tlog
+719effe3f9305abfadbe168aa1e6eb9e1d9d304a 2020122508:09:02-UTC ./Dragon/x64/Release/CL.write.1.tlog
+ea67fc40ab6e5367a2e5c1752cccc16165c12b32 2020122508:08:43-UTC ./Dragon/version.h
 2473c7f11a91f08095d7391bc2871391c507fcdb 2020110203:25:06-UTC ./Dragon/SamePeople.cpp
 f097a32f3e3700b04cc707f9c841d5a8aa868881 2020103109:34:36-UTC ./Dragon/x64/Debug/CL.write.1.tlog
 d17c5274cd22f8932b7da5c81822720867b37ebe 2020103109:34:36-UTC ./Dragon/x64/Debug/Dragon.log
@@ -13,7 +14,6 @@ ba46bd66b40073eb02fab6db1a3bccea02e34157 2020103109:00:49-UTC ./Dragon/x64/Debug
 c218fc3922db628956a79359cba066d23445ea8d 2020103108:11:30-UTC ./Dragon/x64/Release/link.read.1.tlog
 32433a2cab32077c404b46694487aaf27ae06162 2020103108:11:30-UTC ./Dragon/x64/Release/link.write.1.tlog
 47f3343ae465b67481ca22bc09c14360a7c0ef5b 2020103108:10:51-UTC ./CHANGELOG_vegesistvan
-450aa52d3ef8c06851b06a2b366f37a45cb480f1 2020103108:10:04-UTC ./Dragon/version.h
 81d04b3a708d90a072d0d0ea4ccd17bd2aa8a367 2020103107:50:05-UTC ./Dragon/SamePeopleInfo.cpp
 a1ef193c291d8b168e375dfec6aac6d7e8157a93 2020103107:48:16-UTC ./Dragon/x64/Release/Dragon.res
 7bfe5faf90285adf9e4a15fe79eab26fa8773b5d 2020103107:48:10-UTC ./Dragon/Dragon.aps
