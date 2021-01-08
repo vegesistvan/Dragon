@@ -668,7 +668,7 @@ LRESULT CTableMarriages::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 
 	if( theApp.m_inputMode == GAHTML )
 	{
-		if(Menu.LoadMenu( IDR_DROPDOWN_MARRIAGE ))
+		if(Menu.LoadMenu( IDR_DROPDOWN_HTML ))
 		{
 			pPopup = Menu.GetSubMenu(0);
 			if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )

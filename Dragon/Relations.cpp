@@ -561,9 +561,9 @@ void CRelations::hazastarsak( CString rowid, int sex_id )
 	CString mother_index;
 
 	if( sex_id == MAN )
-		m_command.Format( L"SELECT rowid,* FROM marriages WHERE spouse1_id=%s OR spouse2_id=%s ORDER BY orderHusband", rowid, rowid );
-	else
 		m_command.Format( L"SELECT rowid,* FROM marriages WHERE spouse1_id=%s OR spouse2_id=%s ORDER BY orderWife", rowid, rowid );
+	else
+		m_command.Format( L"SELECT rowid,* FROM marriages WHERE spouse1_id=%s OR spouse2_id=%s ORDER BY orderHusband", rowid, rowid );
 	if( !query( m_command ) ) return;
 	
 
@@ -582,12 +582,12 @@ void CRelations::hazastarsak( CString rowid, int sex_id )
 		if( rowid == spouse1_id )
 		{
 			m_command.Format( L"SELECT rowid,* FROM people WHERE rowid ='%s'",spouse2_id );
-			order = orderHusband;
+			order = orderWife;
 		}
 		else
 		{
 			m_command.Format( L"SELECT rowid,* FROM people WHERE rowid ='%s'",spouse1_id );
-			order = orderWife;
+			order = orderHusband;
 		}
 		lineNumber		= m_recordset->GetFieldString( PEOPLE_LINENUMBER );
 		if( !query2( m_command ) ) return;

@@ -161,9 +161,9 @@ void CGaDescendants::printMarriages()
 	int		numberOfSpouses;
 
 	if( p.sex_id ==  MANS )
-		m_command.Format( L"SELECT place, date, spouse2_id FROM marriages WHERE spouse1_id='%s' ORDER BY orderHusband", p.rowid );
+		m_command.Format( L"SELECT place, date, spouse2_id FROM marriages WHERE spouse1_id='%s' ORDER BY orderWife", p.rowid );
 	else
-		m_command.Format( L"SELECT place, date, spouse1_id FROM marriages WHERE spouse2_id='%s' ORDER BY orderWife", p.rowid );
+		m_command.Format( L"SELECT place, date, spouse1_id FROM marriages WHERE spouse2_id='%s' ORDER BY orderHusband", p.rowid );
 	if( !query2( m_command ) ) return;
 
 	numberOfSpouses = m_recordset2.RecordsCount();

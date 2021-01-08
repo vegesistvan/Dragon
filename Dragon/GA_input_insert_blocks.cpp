@@ -359,14 +359,8 @@ cont: if( d.sex_id == MAN )
 		spouse1_id = d.rowid;
 		spouse1_id = v_marriages.at(i).spouse_id;   // uj: minden házstárshoz a leszármazott más bejegyzése tartozik
 		spouse2_id = v_marriages.at(i).rowid;
-		orderWife.Format( L"%d", i+1 );
-		orderHusband.Format(L"%d",v_marriages.at(i).orderSpouse );
-		/*
-		if( v_spouseSpouses.size() == 0 ) 
-			orderHusband = L"1";
-		else
-			orderHusband.Format( L"%d", v_marriages.at(i).order );
-		*/
+		orderWife.Format( L"%d", i+1 );				// vMarriages vektorban vannak a házastársak, sorrendben
+		orderHusband.Format( L"%d", v_marriages.at(i).orderSpouse );
 	}
 	else
 	{
@@ -375,12 +369,6 @@ cont: if( d.sex_id == MAN )
 		spouse2_id = v_marriages.at(i).spouse_id;	// uj: minden házstárshoz a leszármazott más bejegyzése tartozik
 		orderHusband.Format( L"%d", i+1 );
 		orderWife.Format(L"%d",v_marriages.at(i).orderSpouse );
-		/*
-		if( v_spouseSpouses.size() == 0 ) 
-			orderWife = L"1";
-		else
-			orderWife.Format( L"%d", v_marriages.at(i).order );
-			*/
 	}
 	insertMarriage( spouse1_id, spouse2_id, sex_id1, sex_id2, orderHusband, orderWife, v_marriages.at(i).place, v_marriages.at(i).date, 1 );
 	return 1;
@@ -388,6 +376,7 @@ cont: if( d.sex_id == MAN )
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Házastárs további házassága ( 2 típusú )
+// V László .... =Bp 1921.06.06 Nagyabafalvi és Felsõlehotai Abaffy Erzsébet *Arad 1900.02.16 +L 1972.09.14 (Emil-Urbán Mária, 2f. Újházy László???????)
 int CGaInput::insertSpouseSpousesMarriage( UINT i )
 {
 	CString rowidS = v_marriages.at( v_spouseSpouses.at(i).spouseIndex ).rowid;
@@ -403,15 +392,17 @@ int CGaInput::insertSpouseSpousesMarriage( UINT i )
 	CString orderWife(L"");
 	CString orderHusband(L"");
 
-	if( d.sex_id == MAN )
+	if( sex_id2 == MAN )    
 	{
 		orderHusband.Format( L"%d", v_spouseSpouses.at(i).order );
+//		orderWife.Format( L"%d", v_marriages.at(v_spouseSpouses.at(i).spouseIndex ).orderSpouse ); // új
 		spouse1_id = rowidSS;
 		spouse2_id = rowidS;
 	}
 	else
 	{
 		orderWife.Format( L"%d", v_spouseSpouses.at(i).order );
+//		orderHusband.Format( L"%d", v_marriages.at(v_spouseSpouses.at(i).spouseIndex ).orderSpouse ); //új
 		spouse1_id = rowidS;
 		spouse2_id = rowidSS;
 	}

@@ -1,6 +1,8 @@
 #pragma once
+#define VERSION  L"1.3.16"
+// Házasság sorszámok javítása 2
 
-#define VERSION  L"1.3.15"
+//#define VERSION  L"1.3.15"
 // Házasság sorszámok javítása
 // #define VERSION  L"1.3.14"
 // Összevonásokon dolgoztam 

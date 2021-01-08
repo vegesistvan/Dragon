@@ -178,7 +178,7 @@ L"rowid", L"feleség", L"születés", L"halál", L"apja", L"anyja" \
 //	_wife		= L"N N";
 	m_contract	= false;
 	m_contract	= true;			// végrejatsa-e az összevonásokat	
-	m_loop		= 3;
+	m_loop		= 1;
 	m_azonos	= 0;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

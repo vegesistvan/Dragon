@@ -104,7 +104,7 @@ család->törzs kapcsolatokról. Az alábbi felsorolásokban megtaláljuk a nemlétezõ 
 	CStringArray A;
 	int		n;
 	
-	CProgressWnd wndP(NULL, L"Családalapítók összekötése..."); 
+	CProgressWnd wndP(NULL, L"Családalapítók [xxx család]->[törzs: yyyy] összekötése..."); 
 	wndP.GoModal();
 
 	fwprintf( theApp.fl, L"Az adatbázisban létezõ család apítói és leszármazottai:\n\n" );

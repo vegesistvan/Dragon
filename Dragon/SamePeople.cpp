@@ -832,7 +832,7 @@ void CSamePeople::deleteMarriages()
 	wndP.SetText( str );
 #endif
 
-	m_command = L"SELECT rowid, spouse1_id, spouse2_id FROM marriages ORDER BY spouse1_id, spouse2_id";
+	m_command = L"SELECT rowid, spouse1_id, spouse2_id FROM marriages ORDER BY spouse1_id, spouse2_id, source ";
 	if( !query( m_command ) ) return;
 
 	CString rowid11;

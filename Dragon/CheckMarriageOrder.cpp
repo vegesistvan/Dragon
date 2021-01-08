@@ -111,12 +111,14 @@ BEGIN_MESSAGE_MAP(CCheckMarriageOrder, CDialogEx)
 	ON_WM_SIZING()
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST, &CCheckMarriageOrder::OnCustomdrawList)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CCheckMarriageOrder::OnDblclkList)
+	ON_EN_KILLFOCUS(IDC_SEARCH, &CCheckMarriageOrder::OnKillfocusSearch)
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CCheckMarriageOrder::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 	EASYSIZE_ADD( IDC_LIST,	ES_BORDER,	ES_BORDER,		ES_BORDER,		ES_BORDER,	0 );
+	EASYSIZE_ADD( IDC_INFO,	ES_BORDER,	ES_BORDER,		ES_BORDER,		ES_KEEPSIZE,	0 );
 	EASYSIZE_INIT();
 /*	
 		_info = L"\
@@ -172,6 +174,9 @@ az elsõ házastárssal.\
 	SetWindowTextW( caption ),
 
 */
+	str = L"piros az ember, fekete a házastársa.        O - házasság sorszáma  S - az ember hierarchia száma ";
+	GetDlgItem( IDC_INFO )->SetWindowTextW( str );
+
 	m_ListCtrl.KeepSortOrder(TRUE);
 	m_ListCtrl.SetExtendedStyle(m_ListCtrl.GetExtendedStyle()| LVS_EX_GRIDLINES );
 	m_ListCtrl.InsertColumn( L_LINENUMBER,	L"line#",		LVCFMT_RIGHT,	 80,-1,COL_NUM);
@@ -830,4 +835,10 @@ void CCheckMarriageOrder::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
 
 	dlg.DoModal();
 	*pResult = 0;
+}
+
+
+void CCheckMarriageOrder::OnKillfocusSearch()
+{
+	// TODO: Add your control notification handler code here
 }

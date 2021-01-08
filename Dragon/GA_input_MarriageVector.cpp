@@ -360,14 +360,11 @@ void CGaInput::splitMarriageSubstrings()
 				
 			}
 
-			
-
-			
+					
 			// minden házastársnak kiszámítja a házasság-sorszámot
 			if( v_spouseSpouses.size() == 0 )	// ha a házastársnak nincsenek további házastársai, akkor neki ez az 1. házassága;
 				v_marriages.at(i).orderSpouse = 1;
 			else
-//				v_marriages.at(i).orderSpouse = v_p.at( v_p.size() -1).mother_index + 1; // a soron követketõ sorszámot adja
 				v_marriages.at(i).orderSpouse = getOrderSpouse( &v_p );
 
 
