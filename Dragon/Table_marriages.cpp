@@ -29,14 +29,14 @@ enum
 	LIST_HFIRSTNAME,
 	LIST_HBIRTHDATE,
 	LIST_HDEATHDATE,
-	LIST_ORDERHUSBAND,
+	LIST_ORDERWIFE,
 	LIST_SEPARATOR,
 	LIST_SPOUSE2_ID,
 	LIST_WLASTNAME,
 	LIST_WFIRSTNAME,
 	LIST_WBIRTHDATE,
 	LIST_WDEATHDATE,
-	LIST_ORDERWIFE,
+	LIST_ORDERHUSBAND,
 };
 
 
@@ -114,15 +114,14 @@ BOOL CTableMarriages::OnInitDialog()
 	m_ListCtrl.InsertColumn( LIST_HFIRSTNAME,	L"",			LVCFMT_LEFT,	100,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( LIST_HBIRTHDATE,	L"született",	LVCFMT_LEFT,	 70,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( LIST_HDEATHDATE,	L"meghalt",		LVCFMT_LEFT,	 70,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( LIST_ORDERHUSBAND,	L"# házasság",	LVCFMT_RIGHT,	 70,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( LIST_ORDERWIFE,	L"# házasság",	LVCFMT_RIGHT,	 70,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( LIST_SEPARATOR,	L"",			LVCFMT_LEFT,	 30,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( LIST_SPOUSE2_ID,	L"spouse2_id",	LVCFMT_RIGHT,	 80,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( LIST_WLASTNAME,	L"feleség",		LVCFMT_LEFT,	100,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( LIST_WFIRSTNAME,	L"",			LVCFMT_LEFT,	100,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( LIST_WBIRTHDATE,	L"született",	LVCFMT_LEFT,	 70,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( LIST_WDEATHDATE,	L"meghalt",		LVCFMT_LEFT,	 70,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( LIST_ORDERWIFE,	L"# házasság",	LVCFMT_RIGHT,	 70,-1,COL_NUM);
-	
+	m_ListCtrl.InsertColumn( LIST_ORDERHUSBAND,	L"# házasság",	LVCFMT_RIGHT,	 70,-1,COL_NUM);
 
 	m_columnsCount	= m_ListCtrl.GetHeaderCtrl()->GetItemCount();
 
@@ -351,14 +350,14 @@ void CTableMarriages::fillTable( UINT nItem )
 		push( theApp.m_recordset1->GetFieldString( 2 ) );
 		push( theApp.m_recordset1->GetFieldString( 3 ) );
 		push( theApp.m_recordset1->GetFieldString( 4 ) );
-		push( theApp.m_recordset->GetFieldString( MARRIAGES_ORDERHUSBAND ) );
+		push( theApp.m_recordset->GetFieldString( MARRIAGES_ORDERWIFE ) );
 		push( L" - " );
 		push( theApp.m_recordset->GetFieldString( MARRIAGES_SPOUSE2_ID ) );
 		push( last_name2 );
 		push( theApp.m_recordset2->GetFieldString( 2 ) );
 		push( theApp.m_recordset2->GetFieldString( 3 ) );
 		push( theApp.m_recordset2->GetFieldString( 4 ) );
-		push( theApp.m_recordset->GetFieldString( MARRIAGES_ORDERWIFE ) );
+		push( theApp.m_recordset->GetFieldString( MARRIAGES_ORDERHUSBAND ) );
 
 		wndProgress.StepIt();
 		wndProgress.PeekAndPump();
@@ -749,7 +748,8 @@ void CTableMarriages::OnEditGahtml()
 	CStdioFile file( theApp.m_htmlFileSpec, CFile::modeRead); 
 	CString cLine;
 	
-	for( int i = 0; i < htmlLineNumber; ++i ) file.ReadString( cLine );
+	for( int i = 0; i < htmlLineNumber; ++i ) 
+		file.ReadString( cLine );
 
 	file.Close();
 

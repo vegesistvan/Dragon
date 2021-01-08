@@ -214,6 +214,7 @@ typedef struct
 	CString	rowid;
 	CString	father_id;
 	CString	mother_id;
+	int		orderSpouse;
 
 	CString spouse_spouses;
 

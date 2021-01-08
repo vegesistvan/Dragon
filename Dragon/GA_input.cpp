@@ -636,7 +636,7 @@ void CGaInput::connectBranches()
 
 	std::vector<CString> v_rowid;
 
-	CProgressWnd wndProgress(NULL,L"Elágazások összekötése (folyt XXX) ..." ); 
+	CProgressWnd wndProgress(NULL,L"Folytatás táblák összekötése (folyt XXX) ..." ); 
 	wndProgress.GoModal();
 
 	/// lekérdezi azokat az apákat, akiknél elágazás van

@@ -76,8 +76,8 @@ const COLUMN marriages[] =
 	{ L"spouse1_id",	L"INT"	},		// a kapcsolat egyik tagja
 	{ L"spouse2_id",	L"INT"	},		// a kapcsolat másik tagja
 	{ L"type_id",		L"INT"  },		// a kapcsolat típusa 0: házasság 
-	{ L"orderHusband",	L"INT"  },		// az azonos típusú kapcsolatok sorszáma ( 1. férj 2. férj, stb
-	{ L"orderWife",		L"INT"  },		// az azonos típusú kapcsolatok sorszáma ( 1. feleség, 2. feleség, stb
+	{ L"orderHusband",	L"INT"  },		// 1. férj 2. férj, stb
+	{ L"orderWife",		L"INT"  },		// 1. feleség, 2. feleség, stb
 	{ L"place",			L"TEXT" },
 	{ L"date",			L"TEXT" },
 	{ L"end",			L"TEXT" },

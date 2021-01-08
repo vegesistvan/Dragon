@@ -187,6 +187,7 @@
     <ClInclude Include="about.h" />
     <ClInclude Include="CheckGenerations.h" />
     <ClInclude Include="checkIntegrity.h" />
+    <ClInclude Include="CheckMarriageOrder.h" />
     <ClInclude Include="EditComment.h" />
     <ClInclude Include="EditMarriage.h" />
     <ClInclude Include="EditPeople.h" />
@@ -301,6 +302,7 @@
     <ClCompile Include="about.cpp" />
     <ClCompile Include="CheckGenerations.cpp" />
     <ClCompile Include="checkIntegrity.cpp" />
+    <ClCompile Include="CheckMarriageOrder.cpp" />
     <ClCompile Include="EditComment.cpp" />
     <ClCompile Include="EditMarriage.cpp" />
     <ClCompile Include="EditPeople.cpp" />

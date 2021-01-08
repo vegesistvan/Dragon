@@ -95,6 +95,9 @@ void CGaInput::insertEntries()
 
 // emberek insertáláa
 	
+	int z;
+	if( m_lineNumber == 190365 )
+		z = 1;
 
 	insertDescendant();					// a v_brunch-hoz meg kell adni a rowid-jét!!
 
@@ -335,42 +338,91 @@ p->tableRoman,p->arm,p->orderFather,p->orderMother,p->csalad,p->gap );
 //////////////////////////////////////////// I N S E R T  M A R R I A G E S  ////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+// Leszármazott házassága ( 1 típusú )
 int CGaInput::insertDescMarriage( UINT i )
 {
-	CString order1(L"1");
-	CString order2(L"1");
+	CString orderHusband(L"");
+	CString orderWife(L"");
 	CString spouse1_id;
 	CString spouse2_id;
 	
 	int sex_id1 = d.sex_id;
 	int sex_id2 = v_marriages.at(i).sex_id;
 
-	int source;			// mindig a férjet jelenti!!
-
 	if( d.rowid==L"0" || v_marriages.at(i).rowid == L"0" ) return 0;
 
-cont:	if( d.sex_id == MAN )
+//	if( v_spouseSpouses.size() == 0 ) 
+
+
+cont: if( d.sex_id == MAN )
 	{
 		spouse1_id = d.rowid;
 		spouse1_id = v_marriages.at(i).spouse_id;   // uj: minden házstárshoz a leszármazott más bejegyzése tartozik
 		spouse2_id = v_marriages.at(i).rowid;
-		order2.Format( L"%d", i+1 );
-		source = 1;
+		orderWife.Format( L"%d", i+1 );
+		orderHusband.Format(L"%d",v_marriages.at(i).orderSpouse );
+		/*
+		if( v_spouseSpouses.size() == 0 ) 
+			orderHusband = L"1";
+		else
+			orderHusband.Format( L"%d", v_marriages.at(i).order );
+		*/
 	}
 	else
 	{
 		spouse1_id = v_marriages.at(i).rowid;
 		spouse2_id = d.rowid;
 		spouse2_id = v_marriages.at(i).spouse_id;	// uj: minden házstárshoz a leszármazott más bejegyzése tartozik
-		order1.Format( L"%d", i+1 );
-		source = 2;
+		orderHusband.Format( L"%d", i+1 );
+		orderWife.Format(L"%d",v_marriages.at(i).orderSpouse );
+		/*
+		if( v_spouseSpouses.size() == 0 ) 
+			orderWife = L"1";
+		else
+			orderWife.Format( L"%d", v_marriages.at(i).order );
+			*/
 	}
-	insertMarriage( spouse1_id, spouse2_id, sex_id1, sex_id2, order1, order2, v_marriages.at(i).place, v_marriages.at(i).date, source );
+	insertMarriage( spouse1_id, spouse2_id, sex_id1, sex_id2, orderHusband, orderWife, v_marriages.at(i).place, v_marriages.at(i).date, 1 );
 	return 1;
 
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Házastárs további házassága ( 2 típusú )
+int CGaInput::insertSpouseSpousesMarriage( UINT i )
+{
+	CString rowidS = v_marriages.at( v_spouseSpouses.at(i).spouseIndex ).rowid;
+	CString rowidSS = v_spouseSpouses.at(i).rowid;
+	CString spouse1_id;
+	CString spouse2_id;
+	int sex_id1 = s.sex_id;
+	int sex_id2 = v_spouseSpouses.at(i).sex_id;
+
+
+	if( rowidS==L"0" || rowidSS == L"0" ) return 0;
+
+	CString orderWife(L"");
+	CString orderHusband(L"");
+
+	if( d.sex_id == MAN )
+	{
+		orderHusband.Format( L"%d", v_spouseSpouses.at(i).order );
+		spouse1_id = rowidSS;
+		spouse2_id = rowidS;
+	}
+	else
+	{
+		orderWife.Format( L"%d", v_spouseSpouses.at(i).order );
+		spouse1_id = rowidS;
+		spouse2_id = rowidSS;
+	}
+
+	
+	insertMarriage( spouse1_id, spouse2_id, sex_id1, sex_id2, orderHusband, orderWife, L"", L"", 2 );
+	return 1;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// házastárs szüleinak házassága ( 3 típusú )
 int CGaInput::insertSpouseParentsMarriage( UINT i )
 {
 	CString rowidF = v_marriages.at(i).rowidF;
@@ -381,42 +433,7 @@ int CGaInput::insertSpouseParentsMarriage( UINT i )
 
 
 	if( rowidF==L"0" || rowidM == L"0" ) return 0;
-	insertMarriage( rowidF, rowidM, sex_id1, sex_id2, L"1", L"1", L"", L"", 3 );
-	return 1;
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int CGaInput::insertSpouseSpousesMarriage( UINT i )
-{
-	CString rowidS = v_marriages.at( v_spouseSpouses.at(i).spouseIndex ).rowid;
-	CString rowidSS = v_spouseSpouses.at(i).rowid;
-	CString spouse1_id;
-	CString spouse2_id;
-	int sex_id1 = s.sex_id;
-	int sex_id2 = v_spouseSpouses.at(i).sex_id;
-
-	int source;
-
-	if( rowidS==L"0" || rowidSS == L"0" ) return 0;
-
-	CString order1(L"1");
-	CString order2(L"1");
-
-	if( d.sex_id == MAN )
-	{
-		order1.Format( L"%d", v_spouseSpouses.at(i).order );
-		spouse1_id = rowidSS;
-		spouse2_id = rowidS;
-		source = 2;
-	}
-	else
-	{
-		order2.Format( L"%d", v_spouseSpouses.at(i).order );
-		spouse1_id = rowidS;
-		spouse2_id = rowidSS;
-		source = 5;
-	}
-
-	insertMarriage( spouse1_id, spouse2_id, sex_id1, sex_id2, order1, order2, L"", L"", source );
+	insertMarriage( rowidF, rowidM, sex_id1, sex_id2, L"", L"", L"", L"", 3 );
 	return 1;
 }
 

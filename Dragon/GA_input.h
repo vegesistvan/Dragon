@@ -106,6 +106,8 @@ public:
 	int m_rollToLineFrom;
 
 	CString m_knownAsTable;
+
+	int	m_spouseOrder;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -153,9 +155,10 @@ public:
 	BOOL	isName( CString str, NAME* name );
 	void	splitSpouseString( CString marriageString, SNAMEBLOCK *snb );
 	void	splitSpouseStringNew( CString marriageString, SNAMEBLOCK *snb );
-	void CGaInput::splitSpouseStringNew2( CString marriageString, SNAMEBLOCK *snb );
+	void	splitSpouseStringNew2( CString marriageString, SNAMEBLOCK *snb );
 //	void	splitSpouseString2( CString marriageString, SNAMEBLOCK *snb );
 
+	int		getOrderSpouse( std::vector<PEOPLE>* vp );
 //CString	isItRelatives( CString cLine );
 
 	void	splitDescendantSubstring( CString cLine );

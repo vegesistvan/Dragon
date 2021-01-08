@@ -132,7 +132,7 @@ CString CGaInput::splitLineToSubstrings( CString cLine )
 		order				= _wtoi( str );
 		marriagesS.order	= order;
 		cLine				= cLine.Mid( 2 );					// leszedi az n= karaktereket
-
+		marriagesS.orderSpouse = 1;
 		if( ( pos2 = cLine.Find( '=' ) ) != -1 )
 		{
 			marriagesS.marriageSubstr	= cLine.Left( pos2-1 );			// a vizsgálandó házasság
