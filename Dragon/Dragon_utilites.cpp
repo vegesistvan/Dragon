@@ -381,7 +381,7 @@ CString CDragonApp::contractions()
 // 2 nõi keresztnév
 int CDragonApp::isFirstName( CString name )
 {
-	name.Replace( ')', ' ' );
+//	name.Replace( ')', ' ' );
 	name.Replace( '?', ' ' );
 	name.Trim();
 	if( name.IsEmpty() ) return -1;
@@ -411,10 +411,10 @@ int CDragonApp::isFirstName( CString name )
 		return _wtoi( theApp.m_recordsetSystem->GetFieldString( 1 ) );		// megvan az adatbázisban, visszadja a sex-et
 
 	CSaveFirstName dlg;
-	dlg.m_first_name = name;
+	dlg.m_first_name = A[i];
 	if( dlg.DoModal() == IDCANCEL ) return -1;
 
-	m_command.Format( L"INSERT INTO firstnames (first_name, sexc_id ) VALUES ('%s', '%d' )", name, dlg.m_sex_id );
+	m_command.Format( L"INSERT INTO firstnames (first_name, sex_id ) VALUES ('%s', '%d' )", A[i], dlg.m_sex_id );
 	if( !executeSys( m_command ) ) return -1;
 	return ( dlg.m_sex_id );
 

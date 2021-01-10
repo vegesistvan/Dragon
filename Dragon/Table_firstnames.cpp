@@ -17,14 +17,15 @@
 // CTableFirstnames dialog
 enum
 {
-	L_FIRST_NAME = 0,
+	L_CNT = 0,
+	L_ROWID,
+	L_FIRST_NAME,
 	L_SEX,
 	L_LANGUAGE,
 	L_ORIGIN,
 	L_MEANING,
 	L_OCCURANCE,
 	L_COMMENT,
-	L_ROWID,
 };
 IMPLEMENT_DYNAMIC(CTableFirstnames, CDialogEx)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -85,6 +86,8 @@ BOOL CTableFirstnames::OnInitDialog()
 	m_ListCtrl.SortByHeaderClick(TRUE);
 	m_ListCtrl.KeepSortOrder(TRUE);
 	m_ListCtrl.SetExtendedStyle(m_ListCtrl.GetExtendedStyle()| LVS_EX_GRIDLINES | LVS_EX_HEADERDRAGDROP );
+	m_ListCtrl.InsertColumn( L_CNT,			L"cnt",			LVCFMT_LEFT,   40,-1,COL_HIDDEN);
+	m_ListCtrl.InsertColumn( L_ROWID,		L"rowid",		LVCFMT_RIGHT,  40,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_FIRST_NAME,	L"utónév",		LVCFMT_LEFT, 120,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_SEX,			L"nem",			LVCFMT_LEFT,  40,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_LANGUAGE,	L"nyelv",		LVCFMT_LEFT,  80,-1,COL_TEXT);
@@ -92,7 +95,7 @@ BOOL CTableFirstnames::OnInitDialog()
 	m_ListCtrl.InsertColumn( L_MEANING,		L"jelentés",	LVCFMT_LEFT, 200,-1,COL_TEXT);	
 	m_ListCtrl.InsertColumn( L_COMMENT,		L"megjegyzés",	LVCFMT_LEFT, 120,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_OCCURANCE,	L"elõfordult",	LVCFMT_RIGHT, 80,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( L_ROWID,		L"rowid",		LVCFMT_RIGHT,20,-1, COL_HIDDEN );
+
 
 	m_sexLast = 1;
 	OnUnfilter();
@@ -171,10 +174,11 @@ void CTableFirstnames::fillTable()
 	int nItem;
 	for( UINT i = 0; i < theApp.m_recordsetName->RecordsCount(); ++i, theApp.m_recordsetName->MoveNext() )
 	{
-		nItem = m_ListCtrl.InsertItem( i,			theApp.m_recordsetName->GetFieldString( SEX_FIRST_NAME ));
+		str.Format( L"%d", i+1 );
+		nItem = m_ListCtrl.InsertItem( i, str);
 		fillRow( nItem );
 	}
-	m_orderix = 0;
+	m_orderix = 2;
 	m_ListCtrl.SetSortOrder( 1, m_orderix+1 );
 
 
@@ -184,8 +188,8 @@ void CTableFirstnames::fillTable()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTableFirstnames::fillRow( int nItem )
 {
-	m_ListCtrl.SetItemText( nItem, L_FIRST_NAME,theApp.m_recordsetName->GetFieldString( SEX_FIRST_NAME ));
-
+	m_ListCtrl.SetItemText( nItem, L_ROWID, theApp.m_recordsetName->GetFieldString( SEX_ROWID ));
+	m_ListCtrl.SetItemText( nItem, L_FIRST_NAME, theApp.m_recordsetName->GetFieldString( SEX_FIRST_NAME ));
 	str.Empty();
 	switch ( _wtoi( theApp.m_recordsetName->GetFieldString( SEX_SEX_ID ) ) )
 	{
@@ -199,7 +203,7 @@ void CTableFirstnames::fillRow( int nItem )
 		str =L"nõi";
 		break;
 	}
-	m_ListCtrl.SetItemText( nItem, L_SEX,		str );
+	m_ListCtrl.SetItemText( nItem, L_SEX,str );
 
 	int language_id;
 	CString language;
@@ -211,7 +215,6 @@ void CTableFirstnames::fillRow( int nItem )
 	m_ListCtrl.SetItemText( nItem, L_MEANING,	theApp.m_recordsetName->GetFieldString( SEX_MEANING ));
 	m_ListCtrl.SetItemText( nItem, L_COMMENT,	theApp.m_recordsetName->GetFieldString( SEX_COMMENT ));
 	m_ListCtrl.SetItemText( nItem, L_OCCURANCE,	theApp.m_recordsetName->GetFieldString( SEX_OCCURANCE ));
-	m_ListCtrl.SetItemText( nItem, L_ROWID,		theApp.m_recordsetName->GetFieldString( SEX_ROWID ));
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Név módosítása

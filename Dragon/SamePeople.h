@@ -31,6 +31,7 @@ protected:
 	CString m_name;				// egy ember neve, amit elõírhatunk vizsgélatra
 	int		m_match;			// az egyezõ adazpárok száma;
 	int		nItem;
+	int		m_loop;
 	int		m_columnsCount;
 
 	CString unitedSpec;			// egyesített bejegyzéseket listázó fájl

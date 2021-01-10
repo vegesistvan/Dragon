@@ -1,6 +1,7 @@
 #pragma once
 #include "listctrlex.h"
 #include "ProgressWnd.h"
+#include "colorstatic.h"
 
 
 typedef struct 
@@ -129,7 +130,7 @@ protected:
 	CString m_last_name_h;
 	CString m_last_name_w;
 
-
+	BOOL PreTranslateMessage(MSG* pMsg);
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnInitDialog();
@@ -138,5 +139,7 @@ public:
 	afx_msg void OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult);
 	CListCtrlEx m_ListCtrl;
 	afx_msg void OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnKillfocusSearch();
+//	afx_msg void OnKillfocusSearch();
+	afx_msg void OnClickedKeres();
+	CColorStatic colorKeres;
 };

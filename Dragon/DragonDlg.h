@@ -425,4 +425,5 @@ public:
 	afx_msg void OnClose();
 	afx_msg void OnSamenameandspouse();
 //	afx_msg void OnInfo();
+	afx_msg void OnAppExit();
 };

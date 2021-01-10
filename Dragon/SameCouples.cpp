@@ -178,7 +178,7 @@ L"rowid", L"feleség", L"születés", L"halál", L"apja", L"anyja" \
 //	_wife		= L"N N";
 	m_contract	= false;
 	m_contract	= true;			// végrejatsa-e az összevonásokat	
-	m_loop		= 1;
+	m_loop		= 3;
 	m_azonos	= 0;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -871,8 +871,8 @@ void CSameCouples::deleteMarriages( int loop )
 	str.Format( L"Házasságok ellenõrzése és törlése..." );
 	wndP.SetText( str );
 #endif
-
-	m_command = L"SELECT rowid, spouse1_id, spouse2_id FROM marriages ORDER BY spouse1_id, spouse2_id";
+	// A legkisebb szerepkódú házasságot tartja meg ( ORDER BY ... source )
+	m_command = L"SELECT rowid, spouse1_id, spouse2_id FROM marriages ORDER BY spouse1_id, spouse2_id, source ";
 	if( !query( m_command ) ) return;
 
 	CString rowid11;

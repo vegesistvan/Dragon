@@ -160,6 +160,7 @@ házastársak\n\n\
 	m_contract	= true;			// végrehajtsa-e az összevonásokat	
 	m_azonos	= 1;			// az azonos adatpárok elõírt száma
 	nItem		= 0;
+	m_loop		= 1;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CSamePeople::~CSamePeople()
@@ -245,6 +246,9 @@ BOOL CSamePeople::OnInitDialog()
 
 		m_ListCtrl.SetItemCountEx( nItem + 1 );
 		m_ListCtrl.AttachDataset( &tableLines );
+		
+//		OnHtml();
+		
 		CDialogEx::ShowWindow( SW_SHOW );
 	}
 	else
@@ -269,68 +273,77 @@ void CSamePeople::core()
 	CString firstName;
 	bool	first = true;;
 	int		pos;
+	int		loop = 0;
 
-	wndP.m_strTitle = L"Azonos nevû emberek bejegyzéseinek vizsgálata és összevonása.";
+
+	while( loop < m_loop )
+	{
+
+		++loop;
+		wndP.m_strTitle = L"Azonos nevû emberek bejegyzéseinek vizsgálata és összevonása.";
 
 #ifndef _DEBUG
-	wndP.SetText( L"Azonos nevû emberek bejegyzéseinek vizsgálata..." );
+
+		str = L"Azonos nevû emberek bejegyzéseinek összegyûjtése...";
+		wndP.SetText( str );
 #endif
-
-	m_command.Format( L"SELECT %s FROM people ORDER BY last_name, first_name, source", p_fields );
-	if( !query( m_command ) ) return;
-
-	wndP.SetRange( 0, m_recordset->RecordsCount() );
-	wndP.SetPos(0 );
-	wndP.SetStep(1 );
-
-	CString nameR;
-	vPeople.clear();
-	for( UINT i = 0; i < m_recordset->RecordsCount()-1; ++i )
-	{
-		lastName  = m_recordset->GetFieldString( P_LAST_NAME );
-		if( lastName.IsEmpty() ) goto cont;
-
-		firstName = m_recordset->GetFieldString( P_FIRST_NAME );
-
-		name.Format( L"%s %s", lastName, sepFirstName( firstName ) );
-		if( name.TrimRight().IsEmpty() ) goto cont;
 			
-		if( !m_name.IsEmpty() )
-		{
-			nameR = name.Left( m_name.GetLength() );	
-			if( nameR != m_name ) goto cont;
-		}
+		m_command.Format( L"SELECT %s FROM people ORDER BY last_name, first_name, source", p_fields );
+		if( !query( m_command ) ) return;
 
-		if( name == namePrev )
+		wndP.SetRange( 0, m_recordset->RecordsCount() );
+		wndP.SetPos(0 );
+		wndP.SetStep(1 );
+
+		CString nameR;
+		vPeople.clear();
+		for( UINT i = 0; i < m_recordset->RecordsCount()-1; ++i )
 		{
-			if( first )
+			lastName  = m_recordset->GetFieldString( P_LAST_NAME );
+			if( lastName.IsEmpty() ) goto cont;
+
+			firstName = m_recordset->GetFieldString( P_FIRST_NAME );
+
+			name.Format( L"%s %s", lastName, sepFirstName( firstName ) );
+			if( name.TrimRight().IsEmpty() ) goto cont;
+			
+			if( !m_name.IsEmpty() )
 			{
-				putPeople( name, i-1 );
-				first = false;
+				nameR = name.Left( m_name.GetLength() );	
+				if( nameR != m_name ) goto cont;
 			}
-			putPeople( name, i );
-		}
-		else if( vPeople.size() )
-		{
-			processPeople();
-			vPeople.clear();
-			first = true;
-		}
-		namePrev = name;
-cont:	m_recordset->MoveNext();
-		wndP.StepIt();
-		wndP.PeekAndPump();
-		if (wndP.Cancelled()) break;
-	}
-	if( vPeople.size() )
-		processPeople();
 
-	if( m_contract )
-	{
-		theApp.execute( L"BEGIN" );
-		contractFull();
-		deleteMarriages();
-		theApp.execute( L"COMMIT" );
+			if( name == namePrev )
+			{
+				if( first )
+				{
+					putPeople( name, i-1 );
+					first = false;
+				}
+				putPeople( name, i );
+			}
+			else if( vPeople.size() )
+			{
+				processPeople();
+				vPeople.clear();
+				first = true;
+			}
+			namePrev = name;
+cont:		m_recordset->MoveNext();
+			wndP.StepIt();
+			wndP.PeekAndPump();
+			if (wndP.Cancelled()) break;
+		}
+		if( vPeople.size() )
+			processPeople();
+
+		if( m_contract )
+		{
+			theApp.execute( L"BEGIN" );
+			contractFull();
+			deleteMarriages();
+			theApp.execute( L"COMMIT" );
+		}
 	}
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -831,7 +844,7 @@ void CSamePeople::deleteMarriages()
 	str.Format( L"Házasságok ellenõrzése és törlése..." );
 	wndP.SetText( str );
 #endif
-
+	// A legkisebb szerepkódú házasságot tartja meg ( ORDER BY ... source )
 	m_command = L"SELECT rowid, spouse1_id, spouse2_id FROM marriages ORDER BY spouse1_id, spouse2_id, source ";
 	if( !query( m_command ) ) return;
 

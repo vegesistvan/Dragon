@@ -104,6 +104,7 @@ void CCheckMarriageOrder::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_LIST, m_ListCtrl);
+	DDX_Control(pDX, IDC_KERES, colorKeres);
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CCheckMarriageOrder, CDialogEx)
@@ -111,7 +112,8 @@ BEGIN_MESSAGE_MAP(CCheckMarriageOrder, CDialogEx)
 	ON_WM_SIZING()
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST, &CCheckMarriageOrder::OnCustomdrawList)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CCheckMarriageOrder::OnDblclkList)
-	ON_EN_KILLFOCUS(IDC_SEARCH, &CCheckMarriageOrder::OnKillfocusSearch)
+//	ON_EN_KILLFOCUS(IDC_SEARCH, &CCheckMarriageOrder::OnKillfocusSearch)
+	ON_STN_CLICKED(IDC_KERES, &CCheckMarriageOrder::OnClickedKeres)
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CCheckMarriageOrder::OnInitDialog()
@@ -174,6 +176,9 @@ az elsõ házastárssal.\
 	SetWindowTextW( caption ),
 
 */
+
+	colorKeres.SetTextColor( theApp.m_colorClick );
+
 	str = L"piros az ember, fekete a házastársa.        O - házasság sorszáma  S - az ember hierarchia száma ";
 	GetDlgItem( IDC_INFO )->SetWindowTextW( str );
 
@@ -312,7 +317,7 @@ void CCheckMarriageOrder::collectHusband()
 
 			wifes.date	= m_recordset->GetFieldString( MARRIAGES_DATE );
 			wifes.place	= m_recordset->GetFieldString( MARRIAGES_PLACE );
-			wifes.order	= m_recordset->GetFieldString( MARRIAGES_ORDERHUSBAND );
+			wifes.order	= m_recordset->GetFieldString( MARRIAGES_ORDERWIFE );
 		
 			vSpouse2.push_back( wifes );
 			m_recordset->MoveNext();
@@ -327,7 +332,7 @@ void CCheckMarriageOrder::collectHusband()
 
 				wifes.date	= m_recordset->GetFieldString( MARRIAGES_DATE );
 				wifes.place	= m_recordset->GetFieldString( MARRIAGES_PLACE );
-				wifes.order	= m_recordset->GetFieldString( MARRIAGES_ORDERHUSBAND );
+				wifes.order	= m_recordset->GetFieldString( MARRIAGES_ORDERWIFE );
 		
 				vSpouse2.push_back( wifes );
 				m_recordset->MoveNext();
@@ -378,7 +383,7 @@ void CCheckMarriageOrder::collectWife()
 
 			husband.date	= m_recordset->GetFieldString( MARRIAGES_DATE );
 			husband.place	= m_recordset->GetFieldString( MARRIAGES_PLACE );
-			husband.order	= m_recordset->GetFieldString( MARRIAGES_ORDERWIFE );
+			husband.order	= m_recordset->GetFieldString( MARRIAGES_ORDERHUSBAND );
 		
 			vSpouse2.push_back( husband );
 			m_recordset->MoveNext();
@@ -393,7 +398,7 @@ void CCheckMarriageOrder::collectWife()
 
 				husband.date	= m_recordset->GetFieldString( MARRIAGES_DATE );
 				husband.place	= m_recordset->GetFieldString( MARRIAGES_PLACE );
-				husband.order	= m_recordset->GetFieldString( MARRIAGES_ORDERWIFE );
+				husband.order	= m_recordset->GetFieldString( MARRIAGES_ORDERHUSBAND );
 		
 				vSpouse2.push_back( husband );
 				m_recordset->MoveNext();
@@ -837,8 +842,82 @@ void CCheckMarriageOrder::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
 	*pResult = 0;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//void CCheckMarriageOrder::OnKillfocusSearch()
+//{
+//	CString	search;
+//	GetDlgItem( IDC_SEARCH )->GetWindowText( search );
+//	if( search.IsEmpty() )
+//	{
+//		AfxMessageBox( L"Meg kell adni a keresendõ stringet!");
+//		return;
+//	}
+//
+//	int		n				= m_ListCtrl.GetItemCount();
+//	int		length			= search.GetLength();
+//	int		nItem;
+//	CString	str;
+//
+//	theApp.unselectAll( &m_ListCtrl );
+//	for( nItem = 0; nItem < n; ++nItem )
+//	{
+//		str = m_ListCtrl.GetItemText( nItem, L_NAME );
+//		str = str.Left(length);						// az aktuális search string hosszával azonos hosszúság leválasztása
+//		if( str == search )
+//		{
+//			m_ListCtrl.SetItemState( nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED );
+//			m_ListCtrl.EnsureVisible( nItem, FALSE );
+//			break;
+//		}
+//	}
+//}
 
-void CCheckMarriageOrder::OnKillfocusSearch()
+
+void CCheckMarriageOrder::OnClickedKeres()
 {
-	// TODO: Add your control notification handler code here
+		CString	search;
+	GetDlgItem( IDC_SEARCH )->GetWindowText( search );
+	if( search.IsEmpty() )
+	{
+		AfxMessageBox( L"Meg kell adni a keresendõ stringet!");
+		return;
+	}
+
+	int		n				= m_ListCtrl.GetItemCount();
+	int		length			= search.GetLength();
+	int		nItem;
+	CString	str;
+
+	theApp.unselectAll( &m_ListCtrl );
+	for( nItem = 0; nItem < n; ++nItem )
+	{
+		str = m_ListCtrl.GetItemText( nItem, L_NAME );
+		str = str.Left(length);						// az aktuális search string hosszával azonos hosszúság leválasztása
+		if( str == search )
+		{
+			m_ListCtrl.SetItemState( nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED );
+			m_ListCtrl.EnsureVisible( nItem, FALSE );
+			break;
+		}
+	}
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BOOL CCheckMarriageOrder::PreTranslateMessage(MSG* pMsg)
+{
+	int x=(int)pMsg->wParam;
+
+    if( pMsg->message==WM_KEYDOWN)
+    {
+		switch( x )
+		{
+		case VK_RETURN:
+			GetDlgItem( IDC_SEARCH )->GetWindowTextW( str );
+			if( str.GetLength() ) 
+				OnClickedKeres();
+			break;
+		case VK_ESCAPE:
+			CDialogEx::OnCancel();
+		}
+	}
+    return CWnd::PreTranslateMessage(pMsg);
 }

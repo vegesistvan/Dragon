@@ -83,7 +83,7 @@ CDragonDlg::CDragonDlg(CWnd* pParent /*=NULL*/)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CDragonDlg::~CDragonDlg()
 {
-
+	AfxMessageBox( L"Vége" );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::DoDataExchange(CDataExchange* pDX)
@@ -189,6 +189,7 @@ ON_COMMAND(ID_SAME, &CDragonDlg::OnSame)
 ON_WM_CLOSE()
 ON_COMMAND(ID_SAMENAMEANDSPOUSE, &CDragonDlg::OnSamenameandspouse)
 //ON_COMMAND(ID_INFO, &CDragonDlg::OnInfo)
+ON_COMMAND(ID_APP_EXIT, &CDragonDlg::OnAppExit)
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CDragonDlg::OnInitDialog()
@@ -1130,6 +1131,7 @@ void CDragonDlg::OnSame()
 }
 void CDragonDlg::OnClose()
 {
+	if( AfxMessageBox( L"Tényleg be akarod zárni a programot?", MB_YESNO ) == IDNO ) return;
 
 	if( m_pIndividuals != NULL )	m_pIndividuals->CloseWindow();
 	if( m_pMarriages != NULL )		m_pMarriages->CloseWindow();
@@ -1151,11 +1153,8 @@ void CDragonDlg::OnClose()
 
 	CDialogEx::OnClose();
 }
-
-
-
-//void CDragonDlg::OnInfo()
-//{
-//	CSamePeopleInfo dlg;
-//	dlg.DoModal();
-//}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDragonDlg::OnAppExit()
+{
+	MessageBox( L"AppExit" );
+}

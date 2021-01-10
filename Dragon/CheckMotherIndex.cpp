@@ -9,6 +9,14 @@
 #include "utilities.h"
 // CCheckMotherIndex dialog
 
+enum
+{
+	L_CNT = 0,
+	L_LINENUMBER,
+	L_INDEX,
+	L_LINE
+};
+
 IMPLEMENT_DYNAMIC(CCheckMotherIndex, CDialogEx)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CCheckMotherIndex::CCheckMotherIndex(CWnd* pParent /*=NULL*/)
@@ -46,12 +54,19 @@ BOOL CCheckMotherIndex::OnInitDialog()
 
 	int nItem = 0;
 	CString rowid;
-	CString lineNumber;
-	CString lineNumberF;
-	CString gaLine;
-	CString cntS;
 	CString name;
+	CString lineNumber;
+	CString lineNumberP;
+	CString lineP;
+	CString gaLine;
 	CString father_id;
+	CString mother_id;
+	CString parent;
+
+	int		z;
+	int		pos;
+	int		sex_id;
+	int		source;
 	int		mother_index;
 	int		count;
 	int		cnt = 0;
@@ -65,7 +80,7 @@ Ha leányági leszármazottak gyeremekei is vannak a GA-html-ben, akkor az apa és a
 ";
 	GetDlgItem( IDC_EDIT )->SetWindowTextW( info );
 
-	CProgressWnd wndP( NULL, L"Anya-indexek ellenõrzése..." );
+	CProgressWnd wndP( NULL, L"Szülõ-indexek ellenõrzése..." );
 	wndP.GoModal();
 
 #ifndef _DEBUG
@@ -76,9 +91,10 @@ Ha leányági leszármazottak gyeremekei is vannak a GA-html-ben, akkor az apa és a
 	m_ListCtrl.KeepSortOrder(TRUE);
 	m_ListCtrl.SetExtendedStyle(m_ListCtrl.GetExtendedStyle()| LVS_EX_GRIDLINES );
 	
-	m_ListCtrl.InsertColumn( 0,	L"#",		LVCFMT_RIGHT,	 60,-1,COL_NUM );
-	m_ListCtrl.InsertColumn( 1,	L"line#",	LVCFMT_RIGHT,	 60,-1,COL_NUM );
-	m_ListCtrl.InsertColumn( 2,	L"név",		LVCFMT_LEFT,	200,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_CNT,			L"#",		LVCFMT_RIGHT,	 60,-1,COL_NUM );
+	m_ListCtrl.InsertColumn( L_LINENUMBER,	L"line#",	LVCFMT_RIGHT,	 60,-1,COL_NUM );
+	m_ListCtrl.InsertColumn( L_INDEX,		L"X",		LVCFMT_RIGHT,	 20,-1,COL_NUM );
+	m_ListCtrl.InsertColumn( L_LINE,		L"név",		LVCFMT_LEFT,	200,-1,COL_TEXT);
 
 	theApp.m_inputCode = GetInputCode( theApp.m_htmlFileSpec );
 	gafile.Open( theApp.m_htmlFileSpec, CFile::modeRead );
@@ -87,17 +103,16 @@ Ha leányági leszármazottak gyeremekei is vannak a GA-html-ben, akkor az apa és a
 	while( 	gafile.ReadString( cLine ) )
 		vPos.push_back( gafile.GetPosition() );
 
-
 	
-	m_command = L"SELECT rowid, lineNumber, mother_index, father_id, first_name, last_name FROM people ORDER BY lineNumber";
+	m_command = L"SELECT rowid, lineNumber, mother_index, father_id, mother_id, first_name, last_name FROM people WHERE source='1' ORDER BY lineNumber";
 	if( !theApp.query( m_command ) )
 	{
 		OnCancel();
-		return false;
+//		return false;
 	}
 
 #ifndef _DEBUG
-	str.Format( L"Gyermek-anya rekordok vizsgálata..." );
+	str.Format( L"Gyermek-szülõ rekordok vizsgálata..." );
 	wndP.SetText( str );
 #endif
 
@@ -107,42 +122,78 @@ Ha leányági leszármazottak gyeremekei is vannak a GA-html-ben, akkor az apa és a
 
 	for( int i = 0; i < theApp.m_recordset->RecordsCount(); ++i, theApp.m_recordset->MoveNext() )
 	{
+		rowid			= theApp.m_recordset->GetFieldString( 0 );
+		if( rowid == L"5321" )
+			z = 7;
 		lineNumber		= theApp.m_recordset->GetFieldString( 1 );
 		mother_index	= _wtoi( theApp.m_recordset->GetFieldString( 2 ) );
-		father_id		= theApp.m_recordset->GetFieldString( 3 );
+		if( mother_index == 0 ) goto cont;
 
-		m_command.Format( L"SELECT lineNumber FROM marriages WHERE spouse1_id='%s'", father_id );
-		if( !theApp.query1( m_command ) ) 
-		{
-			OnCancel();
-			return false;
-		}
-		count = theApp.m_recordset1->RecordsCount();		//  _wtoi( theApp.m_recordset1->GetFieldString( 0 ) );
+		father_id		= theApp.m_recordset->GetFieldString( 3 );
+		mother_id		= theApp.m_recordset->GetFieldString( 4 );
+
+		if( mother_id == L"42691" )
+			z = 1;
+//		name.Format( L"%s %s", theApp.m_recordset->GetFieldString(6), theApp.m_recordset->GetFieldString(5) );
+		// hány házastársa van az apának?
+		m_command.Format( L"SELECT lineNumber FROM marriages WHERE spouse1_id='%s' AND spouse2_id= '%s'", father_id, mother_id );  // az ember apjának házasságai
+		if( !theApp.query1( m_command ) ) OnCancel();
+		if( !theApp.m_recordset1->RecordsCount() ) goto cont;
+
+		lineNumberP	= theApp.m_recordset1->GetFieldString( 0 );
+		lineP = getHtmlLine( lineNumberP );
 		
-		if( count && mother_index > count )
+
+		m_command.Format( L"SELECT lineNumber FROM marriages WHERE spouse1_id='%s'", father_id );  // az ember apjának házasságai
+		if( !theApp.query1( m_command ) ) OnCancel();
+		count =theApp.m_recordset1->RecordsCount();
+		if( !count ) goto cont;
+
+		parent = getWord( lineP,2, &pos );
+		if( (pos = parent.Find( '/' )) != -1 )
+			parent = parent.Left( pos );
+		parent.Remove( ',' );
+		parent.TrimRight();
+		sex_id = theApp.isFirstName( parent );
+		if( sex_id == -1 ) goto cont;  // nem tudja milyen nemû
+/* Nme értem, hogy miért nem jó????
+		if( sex_id == 2 ) // hány házastársa van az anyának
 		{
+			m_command.Format( L"SELECT count() FROM marriages WHERE spouse2_id='%s'", mother_id );  // az ember apjának házasságai
+			if( !theApp.query1( m_command ) ) OnCancel();
+			count = _wtoi( theApp.m_recordset1->GetFieldString( 0 ) );
+			if( !count ) goto cont;
+		}
+*/
+		if( mother_index > count  )
+		{
+			// szülõ
 			++cnt;
-			cntS.Format( L"%d", cnt );
-			lineNumberF	= theApp.m_recordset1->GetFieldString( 0 );
-			
-			nItem = m_ListCtrl.InsertItem( nItem, cntS );
-			m_ListCtrl.SetItemText( nItem, 1, lineNumberF);
-			str = getHtmlLine( lineNumberF );
-			m_ListCtrl.SetItemText( nItem, 2, str );
+			str.Format( L"%d", cnt );
+			nItem = m_ListCtrl.InsertItem( nItem, str );
+		
+			str.Format( L"%d", count );
+			m_ListCtrl.SetItemText( nItem, L_INDEX, str );
+			m_ListCtrl.SetItemText( nItem, L_LINENUMBER, lineNumberP);
+			m_ListCtrl.SetItemText( nItem, L_LINE, lineP );
 			++nItem;
 
 			// gyermek 
-			
-			nItem = m_ListCtrl.InsertItem( nItem, cntS );
-			m_ListCtrl.SetItemText( nItem, 1, lineNumber );
+			str.Format( L"%d-%d", cnt, mother_index );
+			nItem = m_ListCtrl.InsertItem( nItem, str );
+
+			str.Format( L"%d", mother_index );
+			m_ListCtrl.SetItemText( nItem, L_INDEX, str );
+			m_ListCtrl.SetItemText( nItem, L_LINENUMBER, lineNumber );
+
 			str = getHtmlLine( lineNumber );
-			m_ListCtrl.SetItemText( nItem, 2, str );
+			m_ListCtrl.SetItemText( nItem, L_LINE, str );
 			++nItem;
 
 			nItem = m_ListCtrl.InsertItem( nItem, L"" );
 			++nItem;
 		}
-		wndP.StepIt();
+cont:	wndP.StepIt();
 		wndP.PeekAndPump();
 		if (wndP.Cancelled()) break;
 	}
@@ -192,7 +243,7 @@ LRESULT CCheckMotherIndex:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
     {
 		pPopup = Menu.GetSubMenu(0);
 
-		if( m_ListCtrl.GetItemText( nItem, 1 ).IsEmpty() )
+		if( m_ListCtrl.GetItemText( nItem, L_LINENUMBER ).IsEmpty() )
 		{
 			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
 			pPopup->EnableMenuItem(ID_HTML_NOTEPAD, MF_BYCOMMAND | MF_GRAYED);
@@ -205,14 +256,14 @@ LRESULT CCheckMotherIndex:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 void CCheckMotherIndex::OnHtmlEdit()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	1 ) );
+	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	L_LINENUMBER ) );
 	theApp.listHtmlLine( lineNumber );
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckMotherIndex::OnHtmlNotepad()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	CString lineNumber = m_ListCtrl.GetItemText( nItem, 	1 );
+	CString lineNumber = m_ListCtrl.GetItemText( nItem, L_LINENUMBER );
 	if( !lineNumber.IsEmpty() ) 
 		theApp.editNotepad( lineNumber );
 }

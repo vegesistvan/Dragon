@@ -338,7 +338,7 @@ public:
 	afx_msg void OnCheckIntegrity();
 
 	afx_msg void OnCheckGenerations();
-	afx_msg void OnNoMarriageOrder();
+	afx_msg void OnMoreMarriages();
 };
 extern CDragonApp theApp;
 

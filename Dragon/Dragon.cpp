@@ -30,7 +30,7 @@ ON_COMMAND(ID_HUSBAND_WIFE, &CDragonApp::OnHusbandWife)
 ON_COMMAND(ID_EMAIL, &CDragonApp::OnEmail)
 ON_COMMAND(ID_CHECK_INEGRITY, &CDragonApp::OnCheckIntegrity)
 ON_COMMAND(ID_CHECK_GENERATIONS, &CDragonApp::OnCheckGenerations)
-ON_COMMAND(ID_NOMARRIAGEORDER, &CDragonApp::OnNoMarriageOrder)
+ON_COMMAND(ID_MOREMARRIAGES, &CDragonApp::OnMoreMarriages)
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CDragonApp::CDragonApp()
@@ -698,7 +698,7 @@ void CDragonApp::OnCheckGenerations()
 	dlg.DoModal();
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragonApp::OnNoMarriageOrder()
+void CDragonApp::OnMoreMarriages()
 {
 	CCheckMarriageOrder dlg;
 	dlg.DoModal();

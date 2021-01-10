@@ -2,7 +2,59 @@
 
 #include "listctrlex.h"
 #include "colorstatic.h"
+#include "ProgressWnd.h"
 // CTableMarriages dialog
+
+typedef struct 
+{
+	CString linenumber;
+	CString sex_id;
+	CString source;
+
+	CString rowid;
+	CString name;
+	CString birth;
+	CString death;
+
+	CString rowidF;
+	CString father;
+	CString birthF;
+	CString deathF;
+
+	CString rowidM;
+	CString mother;
+	CString birthM;
+	CString deathM;
+}SPOUSE11;
+
+typedef struct 
+{
+	CString rowidS;
+	CString place;
+	CString date;
+	CString order;
+
+	CString linenumber;
+	CString sex_id;
+	CString source;
+
+	CString rowid;
+	CString name;
+	CString birth;
+	CString death;
+
+	CString rowidF;
+	CString father;
+	CString birthF;
+	CString deathF;
+
+	CString rowidM;
+	CString mother;
+	CString birthM;
+	CString deathM;
+}SPOUSE21;
+
+
 
 class CTableMarriages : public CDialogEx
 {
@@ -31,8 +83,8 @@ protected:
 
 	CString m_filter;
 	CString m_filterText;
-	CString m_last_name_h;
-	CString m_last_name_w;
+//	CString m_last_name_h;
+//	CString m_last_name_w;
 
 	CListCtrlEx m_ListCtrl;
 	
@@ -45,6 +97,61 @@ protected:
 	void OnHtmlNotepad();
 	void OnHtmlShows();
 
+	std::vector<SPOUSE11>	vSpouse1;
+	std::vector<SPOUSE21>	vSpouse2;
+	std::vector<byte>		vColor;
+
+	std::vector<MORESPOUSES> vSpouses;
+	CSqliteDBRecordSet*	 m_recordset;
+	CSqliteDBRecordSet*	 m_recordset1;
+	CSqliteDBRecordSet*	 m_recordset2;
+	CSqliteDBRecordSet*	 m_recordset3;
+	CSqliteDBRecordSet*	 m_recordset4;
+
+	void marriages();
+	void htmlHeader( CString title );
+	void collectHusband();
+	void collectWife();
+	void fillSpouse1();
+	void fillSpouse2();
+	void listHtml();
+	void fillTable();
+	void emptyRow();
+
+	BOOL query( CString command );
+	BOOL query1( CString command );
+	BOOL query2( CString command );
+	BOOL query3( CString command );
+	BOOL query4( CString command );
+
+	CProgressWnd wndP;
+
+	CString fileSpec;
+
+	FILE* fh1;
+
+
+	CString rowid;
+
+/*
+	CString _birth;
+	CString _death;
+	CString _father;
+	CString _mother;
+	CString _spouses;
+
+	CString _info;
+*/
+	CString m_explanation;
+	CString p_fields;
+	int		nItem;
+	int m_cnt;
+	CString m_last_name_h;
+	CString m_last_name_w;
+
+	
+	CColorStatic colorKeres;
+//	BOOL PreTranslateMessage(MSG* pMsg);
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnInitDialog();
@@ -52,10 +159,12 @@ public:
 	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
 	afx_msg LRESULT OnSetColumnColor(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnColumnSorted(WPARAM wParam, LPARAM lParam);
-//	afx_msg void OnChangeSearch();
 	afx_msg void OnExportAll();
 	afx_msg void OnExportSelected();
 	afx_msg void OnAzonosMarriagelist();
+	afx_msg void OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnClickedKeres();
+
 
 	afx_msg void OnUnfilter();
 	afx_msg void OnFilterHlastname();
@@ -73,6 +182,5 @@ public:
 	afx_msg void OnEditUpdate();
 	afx_msg void OnEditDelete();
 	afx_msg void OnEditGahtml();
-	CColorStatic colorKeres;
-	afx_msg void OnClickedKeres();
+	afx_msg void OnMoreMarriages();
 };
