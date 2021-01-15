@@ -241,6 +241,7 @@ typedef struct
 								// 1-n az 1-n csoportba tartozik
 	UINT	group2;				// más csoporttól vette el
 	int		status;				// 1 = megtartandó, -1 törlendõ 
+	UINT	rgbcolor;
 	UINT	match;
 	CString rowid;
 	CString line;

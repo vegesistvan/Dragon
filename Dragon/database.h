@@ -38,7 +38,23 @@ enum
 	M_ROOTPAGE,
 	M_SQL							// CREATE .....
 };
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+const COLUMN contracted[] =
+{
+	{ L"xid",			L"INTEGER PRIMARY KEY ASC" },
+	{ L"code1",			L"NUM" },
+	{ L"code2",			L"NUM" },
+	{ L"filespec",		L"TEXT"	},
 
+};
+enum
+{
+	C_ROWID = 0,
+	C_XID,
+	C_CODE1,
+	C_CODE2,
+	C_FILESPEC,
+};
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const COLUMN inputFiles[] =
 {
@@ -347,6 +363,7 @@ enum
 // ABC sorrendben!!!
 const DB databaseTables[] =
 {
+	{ L"contracted", (COLUMN*)&contracted, sizeof( contracted )/sizeof(COLUMN) },
 	{ L"inputFiles", (COLUMN*)&inputFiles, sizeof( inputFiles )/sizeof(COLUMN) },
 	{ L"marriages", (COLUMN*)&marriages, sizeof( marriages )/sizeof(COLUMN) },
 	{ L"people", (COLUMN*)&people, sizeof( people )/sizeof(COLUMN) },

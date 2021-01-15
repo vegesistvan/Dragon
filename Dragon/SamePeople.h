@@ -31,14 +31,21 @@ protected:
 	CString m_name;				// egy ember neve, amit elõírhatunk vizsgélatra
 	int		m_match;			// az egyezõ adazpárok száma;
 	int		nItem;
-	int		m_loop;
 	int		m_columnsCount;
-
+	int		m_loop;
+	int		m_loopMax;
 	CString unitedSpec;			// egyesített bejegyzéseket listázó fájl
 	CString differentSpec;		// különbözü bejegyzéseket listázó fájl
 	
 	FILE* fU;  
 	FILE* fD;  
+
+	FILE* textU;
+	FILE* textD;
+
+	CString m_fileSpecTextU;
+	CString m_fileSpecTextD;
+	CString sWHITE;
 
 	bool	m_contracted;		// jelzi, hogy vannak összevont bejegyzések a vPeople vektorban
 	int		m_azonos;			// az egyesítéshez szükséges azonosságok száma
@@ -47,6 +54,8 @@ protected:
 	std::vector<CONTRACT> vContract;
 	std::vector<int> vColor;
 	std::vector<TCHAR*> tableLines; 
+
+	std::vector<int> vLoops;
 	SAMENAMES r;				// referencia adatok az összehasonlításnál
 	
 	CStringArray m_colors;
@@ -77,12 +86,14 @@ protected:
 	void deleteMarriages();
 	void setRef( int i ) ;
 	void resetRef();
-	void printRef( int group );
-	void fillTable();
+	void emptyLine( FILE* fl, int loop );
+//	void printRef( int group );
+//	void fillTable();
 
 	void openUnited( );
-	void openDifferent();
 
+	void openDifferent();
+	void keress( int start );
 	void push( CString item );
 	void list();
 
@@ -110,5 +121,7 @@ public:
 	afx_msg void OnHtmlNotepad();
 
 	afx_msg void OnInfo();
-	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
+	afx_msg void OnClickedNext();
+	CColorStatic colorNext;
+	afx_msg void OnFilterLoop();
 };

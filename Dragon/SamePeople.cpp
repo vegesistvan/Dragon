@@ -12,7 +12,9 @@
 #include "utilities.h"
 #include "html_Lines.h"
 #include "SamePeopleInfo.h"
-
+#include <stdio.h>
+#include <wchar.h>
+#include "FilterLoop.h"
 // lekérdezett mezõk a people táblából
 enum
 {
@@ -33,10 +35,12 @@ enum
 enum
 {
 	S_CNT = 0,
+	S_LOOP, 
 	S_GROUP,
 	S_MATCH,
 	S_GROUP2,
 	S_STATUS,
+	S_RGBCOLOR,
 	S_LINE,
 	S_UNITED,
 	S_GENERATION,
@@ -144,7 +148,7 @@ házastársak\n\n\
 	m_colors.Add( L"aqua" );			//0,255,255
 	m_colors.Add( L"lightGray" );		//211,211,211
 
-	m_rgb[0] = 0;
+	m_rgb[0] = RGB( 255, 255, 255 );
 	m_rgb[1] = RGB( 127, 255, 212 );
 	m_rgb[2] = RGB( 255, 255, 0 );
 	m_rgb[3] = RGB( 0, 191, 255 );
@@ -154,13 +158,15 @@ házastársak\n\n\
 	m_rgb[7] = RGB( 255, 255, 224 );
 	m_rgb[8] = RGB( 0,255,255 );
 	m_rgb[9] = RGB( 211,211,211 );
-	
+
+	sWHITE.Format( L"%u", RGB(255,255,255) );
+
 	m_name = L"";   // ha csak egy embert akarunk vizsgálni, itt megadhatjuk a nevét
 	m_contract	= false;
 	m_contract	= true;			// végrehajtsa-e az összevonásokat	
 	m_azonos	= 1;			// az azonos adatpárok elõírt száma
 	nItem		= 0;
-	m_loop		= 1;
+	m_loopMax   = 2;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CSamePeople::~CSamePeople()
@@ -173,6 +179,7 @@ void CSamePeople::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_LIST, m_ListCtrl);
 	DDX_Control(pDX, IDC_SEARCH_TXT, colorSearch);
 	DDX_Text(pDX, IDC_SEARCH, m_search);
+	DDX_Control(pDX, IDC_NEXT, colorNext);
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CSamePeople, CDialogEx)
@@ -191,6 +198,8 @@ BEGIN_MESSAGE_MAP(CSamePeople, CDialogEx)
 
 	ON_COMMAND(ID_INFO, &CSamePeople::OnInfo)
 	ON_WM_CTLCOLOR()
+	ON_STN_CLICKED(IDC_NEXT, &CSamePeople::OnClickedNext)
+	ON_COMMAND(ID_FILTER_LOOP, &CSamePeople::OnFilterLoop)
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CSamePeople::OnInitDialog()
@@ -200,68 +209,115 @@ BOOL CSamePeople::OnInitDialog()
 	EASYSIZE_ADD( IDC_CAPTION,	ES_BORDER,	ES_BORDER,	ES_BORDER,		ES_KEEPSIZE,	0 );
 	EASYSIZE_INIT();
 
+	CString fileName;
+	
+	fileName = L"peopleUnited";
+	m_fileSpecTextU = theApp.openTextFile( &textU, fileName, L"w+" );
+
+	fileName = L"peopleDifferent";
+	m_fileSpecTextD = theApp.openTextFile( &textD, fileName, L"w+" );
+
+	CString drive;
+	CString path;
+	CString fname;
+	CString ext;
+	TCHAR* old;
+	TCHAR* renamed;
+
+
 	colorSearch.SetTextColor( theApp.m_colorClick );
+	colorNext.SetTextColor( theApp.m_colorClick );
 	createColumns();
 
-	wndP.Create( NULL, L"Azonos nevû emberek beolvasása..." );
+
+	m_loop = 1;
+
+	wndP.Create( NULL, L"" );
 	wndP.GoModal();
-
-	theApp.setStartTime();
-	openDifferent();
-	openUnited();
-
+	
 	tableLines.clear();
-	vContract.clear();
+	vColor.clear();
 
-	core();
-
-	wndP.DestroyWindow();
-
-	if( vContract.size() )
+	vLoops.clear();
+	while( m_loop <= m_loopMax )
 	{
+		str.Format( L"Azonos emberek bejegyzéseinek összevonása. (%d/%d)", m_loop, m_loopMax );
+		wndP.m_strTitle = str;
+
+		// az aktuáli sadatbázis fájlok másolása *P.db fájlba
+		splitFilespec( theApp.m_databaseSpec, &drive, &path,  &fname, &ext );
+		str.Format( L"%s:%s\\%sP.%s", drive, path, fname, ext );
+		CopyFile( theApp.m_databaseSpec, str, false );
+		theApp.m_databaseSpec = str;
+		str.Format( L"%s:%s\\%sP_blob.%s", drive, path, fname, ext );
+		CopyFile( theApp.m_blobSpec, str, false );
+		theApp.openDatabase();
+
+		theApp.setStartTime();
+		openDifferent();
+		openUnited();
+
+		vContract.clear();
+	
+
+		core();
+
+		m_command.Format( L"PRAGMA user_version='%d'", vContract.size() );
+		theApp.execute( m_command );
+
+		
+
 		if( m_contract )
 		{
-			theApp.m_user_version = theApp.m_user_version * 10 + 2;
-			m_command.Format( L"PRAGMA user_version='%d'", theApp.m_user_version );
-			theApp.execute( m_command );
-
 			if( vContract.size() > 200 )
 			{
 #ifndef _DEBUG
-				wndP.SetText( L"Adatbázis tömörítése..." );
+				str.Format( L"(5/5) Adatbázis tömörítése" ); 
+				wndP.SetText( str );
 #endif
-				theApp.execute( L"VACUUM");
+//				theApp.execute( L"VACUUM");
 			}
 		}
-		str.Format( L"%d bejegyzés került összevonásra.", vContract.size() );
-		fwprintf( fU, L"\n\n%s\n\n", str );
-	
-		fwprintf( fU, L"Eltelt idõ: %s<br><br>", theApp.get_time_elapsed() );
+		if( !vContract.size() ) break;
+
 		fclose( fU );
-
-		fwprintf( fD, L"Eltelt idõ: %s<br><br>", theApp.get_time_elapsed() );
 		fclose( fD );
-
-		GetDlgItem( IDC_CAPTION )->SetWindowTextW( str );
-
-		m_ListCtrl.SetItemCountEx( nItem + 1 );
-		m_ListCtrl.AttachDataset( &tableLines );
-		
-//		OnHtml();
-		
-		CDialogEx::ShowWindow( SW_SHOW );
+		vLoops.push_back( m_loop );
+		++m_loop;
 	}
-	else
+	if( m_contract )
 	{
-		fclose( fU );
-		str = L"Nincs összevonható bejegyzés!";
-		fwprintf( fD, L"%s\n\n", str );
-		fwprintf( fD, L"Eltelt idõ: %s<br><br>", theApp.get_time_elapsed() );
-		fclose( fD );
-		theApp.showHtmlFile( differentSpec );
-		AfxMessageBox( L"Nincs több összevonanható bejegyzés!" );		
-		CDialogEx::OnOK();
+		if( vContract.size() > 200 )
+		{
+#ifndef _DEBUG
+			str.Format( L"(5/5) Adatbázis tömörítése" ); 
+			wndP.SetText( str );
+#endif
+//			theApp.execute( L"VACUUM");
+		}
+		
 	}
+	wndP.DestroyWindow();
+
+	if( tableLines.size() )
+	{
+		m_command.Format( L"INSERT INTO contracted ( code1, filespec) VALUES ( 1, '%s')", m_fileSpecTextU );
+		if( !theApp.execute( m_command ) ) return false;
+
+		m_command.Format( L"INSERT INTO contracted ( code1, filespec) VALUES ( 2, '%s')", m_fileSpecTextD );
+		if( !theApp.execute( m_command ) ) return false;
+	}
+
+	fclose( fU );
+	fclose( fD );
+	fclose( textU );
+	fclose( textD );
+	m_ListCtrl.SetItemCountEx( tableLines.size() + 1  );
+	m_ListCtrl.AttachDataset( &tableLines );
+
+
+
+
 	return true;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -273,78 +329,69 @@ void CSamePeople::core()
 	CString firstName;
 	bool	first = true;;
 	int		pos;
-	int		loop = 0;
-
-
-	while( loop < m_loop )
-	{
-
-		++loop;
-		wndP.m_strTitle = L"Azonos nevû emberek bejegyzéseinek vizsgálata és összevonása.";
 
 #ifndef _DEBUG
 
-		str = L"Azonos nevû emberek bejegyzéseinek összegyûjtése...";
-		wndP.SetText( str );
+	str.Format( L"(1/5) Azonos nevû emberek bejegyzéseinek összegyûjtése..." );
+	wndP.SetText( str );
 #endif
 			
-		m_command.Format( L"SELECT %s FROM people ORDER BY last_name, first_name, source", p_fields );
-		if( !query( m_command ) ) return;
+	m_command.Format( L"SELECT %s FROM people ORDER BY last_name, first_name, source", p_fields );
+	if( !query( m_command ) ) return;
 
-		wndP.SetRange( 0, m_recordset->RecordsCount() );
-		wndP.SetPos(0 );
-		wndP.SetStep(1 );
+	wndP.SetRange( 0, m_recordset->RecordsCount() );
+	wndP.SetPos(0 );
+	wndP.SetStep(1 );
 
-		CString nameR;
-		vPeople.clear();
-		for( UINT i = 0; i < m_recordset->RecordsCount()-1; ++i )
-		{
-			lastName  = m_recordset->GetFieldString( P_LAST_NAME );
-			if( lastName.IsEmpty() ) goto cont;
+	CString nameR;
+	vPeople.clear();
+	for( UINT i = 0; i < m_recordset->RecordsCount()-1; ++i )
+	{
+		lastName  = m_recordset->GetFieldString( P_LAST_NAME );
+		if( lastName.IsEmpty() ) goto cont;
 
-			firstName = m_recordset->GetFieldString( P_FIRST_NAME );
-
-			name.Format( L"%s %s", lastName, sepFirstName( firstName ) );
-			if( name.TrimRight().IsEmpty() ) goto cont;
+		firstName = m_recordset->GetFieldString( P_FIRST_NAME );
+		name.Format( L"%s %s", lastName, sepFirstName( firstName ) );
+		if( name.TrimRight().IsEmpty() ) goto cont;
 			
-			if( !m_name.IsEmpty() )
-			{
-				nameR = name.Left( m_name.GetLength() );	
-				if( nameR != m_name ) goto cont;
-			}
-
-			if( name == namePrev )
-			{
-				if( first )
-				{
-					putPeople( name, i-1 );
-					first = false;
-				}
-				putPeople( name, i );
-			}
-			else if( vPeople.size() )
-			{
-				processPeople();
-				vPeople.clear();
-				first = true;
-			}
-			namePrev = name;
-cont:		m_recordset->MoveNext();
-			wndP.StepIt();
-			wndP.PeekAndPump();
-			if (wndP.Cancelled()) break;
-		}
-		if( vPeople.size() )
-			processPeople();
-
-		if( m_contract )
+		if( !m_name.IsEmpty() )
 		{
-			theApp.execute( L"BEGIN" );
-			contractFull();
-			deleteMarriages();
-			theApp.execute( L"COMMIT" );
+			nameR = name.Left( m_name.GetLength() );	
+			if( nameR != m_name ) goto cont;
 		}
+
+		if( name == namePrev )
+		{
+			if( first )
+			{
+				putPeople( name, i-1 );
+				first = false;
+			}
+			putPeople( name, i );
+		}
+		else if( vPeople.size() )
+		{
+			processPeople();
+			vPeople.clear();
+			first = true;
+		}
+		namePrev = name;
+cont:	m_recordset->MoveNext();
+		wndP.StepIt();
+		wndP.PeekAndPump();
+		if (wndP.Cancelled()) break;
 	}
+	if( vPeople.size() )
+		processPeople();
+
+	if( m_contract )
+	{
+		theApp.execute( L"BEGIN" );
+		contractFull();
+		deleteMarriages();
+		theApp.execute( L"COMMIT" );
+	}
+
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSamePeople::putPeople( CString name, UINT i )
@@ -739,7 +786,7 @@ void CSamePeople::contractFull()
 
 
 #ifndef _DEBUG
-	str.Format( L"Törlendõ-megtartandó azonosítók korrigálása..." );
+	str.Format( L"(2/5) Törlendõ-megtartandó azonosítók korrigálása..." );
 	wndP.SetText( str );
 #endif
 	wndP.SetRange( 0, vContract.size() );
@@ -767,7 +814,8 @@ void CSamePeople::contractFull()
 
 
 #ifndef _DEBUG
-	wndP.SetText( L"Törlés...");
+	str.Format( L"(3/5) Emberek fölösleges bejegyzéseinek törlése..." ); 
+	wndP.SetText( str );
 #endif
 	wndP.SetRange( 0, vContract.size() );
 	wndP.SetPos(0 );
@@ -841,7 +889,7 @@ void CSamePeople::deleteMarriages()
 {
 
 #ifndef _DEBUG
-	str.Format( L"Házasságok ellenõrzése és törlése..." );
+	str.Format( L"(4/5 Házasságok ellenõrzése és a fölöslegesek törlése..." );
 	wndP.SetText( str );
 #endif
 	// A legkisebb szerepkódú házasságot tartja meg ( ORDER BY ... source )
@@ -878,6 +926,12 @@ void CSamePeople::deleteMarriages()
 void CSamePeople::listPeople()
 {
 
+	int status;
+	int	group;
+	int colorIndex;
+	int	rgbColor;
+
+
 	int index;
 	int z;
 	SAMENAMES x;
@@ -888,15 +942,15 @@ void CSamePeople::listPeople()
 		x = vPeople.at(i);
 
 		if( x.group2 == 0 )
-			ident.Format( L"%2d %2d    %2d ", x.group, x.match, x.status );
+			ident.Format( L"%2d %2d %2d    %2d ", m_loop, x.group, x.match, x.status );
 		else
-			ident.Format( L"%2d %2d %2d %2d ", x.group, x.match, x.group2, x.status );
+			ident.Format( L"%2d %2d %2d %2d %2d ", m_loop, x.group, x.match, x.group2, x.status );
 
 		if( x.status == 1 )
-			ident.Format( L"%2d       %2d ", x.group, x.status );
+			ident.Format( L"%2d %2d       %2d ", m_loop, x.group, x.status );
 
 		if( !x.group )
-			ident = L"            ";
+			ident = L"               ";
 
 
 		str.Format( L"\
@@ -910,7 +964,7 @@ x.rowid,  x.name,   x.birth,  x.death,\
 x.rowidF, x.father, x.birthF, x.deathF,\
 x.rowidM, x.mother, x.birthM, x.deathM,\
 x.rowidS, x.spouses\
-);
+); 
 		ident += str;
 		if( m_contracted )
 		{
@@ -937,18 +991,77 @@ x.rowidS, x.spouses\
 	else
 		fwprintf( fD, L"\n" );
 
-	
+
+
+
+	for( UINT i = 0; i < vPeople.size(); ++i )
+	{
+		x = vPeople.at(i);
+		
+		switch( x.status )
+		{
+		case 0:
+			colorIndex = 0;					// fehér
+			break;
+		case 1:
+			colorIndex = x.group % 10;		// váltakozó színes
+			break;
+		case -1:
+			colorIndex = 9;					// szürke
+			break;
+		}
+
+		rgbColor = m_rgb[colorIndex];
+
+		str.Format( L"\
+%d\t%d\t%d\t%d\t%d\t%d\t%d\t\
+%s\t%s\t%s\t%s\t\
+%s\t%s\t%s\t%s\t\
+%s\t%s\t%s\t%s\t\
+%s\t%s\t%s\t%s\t\
+%s\t%s\t%s\t\n",\
+colorIndex, m_loop, x.group, x.match, x.group2, x.status, rgbColor,\
+x.line, x.united, x.generation, x.source,\
+x.rowid,  x.name,   x.birth,  x.death,\
+x.rowidF, x.father, x.birthF, x.deathF,\
+x.rowidM, x.mother, x.birthM, x.deathM,\
+x.rowidS, x.spouses, x.lineF\
+);
+
+		if( m_contracted )
+			fwprintf( textU, str );
+		else
+			fwprintf( textD, str );
+	}
+	if( m_contracted )
+		emptyLine( textU, m_loop );
+	else
+		emptyLine( textD, m_loop );
+
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CSamePeople::emptyLine( FILE* fl, int loop )
+{
+	UINT i;
+	fwprintf( fl, L"\t%d\t", loop );
+	for( i = 2; i < S_RGBCOLOR; i++ )	// egy üres sor az azonos nevû emberek után
+		fwprintf( fl, L"\t" );
+	fwprintf( fl, sWHITE );						// RGB color white
+	for( ; i < m_columnsCount; i++ )  // eg yüres sor az azonos nevû emberek után
+		fwprintf( fl, L"\t" );
+	fwprintf( fl, L"\n" );
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 void CSamePeople::printRef( int group )
 {
 		str.Format( L"\
-%2d %2s %9s %2s %1s %1s \
+%2d %2d %2s %9s %2s %1s %1s \
 %-39s %12s %12s \
 %8s %-30s %12s %12s \
 %8s %-30s %12s %12s \
 %8s %s",\
-group, L" ", L" ", L" ", r.generation, L" ",
+m_loop, group, L" ", L" ", L" ", r.generation, L" ",
 L" ", r.birth, r.death,
 L" ", r.father, r.birthF, r.deathF,
 L" ", r.mother, r.birthM, r.deathM,
@@ -956,7 +1069,9 @@ L" ", r.spouses
 );
 	fwprintf( fU, L"<span style=\"background:DeepPink\">%s</span>\n", str );
 
+	fwprintf( textU, str );
 }
+*/
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSamePeople::resetRef()
 {
@@ -1011,7 +1126,7 @@ void CSamePeople::setRef( int i )
 void CSamePeople::openUnited()
 {
 	CString fileName;
-	fileName.Format( L"peopleUnited_%d", theApp.m_user_version );
+	fileName.Format( L"peopleUnited_%d", m_loop );
 	unitedSpec = theApp.openHtmlFile( &fU, fileName, L"w+" );
 
 	createHead( L"AZONOS NEVÛ EMBEREK, AKIK AZONOSAK IS, EZÉRT BEJEGYZÉSEIK ÖSSZEVONHATÓAK" );
@@ -1042,7 +1157,7 @@ L"rowid-házastársak---------------"\
 void CSamePeople::openDifferent()
 {
 	CString fileName;
-	fileName.Format( L"peopleDifferent_%d", theApp.m_user_version );
+	fileName.Format( L"peopleDifferent_%d", m_loop );
 	differentSpec = theApp.openHtmlFile( &fD, fileName, L"w+" );
 
 	createHead( L"AZONOS NEVÛ EMBEREK, AKIK KÜLÖNBÖZNEK EGYMÁSTÓ" );
@@ -1075,14 +1190,13 @@ void CSamePeople::createHead( CString title  )
 <BODY>\n\
 <center>%s</center><br><br>\n\n\
 <pre>\n\
-%-21s %s (%d)<br>\
+%-21s %s<br>\
 %-21s %s<br>\
 %-21s %d<br><br>\
 ",
 title,\
 L"Adatbázis:",\
 theApp.m_databaseSpec,\
-theApp.m_user_version,\
 L"Lista készült:",\
 theApp.getPresentDateTime(),\
 L"Egyezések min. száma:",\
@@ -1140,10 +1254,12 @@ void CSamePeople::createColumns()
 	m_ListCtrl.SetExtendedStyle(m_ListCtrl.GetExtendedStyle()| LVS_EX_GRIDLINES );
 	
 	m_ListCtrl.InsertColumn( S_CNT,				L"cnt",			LVCFMT_RIGHT,	 20,-1,COL_HIDDEN);
+	m_ListCtrl.InsertColumn( S_LOOP,			L"loop",		LVCFMT_RIGHT,	 30,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( S_GROUP,			L"gr",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( S_MATCH,			L"m#",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( S_GROUP2,			L"gr2",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( S_STATUS,			L"st",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( S_RGBCOLOR,		L"rgb",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( S_LINE,			L"line#",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( S_UNITED,			L"U",			LVCFMT_LEFT,	 20,-1,COL_NUM );
 	m_ListCtrl.InsertColumn( S_SOURCE,			L"S",			LVCFMT_RIGHT,	 20,-1,COL_NUM);
@@ -1166,6 +1282,7 @@ void CSamePeople::createColumns()
 	m_columnsCount	= m_ListCtrl.GetHeaderCtrl()->GetItemCount();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 void CSamePeople::fillTable()
 {
 	int group;
@@ -1179,6 +1296,9 @@ void CSamePeople::fillTable()
 		group = vPeople.at(i).group;
 
 		nItem = m_ListCtrl.InsertItem( nItem, vPeople.at(i).sex_id );
+
+		str.Format( L"%d", m_loop );
+		m_ListCtrl.SetItemText( nItem, S_LOOP, str );
 
 		str.Format( L"%d", group );
 		m_ListCtrl.SetItemText( nItem, S_GROUP, str );
@@ -1232,6 +1352,7 @@ void CSamePeople::fillTable()
 //    m_ListCtrl.SetColumnWidth(i,LVSCW_AUTOSIZE_USEHEADER);
 
 }
+*/
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSamePeople::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
 {
@@ -1254,11 +1375,13 @@ void CSamePeople::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
 	case CDDS_ITEMPREPAINT|CDDS_SUBITEM:
 		nItem	= pLVCD->nmcd.dwItemSpec;
 		nCol	= pLVCD->iSubItem;
-		iData   = vColor.at(nItem);
-		if( iData  )
-		{
-			pLVCD->clrTextBk = m_rgb[iData];
-		}
+//		iData   = vColor.at(nItem);
+//		iData   = _wtoi( tableLines.at( nItem*m_columnsCount + S_STATUS ) );
+//		if( iData  )
+//		{
+//			pLVCD->clrTextBk = m_rgb[iData];
+			pLVCD->clrTextBk =  _wtoi( tableLines.at( nItem*m_columnsCount + S_RGBCOLOR ) );
+//		}
 		*pResult = CDRF_DODEFAULT;
 		break;
 	}
@@ -1285,7 +1408,23 @@ BOOL CSamePeople::PreTranslateMessage(MSG* pMsg)
 	return CWnd::PreTranslateMessage(pMsg);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CSamePeople::OnClickedNext()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	if( nItem == -0 )
+	{
+		AfxMessageBox( L"Nincs kijelölve sor!" );
+		return;
+	}
+	keress( nItem + 1 );
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSamePeople::OnClickedSearchTxt()
+{
+	keress( 0 );
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CSamePeople::keress( int start )
 {
 	CString	search;
 	GetDlgItem( IDC_SEARCH )->GetWindowText( search );
@@ -1295,21 +1434,54 @@ void CSamePeople::OnClickedSearchTxt()
 		return;
 	}
 
-	int		n		= m_ListCtrl.GetItemCount();
+	CProgressWnd wndProgress(NULL, L"Folyik a keresés.." ); 
+	wndProgress.GoModal();
+	wndProgress.SetRange(0, m_ListCtrl.GetItemCount() );
+	wndProgress.SetPos(0);
+	wndProgress.SetStep(1);
+
+
+
+	int		itemCnt	= m_ListCtrl.GetItemCount();
 	int		length	= search.GetLength();
+	int		nItem;
+	int		topIndex = m_ListCtrl.GetTopIndex();
 	CString	str;
 
 	theApp.unselectAll( &m_ListCtrl );
-	for( int nItem = 0; nItem < n; ++nItem )
+
+	for( nItem = start; nItem < itemCnt-1; ++nItem )
 	{
 		str = m_ListCtrl.GetItemText( nItem, S_NAME );
 		str = str.Left(length);						// az aktuális search string hosszával azonos hosszúság leválasztása
-		if( str == search )
+		if( str == search )	break;
+		wndProgress.StepIt();
+		wndProgress.PeekAndPump();
+		if (wndProgress.Cancelled()) break;
+	}
+	wndProgress.DestroyWindow();
+
+	if( nItem < itemCnt-1 )			// megtalálta a keresett embert,. aki az nItem-1 sorban van
+	{
+		m_ListCtrl.EnsureVisible( nItem, FALSE );
+
+		if( nItem > topIndex )   // lefele megy, fel kell hozni a tábla tetejére a megtalált sort
 		{
-			m_ListCtrl.SetItemState( nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED );
-			m_ListCtrl.EnsureVisible( nItem, FALSE );
-			break;
+			int countPP = m_ListCtrl.GetCountPerPage();
+			int nItemEV	= nItem - 1 + countPP;			// alaphelyzet: a kijelölt sor az ablak tetején
+
+			if( nItemEV > itemCnt - 1 )					// már nem lehet az ablak tetejére hozni, mert nincs annyi adat
+				nItemEV = itemCnt - 1;
+
+			m_ListCtrl.EnsureVisible( nItemEV, FALSE );
 		}
+		m_ListCtrl.SetItemState( nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED );
+		Invalidate( false );
+	}
+	else
+	{
+		str.Format( L"%s nevû embert nem találtam!", search );
+		AfxMessageBox( str );
 	}
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1417,14 +1589,18 @@ void CSamePeople::OnInfo()
 void CSamePeople::list()
 {
 	int status;
-	int	group;
+	int group;
 	int colorIndex;
+	int	i;
 
 	
-
 	for( UINT i = 0; i < vPeople.size(); ++i )
 	{
-		push( vPeople.at(i).sex_id );
+		str.Format( L"%d", i+1 );
+		push( str );
+
+		str.Format( L"%d", m_loop );
+		push( str );
 
 		group = vPeople.at(i).group;
 		str.Format( L"%d", group );
@@ -1437,31 +1613,6 @@ void CSamePeople::list()
 		push( str );
 
 		status = vPeople.at(i).status;
-		str.Format( L"%d", status );
-		push( str );
-
-		push( vPeople.at(i).line );
-		push( vPeople.at(i).united );
-		push( vPeople.at(i).generation );
-		push( vPeople.at(i).source );
-
-		push( vPeople.at(i).rowid );
-		push( vPeople.at(i).name );
-		push( vPeople.at(i).birth );
-		push( vPeople.at(i).death );
-		push( vPeople.at(i).rowidF );
-		push( vPeople.at(i).father );
-		push( vPeople.at(i).birthF );
-		push( vPeople.at(i).deathF );
-		push( vPeople.at(i).rowidM );
-		push( vPeople.at(i).mother );
-		push( vPeople.at(i).birthM );
-		push( vPeople.at(i).deathM );
-		push( vPeople.at(i).rowidS );
-		push( vPeople.at(i).spouses );
-		push( vPeople.at(i).lineF );
-
-		
 		switch( status )
 		{
 		case 0:
@@ -1474,23 +1625,70 @@ void CSamePeople::list()
 			colorIndex = 9;
 			break;
 		}
-		vColor.push_back( colorIndex );
-		/*
-		m_ListCtrl.SetItemData( nItem, 0 );
-		if( status == 1 )
-		{
-			colorIndex = group % 10;
-			m_ListCtrl.SetItemData( nItem, colorIndex );
-		}
-		else if( status == -1 )
-			m_ListCtrl.SetItemData( nItem, 9 );
-			*/
+		str.Format( L"%d", status );
+		push( str );
 
+		str.Format( L"%u", m_rgb[ colorIndex ] );
+		push( str );
+
+		push( vPeople.at(i).line );
+		push( vPeople.at(i).united );
+		push( vPeople.at(i).generation );
+		push( vPeople.at(i).source );
+
+		push( vPeople.at(i).rowid );
+		push( vPeople.at(i).name );
+		push( vPeople.at(i).birth );
+		push( vPeople.at(i).death );
+		
+		push( vPeople.at(i).rowidF );
+		push( vPeople.at(i).father );
+		push( vPeople.at(i).birthF );
+		push( vPeople.at(i).deathF );
+	
+		push( vPeople.at(i).rowidM );
+		push( vPeople.at(i).mother );
+		push( vPeople.at(i).birthM );
+		push( vPeople.at(i).deathM );
+		
+		push( vPeople.at(i).rowidS );
+		push( vPeople.at(i).spouses );
+		push( vPeople.at(i).lineF );
+
+/*		
+		switch( status )
+		{
+		case 0:
+			colorIndex = 0;
+			break;
+		case 1:
+			colorIndex = group % 10;
+			break;
+		case -1:
+			colorIndex = 9;
+			break;
+		}
+*/
+		vColor.push_back( colorIndex );
 		++nItem;
 	}
+
+/*
 	vColor.push_back( 0 );
 	for( int i = 0; i < m_columnsCount; i++ )  // eg yüres sor az azonos nevû emberek után
 		push( L" " );
+*/
+/*	
+		S_STATUS,
+	S_RGBCOLOR,
+	S_LINE,
+*/
+	for( i = 0; i < S_RGBCOLOR; i++ )	// egy üres sor az azonos nevû emberek után
+		push( L" " );
+	push( sWHITE );						// RGB color white
+	for( ; i < m_columnsCount-1; i++ )  // eg yüres sor az azonos nevû emberek után
+		push( L" " );
+
 	++nItem;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1506,12 +1704,14 @@ void CSamePeople::push( CString item )
 
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-HBRUSH CSamePeople::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
+void CSamePeople::OnFilterLoop()
 {
-	HBRUSH hbr = CDialogEx::OnCtlColor(pDC, pWnd, nCtlColor);
+	int	loop;
+	CFilterLoop dlg;
+	dlg.vLoops = &vLoops; 
+	if( dlg.DoModal() == IDCANCEL ) return;
+	loop = dlg.m_loop;
 
-	// TODO:  Change any attributes of the DC here
-
-	// TODO:  Return a different brush if the default is not desired
-	return hbr;
+	str.Format( L"%d", loop );
+	AfxMessageBox( str );
 }

@@ -1,5 +1,8 @@
 #pragma once
-#define VERSION  L"1.3.17"
+#define VERSION L"1.3.18"
+
+
+//#define VERSION  L"1.3.17"
 // Házasságok
 
 // #define VERSION  L"1.3.16"

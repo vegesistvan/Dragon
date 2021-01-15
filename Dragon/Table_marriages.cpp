@@ -60,12 +60,13 @@ enum
 	P_UNITED,
 };
 
-// ListCtrl oszlopok
+// ListCtrl oszlopok a több házastárs
 enum
 {
 	L_LINENUMBER = 0,
 	L_ORDER, 
 	L_DATE,
+	L_SOURCEM,
 	L_SOURCE,
 	L_ROWID,
 	L_NAME,
@@ -135,6 +136,7 @@ void CTableMarriages::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_LIST, m_ListCtrl);
 	DDX_Control(pDX, IDC_KERES, colorKeres);
+	DDX_Control(pDX, IDC_NEXT, colorNext);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CTableMarriages, CDialogEx)
@@ -166,6 +168,7 @@ BEGIN_MESSAGE_MAP(CTableMarriages, CDialogEx)
 	ON_STN_CLICKED(IDC_KERES, &CTableMarriages::OnClickedKeres)
 	ON_COMMAND(ID_MOREMARRIAGES, &CTableMarriages::OnMoreMarriages)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST, &CTableMarriages::OnCustomdrawList)
+	ON_STN_CLICKED(IDC_NEXT, &CTableMarriages::OnClickedNext)
 END_MESSAGE_MAP()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CTableMarriages::OnInitDialog()
@@ -183,6 +186,8 @@ BOOL CTableMarriages::OnInitDialog()
 	enableMenu( MF_GRAYED );
 
 	colorKeres.SetTextColor( theApp.m_colorClick ); 
+	colorNext.SetTextColor( theApp.m_colorClick );
+
 	m_command.Format( L"SELECT count(*) FROM marriages" );
 	if( !theApp.query( m_command ) ) return false;
 
@@ -874,8 +879,25 @@ void CTableMarriages::OnEditGahtml()
 	dlg.DoModal();
 
 }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTableMarriages::OnClickedNext()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	if( nItem == -0 )
+	{
+		AfxMessageBox( L"Nincs kijelölve sor!" );
+		return;
+	}
+
+	keress( nItem + 1 );
+}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTableMarriages::OnClickedKeres()
+{
+	keress( 0 );
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTableMarriages::keress( int start )
 {
 	CString	search;
 	GetDlgItem( IDC_SEARCH )->GetWindowText( search );
@@ -886,9 +908,10 @@ void CTableMarriages::OnClickedKeres()
 	}
 
 
-	int		n				= m_ListCtrl.GetItemCount();
-	int		length			= search.GetLength();
+	int		itemCnt	= m_ListCtrl.GetItemCount();
+	int		length	= search.GetLength();
 	int		nItem;
+	int		topIndex = m_ListCtrl.GetTopIndex();
 	CString	str;
 
 	theApp.unselectAll( &m_ListCtrl );
@@ -899,25 +922,45 @@ void CTableMarriages::OnClickedKeres()
 			AfxMessageBox( L"Rendezni kell az oszlopot, amelyben keresni akarsz!" );
 			return;
 		}
-		for( nItem = 0; nItem < n; ++nItem )
-		{
-			str = m_ListCtrl.GetItemText( nItem, m_orderix);
-			str = str.Left(length);						// az aktuális search string hosszával azonos hosszúság leválasztása
-			if( str == search )	break;
-		}
+	
 
 	}
 	else
 	{
-		for( nItem = 0; nItem < n; ++nItem )
-		{
-			str = m_ListCtrl.GetItemText( nItem, L_NAME );
-			str = str.Left(length);						// az aktuális search string hosszával azonos hosszúság leválasztása
-			if( str == search )	break;
-		}
+		m_orderix = L_NAME;	
 	}
-	m_ListCtrl.SetItemState( nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED );
-	m_ListCtrl.EnsureVisible( nItem, FALSE );
+	for( nItem = start; nItem < itemCnt-1; ++nItem )
+	{
+		str = m_ListCtrl.GetItemText( nItem, m_orderix);
+		str = str.Left(length);						// az aktuális search string hosszával azonos hosszúság leválasztása
+		if( str == search )	break;
+	}
+
+	
+
+	if( nItem < itemCnt-1 )			// megtalálta a keresett embert,. aki az nItem-1 sorban van
+	{
+		m_ListCtrl.EnsureVisible( nItem, FALSE );
+
+		if( nItem > topIndex )   // lefele megy, fel kell hozni a tábla tetejére a megtalált sort
+		{
+			int countPP = m_ListCtrl.GetCountPerPage();
+			int nItemEV	= nItem - 1 + countPP;			// alaphelyzet: a kijelölt sor az ablak tetején
+
+			if( nItemEV > itemCnt - 1 )					// már nem lehet az ablak tetejére hozni, mert nincs annyi adat
+				nItemEV = itemCnt - 1;
+
+			m_ListCtrl.EnsureVisible( nItemEV, FALSE );
+		}
+		m_ListCtrl.SetItemState( nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED );
+		Invalidate( false );
+	}
+	else
+	{
+		str.Format( L"%s nevû embert nem találtam!", search );
+		AfxMessageBox( str );
+	}
+
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CTableMarriages::PreTranslateMessage(MSG* pMsg)
@@ -954,6 +997,7 @@ void CTableMarriages::OnMoreMarriages()
 	m_ListCtrl.InsertColumn( L_LINENUMBER,	L"line#",		LVCFMT_RIGHT,	 80,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_ORDER,		L"O",			LVCFMT_RIGHT,	 20,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_DATE,		L"esküvõ",		LVCFMT_RIGHT,	 80,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_SOURCEM,		L"M",			LVCFMT_RIGHT,	 20,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_SOURCE,		L"S",			LVCFMT_RIGHT,	 20,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_ROWID,		L"rowid",		LVCFMT_RIGHT,	 80,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_NAME,		L"név",			LVCFMT_LEFT,	200,-1,COL_TEXT);
@@ -972,21 +1016,13 @@ void CTableMarriages::OnMoreMarriages()
 
 	nItem = 0;
 	m_cnt = 0;
-	marriages();
 
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTableMarriages::marriages()
-{
-	CString fileName;
 	CString title(L"Emberek, akiknek több házastársuk volt" ); 
-
-	
 	wndP.Create( NULL, title );
 	wndP.GoModal();
 	
-	fileName += L"peopleHaveUnorderedSpouses";
+	CString fileName;
+	fileName += L"peopleHavingMoreSpouses";
 	fileSpec = theApp.openHtmlFile( &fh1, fileName, L"w+" );
 	htmlHeader( title );
 
@@ -1030,13 +1066,15 @@ void CTableMarriages::marriages()
 
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// vSpouse1 vektorban a férj
+// vSpouse2 vektorban a feleségek
+
 void CTableMarriages::collectHusband()
 {
 	CString spouse1_id;
 	CString spouse2_id;
 
-	UINT i;
-	bool	volt = false;
+	bool	volt = false;  // true: ha a férjt már eltettük vSpouse1-be
 	
 	SPOUSE11 husband;
 	SPOUSE21 wifes;
@@ -1049,11 +1087,12 @@ void CTableMarriages::collectHusband()
 	wndP.SetRange( 0, m_recordset->RecordsCount()/2-1 );
 	wndP.SetPos(0 );
 	wndP.SetStep(1 );
-	for( i = 0; i < m_recordset->RecordsCount()-1; ++i )
+	for( UINT i = 0; i < m_recordset->RecordsCount()-1; ++i )
 	{
 		spouse1_id = m_recordset->GetFieldString( MARRIAGES_SPOUSE1_ID );
 		m_recordset->MoveNext();
 
+		// ha volt == false, nem teszi el a férjet, csak akkor, ha a következõ is õ (rowid azonos)
 		if( spouse1_id == m_recordset->GetFieldString( MARRIAGES_SPOUSE1_ID ) )
 		{
 			if( !volt )
@@ -1063,12 +1102,13 @@ void CTableMarriages::collectHusband()
 				volt = true;
 			}
 			m_recordset->MovePrevious();
-			wifes.rowidS	= spouse1_id;
+			wifes.rowidS	= spouse1_id;   // feleség férjének rowid-je
 			wifes.rowid	= m_recordset->GetFieldString( MARRIAGES_SPOUSE2_ID );
 
 			wifes.date	= m_recordset->GetFieldString( MARRIAGES_DATE );
 			wifes.place	= m_recordset->GetFieldString( MARRIAGES_PLACE );
 			wifes.order	= m_recordset->GetFieldString( MARRIAGES_ORDERWIFE );
+			wifes.sourceM = m_recordset->GetFieldString( MARRIAGES_SOURCE );	
 		
 			vSpouse2.push_back( wifes );
 			m_recordset->MoveNext();
@@ -1083,6 +1123,7 @@ void CTableMarriages::collectHusband()
 
 				wifes.date	= m_recordset->GetFieldString( MARRIAGES_DATE );
 				wifes.place	= m_recordset->GetFieldString( MARRIAGES_PLACE );
+
 				wifes.order	= m_recordset->GetFieldString( MARRIAGES_ORDERWIFE );
 		
 				vSpouse2.push_back( wifes );
@@ -1097,6 +1138,9 @@ void CTableMarriages::collectHusband()
 	}
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Nõk házasságai:
+// vSpouse1 vektorban a nõ
+// vSpouse2 vektorban a férjek
 void CTableMarriages::collectWife()
 {
 	CString spouse1_id;
@@ -1135,6 +1179,7 @@ void CTableMarriages::collectWife()
 			husband.date	= m_recordset->GetFieldString( MARRIAGES_DATE );
 			husband.place	= m_recordset->GetFieldString( MARRIAGES_PLACE );
 			husband.order	= m_recordset->GetFieldString( MARRIAGES_ORDERHUSBAND );
+			husband.sourceM	= m_recordset->GetFieldString( MARRIAGES_SOURCE );
 		
 			vSpouse2.push_back( husband );
 			m_recordset->MoveNext();
@@ -1165,6 +1210,7 @@ void CTableMarriages::collectWife()
 	
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// vSpouse1 vektor feltöltése a 'people' táblábólé lekérdezett adatokkal
 void CTableMarriages::fillSpouse1()
 {
 	UINT i;
@@ -1237,6 +1283,7 @@ void CTableMarriages::fillSpouse1()
 	}
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// vSpouse2 vektor feltöltése a 'people' táblábólé lekérdezett adatokkal
 void CTableMarriages::fillSpouse2()
 {
 	UINT i;
@@ -1304,29 +1351,6 @@ void CTableMarriages::fillSpouse2()
 		wndP.PeekAndPump();
 		if (wndP.Cancelled()) break;
 	}
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTableMarriages::htmlHeader( CString title )
-{
-	fwprintf( fh1, L"<HEAD>\n" );
-	fwprintf( fh1, L"<style>\n" );
-	fwprintf( fh1, L"</style>\n" );
-	fwprintf( fh1, L"</HEAD>\n" );
-	fwprintf( fh1, L"<BODY>\n" );
-	fwprintf( fh1, L"<center>%s</center><br><br>\n\n", title );
-	fwprintf( fh1, m_explanation );
-	fwprintf( fh1, L"<pre>" );
-	fwprintf( fh1, L"\n%-20s %s<br>", L"Adatbázis:", theApp.m_databaseSpec );
-//	fwprintf( fh1, L"%-20s %d<br>", L"Összevonások száma:", theApp._iterationCount );
-	fwprintf( fh1, L"%-20s %s<br><br><br>\n", L"lista készült:", theApp.getPresentDateTime() );
-	
-	str.Format( L"\n%10s %1s %12s %1s %8s %-25s %12s %12s %8s %-20s %12s %12s %8s %-20s %12s %12s<br>\n",\
-L"line#", L"O", L"esküvõ",L"S",\
-L"rowid", L"name", L"születés", L"halál",\
-L"rowid", L"apja", L"születés", L"halál",\
-L"rowid", L"anyja", L"születés", L"halál"\
-);
-	fwprintf( fh1, str );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTableMarriages::listHtml()
@@ -1398,6 +1422,7 @@ void CTableMarriages::fillTable()
 		push( vSpouse1.at(i).linenumber );
 		push( L"" );							// order
 		push( L"" );							// date
+		push( L"" );							// sourceM
 		push( vSpouse1.at(i).source );
 		push( rowid );
 		push( vSpouse1.at(i).name );
@@ -1421,6 +1446,7 @@ void CTableMarriages::fillTable()
 				push( vSpouse2.at(j).linenumber );
 				push( vSpouse2.at(j).order );	
 				push( vSpouse2.at(j).date );	
+				push( vSpouse2.at(j).sourceM );
 				push( vSpouse2.at(j).source );
 				push( vSpouse2.at(j).rowid );
 				push( vSpouse2.at(j).name );
@@ -1450,6 +1476,7 @@ void CTableMarriages::fillTable()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTableMarriages::emptyRow()
 {
+	push( L"" );
 	push( L"" );
 	push( L"" );
 	push( L"" );
@@ -1559,3 +1586,28 @@ void CTableMarriages::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
 	}
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTableMarriages::htmlHeader( CString title )
+{
+	fwprintf( fh1, L"<HEAD>\n" );
+	fwprintf( fh1, L"<style>\n" );
+	fwprintf( fh1, L"</style>\n" );
+	fwprintf( fh1, L"</HEAD>\n" );
+	fwprintf( fh1, L"<BODY>\n" );
+	fwprintf( fh1, L"<center>%s</center><br><br>\n\n", title );
+	fwprintf( fh1, m_explanation );
+	fwprintf( fh1, L"<pre>" );
+	fwprintf( fh1, L"\n%-20s %s<br>", L"Adatbázis:", theApp.m_databaseSpec );
+//	fwprintf( fh1, L"%-20s %d<br>", L"Összevonások száma:", theApp._iterationCount );
+	fwprintf( fh1, L"%-20s %s<br><br><br>\n", L"lista készült:", theApp.getPresentDateTime() );
+	
+	str.Format( L"\n%10s %1s %12s %1s %8s %-25s %12s %12s %8s %-20s %12s %12s %8s %-20s %12s %12s<br>\n",\
+L"line#", L"O", L"esküvõ",L"S",\
+L"rowid", L"name", L"születés", L"halál",\
+L"rowid", L"apja", L"születés", L"halál",\
+L"rowid", L"anyja", L"születés", L"halál"\
+);
+	fwprintf( fh1, str );
+}
+
+

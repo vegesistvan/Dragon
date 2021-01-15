@@ -196,7 +196,6 @@ public:
 	int		m_deletedP;
 	int		m_deletedM;
 	CString m_listFile;
-	int		m_user_version;  // adatbázis user_version-je
 	
 	std::vector<FAMS> v_fams;
 	std::vector<CString> v_tables;
@@ -339,6 +338,7 @@ public:
 
 	afx_msg void OnCheckGenerations();
 	afx_msg void OnMoreMarriages();
+	afx_msg void OnShowSamePeople();
 };
 extern CDragonApp theApp;
 

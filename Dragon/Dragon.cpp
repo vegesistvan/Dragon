@@ -12,6 +12,7 @@
 #include "checkIntegrity.h"
 #include "CheckGenerations.h"
 #include "CheckMarriageOrder.h"
+#include "ContractedPeople.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -31,6 +32,7 @@ ON_COMMAND(ID_EMAIL, &CDragonApp::OnEmail)
 ON_COMMAND(ID_CHECK_INEGRITY, &CDragonApp::OnCheckIntegrity)
 ON_COMMAND(ID_CHECK_GENERATIONS, &CDragonApp::OnCheckGenerations)
 ON_COMMAND(ID_MOREMARRIAGES, &CDragonApp::OnMoreMarriages)
+ON_COMMAND(ID_SHOW_SAME_PEOPLE, &CDragonApp::OnShowSamePeople)
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CDragonApp::CDragonApp()
@@ -195,6 +197,7 @@ BOOL CDragonApp::InitInstance()
 	CDragonDlg dlg;
 	m_pMainWnd = &dlg;
 	dlg.DoModal();
+
 	return FALSE;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -248,7 +251,6 @@ BOOL CDragonApp::openDatabase()
 
 	if( !open.openDatabase() ) return false;
 
-	m_user_version = open.m_user_version;
 	
 	WriteProfileString( L"Settings",L"databasespec", m_databaseSpec ); // jó adatbázis, eltenni
 
@@ -703,3 +705,11 @@ void CDragonApp::OnMoreMarriages()
 	CCheckMarriageOrder dlg;
 	dlg.DoModal();
 }
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDragonApp::OnShowSamePeople()
+{
+	CContractedPeople dlg;
+
+	dlg.DoModal();
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

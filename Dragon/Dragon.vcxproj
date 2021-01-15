@@ -188,10 +188,12 @@
     <ClInclude Include="CheckGenerations.h" />
     <ClInclude Include="checkIntegrity.h" />
     <ClInclude Include="CheckMarriageOrder.h" />
+    <ClInclude Include="ContractedPeople.h" />
     <ClInclude Include="EditComment.h" />
     <ClInclude Include="EditMarriage.h" />
     <ClInclude Include="EditPeople.h" />
     <ClInclude Include="FatherMother.h" />
+    <ClInclude Include="FilterLoop.h" />
     <ClInclude Include="GedcomOut.h" />
     <ClInclude Include="GA_ascendantsChain.h" />
     <ClInclude Include="build_defs.h" />
@@ -303,10 +305,12 @@
     <ClCompile Include="CheckGenerations.cpp" />
     <ClCompile Include="checkIntegrity.cpp" />
     <ClCompile Include="CheckMarriageOrder.cpp" />
+    <ClCompile Include="ContractedPeople.cpp" />
     <ClCompile Include="EditComment.cpp" />
     <ClCompile Include="EditMarriage.cpp" />
     <ClCompile Include="EditPeople.cpp" />
     <ClCompile Include="FatherMother.cpp" />
+    <ClCompile Include="FilterLoop.cpp" />
     <ClCompile Include="Gedcom.cpp" />
     <ClCompile Include="GedcomOut.cpp" />
     <ClCompile Include="app_export.cpp" />

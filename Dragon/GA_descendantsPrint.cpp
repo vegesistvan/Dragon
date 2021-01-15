@@ -286,9 +286,9 @@ void CGaDescendants::printSpRelatives()
 
 
 	if( s.sex_id == MANS )
-		m_command.Format( L"SELECT spouse2_id, orderHusband  FROM marriages WHERE spouse1_id='%s'", s.rowid ); // a házastárs házastársai
+		m_command.Format( L"SELECT spouse2_id, orderWife  FROM marriages WHERE spouse1_id='%s'", s.rowid ); // a házastárs házastársai
 	else
-		m_command.Format( L"SELECT spouse1_id, orderWife FROM marriages WHERE spouse2_id='%s'", s.rowid ); // a házastárs házastársai
+		m_command.Format( L"SELECT spouse1_id, orderHusband FROM marriages WHERE spouse2_id='%s'", s.rowid ); // a házastárs házastársai
 	if( !query4( m_command ) ) return;
 	numOfSpouses = m_recordset4.RecordsCount();
 	if( numOfSpouses > 1 )

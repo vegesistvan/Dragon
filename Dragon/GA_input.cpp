@@ -273,6 +273,7 @@ Az alábbi sorokban ismeretlen keresztnevû embereket talált.<br>\
 	while(file.ReadString(cLine)) 
 	{
 		cLine.Trim();
+//		cLine.Remove( ';' );
 		if( theApp.m_inputCode == UTF8 || theApp.m_inputCode == UTF8BOM )
 			cLine = Utf8ToAnsi( cLine );
 

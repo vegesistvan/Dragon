@@ -33,6 +33,7 @@ typedef struct
 	CString place;
 	CString date;
 	CString order;
+	CString sourceM;
 
 	CString linenumber;
 	CString sex_id;
@@ -63,10 +64,6 @@ class CTableMarriages : public CDialogEx
 public:
 	CTableMarriages(CWnd* pParent = NULL);   // standard constructor
 	virtual ~CTableMarriages();
-
-
-	CWnd* m_pParent;
-// Dialog Data
 	enum { IDD = IDD_TABLE_MARRIAGES };
 
 protected:
@@ -78,16 +75,13 @@ protected:
 	CString m_command;
 	CString str;
 	int		m_orderix;
-
 	int		m_columnsCount;
 
 	CString m_filter;
 	CString m_filterText;
-//	CString m_last_name_h;
-//	CString m_last_name_w;
-
 	CListCtrlEx m_ListCtrl;
-	
+	CWnd* m_pParent;
+
 	void	enableMenu( BOOL flag );
 	void CTableMarriages::azonosMarriages( int list );
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
@@ -108,7 +102,7 @@ protected:
 	CSqliteDBRecordSet*	 m_recordset3;
 	CSqliteDBRecordSet*	 m_recordset4;
 
-	void marriages();
+	
 	void htmlHeader( CString title );
 	void collectHusband();
 	void collectWife();
@@ -117,6 +111,7 @@ protected:
 	void listHtml();
 	void fillTable();
 	void emptyRow();
+	void keress( int start );
 
 	BOOL query( CString command );
 	BOOL query1( CString command );
@@ -130,28 +125,16 @@ protected:
 
 	FILE* fh1;
 
-
 	CString rowid;
 
-/*
-	CString _birth;
-	CString _death;
-	CString _father;
-	CString _mother;
-	CString _spouses;
-
-	CString _info;
-*/
 	CString m_explanation;
 	CString p_fields;
 	int		nItem;
 	int m_cnt;
 	CString m_last_name_h;
 	CString m_last_name_w;
-
-	
 	CColorStatic colorKeres;
-//	BOOL PreTranslateMessage(MSG* pMsg);
+
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnInitDialog();
@@ -183,4 +166,6 @@ public:
 	afx_msg void OnEditDelete();
 	afx_msg void OnEditGahtml();
 	afx_msg void OnMoreMarriages();
+	CColorStatic colorNext;
+	afx_msg void OnClickedNext();
 };

@@ -78,10 +78,10 @@ int wordList( CStringArray *arrayP,CString line, char sep, BOOL single )
 
 	arrayP->RemoveAll();
 //	line.Replace( '\t', ' ' );
-	while (pos!=-1)
+	while( pos != -1 )
 	{
 		lastpos = pos;
-		pos=line.Find(sep,pos);											// find next sep	
+		pos = line.Find( sep, pos );											// find next sep	
 		if(pos != -1)													// there is a sep!
 		{
 			length = pos-lastpos;										// length of the item between two sep

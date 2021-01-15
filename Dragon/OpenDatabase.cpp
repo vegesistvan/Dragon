@@ -100,8 +100,6 @@ bool COpenDatabase::openDatabase()
 
 	
 
-	if( !query( L"PRAGMA user_version" )) return 0;
-	m_user_version = _wtoi( m_tabla->GetFieldString( 0 ) );
 	return 1;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

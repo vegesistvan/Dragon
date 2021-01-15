@@ -174,12 +174,12 @@ L"rowid", L"feleség", L"születés", L"halál", L"apja", L"anyja" \
 
 //Ha csak egy házaspárt akatsz vizsgálni, add meg a nevüket
 
-//	_husband	= L"Ajkay István";
-//	_wife		= L"N N";
-	m_contract	= false;
+//	_husband	= L"Ajkay István";	// férj neve
+//	_wife		= L"N N";			// feleség neve
+	m_contract	= false;		
 	m_contract	= true;			// végrejatsa-e az összevonásokat	
-	m_loop		= 3;
-	m_azonos	= 0;
+	m_loopMax		= 3;			// max loop
+	m_azonos	= 1;			// legalább ennyi egyezés ellemtmondás nélkül
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CSameCouples::~CSameCouples()
@@ -199,26 +199,53 @@ END_MESSAGE_MAP()
 BOOL CSameCouples::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
+
 	return TRUE;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSameCouples::OnBnClickedOk()
 {
-	int loop = 1;
-	
+	CString drive;
+	CString path;
+	CString fname;
+	CString ext;
+	TCHAR* old;
+	TCHAR* renamed;
+
 	wndP.Create( NULL, L"Azonos nevû házaspárok..." );
 	wndP.GoModal();
 	
-	while( true )
+	m_loop = 1;
+	while( m_loop < m_loopMax )
 	{
 
 		theApp.setStartTime();
+
+		splitFilespec( theApp.m_databaseSpec, &drive, &path,  &fname, &ext );
+	
+		str.Format( L"%s:%s\\%sM.%s", drive, path, fname, ext );
+		CopyFile( theApp.m_databaseSpec, str, false );
+		theApp.m_databaseSpec = str;
+
+		str.Format( L"%s:%s\\%sP_blob.%s", drive, path, fname, ext );
+		CopyFile( theApp.m_blobSpec, str, false );
+
+		theApp.openDatabase();
+
+
+
+
 		openUnited();
 		openDifferent();
 
 		vContract.clear();
 
-		core( loop );
+		core( m_loop );
+
+
+		m_command.Format( L"PRAGMA user_version='%d'", vContract.size() );
+		theApp.execute( m_command );
+
 
 		if( vContract.size() )
 			str.Format( L"%d ember összevonva.", vContract.size() );
@@ -235,12 +262,9 @@ void CSameCouples::OnBnClickedOk()
 		fclose( fU );
 		fclose( fD );
 
+
 		if( vContract.size() )
 		{
-			theApp.m_user_version = theApp.m_user_version*10+1;
-			m_command.Format( L"PRAGMA user_version='%d'", theApp.m_user_version );
-			theApp.execute( m_command );
-
 			theApp.showHtmlFile( unitedSpec );
 			theApp.showHtmlFile( differentSpec );
 		}
@@ -249,8 +273,7 @@ void CSameCouples::OnBnClickedOk()
 			theApp.showHtmlFile( differentSpec );
 			break;
 		}
-		if( loop == m_loop ) break;
-		++loop;
+		++m_loop;
 	}
 	wndP.DestroyWindow();		
 
@@ -1084,7 +1107,7 @@ a.rowidS2, a.spouse2, a.birthS2, a.deathS2, a.fatherS2, a.motherS2 );
 void CSameCouples::openUnited()
 {
 	CString fileName;
-	fileName.Format( L"couplesUnited_%d", theApp.m_user_version );
+	fileName.Format( L"couplesUnited_%d", m_loop );
 	unitedSpec = theApp.openHtmlFile( &fU, fileName, L"w+" );
 
 	createHead( L"AZONOS NEVÛ HÁZASPÁROK, AKIK AZONOSAK, EZÉRT ÖSSZEVONHATÓAK" ); 
@@ -1102,7 +1125,7 @@ Ha egy azonos nevû csoportban több különbözõ egyesítés lehetséges, akkor azok a 
 void CSameCouples::openDifferent()
 {
 	CString fileName;
-	fileName.Format( L"couplesDifferent_%d", theApp.m_user_version );
+	fileName.Format( L"couplesDifferent_%d", m_loop );
 	differentSpec = theApp.openHtmlFile( &fD, fileName, L"w+" );
 
 	createHead( L"AZONOS NEVÛ HÁZASPÁROK, AKIK KÜLÖNBÖZNEK EGYMÁSTÓL" ); 
@@ -1125,14 +1148,13 @@ void CSameCouples::createHead( CString title )
 <BODY>\n\
 <center>%s</center><br><br>\n\n\
 <pre>\n\
-%-21s %s (%d)<br>\
+%-21s %s<br>\
 %-21s %s<br><br>\
 %-21s %d<br><br>\
 ",
 title,\
 L"Adatbázis:",\
 theApp.m_databaseSpec,\
-theApp.m_user_version,\
 L"Lista készült:",\
 theApp.getPresentDateTime(),\
 L"Egyezések min. száma:",\

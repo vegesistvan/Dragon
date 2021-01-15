@@ -355,10 +355,11 @@ void CDragonDlg::OnSelectedFiles()
 void CDragonDlg::mainTitle( )
 {
 	CString caption;
+	CString userVersion;
 
 	query( L"PRAGMA user_version" );
-	theApp.m_user_version = _wtoi( m_recordset->GetFieldString( 0 ) );
-	caption.Format( L"Dragon v. %s - %s || Családok nyilvántartása || adatbázis: %s (%d) || %s ||", BUILT, PLATFORM, theApp.m_databaseSpec, theApp.m_user_version, theApp.m_inputMode );
+	userVersion = m_recordset->GetFieldString( 0 );
+	caption.Format( L"Dragon v. %s - %s || Családok nyilvántartása || adatbázis: %s (%s) || %s ||", BUILT, PLATFORM, theApp.m_databaseSpec, userVersion, theApp.m_inputMode );
 	SetWindowText( caption );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1129,6 +1130,7 @@ void CDragonDlg::OnSame()
 	mainTitle( );
 
 }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnClose()
 {
 	if( AfxMessageBox( L"Tényleg be akarod zárni a programot?", MB_YESNO ) == IDNO ) return;

@@ -29,6 +29,7 @@ protected:
 	CString	_husband;		// csak ezt a házaspárt vizsgájuk!!
 	CString _wife;
 	int		m_loop;
+	int		m_loopMax;
 
 	CString str;
 	CString m_command;
