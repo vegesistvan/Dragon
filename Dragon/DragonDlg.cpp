@@ -55,10 +55,10 @@
 
 #include "GA_ascendantsChain.h"
 #include "SameCouples.h"
-#include "SamePeople.h"
 #include "checkLifespan.h"
 
 #include "SamePeopleInfo.h"
+#include "Contract.h"
 
 #include "version.h"
 
@@ -1125,10 +1125,13 @@ void CDragonDlg::OnSameNames()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnSame()
 {
+/*
 	CSamePeople dlg;
 	dlg.DoModal();
+*/
+	CContract cc;
+	cc.contractPeople();
 	mainTitle( );
-
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnClose()

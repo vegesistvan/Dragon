@@ -339,6 +339,7 @@ public:
 	afx_msg void OnCheckGenerations();
 	afx_msg void OnMoreMarriages();
 	afx_msg void OnShowSamePeople();
+	afx_msg void OnShowDifferentPeople();
 };
 extern CDragonApp theApp;
 

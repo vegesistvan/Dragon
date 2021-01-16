@@ -1,20 +1,13 @@
-// SamePeople.cpp : implementation file
+// Contract.cpp : implementation file
 //
-// Nagy kihívás, hogy az azonos nevû emeberek bejegyzései között megtaláljuk az azonos emberhez tartozókat.
-// Elõfordulhat, hogy két ember külön-külön megfelel egy harmadikkal való azonosításnak, de egymással már konfliktusban vannak.
-// Ezt valahogy meg kellene oldani.
 
 #include "stdafx.h"
 #include "Dragon.h"
-#include "SamePeople.h"
-#include "afxdialogex.h"
-#include <algorithm>
+#include "Contract.h"
 #include "utilities.h"
-#include "html_Lines.h"
-#include "SamePeopleInfo.h"
-#include <stdio.h>
-#include <wchar.h>
-#include "FilterLoop.h"
+#include "ProgressWnd.h"
+#include "ContractedPeople.h"
+#include <algorithm>
 // lekérdezett mezõk a people táblából
 enum
 {
@@ -45,35 +38,36 @@ enum
 	S_UNITED,
 	S_GENERATION,
 	S_SOURCE,
-	S_ROWID,
 	S_NAME,
+	S_ROWID,
 	S_BIRTH,
 	S_DEATH,
-	S_ROWIDF,
 	S_FATHER,
+	S_ROWIDF,
 	S_BIRTHF,
 	S_DEATHF,
-	S_ROWIDM,
 	S_MOTHER,
+	S_ROWIDM,
 	S_BIRTHM,
 	S_DEATHM,
 	S_ROWIDS,
 	S_SPOUSES,
 	S_LINEF,
+	COLUMNSCOUNT,
 };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool sortBySource(const SAMENAMES &v1, const SAMENAMES &v2) 
+bool sortBySourceX(const SAMENAMES &v1, const SAMENAMES &v2) 
 {
 	return( v1.source < v2.source );
 }
-bool sortBy(const CONTRACT &v1, const CONTRACT &v2) 
+bool sortByX(const CONTRACT &v1, const CONTRACT &v2) 
 {
 	return( v1.rowidBy < v2.rowidBy );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // return TRUE ne cseréljen
 // return FALS cseréljen
-bool sortByGroupStatus(const SAMENAMES &v1, const SAMENAMES &v2) 
+bool sortByGroupStatusX(const SAMENAMES &v1, const SAMENAMES &v2) 
 { 
 	if( v1.group > v2.group )
 		return false;
@@ -86,11 +80,10 @@ bool sortByGroupStatus(const SAMENAMES &v1, const SAMENAMES &v2)
 	}
 	return true;
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-IMPLEMENT_DYNAMIC(CSamePeople, CDialogEx)
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CSamePeople::CSamePeople(CWnd* pParent /*=NULL*/)
-	: CDialogEx(CSamePeople::IDD, pParent)
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+IMPLEMENT_DYNAMIC(CContract, CWnd)
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CContract::CContract()
 {
 	m_recordset		= new CSqliteDBRecordSet;
 	m_recordset1	= new CSqliteDBRecordSet;
@@ -162,53 +155,20 @@ házastársak\n\n\
 	sWHITE.Format( L"%u", RGB(255,255,255) );
 
 	m_name = L"";   // ha csak egy embert akarunk vizsgálni, itt megadhatjuk a nevét
-	m_contract	= false;
-	m_contract	= true;			// végrehajtsa-e az összevonásokat	
 	m_azonos	= 1;			// az azonos adatpárok elõírt száma
 	nItem		= 0;
-	m_loopMax   = 2;
+	m_loopMax   = 4;
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CSamePeople::~CSamePeople()
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CContract::~CContract()
 {
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSamePeople::DoDataExchange(CDataExchange* pDX)
-{
-	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_LIST, m_ListCtrl);
-	DDX_Control(pDX, IDC_SEARCH_TXT, colorSearch);
-	DDX_Text(pDX, IDC_SEARCH, m_search);
-	DDX_Control(pDX, IDC_NEXT, colorNext);
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BEGIN_MESSAGE_MAP(CSamePeople, CDialogEx)
-	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST, &CSamePeople::OnCustomdrawList)
-	ON_WM_SIZE()
-	ON_WM_SIZING()
-	ON_STN_CLICKED(IDC_SEARCH_TXT, &CSamePeople::OnClickedSearchTxt)
-	ON_COMMAND(ID_HTML, &CSamePeople::OnHtml)
-
-	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-
-	ON_COMMAND(ID_HTML_EDIT, &CSamePeople::OnHtmlEdit)
-	ON_COMMAND(ID_HTML_SHOWS, &CSamePeople::OnHtmlShows)
-	ON_COMMAND(ID_HTML_PEOPLEFATHER, &CSamePeople::OnHtmlPeoplefather)
-	ON_COMMAND(ID_HTML_NOTEPAD, &CSamePeople::OnHtmlNotepad)
-
-	ON_COMMAND(ID_INFO, &CSamePeople::OnInfo)
-	ON_WM_CTLCOLOR()
-	ON_STN_CLICKED(IDC_NEXT, &CSamePeople::OnClickedNext)
-	ON_COMMAND(ID_FILTER_LOOP, &CSamePeople::OnFilterLoop)
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BEGIN_MESSAGE_MAP(CContract, CWnd)
 END_MESSAGE_MAP()
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CSamePeople::OnInitDialog()
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bool CContract::contractPeople()
 {
-	CDialogEx::OnInitDialog();
-	EASYSIZE_ADD( IDC_LIST,	ES_BORDER,	ES_BORDER,		ES_BORDER,		ES_BORDER,	0 );
-	EASYSIZE_ADD( IDC_CAPTION,	ES_BORDER,	ES_BORDER,	ES_BORDER,		ES_KEEPSIZE,	0 );
-	EASYSIZE_INIT();
-
 	CString fileName;
 	
 	fileName = L"peopleUnited";
@@ -224,24 +184,15 @@ BOOL CSamePeople::OnInitDialog()
 	TCHAR* old;
 	TCHAR* renamed;
 
-
-	colorSearch.SetTextColor( theApp.m_colorClick );
-	colorNext.SetTextColor( theApp.m_colorClick );
-	createColumns();
-
-
-	m_loop = 1;
+	m_loop = 1;		// ciklus számláló
 
 	wndP.Create( NULL, L"" );
 	wndP.GoModal();
 	
 	tableLines.clear();
-	vColor.clear();
-
-	vLoops.clear();
 	while( m_loop <= m_loopMax )
 	{
-		str.Format( L"Azonos emberek bejegyzéseinek összevonása. (%d/%d)", m_loop, m_loopMax );
+		str.Format( L"Azonos emberek bejegyzéseinek összevonása. (%d. ciklus)", m_loop );
 		wndP.m_strTitle = str;
 
 		// az aktuáli sadatbázis fájlok másolása *P.db fájlba
@@ -254,57 +205,37 @@ BOOL CSamePeople::OnInitDialog()
 		theApp.openDatabase();
 
 		theApp.setStartTime();
-		openDifferent();
-		openUnited();
+		openDifferent();			// html fájl
+		openUnited();				// html fájl
 
-		vContract.clear();
+		vContract.clear();			// az összevont emberek 
 	
 
 		core();
 
-		m_command.Format( L"PRAGMA user_version='%d'", vContract.size() );
-		theApp.execute( m_command );
-
-		
-
-		if( m_contract )
-		{
-			if( vContract.size() > 200 )
-			{
-#ifndef _DEBUG
-				str.Format( L"(5/5) Adatbázis tömörítése" ); 
-				wndP.SetText( str );
-#endif
-//				theApp.execute( L"VACUUM");
-			}
-		}
-		if( !vContract.size() ) break;
-
-		fclose( fU );
-		fclose( fD );
-		vLoops.push_back( m_loop );
-		++m_loop;
-	}
-	if( m_contract )
-	{
 		if( vContract.size() > 200 )
 		{
 #ifndef _DEBUG
 			str.Format( L"(5/5) Adatbázis tömörítése" ); 
 			wndP.SetText( str );
 #endif
-//			theApp.execute( L"VACUUM");
+			theApp.execute( L"VACUUM");
 		}
-		
+
+		if( !vContract.size() ) break;		// nincs összevont ember, vége a programnak
+		fclose( fU );
+		fclose( fD );
+
+		++m_loop;
 	}
 	wndP.DestroyWindow();
-
+	
 	if( tableLines.size() )
 	{
-		m_command.Format( L"INSERT INTO contracted ( code1, filespec) VALUES ( 1, '%s')", m_fileSpecTextU );
+		m_command.Format( L"INSERT INTO contracted ( code1, code2, filespec) VALUES ( 1, 0, '%s')", m_fileSpecTextU );
 		if( !theApp.execute( m_command ) ) return false;
 
-		m_command.Format( L"INSERT INTO contracted ( code1, filespec) VALUES ( 2, '%s')", m_fileSpecTextD );
+		m_command.Format( L"INSERT INTO contracted ( code1, code2, filespec) VALUES ( 2, 0, '%s')", m_fileSpecTextD );
 		if( !theApp.execute( m_command ) ) return false;
 	}
 
@@ -312,16 +243,13 @@ BOOL CSamePeople::OnInitDialog()
 	fclose( fD );
 	fclose( textU );
 	fclose( textD );
-	m_ListCtrl.SetItemCountEx( tableLines.size() + 1  );
-	m_ListCtrl.AttachDataset( &tableLines );
 
-
-
-
+	CContractedPeople dlg;
+	dlg.DoModal();
 	return true;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSamePeople::core()
+void CContract::core()
 {
 	CString namePrev;
 	CString name;
@@ -384,17 +312,13 @@ cont:	m_recordset->MoveNext();
 	if( vPeople.size() )
 		processPeople();
 
-	if( m_contract )
-	{
-		theApp.execute( L"BEGIN" );
-		contractFull();
-		deleteMarriages();
-		theApp.execute( L"COMMIT" );
-	}
-
+	theApp.execute( L"BEGIN" );
+	contractFull();
+	deleteMarriages();
+	theApp.execute( L"COMMIT" );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSamePeople::putPeople( CString name, UINT i )
+void CContract::putPeople( CString name, UINT i )
 {
 	m_recordset->MoveTo( i );
 
@@ -484,7 +408,7 @@ void CSamePeople::putPeople( CString name, UINT i )
 // egymással ellentmondásban lehetnek!
 // Pl: LPB: birth, BP1= birth death1, BP2:birth death2
 // A kijelölt bejegyzések közötti ellentmondásokat ki kellen szûrni. De akkor melyik a jó bejegyzés?
-void CSamePeople::processPeople()
+void CContract::processPeople()
 {
 	UINT group = 1;
 	UINT db = 0;
@@ -506,7 +430,7 @@ void CSamePeople::processPeople()
 		z = 1;
 	m_contracted = false;
 	resetRef();
-	std::sort( vPeople.begin(), vPeople.end(), sortBySource );
+	std::sort( vPeople.begin(), vPeople.end(), sortBySourceX );
 
 /*
 	for( UINT i = 0; i < vPeople.size(); ++i )
@@ -596,7 +520,7 @@ void CSamePeople::processPeople()
 // Az i1 és i2 indexû házasspárok azonosságát állapíthja meg.
 // return true: azonosak (nincs ellentmondás az adatai között!!!) 
 // return false: különbözõek
-int CSamePeople::identical( UINT i1, UINT i2 )
+int CContract::identical( UINT i1, UINT i2 )
 {
 	SAMENAMES	a = vPeople.at(i1);
 	SAMENAMES	b = vPeople.at(i2);
@@ -658,7 +582,7 @@ int CSamePeople::identical( UINT i1, UINT i2 )
 //  1 : mindkettõ meg van adva és egyezik;
 //  0 : csak az egyik vagy egy sincs van megadva, így nincs ellentmondás
 //  -1 : mindkettõ meg van adva és nem egyezik
-int CSamePeople::sameSpouses( CString spouse1, CString spouse2 )
+int CContract::sameSpouses( CString spouse1, CString spouse2 )
 {
 	CStringArray a;
 	CStringArray b;
@@ -750,7 +674,7 @@ int CSamePeople::sameSpouses( CString spouse1, CString spouse2 )
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Az iBy indexû emberrel helyettesíti az iDel indexû embert
-void CSamePeople::contract( UINT iBy, UINT iDel )
+void CContract::contract( UINT iBy, UINT iDel )
 {
 	CString rowid	= vPeople.at( iDel ).rowid;
 	CString rowidBy	= vPeople.at(iBy).rowid;
@@ -769,10 +693,8 @@ void CSamePeople::contract( UINT iBy, UINT iDel )
 	m_contracted = true;		// csak a csoportra jelzi, hogy volt összevonás, az annak megfelleõ fájlba kell listázni
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSamePeople::contractFull()
+void CContract::contractFull()
 {
-	if( !m_contract ) return;
-
 	CString rowid;
 	CString rowidBy;
 	CString sex_id;
@@ -796,7 +718,7 @@ void CSamePeople::contractFull()
 
 	// A törlendõ rowid-ik létezését vizsgálja a megtartandó rowid-k között-
 	// Ha talál ilyet, akkor azt a megtartandó rowid-t lecseréli az õt helyettesító rowid-val.
-	std::sort( vContract.begin(), vContract.end(), sortBy );
+	std::sort( vContract.begin(), vContract.end(), sortByX );
 	for( UINT i = 0; i < vContract.size(); ++i )
 	{
 		rowid	= vContract.at(i).rowid;
@@ -885,7 +807,7 @@ void CSamePeople::contractFull()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Az azonos házaspárokat tartalmazó házasságokat törli.
 // Nem a nevek, hanem a rowid-k azonosságát vizsgálja!!
-void CSamePeople::deleteMarriages()
+void CContract::deleteMarriages()
 {
 
 #ifndef _DEBUG
@@ -923,7 +845,7 @@ void CSamePeople::deleteMarriages()
 	wndP.SetPos(0 );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSamePeople::listPeople()
+void CContract::listPeople()
 {
 
 	int status;
@@ -936,7 +858,10 @@ void CSamePeople::listPeople()
 	int z;
 	SAMENAMES x;
 	CString ident;
-	std::sort( vPeople.begin(), vPeople.end(), sortByGroupStatus );
+	std::sort( vPeople.begin(), vPeople.end(), sortByGroupStatusX );
+
+
+// list into HTML file
 	for( UINT i = 0; i < vPeople.size(); ++i )
 	{
 		x = vPeople.at(i);
@@ -955,14 +880,14 @@ void CSamePeople::listPeople()
 
 		str.Format( L"\
 %9s %2s %1s %1s \
-%8s %-30s %12s %12s \
-%8s %-30s %12s %12s \
-%8s %-30s %12s %12s \
+%-30s %8s %12s %12s \
+%-30s %8s %12s %12s \
+%-30s %8s, %12s %12s \
 %8s %s",\
 x.line, x.united, x.generation, x.source,\
-x.rowid,  x.name,   x.birth,  x.death,\
-x.rowidF, x.father, x.birthF, x.deathF,\
-x.rowidM, x.mother, x.birthM, x.deathM,\
+x.name,   x.rowid, x.birth,  x.death,\
+x.father, x.rowidF, x.birthF, x.deathF,\
+x.mother, x.rowidM, x.birthM, x.deathM,\
 x.rowidS, x.spouses\
 ); 
 		ident += str;
@@ -993,7 +918,7 @@ x.rowidS, x.spouses\
 
 
 
-
+// list into text file
 	for( UINT i = 0; i < vPeople.size(); ++i )
 	{
 		x = vPeople.at(i);
@@ -1022,9 +947,9 @@ x.rowidS, x.spouses\
 %s\t%s\t%s\t\n",\
 colorIndex, m_loop, x.group, x.match, x.group2, x.status, rgbColor,\
 x.line, x.united, x.generation, x.source,\
-x.rowid,  x.name,   x.birth,  x.death,\
-x.rowidF, x.father, x.birthF, x.deathF,\
-x.rowidM, x.mother, x.birthM, x.deathM,\
+x.name, x.rowid,  x.birth,  x.death,\
+x.father, x.rowidF, x.birthF, x.deathF,\
+x.mother, x.rowidM, x.birthM, x.deathM,\
 x.rowidS, x.spouses, x.lineF\
 );
 
@@ -1040,20 +965,20 @@ x.rowidS, x.spouses, x.lineF\
 
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSamePeople::emptyLine( FILE* fl, int loop )
+void CContract::emptyLine( FILE* fl, int loop )
 {
 	UINT i;
 	fwprintf( fl, L"\t%d\t", loop );
 	for( i = 2; i < S_RGBCOLOR; i++ )	// egy üres sor az azonos nevû emberek után
 		fwprintf( fl, L"\t" );
 	fwprintf( fl, sWHITE );						// RGB color white
-	for( ; i < m_columnsCount; i++ )  // eg yüres sor az azonos nevû emberek után
+	for( ; i < COLUMNSCOUNT; i++ )  // eg yüres sor az azonos nevû emberek után
 		fwprintf( fl, L"\t" );
 	fwprintf( fl, L"\n" );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
-void CSamePeople::printRef( int group )
+void CContract::printRef( int group )
 {
 		str.Format( L"\
 %2d %2d %2s %9s %2s %1s %1s \
@@ -1073,7 +998,7 @@ L" ", r.spouses
 }
 */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSamePeople::resetRef()
+void CContract::resetRef()
 {
 	r.group = 0;
 	r.birth.Empty();
@@ -1089,7 +1014,7 @@ void CSamePeople::resetRef()
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Ha vPeople.at(i) azonos egy másik emberrel, akkor a kettõbõl összeszedjük a megadott értékeket
-void CSamePeople::setRef( int i )
+void CContract::setRef( int i )
 {
 	SAMENAMES a;
 	a = vPeople.at(i);
@@ -1123,7 +1048,7 @@ void CSamePeople::setRef( int i )
 
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSamePeople::openUnited()
+void CContract::openUnited()
 {
 	CString fileName;
 	fileName.Format( L"peopleUnited_%d", m_loop );
@@ -1144,9 +1069,9 @@ Ha egy azonos nevû csoportban több különbözõ egyesítés lehetséges, akkor azok a 
 %s %s %s %s",\
 L"gr",L"mt",L"gp",L"st",\
 L"line", L"u", L"G", L"S",\
-L"rowid-név----------------------------- születés---- halál------- ",\
-L"rowid-apa----------------------------- születés---- halál------- ",\
-L"rowid-anya---------------------------- születés---- halál------- ",\
+L"név----------------------------- rowid születés---- halál------- ",\
+L"apa----------------------------- rowid születés---- halál------- ",\
+L"anya---------------------------- rowid születés---- halál------- ",\
 L"rowid-házastársak---------------"\
 );
 
@@ -1154,7 +1079,7 @@ L"rowid-házastársak---------------"\
 	fwprintf( fU, L"<font color='red'>%s</font><br>", columns );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSamePeople::openDifferent()
+void CContract::openDifferent()
 {
 	CString fileName;
 	fileName.Format( L"peopleDifferent_%d", m_loop );
@@ -1170,9 +1095,9 @@ void CSamePeople::openDifferent()
 %9s %2s %1s %1s    \
 %s %s %s %s",\
 L"line", L"u", L"G", L"S",\
-L"rowid-név----------------------------- születés---- halál------- ",\
-L"rowid-apa----------------------------- születés---- halál------- ",\
-L"rowid-anya---------------------------- születés---- halál------- ",\
+L"név----------------------------- rowid születés---- halál------- ",\
+L"apa----------------------------- rowid születés---- halál------- ",\
+L"anya---------------------------- rowid születés---- halál------- ",\
 L"rowid-házastársak---------------"\
 );
 
@@ -1180,7 +1105,7 @@ L"rowid-házastársak---------------"\
 
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSamePeople::createHead( CString title  )
+void CContract::createHead( CString title  )
 {
 	m_head.Format( L"\
 <HEAD>\n\
@@ -1204,7 +1129,7 @@ m_azonos\
 );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CSamePeople::query( CString command )
+BOOL CContract::query( CString command )
 {
 	if( m_recordset->Query(command,theApp.mainDB))
 	{
@@ -1215,7 +1140,7 @@ BOOL CSamePeople::query( CString command )
 	return TRUE;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CSamePeople::query1( CString command )
+BOOL CContract::query1( CString command )
 {
 	if( m_recordset1->Query(command,theApp.mainDB))
 	{
@@ -1226,7 +1151,7 @@ BOOL CSamePeople::query1( CString command )
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CSamePeople::query2( CString command )
+BOOL CContract::query2( CString command )
 {
 	if( m_recordset2->Query(command,theApp.mainDB))
 	{
@@ -1236,357 +1161,8 @@ BOOL CSamePeople::query2( CString command )
 	}
 	return TRUE;
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSamePeople::OnSize(UINT nType, int cx, int cy)
-{
-	CDialogEx::OnSize(nType, cx, cy);
-	EASYSIZE_RESIZE()
-}
-void CSamePeople::OnSizing(UINT fwSide, LPRECT pRect)
-{
-	CDialogEx::OnSizing(fwSide, pRect);
-	EASYSIZE_MINSIZE(430,314,fwSide,pRect); 
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSamePeople::createColumns()
-{
-	m_ListCtrl.KeepSortOrder(TRUE);
-	m_ListCtrl.SetExtendedStyle(m_ListCtrl.GetExtendedStyle()| LVS_EX_GRIDLINES );
-	
-	m_ListCtrl.InsertColumn( S_CNT,				L"cnt",			LVCFMT_RIGHT,	 20,-1,COL_HIDDEN);
-	m_ListCtrl.InsertColumn( S_LOOP,			L"loop",		LVCFMT_RIGHT,	 30,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_GROUP,			L"gr",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_MATCH,			L"m#",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_GROUP2,			L"gr2",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_STATUS,			L"st",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_RGBCOLOR,		L"rgb",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_LINE,			L"line#",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_UNITED,			L"U",			LVCFMT_LEFT,	 20,-1,COL_NUM );
-	m_ListCtrl.InsertColumn( S_SOURCE,			L"S",			LVCFMT_RIGHT,	 20,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_GENERATION,		L"G",			LVCFMT_RIGHT,	 20,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_ROWID,			L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_NAME,			L"név",			LVCFMT_LEFT,	200,-1,COL_TEXT );
-	m_ListCtrl.InsertColumn( S_BIRTH,			L"születés",	LVCFMT_LEFT,	 70,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_DEATH,			L"halálozás",	LVCFMT_LEFT,	 70,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_ROWIDF,			L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_FATHER,			L"apa",			LVCFMT_LEFT,	200,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( S_BIRTHF,			L"születés",	LVCFMT_LEFT,	 70,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_DEATHF,			L"halál",		LVCFMT_LEFT,	 70,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_ROWIDM,			L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_MOTHER,			L"anya",		LVCFMT_LEFT,	200,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( S_BIRTHM,			L"születés",	LVCFMT_LEFT,	 70,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_DEATHM,			L"halál",		LVCFMT_LEFT,	 70,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_ROWIDS,			L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_SPOUSES,			L"házastársak",	LVCFMT_LEFT,	500,-1,COL_TEXT );
-	m_ListCtrl.InsertColumn( S_LINEF,			L"line#F",		LVCFMT_LEFT,	 60,-1,COL_HIDDEN );
-	m_columnsCount	= m_ListCtrl.GetHeaderCtrl()->GetItemCount();
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-void CSamePeople::fillTable()
-{
-	int group;
-	int status;
-	int colorIndex;
-	CString grp;
-
-
-	for( UINT i = 0; i < vPeople.size(); ++i )
-	{
-		group = vPeople.at(i).group;
-
-		nItem = m_ListCtrl.InsertItem( nItem, vPeople.at(i).sex_id );
-
-		str.Format( L"%d", m_loop );
-		m_ListCtrl.SetItemText( nItem, S_LOOP, str );
-
-		str.Format( L"%d", group );
-		m_ListCtrl.SetItemText( nItem, S_GROUP, str );
-
-		str.Format( L"%d", vPeople.at(i).match );
-		m_ListCtrl.SetItemText( nItem, S_MATCH, str );
-		
-		str.Format( L"%d", vPeople.at(i).group2 );
-		m_ListCtrl.SetItemText( nItem, S_GROUP2, str );
-		
-		status = vPeople.at(i).status;
-		str.Format( L"%d", status );
-		m_ListCtrl.SetItemText( nItem, S_STATUS, str );
-
-		m_ListCtrl.SetItemText( nItem, S_LINE, vPeople.at(i).line );
-		m_ListCtrl.SetItemText( nItem, S_UNITED, vPeople.at(i).united );
-		m_ListCtrl.SetItemText( nItem, S_SOURCE, vPeople.at(i).source );
-		m_ListCtrl.SetItemText( nItem, S_GENERATION, vPeople.at(i).generation );
-		m_ListCtrl.SetItemText( nItem, S_ROWID, vPeople.at(i).rowid );
-		m_ListCtrl.SetItemText( nItem, S_NAME, vPeople.at(i).name );
-		m_ListCtrl.SetItemText( nItem, S_BIRTH, vPeople.at(i).birth );
-		m_ListCtrl.SetItemText( nItem, S_DEATH, vPeople.at(i).death );
-		m_ListCtrl.SetItemText( nItem, S_ROWIDF, vPeople.at(i).rowidF );
-		m_ListCtrl.SetItemText( nItem, S_FATHER, vPeople.at(i).father );
-		m_ListCtrl.SetItemText( nItem, S_BIRTHF, vPeople.at(i).birthF );
-		m_ListCtrl.SetItemText( nItem, S_DEATHF, vPeople.at(i).deathF );
-		m_ListCtrl.SetItemText( nItem, S_ROWIDM, vPeople.at(i).rowidM );
-		m_ListCtrl.SetItemText( nItem, S_MOTHER, vPeople.at(i).mother );
-		m_ListCtrl.SetItemText( nItem, S_BIRTHM, vPeople.at(i).birthM );
-		m_ListCtrl.SetItemText( nItem, S_DEATHM, vPeople.at(i).deathM );
-		m_ListCtrl.SetItemText( nItem, S_ROWIDS, vPeople.at(i).rowidS );
-		m_ListCtrl.SetItemText( nItem, S_SPOUSES, vPeople.at(i).spouses );
-		m_ListCtrl.SetItemText( nItem, S_LINEF, vPeople.at(i).lineF );
-
-		m_ListCtrl.SetItemData( nItem, 0 );
-
-		if( status == 1 )
-		{
-			colorIndex = group % 10;
-			m_ListCtrl.SetItemData( nItem, colorIndex );
-		}
-		else if( status == -1 )
-			m_ListCtrl.SetItemData( nItem, 9 );
-		++nItem;
-	}
-	nItem = m_ListCtrl.InsertItem( nItem, L" " );
-	++nItem;
-
-
-//	for(int i = 0;i < m_ListCtrl.GetHeaderCtrl()->GetItemCount();++i)
-//    m_ListCtrl.SetColumnWidth(i,LVSCW_AUTOSIZE_USEHEADER);
-
-}
-*/
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSamePeople::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	NMLVCUSTOMDRAW* pLVCD = reinterpret_cast<NMLVCUSTOMDRAW*>( pNMHDR );
-	
-	int nItem;
-	int nCol;
-	int iData;
-
-	*pResult = 0;
-
-	switch( pLVCD->nmcd.dwDrawStage )
-	{
-	case CDDS_PREPAINT:
-		*pResult = CDRF_NOTIFYITEMDRAW;
-		break;
-	case CDDS_ITEMPREPAINT:
-		*pResult = CDRF_NOTIFYSUBITEMDRAW;
-		break;
-	case CDDS_ITEMPREPAINT|CDDS_SUBITEM:
-		nItem	= pLVCD->nmcd.dwItemSpec;
-		nCol	= pLVCD->iSubItem;
-//		iData   = vColor.at(nItem);
-//		iData   = _wtoi( tableLines.at( nItem*m_columnsCount + S_STATUS ) );
-//		if( iData  )
-//		{
-//			pLVCD->clrTextBk = m_rgb[iData];
-			pLVCD->clrTextBk =  _wtoi( tableLines.at( nItem*m_columnsCount + S_RGBCOLOR ) );
-//		}
-		*pResult = CDRF_DODEFAULT;
-		break;
-	}
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////44
-BOOL CSamePeople::PreTranslateMessage(MSG* pMsg)
-{
-	int x=(int)pMsg->wParam;
-
-    if( pMsg->message==WM_KEYDOWN)
-    {
-		switch( x )
-		{
-		case VK_RETURN:
-			GetDlgItem( IDC_SEARCH )->GetWindowTextW( str );
-			if( str.GetLength() ) 
-			OnClickedSearchTxt();
-			break;
-		case VK_ESCAPE:
-			CDialogEx::OnCancel();
-		}
-	}
-//	return CDialogEx::PreTranslateMessage(pMsg);
-	return CWnd::PreTranslateMessage(pMsg);
-}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSamePeople::OnClickedNext()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	if( nItem == -0 )
-	{
-		AfxMessageBox( L"Nincs kijelölve sor!" );
-		return;
-	}
-	keress( nItem + 1 );
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSamePeople::OnClickedSearchTxt()
-{
-	keress( 0 );
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSamePeople::keress( int start )
-{
-	CString	search;
-	GetDlgItem( IDC_SEARCH )->GetWindowText( search );
-	if( search.IsEmpty() )
-	{
-		AfxMessageBox( L"Meg kell adni a keresendõ stringet!");
-		return;
-	}
-
-	CProgressWnd wndProgress(NULL, L"Folyik a keresés.." ); 
-	wndProgress.GoModal();
-	wndProgress.SetRange(0, m_ListCtrl.GetItemCount() );
-	wndProgress.SetPos(0);
-	wndProgress.SetStep(1);
-
-
-
-	int		itemCnt	= m_ListCtrl.GetItemCount();
-	int		length	= search.GetLength();
-	int		nItem;
-	int		topIndex = m_ListCtrl.GetTopIndex();
-	CString	str;
-
-	theApp.unselectAll( &m_ListCtrl );
-
-	for( nItem = start; nItem < itemCnt-1; ++nItem )
-	{
-		str = m_ListCtrl.GetItemText( nItem, S_NAME );
-		str = str.Left(length);						// az aktuális search string hosszával azonos hosszúság leválasztása
-		if( str == search )	break;
-		wndProgress.StepIt();
-		wndProgress.PeekAndPump();
-		if (wndProgress.Cancelled()) break;
-	}
-	wndProgress.DestroyWindow();
-
-	if( nItem < itemCnt-1 )			// megtalálta a keresett embert,. aki az nItem-1 sorban van
-	{
-		m_ListCtrl.EnsureVisible( nItem, FALSE );
-
-		if( nItem > topIndex )   // lefele megy, fel kell hozni a tábla tetejére a megtalált sort
-		{
-			int countPP = m_ListCtrl.GetCountPerPage();
-			int nItemEV	= nItem - 1 + countPP;			// alaphelyzet: a kijelölt sor az ablak tetején
-
-			if( nItemEV > itemCnt - 1 )					// már nem lehet az ablak tetejére hozni, mert nincs annyi adat
-				nItemEV = itemCnt - 1;
-
-			m_ListCtrl.EnsureVisible( nItemEV, FALSE );
-		}
-		m_ListCtrl.SetItemState( nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED );
-		Invalidate( false );
-	}
-	else
-	{
-		str.Format( L"%s nevû embert nem találtam!", search );
-		AfxMessageBox( str );
-	}
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSamePeople::OnHtml()
-{
-	theApp.showHtmlFile( unitedSpec );
-	theApp.showHtmlFile( differentSpec );
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-LRESULT CSamePeople::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
-{
-	CPoint* point=(CPoint*) lParam;
-    CMenu	Menu;
-	CMenu*	pPopup;
-
-
-	if(Menu.LoadMenu( IDR_DROPDOWN_HTML_P ))
-    {
-		pPopup = Menu.GetSubMenu(0);
-		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
-    }
-	return TRUE;
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSamePeople::OnHtmlEdit()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	S_LINE ) );
-	theApp.listHtmlLine( lineNumber );
-}
-void CSamePeople::OnHtmlNotepad()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	CString lineNumber = m_ListCtrl.GetItemText( nItem, 	S_LINE );
-	if( !lineNumber.IsEmpty() ) 
-		theApp.editNotepad( lineNumber );
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSamePeople::OnHtmlShows()
-{
-	POSITION	pos = m_ListCtrl.GetFirstSelectedItemPosition();
-	int			nItem;
-	std::vector<CString> vLines;
-
-	int cnt = 0;
-	CString name(L"");
-
-	while( pos )
-	{
-		nItem = m_ListCtrl.GetNextSelectedItem( pos );
-		vLines.push_back( m_ListCtrl.GetItemText( nItem, S_LINE ) );
-		if( name.Compare( m_ListCtrl.GetItemText( nItem, S_NAME ) ) )
-		{
-			name = m_ListCtrl.GetItemText( nItem, S_NAME );
-			++cnt;
-		}
-	
-
-	}
-
-	CHtmlLines dlg;
-
-	if( cnt == 1 )
-		dlg.child = name;
-	else
-		dlg.child = L"";
-
-	dlg._what = 1;
-	dlg.vLines = &vLines;
-
-	dlg.DoModal();
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSamePeople::OnHtmlPeoplefather()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	CString lineNumber	= m_ListCtrl.GetItemText( nItem, 	S_LINE );
-	CString lineNumberF	= m_ListCtrl.GetItemText( nItem, 	S_LINEF );
-	if( lineNumberF.IsEmpty() )
-	{
-		AfxMessageBox( L"A kijelölt embernek nem ismerjük az apját!" );
-		return;
-	}
-
-
-	std::vector<CString> vLines;
-
-	vLines.push_back( lineNumberF );
-	vLines.push_back( lineNumber );
-
-	CHtmlLines dlg;
-	dlg._what = 2;
-	dlg.parents.Format( L"%s - %s",  m_ListCtrl.GetItemText( nItem,S_FATHER ), m_ListCtrl.GetItemText( nItem,S_MOTHER ) );
-	dlg.child	= m_ListCtrl.GetItemText( nItem,S_NAME );
-	dlg.vLines	= &vLines;
-	dlg.DoModal();
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSamePeople::OnInfo()
-{
-	CSamePeopleInfo dlg;
-	dlg.DoModal();
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSamePeople::list()
+void CContract::list()
 {
 	int status;
 	int group;
@@ -1655,44 +1231,19 @@ void CSamePeople::list()
 		push( vPeople.at(i).spouses );
 		push( vPeople.at(i).lineF );
 
-/*		
-		switch( status )
-		{
-		case 0:
-			colorIndex = 0;
-			break;
-		case 1:
-			colorIndex = group % 10;
-			break;
-		case -1:
-			colorIndex = 9;
-			break;
-		}
-*/
-		vColor.push_back( colorIndex );
 		++nItem;
 	}
 
-/*
-	vColor.push_back( 0 );
-	for( int i = 0; i < m_columnsCount; i++ )  // eg yüres sor az azonos nevû emberek után
-		push( L" " );
-*/
-/*	
-		S_STATUS,
-	S_RGBCOLOR,
-	S_LINE,
-*/
 	for( i = 0; i < S_RGBCOLOR; i++ )	// egy üres sor az azonos nevû emberek után
 		push( L" " );
 	push( sWHITE );						// RGB color white
-	for( ; i < m_columnsCount-1; i++ )  // eg yüres sor az azonos nevû emberek után
+	for( ; i < COLUMNSCOUNT-1; i++ )  // eg yüres sor az azonos nevû emberek után
 		push( L" " );
 
 	++nItem;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSamePeople::push( CString item )
+void CContract::push( CString item )
 {
 
 	int tLen;
@@ -1702,16 +1253,4 @@ void CSamePeople::push( CString item )
 	_tcscpy_s( sT, tLen, item.GetBuffer() );
 	tableLines.push_back( sT );
 
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSamePeople::OnFilterLoop()
-{
-	int	loop;
-	CFilterLoop dlg;
-	dlg.vLoops = &vLoops; 
-	if( dlg.DoModal() == IDCANCEL ) return;
-	loop = dlg.m_loop;
-
-	str.Format( L"%d", loop );
-	AfxMessageBox( str );
 }

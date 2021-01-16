@@ -43,27 +43,24 @@ táblázat, fájlok is felfedhetnek hibákat.\r\n\
 \r\n\
 Az oszlopok jelentése:\r\n\
 \r\n\
-gr\tgroup, az azonos nevû embercsoporton belül azonosnak éréklelt alcsoportok sorszáma.\r\n\
-mt\tmatch, az azonosnak talált adatpárok száma\r\n\
-gp\tgroupP, korábban a gp csoporthoz tartozott, de elvette, mert több azonosság van ezzel a bejegyzéssel\r\n\
-st\tstatus, -1 azonos, azaz egyesített, majd törölt, 0: változatlanul hagyott, 1: ez az egyesített bejegyzés.\r\n\
+m#\tmatch, az azonosnak talált adatpárok száma\r\n\
 line\ta bejegyzés sorszáma a GA html fájlban.\r\n\
-u\tunited, az ember u számú bejegyzés összevonása.\r\n\
+U\tunited, az ember u számú bejegyzés összevonása.\r\n\
 G\tgeneráció, az ember generációs jele a GA fájlban.\r\n\
 S\taz ember elõfordulása a GA.html fájlban ( 1-2-3-4 )\r\n\
 \r\n\
-rowid\ta bejegyzés azonosítója\r\n\
 név\taz ember neve\r\n\
+rowid\ta bejegyzés azonosítója\r\n\
 születés\tszületési dátum\r\n\
 halál\thalálozás dátuma\r\n\
 \r\n\
+apa neve\r\n\
 rowid\taz apa bejegyzésének azonosítója\r\n\
-név\taz apa neve\r\n\
 születés\tszületési dátuma\r\n\
 halál\thalálozás dátuma\r\n\
 \r\n\
+anya neve\r\n\
 rowid\taz anya bejegyzésének azonosítója\r\n\
-név\taz anya neve\r\n\
 születés\tszületési dátuma\r\n\
 halál\thalálozás dátuma\r\n\
 \r\n\
