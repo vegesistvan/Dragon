@@ -42,6 +42,7 @@ void CGaDescendants::printGAline( UINT ix )
 void CGaDescendants::printBegining( int ix )
 {
 	CString tags;
+	bool ul = false;
 
 	UINT	generation	= vDesc.at(ix).gen;
 	TCHAR	gen			= TCHAR('A') + TCHAR(generation);	// a generációs karakter-jel ( A,B,C,D.....);
@@ -51,6 +52,7 @@ void CGaDescendants::printBegining( int ix )
 	{
 		tags.Format( L"%s<li>", m_tag1 );
 		++cnt_ol;
+		ul = true;
 	}
 	else if( generation == m_genPrev )
 		tags = L"<li>";
@@ -66,7 +68,22 @@ void CGaDescendants::printBegining( int ix )
 	m_genPrev = generation;
 	
 
+	CString familyName = getLastname( &p );
 
+	if( m_checkFamily )
+	{
+		if( m_familyName != familyName )
+		{
+			if( ul )
+				str.Format( L"\n\n<br><br><b>%s %s</b><br>\n\n", L"%%%", familyName );
+			else
+				str.Format( L"\n\n<br><br><b>%s %s</b><br>\n\n", L"%%", familyName );
+			print( str );
+		}
+		m_familyName = familyName;
+	}
+
+	
 	if( m_numbering == SZLUHA )
 		str.Format( L"%s%c&diams;", tags, gen );			// gedcom és kézi bevitelnél nincs generáció, ezt úgy kell beletenni!!
 	else if( m_numbering == VIL )
@@ -79,6 +96,7 @@ void CGaDescendants::printBegining( int ix )
 void CGaDescendants::printDescendant( int ix )
 {
 	CString rowid = vDesc.at( vDesc.size()-1).rowid;
+
 
 // leszármazott neve
 	if( m_CheckLastName )

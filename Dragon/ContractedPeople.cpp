@@ -79,8 +79,8 @@ BEGIN_MESSAGE_MAP(CContractedPeople, CDialogEx)
 	ON_COMMAND(ID_HTML_EDIT, &CContractedPeople::OnHtmlEdit)
 	ON_COMMAND(ID_HTML_SHOWS, &CContractedPeople::OnHtmlShows)
 	ON_COMMAND(ID_HTML_PEOPLEFATHER, &CContractedPeople::OnHtmlPeoplefather)
+	ON_COMMAND(ID_EDIT_NOTEPAD_PARENTS, &CContractedPeople::OnEditNotepadParents)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CContractedPeople::OnHtmlNotepad)
-
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CContractedPeople::OnInitDialog()
@@ -507,4 +507,16 @@ void CContractedPeople::OnHtmlPeoplefather()
 	dlg.child	= m_ListCtrl.GetItemText( nItem,S_NAME );
 	dlg.vLines	= &vLines;
 	dlg.DoModal();
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedPeople::OnEditNotepadParents()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	if( nItem == - 1 )
+	{
+		theApp.message( L"", L"Nincs kijelölve ember!" );
+		return;
+	}
+	CString lineNumberF	= m_ListCtrl.GetItemText( nItem, 	S_LINEF );
+	if( !lineNumberF.IsEmpty() ) theApp.editNotepad( lineNumberF );
 }

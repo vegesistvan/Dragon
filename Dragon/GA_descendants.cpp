@@ -43,6 +43,7 @@ CGaDescendants::CGaDescendants(CWnd* pParent /*=NULL*/)
 	, m_CheckLastName(FALSE)
 	, m_code(FALSE)
 	, m_numbering(0)
+	, m_checkFamily(FALSE)
 {
 
 }
@@ -64,6 +65,7 @@ void CGaDescendants::DoDataExchange(CDataExchange* pDX)
 	DDX_Radio(pDX, IDC_ANSI, m_code);
 	DDX_Control(pDX, IDC_COMBO_BGRD, m_ComboBgrd);
 	DDX_Radio(pDX, IDC_OLD, m_numbering);
+	DDX_Check(pDX, IDC_CHECK_FAMILY, m_checkFamily);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CGaDescendants, CDialogEx)
@@ -144,7 +146,7 @@ void CGaDescendants::treePeople()
 	
 	openHtml( file, title, m_colorBgrnd );
 
-	str.Format( L"%s\n", table );
+	str.Format( L"<b>%s</b>\n", table );
 	print( str );
 
 	queryP( m_rowid1 );

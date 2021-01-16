@@ -62,5 +62,6 @@ public:
 	afx_msg void OnHtmlShows();
 	afx_msg void OnHtmlPeoplefather();
 	afx_msg void OnHtmlNotepad();
+	afx_msg void OnEditNotepadParents();
 
 };

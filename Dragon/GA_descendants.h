@@ -55,6 +55,7 @@ protected:
 
 	int		m_sex_id;
 	CString m_mother_index;
+	CString m_familyName;
 
 	BOOL m_numOfSpouses;
 	CSqliteDBRecordSet m_recordset;
@@ -146,5 +147,6 @@ public:
 	afx_msg void OnClickedSzluha();
 	afx_msg void OnTupigny();
 	afx_msg void OnVillers();
+	BOOL m_checkFamily;
 };
 #endif // !defined(AFX_DESCENDANT_H__930379D8_BDD1_4973_93FF_041F3F3811E4__INCLUDED_)
