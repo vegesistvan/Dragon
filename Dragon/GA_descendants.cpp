@@ -31,19 +31,21 @@ IMPLEMENT_DYNAMIC(CGaDescendants, CDialogEx)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CGaDescendants::CGaDescendants(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CGaDescendants::IDD, pParent)
-	, m_connect(FALSE)
-	, m_woman(FALSE)
-	,m_ixName( 1 )
-	,m_ixSpec( 0 )
-	,m_ixComment( 2 )
-	,m_setCombo(1)
-	,m_rowid1(L"")
-	,m_name(L"")
-	,m_tableNumber(L"")
-	, m_CheckLastName(FALSE)
-	, m_code(FALSE)
-	, m_numbering(0)
-	, m_checkFamily(FALSE)
+	,m_connect(FALSE)		// táblákat összekösse-e
+	,m_woman(FALSE)			// nõk leszármazottait listázza-e
+	,m_setCombo(1)			// 0= nincsenek kiemelések, 1= defeault kiemelések 
+
+	,m_ixName( 1 )			// név bold
+	,m_ixSpec( 0 )			// speciális karakterek (*+=) bold
+	,m_ixComment( 2 )		// comment bold
+	
+	,m_rowid1(L"")			// a leszármazott rowid-ja
+	,m_name(L"")			// leszármazott õs neve
+	,m_tableNumber(L"")		// tablenumber, ha a táblázat leszármazotti listáját kérjük
+	,m_CheckLastName(FALSE)	// családnév kiírása
+	,m_code(FALSE)			// ANSI vagy UTF8 kódrendszer
+	,m_numbering(0)			// milyen számozási rendszer legyen (0,1,2) 
+	,m_checkFamily(FALSE)	// %%% családnév,elõnév kiemelése
 {
 
 }
@@ -69,16 +71,22 @@ void CGaDescendants::DoDataExchange(CDataExchange* pDX)
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CGaDescendants, CDialogEx)
-	ON_BN_CLICKED(IDOK, &CGaDescendants::OnBnClickedOk)
-	ON_BN_CLICKED(IDC_RADIO_CLEAR, &CGaDescendants::OnClickedRadioClear)
-	ON_COMMAND(IDC_RADIO_DEFAULT, &CGaDescendants::OnRadioDefault)
 	ON_WM_CTLCOLOR()
+
 	ON_MESSAGE( WM_CTLCOLORBTN, OnCtlColorBtn )
+	
+	ON_COMMAND(IDC_RADIO_DEFAULT, &CGaDescendants::OnRadioDefault)
+	ON_COMMAND(IDC_TUPIGNY, &CGaDescendants::OnTupigny)
+	ON_COMMAND(IDC_VILLERS, &CGaDescendants::OnVillers)
+	
+	ON_BN_CLICKED(IDC_RADIO_CLEAR, &CGaDescendants::OnClickedRadioClear)
 	ON_BN_CLICKED(IDC_CHECK_WOMAN, &CGaDescendants::OnClickedCheckWoman)
 	ON_BN_CLICKED(IDC_CHECK_CONNECT, &CGaDescendants::OnClickedCheckConnect)
 	ON_BN_CLICKED(IDC_SZLUHA, &CGaDescendants::OnClickedSzluha)
-	ON_COMMAND(IDC_TUPIGNY, &CGaDescendants::OnTupigny)
-	ON_COMMAND(IDC_VILLERS, &CGaDescendants::OnVillers)
+
+	ON_BN_CLICKED(IDOK, &CGaDescendants::OnBnClickedOk)
+	ON_BN_CLICKED(IDC_CHECK_FAMILY, &CGaDescendants::OnClickedCheckFamily)
+	ON_BN_CLICKED(IDC_CHECK_LASTNAME, &CGaDescendants::OnClickedCheckLastname)
 END_MESSAGE_MAP()
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -107,7 +115,7 @@ BOOL CGaDescendants::OnInitDialog()
 		m_connect	= true;
 		m_woman		= true;
 	}
-
+	UpdateData( TOSCREEN );
 	return TRUE;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -146,8 +154,12 @@ void CGaDescendants::treePeople()
 	
 	openHtml( file, title, m_colorBgrnd );
 
-	str.Format( L"<b>%s</b>\n", table );
-	print( str );
+
+	if( !m_checkFamily )
+	{
+		str.Format( L"<b>%s</b>\n", table );
+		print( str );
+	}
 
 	queryP( m_rowid1 );
 	desc.gen				= 0;
@@ -461,14 +473,14 @@ CString CGaDescendants::getNextChildRowid( UINT ix )
 	m_recordset.MoveTo( ixChild - 1 );
 	return( m_recordset.GetFieldString( 0 ) );
 }
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 LRESULT CGaDescendants::OnCtlColorBtn( WPARAM wparam, LPARAM lparam )
 {
 	HDC pDC = (HDC)wparam;
-
 	HWND hand = (HWND)lparam;
-
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -492,37 +504,28 @@ void CGaDescendants::OnRadioDefault()		// default szín beállítása
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaDescendants::OnClickedCheckWoman()
 {
-	m_woman	= !m_woman;
+	m_woman	= !m_woman;				// ha a nõk cgyerekeit is listázni akarjuk, akkor a táblákat is össze kell kötni!!
 	if( m_woman ) m_connect = true;
-	UpdateData(TOSCREEN);
+	UpdateData(TOSCREEN);			// az m_connect-et meg kell  mutatni a képernyõn!
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaDescendants::OnClickedCheckConnect()
 {
-	if( m_woman )
+	if( m_woman )					// ha nõk lszrámazoittait is listázzuk, akkor mindenképpen összekötés kell
 	{
 		m_connect = true;
 		UpdateData(TOSCREEN);
 	}
 }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CGaDescendants::OnBnClickedOk()
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CGaDescendants::OnClickedCheckFamily()
 {
-	UpdateData( FROMSCREEN );
-	m_ixName	= m_ComboName.GetCurSel();
-	m_ixSpec	= m_ComboSpec.GetCurSel();
-	m_ixComment = m_ComboComm.GetCurSel();
-	m_ixBgrd	= m_ComboBgrd.GetCurSel();
-	m_colorBgrnd = szin[m_ixBgrd].rgb;
-
-	if( m_woman ) m_connect = true;
-
-	if( m_rowid1.IsEmpty() )
-		treeTables();
-	else
-		treePeople();
-
-	CDialogEx::OnOK();
+	m_checkFamily = ! m_checkFamily;	// azért kel, hogy OnClickedCheckWoman UpdateData-ja a helyes értéket állítsa be
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CGaDescendants::OnClickedCheckLastname()
+{
+	m_CheckLastName = !m_CheckLastName;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Az UpdateData(TOSCREEN) miatt az m_numbering-értéke mindig helyes legyen!!
@@ -537,4 +540,24 @@ void CGaDescendants::OnVillers()
 void CGaDescendants::OnTupigny()
 {
 	m_numbering = 2;
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CGaDescendants::OnBnClickedOk()
+{
+	UpdateData( FROMSCREEN );
+	m_ixName	= m_ComboName.GetCurSel();
+	m_ixSpec	= m_ComboSpec.GetCurSel();
+	m_ixComment = m_ComboComm.GetCurSel();
+	m_ixBgrd	= m_ComboBgrd.GetCurSel();
+
+	m_colorBgrnd = szin[m_ixBgrd].rgb;
+
+	if( m_woman ) m_connect = true;
+
+	if( m_rowid1.IsEmpty() )
+		treeTables();
+	else
+		treePeople();
+
+	CDialogEx::OnOK();
 }

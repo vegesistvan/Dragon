@@ -2,6 +2,7 @@
 #include "Dragon.h"
 #include "Ga_descendants.h"
 #include "GA_structures.h"
+#include "utilities.h"
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -68,16 +69,21 @@ void CGaDescendants::printBegining( int ix )
 	m_genPrev = generation;
 	
 
+	CString family;
 	CString familyName = getLastname( &p );
 
 	if( m_checkFamily )
 	{
 		if( m_familyName != familyName )
 		{
+			family = getFamilyName( familyName );			// a tables táblából visszadja a tableHeader értékét 
+			
+
+			if( family.IsEmpty() ) family = familyName;
 			if( ul )
-				str.Format( L"\n\n<br><br><b>%s %s</b><br>\n\n", L"%%%", familyName );
+				str.Format( L"\n\n<br><br><b>%s %s</b><br>\n\n", L"%%%", family );
 			else
-				str.Format( L"\n\n<br><br><b>%s %s</b><br>\n\n", L"%%", familyName );
+				str.Format( L"\n\n<br><br><b>%s %s</b><br>\n\n", L"%%", family );
 			print( str );
 		}
 		m_familyName = familyName;
@@ -91,6 +97,26 @@ void CGaDescendants::printBegining( int ix )
 	else if( m_numbering == TUP )
 		str.Format( L"%s%c-%d&diams;", tags, gen, vSerial.at( generation ) );
 	print( str );
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CString CGaDescendants::getFamilyName( CString family )
+{
+	m_command.Format( L"SELECT tableHeader FROM tables WHERE familyName='%s' AND percent = '%s'", family, L"%%%" );
+	if( !theApp.query( m_command ) ) return L"";
+
+
+	str = theApp.m_recordset->GetFieldString( 0 );
+	str = dropFirstWord( str );
+	int pos1;
+	int pos2;
+
+	if( ( pos1 = str.Find( '/' ) ) != -1 )
+		str = str.Left( pos1 );
+
+	if( ( pos1 = str.Find( '[' ) ) != -1 )
+		str = str.Left( pos1 );
+
+	return( str );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaDescendants::printDescendant( int ix )

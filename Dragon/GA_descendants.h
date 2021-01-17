@@ -113,6 +113,7 @@ protected:
 	CString getPlaceDateBlock( CString place, CString date, TCHAR jel );
 	CString getCommentBlock( CString comment, CString occupation  );
 
+	CString getFamilyName( CString family );
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnInitDialog();
@@ -148,5 +149,7 @@ public:
 	afx_msg void OnTupigny();
 	afx_msg void OnVillers();
 	BOOL m_checkFamily;
+	afx_msg void OnClickedCheckFamily();
+	afx_msg void OnClickedCheckLastname();
 };
 #endif // !defined(AFX_DESCENDANT_H__930379D8_BDD1_4973_93FF_041F3F3811E4__INCLUDED_)
