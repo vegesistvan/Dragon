@@ -243,8 +243,7 @@ void CSameCouples::OnBnClickedOk()
 		core( m_loop );
 
 
-		m_command.Format( L"PRAGMA user_version='%d'", vContract.size() );
-		theApp.execute( m_command );
+		theApp.setUserVersion( vContract.size() );
 
 
 		if( vContract.size() )

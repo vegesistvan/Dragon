@@ -130,6 +130,7 @@ void CGaInput::insertEntries()
 CString CGaInput::insertDescendant( )
 {
 	d.last_name		= m_familyName;
+	d.titolo		= m_tableHeader.titolo;
 	d.rowid			= insertAny( &d );
 	m_rowidLastDescendant = d.rowid;
 	return( d.rowid );

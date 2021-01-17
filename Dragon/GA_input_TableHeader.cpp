@@ -15,7 +15,7 @@ int CGaInput::processTableHeader( CString cLine )
 	return 1;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// cLine: %%[%]nnnnnnn(, titolo) (tableNumber) [ág][törzs: mmmmmmmm ] 
+// cLine: %%[%]nnnnnnn(, titolo) (tableNumber) [ág][törzs: mmmmmmmm ] ///comment
 //
 // nnnnnnnnnnn: familyName
 // 
@@ -72,14 +72,7 @@ void CGaInput::splitTableHeader( CString cLine )
 	cLine.Replace( '\'', '|' );	 // a nevekben elõfordulhat az ' jel, amit az SQLite nem szeret
 	cLine.Replace( '%', ' ' );
 	cLine.Trim();
-	/*
-	if( (pos = cLine.Find( '-' ) )  != -1 )						// - comment leszedése
-	{
-		comment = cLine.Mid( pos + 2 );
-		cLine = cLine.Left( pos - 1 );
-	}
-	*/
-
+	
 	if( ( pos = cLine.Find( L"nem kapcs" ) ) != -1  )
 	{
 		joint = 0;
@@ -93,22 +86,7 @@ void CGaInput::splitTableHeader( CString cLine )
 	}
 	else
 		joint = 1;
-/*
-	if( ( pos1 = cLine.Find( '<' ) ) != -1 )   // az esetleges html formattálás levágása
-	{
-		if( ( pos2 = cLine.ReverseFind( '>' ) ) != -1 )
-		{
-			if( pos2 == cLine.GetLength() - 1 )
-				cLine = cLine.Left( pos1 );
-			else
-			{
-				str.Format( L"<> jelek a tábla fejlécen belül!!\n%s", cLine  );
-				AfxMessageBox( str );
-				exit(1);
-			}
-		}
-	}
-*/
+
 	if( ( pos1 = cLine.Find( '<' ) ) != -1 )   // az esetleges html formattálás levágása
 	{
 		cLine = cLine.Left( pos1 );
@@ -142,6 +120,8 @@ void CGaInput::splitTableHeader( CString cLine )
 	CString subs2;
 
 
+	
+	
 	CStringArray A;
 	int n = wordList( &A, cLine, ' ', TRUE );      // cLine [] zárójelek, nem kapcs és comment nélkül
 
@@ -164,6 +144,12 @@ void CGaInput::splitTableHeader( CString cLine )
 
 
 
+	if( (pos = cLine.Find( '/' ) )  != -1 )						// - comment leszedése
+		cLine = cLine.Left( pos );
+
+
+
+
 	familyName = getWord( cLine, 1, &pos );
 
 	if( ( pos = cLine.Find( ',' ) ) != -1 )
@@ -178,9 +164,22 @@ void CGaInput::splitTableHeader( CString cLine )
 		alias = cLine.Mid( pos+6 );
 	}
 
+	if( ( pos = titolo.Find( '/' ) ) != -1 )
+		titolo = titolo.Left( pos );
+
+	if( ( pos = titolo.Find( '(' ) ) != -1 )
+	{
+		if( pos == 0 )
+			titolo = titolo.Mid( 1, titolo.GetLength() - 2 ); // (Benedicti) kiveszi belõle az elõnevet
+		else
+			titolo = titolo.Left( pos );
+	}
+	if( m_tableHeader.percent == "%%%" )
+		m_titolo = titolo;
+
 
 	m_tableHeader.familyName	= familyName;
-	m_tableHeader.titolo		= titolo;
+	m_tableHeader.titolo		= m_titolo;
 	m_tableHeader.tableRoman	= tableRoman;
 	m_tableHeader.comment		= comment;
 	m_tableHeader.joint			= joint;

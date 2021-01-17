@@ -72,14 +72,13 @@ void CGaDescendants::printBegining( int ix )
 	CString family;
 	CString familyName = getLastname( &p );
 
+
 	if( m_checkFamily )
 	{
 		if( m_familyName != familyName )
 		{
 			family = getFamilyName( familyName );			// a tables táblából visszadja a tableHeader értékét 
-			
-
-			if( family.IsEmpty() ) family = familyName;
+//			if( family.IsEmpty() ) family = familyName;
 			if( ul )
 				str.Format( L"\n\n<br><br><b>%s %s</b><br>\n\n", L"%%%", family );
 			else
@@ -101,21 +100,18 @@ void CGaDescendants::printBegining( int ix )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CGaDescendants::getFamilyName( CString family )
 {
-	m_command.Format( L"SELECT tableHeader FROM tables WHERE familyName='%s' AND percent = '%s'", family, L"%%%" );
-	if( !theApp.query( m_command ) ) return L"";
+	CString titolo;
+	CString familyName;
 
+	familyName = p.last_name.MakeUpper();
+	titolo = p.titolo;
 
-	str = theApp.m_recordset->GetFieldString( 0 );
-	str = dropFirstWord( str );
-	int pos1;
-	int pos2;
-
-	if( ( pos1 = str.Find( '/' ) ) != -1 )
-		str = str.Left( pos1 );
-
-	if( ( pos1 = str.Find( '[' ) ) != -1 )
-		str = str.Left( pos1 );
-
+	if( titolo.IsEmpty() )
+		str = familyName;
+	else if( !familyName.IsEmpty() )
+		str.Format( L"%s,%s", familyName, titolo );
+	else
+		str.Empty();
 	return( str );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

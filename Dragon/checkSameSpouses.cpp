@@ -187,8 +187,9 @@ BOOL CCheckSameSpouses::OnInitDialog()
 	EASYSIZE_ADD( IDC_LIST,	ES_BORDER,	ES_BORDER,		ES_BORDER,		ES_BORDER,	0 );
 	EASYSIZE_INIT();
 
+	int iter = theApp.getUserVersion();
 	CString attention = L"Ezt a mûveletet az azonos emberek összevonása után érdemes alkalmazni, hogy csak a gyanús eseteket tartalmazza.\nAkarod, hogy mégis elkészítsük a listát?";
-	if( !theApp._iterationCount )
+	if( !iter )
 	{
 		if( AfxMessageBox( attention, MB_YESNO ) == IDNO ) 
 		{

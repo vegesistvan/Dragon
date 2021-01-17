@@ -75,6 +75,7 @@ void CGaInput::splitDescendantSubstring( CString cLine )
 	}
 	d.last_name = m_familyName;
 	d.last_name = m_tableHeader.familyName;
+	d.titolo	= m_tableHeader.titolo;
 
 ////////////
 

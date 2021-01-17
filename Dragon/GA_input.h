@@ -60,6 +60,7 @@ public:
 	CString	m_folyt;			// a sor végérõl leszedett folyt utáni római szám
 	
 	CString	m_familyName;
+	CString m_titolo;
 	CString m_tableName;
 	CString m_known_as;
 	CString	m_generationFirst; // egy tábla õsének generációja ( az elágazások összekapcsolásához kell )

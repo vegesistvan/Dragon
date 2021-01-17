@@ -226,6 +226,7 @@ bool CContract::contractPeople()
 		fclose( fU );
 		fclose( fD );
 
+		theApp.setUserVersion( m_loop );
 		++m_loop;
 	}
 	wndP.DestroyWindow();
@@ -245,6 +246,8 @@ bool CContract::contractPeople()
 	fclose( textD );
 
 	CContractedPeople dlg;
+	dlg.m_filter = L"code1=1 AND code2=0";
+	dlg.m_contracted = true;
 	dlg.DoModal();
 	return true;
 }

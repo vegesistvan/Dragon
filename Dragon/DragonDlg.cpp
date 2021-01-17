@@ -355,11 +355,9 @@ void CDragonDlg::OnSelectedFiles()
 void CDragonDlg::mainTitle( )
 {
 	CString caption;
-	CString userVersion;
+	int userVersion = theApp.getUserVersion();
 
-	query( L"PRAGMA user_version" );
-	userVersion = m_recordset->GetFieldString( 0 );
-	caption.Format( L"Dragon v. %s - %s || Családok nyilvántartása || adatbázis: %s (%s) || %s ||", BUILT, PLATFORM, theApp.m_databaseSpec, userVersion, theApp.m_inputMode );
+	caption.Format( L"Dragon v. %s - %s || Családok nyilvántartása || adatbázis: %s (%d) || %s ||", BUILT, PLATFORM, theApp.m_databaseSpec, userVersion, theApp.m_inputMode );
 	SetWindowText( caption );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
