@@ -143,7 +143,7 @@ void CGaInput::getMarriageSubstrings( CString cLine )
 		order = _wtoi( cLine.Mid( pos-1, 1 ) );
 		if( order == 0 ) order = 1;							// a házasság sorszáma (ha nincs kiírva, akkor 1 )
 		marriagesS.order	= order;
-		marriagesS.orderSpouse = 1;
+		marriagesS.orderSpouse = order;  // itt 1 volt!!
 
 		if( ( posNext = cLine.Find( '=', posM ) ) == -1 )	// nincs több házasság
 			posNext = cLine.GetLength()+1;

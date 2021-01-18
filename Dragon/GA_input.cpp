@@ -256,6 +256,9 @@ Az alábbi sorokban ismeretlen keresztnevû embereket talált.<br>\
 	else
 		file.SeekToBegin();
 */
+/*
+	Az alábbi nem tudom miért van???
+
 	_int64  pont = 0 ;
 	while( file.ReadString( cLine ) )
 	{
@@ -267,7 +270,7 @@ Az alábbi sorokban ismeretlen keresztnevû embereket talált.<br>\
 		else
 			pont = file.GetPosition();
 	}
-
+*/
 
 	if( !theApp.execute( L"BEGIN" ) ) return;			// Ha nme itt lenne, hanem az insertEntries-ben, akkor nagyon lassú lenne!!!
 	while(file.ReadString(cLine)) 

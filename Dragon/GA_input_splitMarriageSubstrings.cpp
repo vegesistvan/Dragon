@@ -19,10 +19,14 @@
 // Bp 1867.10.21 Kápolnássy_(Kapeller) Kristóf 
 // Rudelházi_(Ludrovai) Borbála 1445 özv 
 //
+
+// v_marriages.at(i).marriageSubstr tartalmazza a = után következõ substringet, ami a következõ =-ig vagy a sor végéig tart
+
+//Árpád/2 *Kaposdada 1864.08.03 +Székesfehérvár 1940.06.22 hv huszár ezredes 
+// =Kolozsvár 1908.11.08 Vajesdi Ajtay Jolán *Mezõdomb 1872.07.15 +Bp 1942.07.02 (Péter-Ágotha Eszter, 1f. Czóbel Béla, 2f. Windisch Jenõ)
 void CGaInput::splitMarriageSubstrings()
 {
 	if( v_marriages.size() == 0 ) return;
-
 
 	CString marriage;
 	CString place;
@@ -357,26 +361,39 @@ void CGaInput::splitMarriageSubstrings()
 			if( v_spouseSpouses.size() == 0 )	// ha a házastársnak nincsenek további házastársai, akkor neki ez az 1. házassága;
 				v_marriages.at(i).orderSpouse = 1;
 			else
+			{
 				v_marriages.at(i).orderSpouse = getOrderSpouse( &v_p );
+			}
 		}
 	}
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // vp-ben a házastársa házastársai
+//
+//  1
+//  2
+// ->3
+
 int CGaInput::getOrderSpouse( std::vector<PEOPLE>* vp )
 {
 	UINT	i;
 	int		index;
 	int		indexPrev = 0;
+
+
 	for( i = 0; i < vp->size(); ++i )
 	{
 		index = vp->at(i).mother_index;
 		if( index != indexPrev + 1 )
 		{
-			return indexPrev + 1;				// a ferlsorolt xf. házastársak indexeiben lyuk van, ez lesz a kiemelt házastárs indexe
+			if( index < indexPrev + 1 )
+				return indexPrev + 1;				// a ferlsorolt xf. házastársak indexeiben lyuk van, ez lesz a kiemelt házastárs indexe
+			else
+				return index-1;
 		}
+		++indexPrev;
 	}
-	return vp->at( i-1).mother_index + 1;  // a felsorolt xf. házastársak indexe 1-tõl folyamatosa nõ, az õvé a következõ lesz
+	return indexPrev + 1;  // a felsorolt xf. házastársak indexe 1-tõl folyamatosa nõ, az õvé a következõ lesz
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
