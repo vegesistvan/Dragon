@@ -99,11 +99,18 @@ BOOL CContractedPeople::OnInitDialog()
 	 if( !theApp.query( m_command ) ) return false;
 	 m_fileSpec = theApp.m_recordset->GetFieldString( 0 );
 
+	 if( m_fileSpec.IsEmpty() )
+	 {
+		 AfxMessageBox( L"Elõször el kel végezni az összevonásokat!" );
+		 CDialog::OnOK();
+		 return false;
+	 }
 
 	 if( _waccess( m_fileSpec, 0 ) )
 	 {
 		 str.Format( L"%s\nfájl nem létezik", m_fileSpec );
 		 AfxMessageBox( str );
+		 CDialog::OnOK();
 		 return false;
 	 }
 

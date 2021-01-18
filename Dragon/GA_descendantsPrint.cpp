@@ -78,11 +78,10 @@ void CGaDescendants::printBegining( int ix )
 		if( m_familyName != familyName )
 		{
 			family = getFamilyName( familyName );			// a tables táblából visszadja a tableHeader értékét 
-//			if( family.IsEmpty() ) family = familyName;
 			if( ul )
-				str.Format( L"\n\n<br><br><b>%s %s</b><br>\n\n", L"%%%", family );
+				str.Format( L"\n\n<p><b>%s %s</b><p>\n\n", L"%%%", family );
 			else
-				str.Format( L"\n\n<br><br><b>%s %s</b><br>\n\n", L"%%", family );
+				str.Format( L"\n\n<p><b>%s %s</b><p>\n\n", L"%%", family );
 			print( str );
 		}
 		m_familyName = familyName;

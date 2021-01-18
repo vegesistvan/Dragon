@@ -4,26 +4,8 @@
 #include "utilities.h"
 #include "GA_input.h"
 #include "GAtoDB.h"
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CGaInput::getDescendant( CString cLine )
-{
-	int pos;
-	if( (pos = cLine.Find( '=' )) == -1 ) return cLine;
-
-	CString descendant;
-	if( pos < 1 )
-	{
-		str.Format( L"Hibás sor: %s", cLine );
-		AfxMessageBox( str );
-		exit(0);
-	}
-
-	m_descendant	= cLine.Left( pos - 1 );	// az esetleges n= házasság sorszámot levágja
-	m_descendant.TrimRight();					// ha volt házasság sorszám, akkor a spsce-t is levágja
-//	if( m_descendant == "E Dorottya" )
-//		int z = 1;
-	return m_descendant;
-}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// A d struktúra elõállítása insertálásra
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaInput::splitDescendantSubstring( CString cLine )
 {
@@ -146,16 +128,6 @@ int CGaInput::getMotherIndex( TCHAR generation, int n_mother_index )
 	int mother_index = n_mother_index;
 
 
-/*
-	int last_index = theApp.v_mother_index.size() - 1;
-
-	if( last_index >= 0 )
-	{
-		if( theApp.v_mother_index.at(last_index ).generation < generation )
-			theApp.v_mother_index.pop_back();
-	}
-*/
-
 	if( n_mother_index == 0 )   // ha a /n nincs megadva, akkor megnézi hogy volt-e már korábban ez a generáció?
 	{
 		int i;
@@ -272,33 +244,3 @@ void CGaInput::splitDescNameString( CString nameSubstring )
 		}
 	}
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-int CGaInput::getTupigny( TCHAR gen )
-{
-	for( UINT i = 0; i < v_tupigny.size(); ++i )
-	{
-		if( v_tupigny.at(i).generation == gen )
-			return v_tupigny.at(i).tupigny;
-	}
-	return 0;
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int CGaInput::putTupigny( TCHAR gen )
-{
-	TUPIGNY tupigny;
-	for( UINT i = 0; i < v_tupigny.size(); ++i )
-	{
-		if( v_tupigny.at(i).generation == gen )
-		{
-			++v_tupigny.at(i).tupigny;
-			return v_tupigny.at(i).tupigny;
-		}
-	}
-	tupigny.generation	= gen;
-	tupigny.tupigny		= 1;
-	v_tupigny.push_back( tupigny );
-
-	return v_tupigny.at( v_tupigny.size() - 1 ).tupigny;
-}
-*/

@@ -12,11 +12,13 @@ void CGaInput::splitLine( CString cLine)
 	clearAll();
 
 	m_cLine = cLine;									// megõrzi a teljes sort esetleges késõbbi felhasználásra ( hibajelzés )
-	cLine			= getBranch( cLine );				// a sor végén lévõ esetleges leágazást ás [...család]-ot leszedi és m_folyt-ba teszi;
-	m_descendant	= splitLineToSubstrings( cLine );	// sort szétszedi descendantra és házasság-vektorokra
-	splitDescendantSubstring( m_descendant );			// d struktúrába teszi az elemeket
+	cLine	= getBranch( cLine );
+	
+	m_descendant = getDescendant( cLine );
+	getMarriageSubstrings( cLine );
 
-	splitMarriageSubstrings();								// a v_marriages vektor substringjeit felbontja és visszateszi a vektorba
+	splitDescendantSubstring( m_descendant );			// d struktúrába teszi az elemeket
+	splitMarriageSubstrings();							// a v_marriages vektor substringjeit felbontja és visszateszi a vektorba
 
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -110,67 +112,47 @@ CString CGaInput::getCsalad( CString root )
 	}
 	return csalad;
 }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CString CGaInput::getDescendant( CString cLine )
+{
+	int pos;
+
+	m_descendant = cLine;
+	if( (pos= cLine.Find( '=' ) ) != -1 )
+	{
+		m_descendant	= cLine.Left( pos - 1 );	// az esetleges n= házasság sorszámot levágja
+		m_descendant.TrimRight();					// ha volt házasság sorszám, akkor a spsce-t is levágja
+	}
+	return m_descendant;
+}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // marriageSubstr -ek betöltése v_marriages vektorba
-CString CGaInput::splitLineToSubstrings( CString cLine )
+void CGaInput::getMarriageSubstrings( CString cLine )
 {
-	v_marriages.clear();
-	CString descendant = getDescendant( cLine );
-
-	int		pos;
-	if( (pos = cLine.Find( '=' )) == -1 ) return descendant;
-	cLine = cLine.Mid( pos - 1 );		// a házasságok, az elsõ n= jellel együtt ( ha nincs, akkor szóköz lesz )
-
-	
-	int			pos2;
-	int			order;
+	int order;
+	int	pos;
+	int posM = 0;
+	int posNext;
+	CString marriageSubstring;
 	MARRIAGES	marriagesS;		// házasság
 
-	do
+	v_marriages.clear();
+	while( ( pos = cLine.Find( '=', posM ) ) != -1 )
 	{
-		str					= cLine.Left( 1 );
-		order				= _wtoi( str );
+		posM = pos + 1;
+		order = _wtoi( cLine.Mid( pos-1, 1 ) );
+		if( order == 0 ) order = 1;							// a házasság sorszáma (ha nincs kiírva, akkor 1 )
 		marriagesS.order	= order;
-		cLine				= cLine.Mid( 2 );					// leszedi az n= karaktereket
 		marriagesS.orderSpouse = 1;
-		if( ( pos2 = cLine.Find( '=' ) ) != -1 )
-		{
-			marriagesS.marriageSubstr	= cLine.Left( pos2-1 );			// a vizsgálandó házasság
-			cLine		= cLine.Mid( pos2-1 );					// a maradék házasságok
-		}
-		else
-		{
-			marriagesS.marriageSubstr = cLine;						// nincs több házasság, csak ez
-			cLine.Empty();
-		}
-		marriagesS.marriageSubstr.Trim();
+
+		if( ( posNext = cLine.Find( '=', posM ) ) == -1 )	// nincs több házasság
+			posNext = cLine.GetLength()+1;
+	
+		marriageSubstring = cLine.Mid( pos+1, posNext-pos-2 );
+		marriageSubstring.Trim();
+		marriagesS.marriageSubstr = marriageSubstring;
 		v_marriages.push_back( marriagesS );
-	}while( !cLine.IsEmpty() );
-
-	return descendant;
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// A %N jelet az elõzõ ember comment mezejéhez hozzáteszi
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CGaInput::updatePreviousDescendant( CString cLine )
-{
-	CString known_as;
-	int		pos;
-	known_as = getWord( cLine, 2, &pos );
-
-	m_command.Format( L"UPDATE people SET known_as='%s' WHERE rowid ='%s'", known_as, m_rowidLastDescendant );
-	if( !theApp.execute( m_command ) ) return;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// A %N jelet az elõzõ ember comment mezejéhez hozzáteszi
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CGaInput::updatePreviousTable( CString cLine )
-{
-	m_command.Format( L"UPDATE tables SET known_as='%s' WHERE rowid ='%d'", cLine, m_rowid_table );
-	if( !theApp.execute( m_command ) ) return;
+	}
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaInput::clearAll()

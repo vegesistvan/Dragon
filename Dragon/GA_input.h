@@ -148,7 +148,8 @@ public:
 	void	noDate( CString str, SNAMEBLOCK *snb );
 
 	CString	getDescendant( CString cLine );
-	
+	void	getMarriageSubstrings( CString cLine );
+
 	int		getMotherIndex( TCHAR generation, int n_mother_index );
 	int		getSexId( CString first_name );
 	BOOL	isTitle( CString cLine ) ;
@@ -190,7 +191,7 @@ public:
 	int		insertSpouseParentsMarriage( UINT i );
 	int		insertSpouseSpousesMarriage( UINT i );
 	void	updatePreviousDescendant( CString cLine );
-	void	updatePreviousTable( CString cLine );
+//	void	updatePreviousTable( CString cLine );
 
 	void	insertIntoFiles( CString fileSpec );	
 

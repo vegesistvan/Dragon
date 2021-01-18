@@ -369,10 +369,8 @@
     <ClCompile Include="Table_places.cpp" />
     <ClCompile Include="SelectMother.cpp" />
     <ClCompile Include="Setup.cpp" />
-    <ClCompile Include="GA_input_DescendantSubstring.cpp" />
-    <ClCompile Include="GA_input_MarriageVector.cpp" />
-    <ClCompile Include="GA_input_PlaceDateComment.cpp" />
-    <ClCompile Include="GA_input_PeopleString.cpp" />
+    <ClCompile Include="GA_input_splitDescendantSubstring.cpp" />
+    <ClCompile Include="GA_input_splitMarriageSubstrings.cpp" />
     <ClCompile Include="html_Descendants.cpp" />
     <ClCompile Include="html_Spouses.cpp" />
     <ClCompile Include="GA_input_common.cpp" />
@@ -393,8 +391,8 @@
     <ClCompile Include="SelectTableHtml.cpp" />
     <ClCompile Include="SelectTableName.cpp" />
     <ClCompile Include="GA_input.cpp" />
-    <ClCompile Include="GA_input_Line.cpp" />
-    <ClCompile Include="GA_input_insert_blocks.cpp" />
+    <ClCompile Include="GA_input_splitLine.cpp" />
+    <ClCompile Include="GA_input_insert.cpp" />
     <ClCompile Include="Table_firstnames.cpp" />
     <ClCompile Include="GA_input_TableHeader.cpp" />
     <ClCompile Include="Table_GaTables.cpp" />

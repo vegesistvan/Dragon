@@ -302,25 +302,19 @@ void CGaInput::splitMarriageSubstrings()
 		v_marriages.at(i).commentM		= spf.comment;
 
 // házastárs további házastársainak feldolgozása
+// 2f. Gaiger György, 3f. Nicky Sándor
 		brace = v_marriages.at(i).spouse_spouses;
+		if( brace.IsEmpty() ) continue;
+
+
+		SPOUSESPOUSES ss;
+		std::vector<PEOPLE> v_p;
+		v_spouseSpouses.clear();	
+		v_p.clear();
+
 		if( (pos = brace.Find( L"f." ) ) != -1 )
 		{
 			v_marriages.at(i).spouses = brace.Mid( pos -1 );
-		}
-/*
-		else  // a házastársnak nincsenek további házastársai, tehát neki ez az elsõ házassága
-		{
-			v_marriages.at(i).order = 1;
-		}
-*/
-		SPOUSESPOUSES ss;
-		std::vector<PEOPLE> v_p;
-
-
-		v_spouseSpouses.clear();	
-		v_p.clear();
-		if( !v_marriages.at(i).spouses.IsEmpty() )				// vannak házastársak 
-		{
 			splitSpousesSpouses( v_marriages.at(i).spouses, &v_p );	//v_p-be házastársanként felbontja a stringet
 
 			for( UINT j = 0; j < v_p.size(); ++j )
@@ -355,23 +349,20 @@ void CGaInput::splitMarriageSubstrings()
 				ss.comment		= v_p.at(j).comment;
 				ss.order		= v_p.at(j).mother_index;
 				ss.spouseIndex	= i;
-				v_spouseSpouses.push_back( ss );
+				v_spouseSpouses.push_back( ss );				// házastársak házastársai 
 
 				
 			}
-
-					
 			// minden házastársnak kiszámítja a házasság-sorszámot
 			if( v_spouseSpouses.size() == 0 )	// ha a házastársnak nincsenek további házastársai, akkor neki ez az 1. házassága;
 				v_marriages.at(i).orderSpouse = 1;
 			else
 				v_marriages.at(i).orderSpouse = getOrderSpouse( &v_p );
-
-
 		}
 	}
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// vp-ben a házastársa házastársai
 int CGaInput::getOrderSpouse( std::vector<PEOPLE>* vp )
 {
 	UINT	i;
@@ -1174,6 +1165,9 @@ void CGaInput::splitFullname( CStringArray* A, NAME* name )
 //
 // 2f. Zahutrecky Éva 1771
 // 3f. Mnisek Szaniszló 1602 néhai lengyel
+// 2f.Gaiger György, 3f. Niczky Sándor	
+
+// A spousese stringbõl a v_p vektorba írja át a házastárs házastársait a splitPeopleString segítségéval
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaInput::splitSpousesSpouses( CString spouses,  std::vector<PEOPLE> *v_p )
 {
@@ -1183,43 +1177,23 @@ void CGaInput::splitSpousesSpouses( CString spouses,  std::vector<PEOPLE> *v_p )
 
 
 	int pos;
-	int pos2;
-
+	int pos2 = 0;
+	int posComma = 0;
 
 	v_p->clear();
-	while( !spouses.IsEmpty() )
+
+	while( true )
 	{
-		if( (pos = spouses.Find( L"f." ) ) != -1 )
-		{
-			order = _wtoi( spouses.Left(1) );
-			if( (pos2 = spouses.Find( L"f.", pos + 2 ) ) != -1 )
-			{
-				spouse = spouses.Mid( pos+3, pos2-pos-5 );
-				spouses = spouses.Mid( pos2-1 );
-			}
-			else
-			{
-				spouse = spouses.Mid( 3 );
-//				spouse.Replace( ')', ' ' );   // miért akartam ezt?
-				spouse.Trim();
-				spouses.Empty();
-			}
-			spouse.Replace( ',', ' ' );
-			spouse.Trim();
-		}
+		if( (pos = spouses.Find( L"f.", pos2 ) ) == -1 )  break;	// a házastársdnak nincs több házastársa
+		pos2 = pos + 1;
+		order = _wtoi( spouses.Mid( pos-1, 1 ) );
+		if( (posComma = spouses.Find( ',', posComma+1 ) ) != -1 )	// , is van, több házastárs is lesz
+			spouse = spouses.Mid( pos+3, posComma - pos - 3 );
 		else
-		{
-			order = 0;
-			spouse = spouses;
-		}
-		spouse.Replace( '?', ' ' );
-		spouse.Trim();
+			spouse = spouses.Mid( pos+3 );
 
 		splitPeopleString( 0,  spouse,  &people );
-		people.mother_index = order;
+		people.mother_index = order;   // a házastárs házastársának nincs megadva az anyja, ezért a mother_index-et a házasság sorszámára használjuk
 		v_p->push_back( people );
-		if( pos == - 1)
-			break;;
-
-	}
+	};
 }
