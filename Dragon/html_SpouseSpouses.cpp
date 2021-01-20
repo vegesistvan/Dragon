@@ -131,10 +131,10 @@ void CSpouseSpouses::fillTable( )
 	}SPOUSES1;
 
 	CGaInput split;
-	std::vector<CString> v_Spouses;		// leszármazott házastársai
-	std::vector<MARRIAGES> v_M;			// leszármazott házasságai
-	std::vector<SPOUSES1> v_sps;		// házastárs házastársai
-	std::vector<PEOPLE> v_p;
+//	std::vector<CString> v_Spouses;		// leszármazott házastársai
+//	std::vector<MARRIAGES> v_M;			// leszármazott házasságai
+//	std::vector<SPOUSES1> v_sps;		// házastárs házastársai
+//	std::vector<PEOPLE> v_p;
 
 	PEOPLE p;
 

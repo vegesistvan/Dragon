@@ -310,6 +310,7 @@
     <ClCompile Include="EditMarriage.cpp" />
     <ClCompile Include="EditPeople.cpp" />
     <ClCompile Include="FatherMother.cpp" />
+    <ClCompile Include="GA_input_processMarriageString.cpp" />
     <ClCompile Include="Gedcom.cpp" />
     <ClCompile Include="GedcomOut.cpp" />
     <ClCompile Include="app_export.cpp" />

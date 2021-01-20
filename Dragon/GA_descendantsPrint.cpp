@@ -108,7 +108,7 @@ CString CGaDescendants::getFamilyName( CString family )
 	if( titolo.IsEmpty() )
 		str = familyName;
 	else if( !familyName.IsEmpty() )
-		str.Format( L"%s,%s", familyName, titolo );
+		str.Format( L"%s, %s", familyName, titolo );
 	else
 		str.Empty();
 	return( str );
@@ -121,9 +121,9 @@ void CGaDescendants::printDescendant( int ix )
 
 // leszármazott neve
 	if( m_CheckLastName )
-		cLine.Format( L"%s %s",  getLastname( &p ), getFirstname( &p ) ); //attrib[m_ixName].code1, p.first_name, attrib[m_ixName].code2 ); 
+		cLine.Format( L"%s %s",  getLastname( &p ), getFirstname( &p )); //attrib[m_ixName].code1, p.first_name, attrib[m_ixName].code2 ); 
 	else
-		cLine.Format( L"%s", getFirstname( &p ) ); //attrib[m_ixName].code1, p.first_name, attrib[m_ixName].code2 ); 
+		cLine.Format( L"%s", getFirstname( &p )); //attrib[m_ixName].code1, p.first_name, attrib[m_ixName].code2 ); 
 	
 // ha apjának több felkesége volt,a felség sorszámának kiírása
 	if( vDesc.at(ix).numOfMothers > 1 )
@@ -142,6 +142,13 @@ void CGaDescendants::printDescendant( int ix )
 				fwprintf( fl, L"%s. ", p.mother_index2 );
 		}
 	}
+	if( !p.posterior.IsEmpty() )
+	{
+		cLine += L" ";
+		cLine += p.posterior;
+	}
+
+
 	// nem értem, hogy hogy az alábbi if-nek mi az értelme. Ezuért most kikapcsoltam 2020.10.04
 /*	
 	if( m_numbering == SZLUHA || m_numbering == TUP )
@@ -505,6 +512,7 @@ void CGaDescendants::queryPeople( CString rowid, PPEOPLE* p )
 	p->death_place		= m_recordset.GetFieldString( PEOPLE_DEATH_PLACE );
 	p->father_id		= m_recordset.GetFieldString( PEOPLE_FATHER_ID );
 	p->first_name		= m_recordset.GetFieldString( PEOPLE_FIRST_NAME );
+	p->posterior		= m_recordset.GetFieldString( PEOPLE_POSTERIOR );
 	p->folyt			= m_recordset.GetFieldString( PEOPLE_FOLYT );
 	p->gap				= m_recordset.GetFieldString( PEOPLE_GAP );
 	p->generation		= m_recordset.GetFieldString( PEOPLE_GENERATION );

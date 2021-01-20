@@ -29,6 +29,7 @@ enum
 	MG_TITOLO,
 	MG_LAST_NAME,
 	MG_FIRST_NAME,
+	MG_POSTERIOR,
 	MG_SEX_ID,
 	MG_BPLACE,
 	MG_BDATE,
@@ -121,6 +122,7 @@ BOOL CHtmlSpouses::OnInitDialog()
 	m_ListCtrl.InsertColumn( MG_TITOLO,			L"elõnév",					LVCFMT_LEFT,	80,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( MG_LAST_NAME,		L"családnév",				LVCFMT_LEFT,	80,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( MG_FIRST_NAME,		L"utónév",					LVCFMT_LEFT,	80,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( MG_POSTERIOR,		L"utótag",					LVCFMT_LEFT,	80,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( MG_SEX_ID,			L"sex",						LVCFMT_LEFT,	30,-1,COL_TEXT);
 
 	m_ListCtrl.InsertColumn( MG_BPLACE,			L"születés",				LVCFMT_LEFT,	100,-1,COL_TEXT);
@@ -280,12 +282,13 @@ void CHtmlSpouses::fillTable( )
 				m_ListCtrl.SetItemText( nItem, MG_SPOUSE, split.v_marriages.at(i).spouseFullname );
 				str = split.v_marriages.at(i).parents;
 				m_ListCtrl.SetItemText( nItem, MG_PARENTS, split.v_marriages.at(i).parents );
-				m_ListCtrl.SetItemText( nItem, MG_SPOUSE_SPOUSES, split.v_marriages.at(i).spouse_spouses );
+				m_ListCtrl.SetItemText( nItem, MG_SPOUSE_SPOUSES, split.v_marriages.at(i).moreSpouses );
 
 				m_ListCtrl.SetItemText( nItem, MG_TITLE, split.v_marriages.at(i).title );
 				m_ListCtrl.SetItemText( nItem, MG_TITOLO, split.v_marriages.at(i).titolo );
 				m_ListCtrl.SetItemText( nItem, MG_LAST_NAME, split.v_marriages.at(i).last_name );
 				m_ListCtrl.SetItemText( nItem, MG_FIRST_NAME, split.v_marriages.at(i).first_name );
+				m_ListCtrl.SetItemText( nItem, MG_POSTERIOR, split.v_marriages.at(i).first_name );   //!!!!!!!!!!!!!!!
 				str.Format( L"%d", split.v_marriages.at(i).sex_id );
 				m_ListCtrl.SetItemText( nItem, MG_SEX_ID, str );
 
@@ -325,7 +328,7 @@ void CHtmlSpouses::fillTable( )
 				m_ListCtrl.SetItemText( nItem, MG_DDATEM, split.v_marriages.at(i).deathDateM );
 				m_ListCtrl.SetItemText( nItem, MG_COMMENTM, split.v_marriages.at(i).commentM );
 
-				m_ListCtrl.SetItemText( nItem, MG_SPOUSE_SPOUSES, split.v_marriages.at(i).spouse_spouses );
+				m_ListCtrl.SetItemText( nItem, MG_SPOUSE_SPOUSES, split.v_marriages.at(i).moreSpouses );
 				++nItem;
 
 				position = (int)file.GetPosition();

@@ -21,12 +21,27 @@ enum
 	L_MARRIAGE,
 	L_PLACE,
 	L_DATE,
-	L_NAME_STR,
-	L_BIRTH_STR,
-	L_DEATH_STR,
+	L_TITLE,
+	L_TITOLO,
+	L_LAST_NAME,
+	L_FIRST_NAME,
+	L_POSTERIOR,
+	L_BIRTH_PLACE,
+	L_BIRTH_DATE,
+	L_DEATH_PLACE,
+	L_DEATH_DATE,
 	L_COMMENT,
-	L_BRACE,
-	L_ARM,
+	L_FATHER,
+	L_BIRTH_PLACEF,
+	L_BIRTH_DATEF,
+	L_DEATH_PLACEF,
+	L_DEATH_DATEF,
+	L_MOTHER,
+	L_BIRTH_PLACEM,
+	L_BIRTH_DATEM,
+	L_DEATH_PLACEM,
+	L_DEATH_DATEM,
+	L_MORESPOUSES,
 };
 IMPLEMENT_DYNAMIC(CMarriages, CDialogEx)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -85,12 +100,27 @@ BOOL CMarriages::OnInitDialog()
 	m_ListCtrl.InsertColumn( L_MARRIAGE,		L"házasság",			LVCFMT_LEFT,    600,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_PLACE,			L"helye",				LVCFMT_LEFT,	 80,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_DATE,			L"ideje",				LVCFMT_LEFT,	 80,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( L_NAME_STR,		L"házastárs",			LVCFMT_LEFT,	400,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( L_BIRTH_STR,		L"született",			LVCFMT_LEFT,	100,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( L_DEATH_STR,		L"meghalt",				LVCFMT_LEFT,	100,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_TITLE,			L"title",				LVCFMT_LEFT,	 80,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_TITOLO,			L"titolo",				LVCFMT_LEFT,	 80,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_LAST_NAME,		L"last_name",			LVCFMT_LEFT,	 80,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_FIRST_NAME,		L"first_name",			LVCFMT_LEFT,	 80,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_POSTERIOR,		L"posterior",			LVCFMT_LEFT,	 80,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_BIRTH_PLACE,		L"birth",				LVCFMT_LEFT,	 80,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_BIRTH_DATE,		L"birth",				LVCFMT_LEFT,	 80,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_DEATH_PLACE,		L"death",				LVCFMT_LEFT,	 80,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_DEATH_DATE,		L"death",				LVCFMT_LEFT,	 80,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_COMMENT,			L"megjegyzés",			LVCFMT_LEFT,	100,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( L_BRACE,			L"rokonok",				LVCFMT_LEFT,	100,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( L_ARM,				L"ág",					LVCFMT_LEFT,	200,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_FATHER,			L"apa",					LVCFMT_LEFT,	 80,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_BIRTH_PLACEF,	L"születés",			LVCFMT_LEFT,	 80,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_BIRTH_DATEF,		L"születés",			LVCFMT_LEFT,	 80,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_DEATH_PLACEF,	L"halál",				LVCFMT_LEFT,	 80,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_DEATH_DATEF,		L"halál",				LVCFMT_LEFT,	 80,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_MOTHER,			L"anya",					LVCFMT_LEFT,	 80,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_BIRTH_PLACEM,	L"születés",			LVCFMT_LEFT,	 80,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_BIRTH_DATEM,		L"születés",			LVCFMT_LEFT,	 80,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_DEATH_PLACEM,	L"halál",				LVCFMT_LEFT,	 80,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_DEATH_DATEM,		L"halál",				LVCFMT_LEFT,	 80,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_MORESPOUSES,		L"házastársak",			LVCFMT_LEFT,	 80,-1,COL_TEXT);
 
 	m_colorCaption.SetTextColor( theApp.m_colorClick );
 	m_orderix = 0;
@@ -216,12 +246,40 @@ void CMarriages::fillTable( )
 				m_ListCtrl.SetItemText( nItem, L_MARRIAGE, marriage );
 				m_ListCtrl.SetItemText( nItem, L_PLACE, split.v_marriages.at(i).place );
 				m_ListCtrl.SetItemText( nItem, L_DATE, split.v_marriages.at(i).date );
-				m_ListCtrl.SetItemText( nItem, L_NAME_STR, split.v_marriages.at(i).spouseFullname );
-				m_ListCtrl.SetItemText( nItem, L_BIRTH_STR, split.v_marriages.at(i).birthSubstr );
-				m_ListCtrl.SetItemText( nItem, L_DEATH_STR, split.v_marriages.at(i).deathSubstr );
+
+				m_ListCtrl.SetItemText( nItem, L_TITLE, split.v_marriages.at(i).title );
+				m_ListCtrl.SetItemText( nItem, L_TITOLO, split.v_marriages.at(i).titolo );
+				m_ListCtrl.SetItemText( nItem, L_LAST_NAME, split.v_marriages.at(i).last_name );
+				m_ListCtrl.SetItemText( nItem, L_FIRST_NAME, split.v_marriages.at(i).first_name );
+				m_ListCtrl.SetItemText( nItem, L_POSTERIOR, split.v_marriages.at(i).posterior );
+				m_ListCtrl.SetItemText( nItem, L_BIRTH_PLACE, split.v_marriages.at(i).birth_place );
+				m_ListCtrl.SetItemText( nItem, L_BIRTH_DATE, split.v_marriages.at(i).birth_date );
+				m_ListCtrl.SetItemText( nItem, L_DEATH_PLACE, split.v_marriages.at(i).death_place );
+				m_ListCtrl.SetItemText( nItem, L_DEATH_DATE, split.v_marriages.at(i).death_date );
 				m_ListCtrl.SetItemText( nItem, L_COMMENT, split.v_marriages.at(i).comment );
-				m_ListCtrl.SetItemText( nItem, L_BRACE, split.v_marriages.at(i).brace );
-				m_ListCtrl.SetItemText( nItem, L_ARM, split.v_marriages.at(i).arm );
+
+				
+				str.Format( L"%s %s %s %s %s",\
+split.v_marriages.at(i).titleF, split.v_marriages.at(i).titoloF, split.v_marriages.at(i).lastNameF, 
+split.v_marriages.at(i).firstNameF,split.v_marriages.at(i).posteriorF ); 					
+				str.Trim();
+				m_ListCtrl.SetItemText( nItem, L_FATHER, str );
+				m_ListCtrl.SetItemText( nItem, L_BIRTH_PLACEF, split.v_marriages.at(i).birthPlaceF );
+				m_ListCtrl.SetItemText( nItem, L_BIRTH_DATEF, split.v_marriages.at(i).birthDateF );
+				m_ListCtrl.SetItemText( nItem, L_DEATH_PLACEF, split.v_marriages.at(i).deathPlaceF );
+				m_ListCtrl.SetItemText( nItem, L_DEATH_DATEF, split.v_marriages.at(i).deathDateF );
+
+				str.Format( L"%s %s %s %s %s",\
+split.v_marriages.at(i).titleM, split.v_marriages.at(i).titoloM, split.v_marriages.at(i).lastNameM, 
+split.v_marriages.at(i).firstNameM,split.v_marriages.at(i).posteriorM ); 					
+				str.Trim();
+				m_ListCtrl.SetItemText( nItem, L_MOTHER, str );
+				m_ListCtrl.SetItemText( nItem, L_BIRTH_PLACEM, split.v_marriages.at(i).birthPlaceM );
+				m_ListCtrl.SetItemText( nItem, L_BIRTH_DATEM, split.v_marriages.at(i).birthDateM );
+				m_ListCtrl.SetItemText( nItem, L_DEATH_PLACEM, split.v_marriages.at(i).deathPlaceM );
+				m_ListCtrl.SetItemText( nItem, L_DEATH_DATEM, split.v_marriages.at(i).deathDateM );
+
+				m_ListCtrl.SetItemText( nItem, L_MORESPOUSES, split.v_marriages.at(i).moreSpouses );
 
 				++nItem;
 				}

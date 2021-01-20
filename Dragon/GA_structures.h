@@ -116,6 +116,7 @@ typedef struct
 	CString titolo;
 	CString first_name;
 	CString last_name;
+	CString posterior;
 	CString other_names;
 	CString known_as;
 	CString birth_place ;
@@ -152,6 +153,7 @@ typedef struct
 	CString titolo;
 	CString first_name;
 	CString last_name;
+	CString posterior;
 	CString known_as;
 	CString birth_place ;
 	CString birth_date;
@@ -187,8 +189,14 @@ typedef struct
 	int		order;			// = jel elõtti szám ( vagy 0 )
 	CString line;
 	CString marriageSubstr;	// = jel utáni substr
+	CString weddigSubstr;
+	CString nameSubstr;
 	CString birthSubstr;
 	CString deathSubstr;
+	CString relativesSubstr;
+	CString parentsSubstr ;
+	CString spousesSubstr;
+
 	CString brace;			// () zárójel tartalma
 	CString parents;
 	CString spouses;				// a zárójelben felsorolt további házastársak
@@ -206,6 +214,7 @@ typedef struct
 	CString titolo;
 	CString first_name;
 	CString last_name;
+	CString posterior;
 
 	CString birth_place;
 	CString birth_date;
@@ -216,13 +225,14 @@ typedef struct
 	CString	mother_id;
 	int		orderSpouse;
 
-	CString spouse_spouses;
+	CString moreSpouses;
 
 	int		sex_idF;				// házastárs apjának blokkja
 	CString titleF;
 	CString titoloF;
 	CString firstNameF;
 	CString lastNameF;
+	CString posteriorF;
 	CString birthPlaceF;
 	CString birthDateF;
 	CString deathPlaceF;
@@ -236,6 +246,7 @@ typedef struct
 	CString titoloM;
 	CString firstNameM;
 	CString lastNameM;
+	CString posteriorM;
 	CString birthPlaceM;
 	CString birthDateM;
 	CString deathPlaceM;
@@ -275,6 +286,7 @@ typedef struct
 	CString titolo;
 	CString last_name;
 	CString first_name;
+	CString posterior;
 	CString comment;
 	CString fullname;
 	int		mother_index;
@@ -297,6 +309,7 @@ typedef struct
 	CString titolo;
 	CString first_name;
 	CString last_name;
+	CString posterior;
 	CString birth_place;
 	CString birth_date;
 	CString death_place;
@@ -333,6 +346,7 @@ typedef struct
 	int		sex_id;
 	CString title;
 	CString first_name;
+	CString posterior;
 	int		mother_index;
 }NAMEBLOCK;
 

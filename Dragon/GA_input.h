@@ -145,6 +145,9 @@ public:
 	CString	splitLineToSubstrings( CString cLine );
 
 	void	splitMarriageSubstrings();
+	void	splitMarriageSubstrings2();
+//	void	splitNameSubstr( CString cLine, int i );
+
 	void	noDate( CString str, SNAMEBLOCK *snb );
 
 	CString	getDescendant( CString cLine );
@@ -164,11 +167,20 @@ public:
 //CString	isItRelatives( CString cLine );
 
 	void	splitDescendantSubstring( CString cLine );
+	void	splitDescendantSubstring2( CString cLine );
 	void	splitPeopleString( int who, CString cLine, PEOPLE * p );
 	void	splitDescNameString( CString nameSubstring );
 	void	splitSpousesSpouses( CString sLine, std::vector<PEOPLE> *v_p);
 	void	splitSpFatherName( CString cLine, NAME* name );
 	void	splitSpouseNameString( CString nameComment, NAME* name ); 
+
+	void	splitSpouseNameString( int ix );
+	void	splitBirthSubstr( int ix );
+	void	splitDeathSubstr( int ix );
+	void	splitRelativesSubstr( int ix );
+
+
+
 	void	splitFullname( CStringArray* A, NAME* name );
 	void	splitName( CString namestr, NAME* name );
 
@@ -200,6 +212,12 @@ public:
 	BOOL	InputTable( int tableNumber );
 	BOOL	InputLine( int lineNumber );
 	BOOL	InputFileFromLine( int lineNUmber);
+
+
+	void	processPeopleStr( CString cLine,  PEOPLE* any );
+	void	splitNameSubstr( CString cLine, PEOPLE* any );
+	CString processWedding( CString cLine, PLACE_DATE_BLOCK* w );
+	int		checkSex( int sex_id );
 
 };
 

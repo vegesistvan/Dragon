@@ -157,7 +157,7 @@ void CGaInput::splitTableHeader( CString cLine )
 		familyName.Replace( ',',' ' );
 		familyName.Trim();
 		titolo	= cLine.Mid( pos+1 );
-		cLine	= cLine.Left( pos - 1 );
+		cLine	= cLine.Left( pos );
 	}
 	if( ( pos = cLine.Find( L"alias" ) ) != -1 )
 	{
@@ -174,17 +174,29 @@ void CGaInput::splitTableHeader( CString cLine )
 		else
 			titolo = titolo.Left( pos );
 	}
+	titolo.Trim();
+	CString word;
+	UINT i;
+	n = wordList( &A, titolo, ' ', true );
+	for( i = 0; i < n; ++i )
+	{
+		word = A[i];
+		if( word == L"és" ) continue;
+		if( word.Right(1) != 'i' ) break;
+	}
+	titolo = packWords( &A, 0, i );
+
 	if( m_tableHeader.percent == "%%%" )
 		m_titolo = titolo;
 
+	m_familyName				= familyName.Trim();
 
-	m_tableHeader.familyName	= familyName;
+	m_tableHeader.familyName	= m_familyName;
 	m_tableHeader.titolo		= m_titolo;
 	m_tableHeader.tableRoman	= tableRoman;
-	m_tableHeader.comment		= comment;
+	m_tableHeader.comment		= comment.Trim();
 	m_tableHeader.joint			= joint;
 	m_tableHeader.alias			= alias;
 
-	m_familyName				= familyName;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

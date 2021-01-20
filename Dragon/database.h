@@ -137,6 +137,7 @@ const COLUMN people[] =
 	{ L"titolo",					L"TEXT" },			// elõnév
 	{ L"first_name",				L"TEXT"	},
 	{ L"last_name",					L"TEXT"	},
+	{ L"posterior",					L"TEXT" },
 	{ L"other_names",				L"TEXT" },  // családnév_( családnév2, családnév 3..) -ból a zárójelben lévõ nevek
 	{ L"known_as",					L"TEXT"	},
 	{ L"birth_place",				L"TEXT"	},
@@ -180,6 +181,7 @@ enum
 	PEOPLE_TITOLO,
 	PEOPLE_FIRST_NAME,
 	PEOPLE_LAST_NAME,
+	PEOPLE_POSTERIOR,
 	PEOPLE_OTHER_NAMES,
 	PEOPLE_KNOWN_AS,
 	PEOPLE_BIRTH_PLACE,

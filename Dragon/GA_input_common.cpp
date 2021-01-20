@@ -201,25 +201,7 @@ void splitPlaceDateComment( CString placeDateComment, PLACE_DATE_BLOCK* ns )
 	}
 	else
 		ns->place = placeDateComment;   // nem talált vesszõt, az egész sor place
-/*
-	for( i = 0; i < n; ++i )
-	{
-		word = A[i];
-		if( (pos = word.Find( ',' ) ) != -1 )		// vesszõt talált.
-		{
-			A[i].Replace( ',', ' ' );
-			A[i].TrimRight();
-			ns->place = packWords( &A, 0, i+1 );
-			ns->comment = packWords( &A, i+1, n-i-1 );
-			return;
-		}
-	}
-	// nem talált vesszõt, az egész sor place
-	ns->place = placeDateComment;
-*/
 }
-
-
 
 // who: 1 házastárs apja
 // who: 2 házastárs anyja

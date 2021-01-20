@@ -81,6 +81,7 @@ enum
 	H_LAST_NAME,
 	H_KNOWN_AS,
 	H_FIRST_NAME,
+	H_POSTERIOR,
 	H_BIRTH_PLACE,
 	H_BIRTH_DATE,
 	H_DEATH_PLACE,
@@ -660,6 +661,7 @@ void CTablePeople::createListColumns( )
 		m_ListCtrl.InsertColumn( H_LAST_NAME,			L"családnév",		LVCFMT_LEFT,	110,-1,COL_TEXT);
 		m_ListCtrl.InsertColumn( H_KNOWN_AS,			L"más",				LVCFMT_LEFT,	 30,-1,COL_TEXT);
 		m_ListCtrl.InsertColumn( H_FIRST_NAME,			L"utónév",			LVCFMT_LEFT,	110,-1,COL_TEXT);
+		m_ListCtrl.InsertColumn( H_POSTERIOR,			L"utótag",			LVCFMT_LEFT,	 60,-1,COL_TEXT);
 		m_ListCtrl.InsertColumn( H_BIRTH_PLACE,			L"születés",		LVCFMT_LEFT,	120,-1,COL_TEXT);
 		m_ListCtrl.InsertColumn( H_BIRTH_DATE,			L"ideje",			LVCFMT_LEFT,	 70,-1,COL_TEXT);
 		m_ListCtrl.InsertColumn( H_DEATH_PLACE,			L"elhalálozás",		LVCFMT_LEFT,	120,-1,COL_TEXT);
@@ -944,6 +946,7 @@ void CTablePeople::fillRow( UINT i )
 		push( last_name );
 		push( m_recordset->GetFieldString( PEOPLE_KNOWN_AS ) );
 		push( m_recordset->GetFieldString( PEOPLE_FIRST_NAME ) );
+		push( m_recordset->GetFieldString( PEOPLE_POSTERIOR ) );
 		push( m_recordset->GetFieldString( PEOPLE_BIRTH_PLACE ) );
 		push( m_recordset->GetFieldString( PEOPLE_BIRTH_DATE ) );
 		push( m_recordset->GetFieldString( PEOPLE_DEATH_PLACE ) );

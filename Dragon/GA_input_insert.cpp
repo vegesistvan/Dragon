@@ -282,11 +282,11 @@ CString CGaInput::insertAny( PEOPLE* p )
 	CString values;
 	values.Format( L"\
 '%d','%d','%d','%d','%d','%d','%d','%d','%d',\
-'%c','%d','%s','%s','%s','%s','%s','%s','%s',\
+'%c','%d','%s','%s','%s','%s','%s','%s','%s', '%s',\
 '%s','%s','%s','%s','%s','%d','%d','%s','%d',\
 '%s','%s','%d','%d', '%s', '%d'",
 m_fileNumber, m_tableHeader.familyNumber,v_tableHeader.size(),m_lineNumber,p->source,1,0,0,0,\
-p->generation,p->sex_id,p->title,p->titolo,p->first_name.Trim(),last_name,other_names,p->birth_place,p->birth_date,\
+p->generation,p->sex_id,p->title,p->titolo,p->first_name.Trim(),last_name, p->posterior, other_names,p->birth_place,p->birth_date,\
 p->death_place,p->death_date,p->comment,p->father_id,p->mother_id,p->mother_index,p->mother_index2,p->folyt,p->tableAncestry,
 p->tableRoman,p->arm,p->orderFather,p->orderMother,p->csalad,p->gap );
 

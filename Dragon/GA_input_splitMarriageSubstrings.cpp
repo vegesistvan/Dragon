@@ -248,8 +248,8 @@ void CGaInput::splitMarriageSubstrings()
 			else if( ( pos = parents.Find( L" lánya" ) ) != -1 )
 				parents = parents.Left( pos );
 
-			v_marriages.at(i).parents			= parents;
-			v_marriages.at(i).spouse_spouses	= spouse_spouses;
+			v_marriages.at(i).parents		= parents;
+			v_marriages.at(i).moreSpouses	= spouse_spouses;
 		}
 
 // házastárs szüleinek feldolgozása
@@ -307,7 +307,7 @@ void CGaInput::splitMarriageSubstrings()
 
 // házastárs további házastársainak feldolgozása
 // 2f. Gaiger György, 3f. Nicky Sándor
-		brace = v_marriages.at(i).spouse_spouses;
+		brace = v_marriages.at(i).moreSpouses;
 		if( brace.IsEmpty() ) continue;
 
 
@@ -1214,3 +1214,96 @@ void CGaInput::splitSpousesSpouses( CString spouses,  std::vector<PEOPLE> *v_p )
 		v_p->push_back( people );
 	};
 }
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// [title][titolo]last_name first_name
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CGaInput::splitSpouseNameString( int ix ) 
+{
+	CString word;
+	CStringArray A;
+	CString title;
+	CString fullname;
+	int n;
+	int i = 0;
+	int sex_id;
+	int dbComment = 0;
+	BOOL	volt = FALSE;
+
+	fullname = v_marriages.at(ix).fullname;
+
+
+
+	n = wordList( &A, fullname, ' ', FALSE ); 
+	if( n < 2 ) return;
+
+	// a sor elejérõl leszedi a title-t, ami mindig kisbetûs
+	for( i = 0; i < n; ++i )
+	{
+		if( iswlower( A[i].GetAt( 0 ) ) )
+		{
+			title += A[i];
+			title += L" ";
+		}
+		else
+			break;
+	}
+	v_marriages.at(ix).title = title.TrimRight();
+
+	if( isLastCharacter( A[i], 'i' ) )						// elõnév következik
+	{
+		if( (sex_id = isFirstName( A[i+1] )) != -1 )		// hamis elõnév
+		{
+			v_marriages.at(ix).last_name	= A[i];
+			v_marriages.at(ix).first_name	= packWords( &A, i+1, n-i-1 );
+			v_marriages.at(ix).sex_id		= sex_id;
+			return;
+		}
+		if( A[i+1] == L"és" )					// kettõs elõnév
+		{
+			v_marriages.at(ix).titolo = packWords( &A, i, 3 );
+			i += 3;
+		}
+		else
+		{
+			v_marriages.at(ix).titolo = A[i];
+			++i;
+		}
+	}
+	v_marriages.at(ix).last_name = A[i];		// családnév
+	if( iswlower( A[n-1][0] ) )
+	{
+		v_marriages.at(ix).posterior = A[n-1];
+		--n;
+	}
+
+
+	v_marriages.at(ix).first_name = packWords( &A, i+1, n-i-1 );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CGaInput::splitBirthSubstr( int ix )
+{
+	CString birthSubstr = v_marriages.at(ix).birthSubstr;
+	if( birthSubstr.IsEmpty() ) return;
+
+	PLACE_DATE_BLOCK ns;
+	splitPlaceDateComment( birthSubstr, &ns );
+	v_marriages.at(ix).birth_date = ns.date;
+	v_marriages.at(ix).birth_place = ns.place;
+	if( !ns.comment.IsEmpty() )
+		v_marriages.at(ix).comment = ns.comment;
+
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CGaInput::splitDeathSubstr( int ix )
+{
+	CString deathSubstr = v_marriages.at(ix).deathSubstr;
+	if( deathSubstr.IsEmpty() ) return;
+
+	PLACE_DATE_BLOCK ns;
+	splitPlaceDateComment( deathSubstr, &ns );
+	v_marriages.at(ix).death_date = ns.date;
+	v_marriages.at(ix).death_place = ns.place;
+	if( !ns.comment.IsEmpty() )
+		v_marriages.at(ix).comment = ns.comment;
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

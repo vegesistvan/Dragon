@@ -20,9 +20,11 @@ enum
 	PS_NAME_STR,
 	PS_BIRTH_STR,
 	PS_DEATH_STR,
+	PS_TITOLO,
+	PS_TITLE,
 	PS_LAST_NAME,
 	PS_FIRST_NAME,
-	PS_TITLE,
+	PS_POSTERIOR,
 	PS_SEX_ID,
 	PS_MOTHER_INDEX,
 	PS_BPLACE,
@@ -88,9 +90,11 @@ BOOL CDescendant::OnInitDialog()
 	m_ListCtrl.InsertColumn( PS_NAME_STR,		L"nameSubString",	LVCFMT_LEFT,	100,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( PS_BIRTH_STR,		L"birthSubstring",	LVCFMT_LEFT,	100,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( PS_DEATH_STR,		L"deathSubstring",	LVCFMT_LEFT,	100,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( PS_TITOLO,			L"elõnév",			LVCFMT_LEFT,	 50,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( PS_TITLE,			L"title",			LVCFMT_LEFT,	 50,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( PS_LAST_NAME,		L"családnév",		LVCFMT_LEFT,	 50,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( PS_FIRST_NAME,		L"utónév",			LVCFMT_LEFT,	 50,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( PS_TITLE,			L"title",			LVCFMT_LEFT,	 50,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( PS_POSTERIOR,		L"utótag",			LVCFMT_LEFT,	 50,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( PS_SEX_ID,			L"sex",				LVCFMT_LEFT,	 30,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( PS_MOTHER_INDEX,	L"motherindex",		LVCFMT_LEFT,	 50,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( PS_BPLACE,			L"b.hely",			LVCFMT_LEFT,	 80,-1,COL_TEXT);
@@ -221,10 +225,13 @@ void CDescendant::fillTable( )
 			m_ListCtrl.SetItemText( nItem, PS_BIRTH_STR, split._descBirthSS );
 			m_ListCtrl.SetItemText( nItem, PS_DEATH_STR, split._descDeathSS );
 
-			m_ListCtrl.SetItemText( nItem, PS_LAST_NAME, split.d.last_name );
-			m_ListCtrl.SetItemText( nItem, PS_LAST_NAME, split.m_tableHeader.familyName );
-			m_ListCtrl.SetItemText( nItem, PS_FIRST_NAME, split.d.first_name );
+			m_ListCtrl.SetItemText( nItem, PS_TITOLO, split.m_titolo );
 			m_ListCtrl.SetItemText( nItem, PS_TITLE, split.d.title );
+			m_ListCtrl.SetItemText( nItem, PS_LAST_NAME, split.d.last_name );
+//			m_ListCtrl.SetItemText( nItem, PS_LAST_NAME, split.m_tableHeader.familyName );
+			m_ListCtrl.SetItemText( nItem, PS_FIRST_NAME, split.d.first_name );
+			m_ListCtrl.SetItemText( nItem, PS_POSTERIOR, split.d.posterior );
+	
 
 			str.Format( L"%d", split.d.sex_id );
 			m_ListCtrl.SetItemText( nItem, PS_SEX_ID, str );

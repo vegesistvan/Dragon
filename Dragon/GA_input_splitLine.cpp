@@ -17,9 +17,11 @@ void CGaInput::splitLine( CString cLine)
 	m_descendant = getDescendant( cLine );
 	getMarriageSubstrings( cLine );
 
+//	splitDescendantSubstring2( m_descendant );			// d struktúrába teszi az elemeket
+//	splitMarriageSubstrings2();							// a v_marriages vektor substringjeit felbontja és visszateszi a vektorba
+
 	splitDescendantSubstring( m_descendant );			// d struktúrába teszi az elemeket
 	splitMarriageSubstrings();							// a v_marriages vektor substringjeit felbontja és visszateszi a vektorba
-
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Leszedi a sor végérõl az elágazás jelzését, amit megtisztítva az 'm_folyt' változóba tesz;
@@ -150,6 +152,8 @@ void CGaInput::getMarriageSubstrings( CString cLine )
 	
 		marriageSubstring = cLine.Mid( pos+1, posNext-pos-2 );
 		marriageSubstring.Trim();
+		if( marriageSubstring.IsEmpty() ) break;  // ez hibás GA.html-nél fordulhat elõ
+
 		marriagesS.marriageSubstr = marriageSubstring;
 		v_marriages.push_back( marriagesS );
 	}

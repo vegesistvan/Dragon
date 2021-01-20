@@ -72,6 +72,7 @@ title,\
 titolo,\
 first_name,\
 last_name,\
+posterior,\
 other_names,\
 birth_place,\
 birth_date,\
