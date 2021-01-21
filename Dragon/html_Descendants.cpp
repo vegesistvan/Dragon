@@ -66,6 +66,10 @@ BEGIN_MESSAGE_MAP(CDescendant, CDialogEx)
 	ON_EN_CHANGE(IDC_SEARCH, &CDescendant::OnChangeSearch)
 	ON_COMMAND(ID_NEWTABLE, &CDescendant::OnNewtable)
 	ON_COMMAND(ID_D_LIST, &CDescendant::OnDList)
+	
+	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
+	ON_COMMAND(ID_HTML_EDIT, &CDescendant::OnHtmlEdit)
+	ON_COMMAND(ID_HTML_NOTEPAD, &CDescendant::OnHtmlNotepad)
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CDescendant::OnInitDialog()
@@ -426,3 +430,43 @@ void CDescendant::PostNcDestroy()
 	}
 	delete this;
 }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+LRESULT CDescendant::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
+{
+	CPoint* point=(CPoint*) lParam;
+    CMenu	Menu;
+	CMenu*	pPopup;
+	int		MENU_IDR;
+
+	MENU_IDR = IDR_DROPDOWN_HTML_EDIT;
+	if(Menu.LoadMenu( MENU_IDR ))
+    {
+		pPopup = Menu.GetSubMenu(0);
+		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
+		{
+//			pPopup->EnableMenuItem(ID_RELATIONS,MF_BYCOMMAND | MF_GRAYED);
+//			pPopup->EnableMenuItem(ID_EDIT_DELETE,MF_BYCOMMAND | MF_GRAYED);
+		}
+		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
+    }
+	return TRUE;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDescendant::OnHtmlEdit()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	PS_LINENUMBER ) );
+	theApp.listHtmlLine( lineNumber );
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDescendant::OnHtmlNotepad()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	CString lineNumber = m_ListCtrl.GetItemText( nItem, PS_LINENUMBER );
+	if( !lineNumber.IsEmpty() ) 
+		theApp.editNotepad( lineNumber );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+

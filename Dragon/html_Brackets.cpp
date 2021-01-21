@@ -100,6 +100,12 @@ BEGIN_MESSAGE_MAP(CHtmlBrackets, CDialogEx)
 	ON_COMMAND(ID_R_DESC_RELATIVES, &CHtmlBrackets::OnRDescRelatives)
 	ON_COMMAND(ID_FILTER_R_TABLE, &CHtmlBrackets::OnFilterRTable)
 	ON_COMMAND(ID_FILTER_R_ALL, &CHtmlBrackets::OnFilterRAll)
+
+	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
+	ON_COMMAND(ID_HTML_EDIT, &CHtmlBrackets::OnHtmlEdit)
+	ON_COMMAND(ID_HTML_NOTEPAD, &CHtmlBrackets::OnHtmlNotepad)
+
+
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CHtmlBrackets::OnInitDialog()
@@ -611,3 +617,41 @@ void CHtmlBrackets::OnRDescOther()
 //	_filterText = L"Kerek zárójelek a leszármazotti rekordokban, amelyek 'fia' vagy 'lánya' kulcsszót tartalmaznak.";
 //	fillTable();
 //}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+LRESULT CHtmlBrackets::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
+{
+	CPoint* point=(CPoint*) lParam;
+    CMenu	Menu;
+	CMenu*	pPopup;
+	int		MENU_IDR;
+
+	MENU_IDR = IDR_DROPDOWN_HTML_EDIT;
+	if(Menu.LoadMenu( MENU_IDR ))
+    {
+		pPopup = Menu.GetSubMenu(0);
+		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
+		{
+//			pPopup->EnableMenuItem(ID_RELATIONS,MF_BYCOMMAND | MF_GRAYED);
+//			pPopup->EnableMenuItem(ID_EDIT_DELETE,MF_BYCOMMAND | MF_GRAYED);
+		}
+		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
+    }
+	return TRUE;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CHtmlBrackets::OnHtmlEdit()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	0 ) );
+	theApp.listHtmlLine( lineNumber );
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CHtmlBrackets::OnHtmlNotepad()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	CString lineNumber = m_ListCtrl.GetItemText( nItem, 0 );
+	if( !lineNumber.IsEmpty() ) 
+		theApp.editNotepad( lineNumber );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -31,8 +31,8 @@ IMPLEMENT_DYNAMIC(CGaDescendants, CDialogEx)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CGaDescendants::CGaDescendants(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CGaDescendants::IDD, pParent)
-	,m_connect(FALSE)		// táblákat összekösse-e
-	,m_woman(FALSE)			// nõk leszármazottait listázza-e
+	,m_connect(TRUE)		// táblákat összekösse-e
+	,m_woman(TRUE)			// nõk leszármazottait listázza-e
 	,m_setCombo(1)			// 0= nincsenek kiemelések, 1= defeault kiemelések 
 
 	,m_ixName( 1 )			// név bold
@@ -45,7 +45,7 @@ CGaDescendants::CGaDescendants(CWnd* pParent /*=NULL*/)
 	,m_CheckLastName(FALSE)	// családnév kiírása
 	,m_code(FALSE)			// ANSI vagy UTF8 kódrendszer
 	,m_numbering(0)			// milyen számozási rendszer legyen (0,1,2) 
-	,m_checkFamily(FALSE)	// %%% családnév,elõnév kiemelése
+	,m_checkFamily(TRUE)	// %%% családnév,elõnév kiemelése
 {
 
 }

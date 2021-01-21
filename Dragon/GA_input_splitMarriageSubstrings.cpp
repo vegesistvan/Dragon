@@ -157,9 +157,9 @@ void CGaInput::splitMarriageSubstrings()
 		v_marriages.at(i).place		+= snb.place;
 		v_marriages.at(i).date		= snb.date;
 		v_marriages.at(i).spouseFullname	= snb.name;
-
-		comment						+= snb.comment;
-		comment						+= L" ";
+		v_marriages.at(i).posterior	= snb.comment;
+//		comment						+= snb.comment;
+//		comment						+= L" ";
 
 		splitSpouseNameString( snb.name, &name );
 
@@ -208,9 +208,8 @@ void CGaInput::splitMarriageSubstrings()
 		v_marriages.at(i).titolo		= name.titolo;
 		v_marriages.at(i).last_name		= name.last_name;
 		v_marriages.at(i).first_name	= name.first_name;
+//		comment = name.comment;
 
-		comment += name.comment;
-		comment += L" ";
 
 		splitPlaceDateComment( birthSubstr, &bs );
 		v_marriages.at(i).birth_place	= bs.place;
@@ -345,6 +344,7 @@ void CGaInput::splitMarriageSubstrings()
 				ss.titolo		= v_p.at(j).titolo;
 				ss.last_name	= v_p.at(j).last_name;
 				ss.first_name	= v_p.at(j).first_name;
+				ss.posterior	= v_p.at(j).posterior;
 
 				ss.birth_place	= v_p.at(j).birth_place;
 				ss.birth_date	= v_p.at(j).birth_date;
@@ -635,7 +635,7 @@ void CGaInput::splitSpouseString( CString marriageString, SNAMEBLOCK *snb )
 		ret = isDate( &A, j, &datum );
 		if( ret )									// van datum!! és az ret szóból áll!
 		{
-			if( datum.Left(2) == L"kb" ) --j;		// a place 1 szóval kevesebb!  ( kb 1944)
+			if( datum.Left(2) == L"kb" || datum.Left(2) == L"elõtt" ) --j;		// a place 1 szóval kevesebb!  ( kb 1944)
 			snb->place	= packWords( &A, 0, j );	// dátum elõtt 'place'  (ha van)
  			snb->date	= datum;
 			snb->name	= packWords( &A, j + ret , i-j - ret );
@@ -697,7 +697,7 @@ void CGaInput::splitSpouseStringNew2( CString marriageString, SNAMEBLOCK *snb )
 		// 1. vagy [place] date name [comment]		// dátum a házasságkötés ideje	
 		// 2. vagy [place] name comment				// dátum a commentben!!
 		// A dátum után van-e név-struktúrájú string?
-		str = packWords( &A, i+db, n-i-1 );			// dátum utáni substring
+		str = packWords( &A, i+db, n-i-db );			// dátum utáni substring
 		if( dbn = isName( str, &name ) )  // a str elején név teljes név van-e? dbn = a név szószáma  
 		{
 			if( db )

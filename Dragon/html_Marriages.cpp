@@ -31,12 +31,17 @@ enum
 	L_DEATH_PLACE,
 	L_DEATH_DATE,
 	L_COMMENT,
+	L_PARENTS,
 	L_FATHER,
+	L_LAST_NAMEF,
+	L_FIRST_NAMEF,
 	L_BIRTH_PLACEF,
 	L_BIRTH_DATEF,
 	L_DEATH_PLACEF,
 	L_DEATH_DATEF,
 	L_MOTHER,
+	L_LAST_NAMEM,
+	L_FIRST_NAMEM,
 	L_BIRTH_PLACEM,
 	L_BIRTH_DATEM,
 	L_DEATH_PLACEM,
@@ -75,6 +80,11 @@ BEGIN_MESSAGE_MAP(CMarriages, CDialogEx)
 	ON_COMMAND(ID_MSUBSTR_UNFILTER, &CMarriages::OnUnfilter)
 	ON_COMMAND(ID_MSUBSTR_LIST, &CMarriages::OnList)
 	ON_COMMAND(ID_NEWTABLE, &CMarriages::OnNewtable )
+
+	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
+	ON_COMMAND(ID_HTML_EDIT, &CMarriages::OnHtmlEdit)
+	ON_COMMAND(ID_HTML_NOTEPAD, &CMarriages::OnHtmlNotepad)
+
 END_MESSAGE_MAP()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CMarriages::OnInitDialog()
@@ -110,12 +120,17 @@ BOOL CMarriages::OnInitDialog()
 	m_ListCtrl.InsertColumn( L_DEATH_PLACE,		L"death",				LVCFMT_LEFT,	 80,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_DEATH_DATE,		L"death",				LVCFMT_LEFT,	 80,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_COMMENT,			L"megjegyzés",			LVCFMT_LEFT,	100,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_PARENTS,			L"szülõk",				LVCFMT_LEFT,	100,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_FATHER,			L"apa",					LVCFMT_LEFT,	 80,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_LAST_NAMEF,		L"családnév",			LVCFMT_LEFT,	 80,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_FIRST_NAMEF,		L"utónév",				LVCFMT_LEFT,	 80,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_BIRTH_PLACEF,	L"születés",			LVCFMT_LEFT,	 80,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_BIRTH_DATEF,		L"születés",			LVCFMT_LEFT,	 80,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_DEATH_PLACEF,	L"halál",				LVCFMT_LEFT,	 80,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_DEATH_DATEF,		L"halál",				LVCFMT_LEFT,	 80,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( L_MOTHER,			L"anya",					LVCFMT_LEFT,	 80,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_MOTHER,			L"anya",				LVCFMT_LEFT,	 80,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_LAST_NAMEM,		L"családnév",			LVCFMT_LEFT,	 80,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_FIRST_NAMEM,		L"utónév",				LVCFMT_LEFT,	 80,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_BIRTH_PLACEM,	L"születés",			LVCFMT_LEFT,	 80,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_BIRTH_DATEM,		L"születés",			LVCFMT_LEFT,	 80,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_DEATH_PLACEM,	L"halál",				LVCFMT_LEFT,	 80,-1,COL_TEXT);
@@ -257,13 +272,16 @@ void CMarriages::fillTable( )
 				m_ListCtrl.SetItemText( nItem, L_DEATH_PLACE, split.v_marriages.at(i).death_place );
 				m_ListCtrl.SetItemText( nItem, L_DEATH_DATE, split.v_marriages.at(i).death_date );
 				m_ListCtrl.SetItemText( nItem, L_COMMENT, split.v_marriages.at(i).comment );
-
+				m_ListCtrl.SetItemText( nItem, L_PARENTS, split.v_marriages.at(i).parents );
 				
 				str.Format( L"%s %s %s %s %s",\
 split.v_marriages.at(i).titleF, split.v_marriages.at(i).titoloF, split.v_marriages.at(i).lastNameF, 
 split.v_marriages.at(i).firstNameF,split.v_marriages.at(i).posteriorF ); 					
 				str.Trim();
 				m_ListCtrl.SetItemText( nItem, L_FATHER, str );
+
+				m_ListCtrl.SetItemText( nItem, L_LAST_NAMEF, split.v_marriages.at(i).lastNameF );
+				m_ListCtrl.SetItemText( nItem, L_FIRST_NAMEF, split.v_marriages.at(i).firstNameF );
 				m_ListCtrl.SetItemText( nItem, L_BIRTH_PLACEF, split.v_marriages.at(i).birthPlaceF );
 				m_ListCtrl.SetItemText( nItem, L_BIRTH_DATEF, split.v_marriages.at(i).birthDateF );
 				m_ListCtrl.SetItemText( nItem, L_DEATH_PLACEF, split.v_marriages.at(i).deathPlaceF );
@@ -274,6 +292,8 @@ split.v_marriages.at(i).titleM, split.v_marriages.at(i).titoloM, split.v_marriag
 split.v_marriages.at(i).firstNameM,split.v_marriages.at(i).posteriorM ); 					
 				str.Trim();
 				m_ListCtrl.SetItemText( nItem, L_MOTHER, str );
+				m_ListCtrl.SetItemText( nItem, L_LAST_NAMEM, split.v_marriages.at(i).lastNameM );
+				m_ListCtrl.SetItemText( nItem, L_FIRST_NAMEM, split.v_marriages.at(i).firstNameM );
 				m_ListCtrl.SetItemText( nItem, L_BIRTH_PLACEM, split.v_marriages.at(i).birthPlaceM );
 				m_ListCtrl.SetItemText( nItem, L_BIRTH_DATEM, split.v_marriages.at(i).birthDateM );
 				m_ListCtrl.SetItemText( nItem, L_DEATH_PLACEM, split.v_marriages.at(i).deathPlaceM );
@@ -416,5 +436,43 @@ void CMarriages::PostNcDestroy()
 	}
 	delete this;
 }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+LRESULT CMarriages::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
+{
+	CPoint* point=(CPoint*) lParam;
+    CMenu	Menu;
+	CMenu*	pPopup;
+	int		MENU_IDR;
+
+	MENU_IDR = IDR_DROPDOWN_HTML_EDIT;
+	if(Menu.LoadMenu( MENU_IDR ))
+    {
+		pPopup = Menu.GetSubMenu(0);
+		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
+		{
+//			pPopup->EnableMenuItem(ID_RELATIONS,MF_BYCOMMAND | MF_GRAYED);
+//			pPopup->EnableMenuItem(ID_EDIT_DELETE,MF_BYCOMMAND | MF_GRAYED);
+		}
+		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
+    }
+	return TRUE;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CMarriages::OnHtmlEdit()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	L_LINE ) );
+	theApp.listHtmlLine( lineNumber );
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CMarriages::OnHtmlNotepad()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	CString lineNumber = m_ListCtrl.GetItemText( nItem, L_LINE );
+	if( !lineNumber.IsEmpty() ) 
+		theApp.editNotepad( lineNumber );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 

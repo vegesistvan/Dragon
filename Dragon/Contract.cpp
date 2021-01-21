@@ -154,7 +154,7 @@ házastársak\n\n\
 
 	sWHITE.Format( L"%u", RGB(255,255,255) );
 
-	m_name = L"";   // ha csak egy embert akarunk vizsgálni, itt megadhatjuk a nevét
+	m_name = L"";				// ha csak egy embert akarunk vizsgálni, itt megadhatjuk a nevét
 	m_azonos	= 1;			// az azonos adatpárok elõírt száma
 	nItem		= 0;
 	m_loopMax   = 4;

@@ -139,6 +139,9 @@ CString CGaInput::insertDescendant( )
 CString CGaInput::insertDescendantSpouse( UINT i )
 {
 	CString rowid(L"0");
+
+	if( !v_marriages.at(i).lastNameM.IsEmpty() || !v_marriages.at(i).firstNameM )				// elõfordulhat ilyem: = 1848.03.15  semmi más
+
 	s.source		= 2;
 	s.generation	= ' ';
 	s.sex_id		= v_marriages.at(i).sex_id;
@@ -146,6 +149,7 @@ CString CGaInput::insertDescendantSpouse( UINT i )
 	s.titolo		= v_marriages.at(i).titolo;
 	s.first_name	= v_marriages.at(i).first_name;
 	s.last_name		= v_marriages.at(i).last_name;
+	s.posterior		= v_marriages.at(i).posterior;
 	s.birth_place	= v_marriages.at(i).birth_place;
 	s.birth_date	= v_marriages.at(i).birth_date;
 	s.death_place	= v_marriages.at(i).death_place;
@@ -173,7 +177,7 @@ CString CGaInput::insertSpouseF( UINT i )
 {
 	CString rowidF(L"0");
 
-	if( !v_marriages.at(i).father.IsEmpty() )				// az apa csak utónevével szerepel
+	if( !v_marriages.at(i).lastNameF.IsEmpty() || !v_marriages.at(i).firstNameF )				// az apa csak utónevével szerepel
 	{
 		sf.source			= 3;
 		sf.generation		= ' ';
@@ -182,6 +186,7 @@ CString CGaInput::insertSpouseF( UINT i )
 		sf.titolo			= v_marriages.at(i).titoloF;
 		sf.last_name		= v_marriages.at(i).lastNameF;
 		sf.first_name		= v_marriages.at(i).firstNameF;
+		sf.posterior		= v_marriages.at(i).posteriorF;
 		sf.birth_place		= v_marriages.at(i).birthPlaceF;
 		sf.birth_date		= v_marriages.at(i).birthDateF;
 		sf.death_place		= v_marriages.at(i).deathPlaceF;
@@ -204,7 +209,8 @@ CString CGaInput::insertSpouseF( UINT i )
 CString CGaInput::insertSpouseM( UINT i )
 {
 	CString rowidM(L"0");
-	if( !v_marriages.at(i).mother.IsEmpty() )				// az apa csak utónevével szerepel
+	if( !v_marriages.at(i).lastNameM.IsEmpty() || !v_marriages.at(i).firstNameM )				// az apa csak utónevével szerepel
+//	if( !v_marriages.at(i).mother.IsEmpty() )				// az apa csak utónevével szerepel
 	{
 		sm.source			= 4;
 		sm.generation		= ' ';
@@ -213,6 +219,7 @@ CString CGaInput::insertSpouseM( UINT i )
 		sm.titolo			= v_marriages.at(i).titoloM;
 		sm.last_name		= v_marriages.at(i).lastNameM;
 		sm.first_name		= v_marriages.at(i).firstNameM;
+		sm.posterior		= v_marriages.at(i).posteriorM;
 		sm.birth_place		= v_marriages.at(i).birthPlaceM;
 		sm.birth_date		= v_marriages.at(i).birthDateM;
 		sm.death_place		= v_marriages.at(i).deathPlaceM;
@@ -245,6 +252,7 @@ CString CGaInput::insertSpouseS( UINT i )
 	ss.titolo			= v_spouseSpouses.at(i).titolo;
 	ss.last_name		= v_spouseSpouses.at(i).last_name;
 	ss.first_name		= v_spouseSpouses.at(i).first_name;
+	ss.posterior		= v_spouseSpouses.at(i).posterior;
 	ss.birth_place		= v_spouseSpouses.at(i).birth_place;
 	ss.birth_date		= v_spouseSpouses.at(i).birth_date;
 	ss.death_place		= v_spouseSpouses.at(i).death_place;

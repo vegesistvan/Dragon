@@ -49,22 +49,6 @@ void CGaInput::splitMarriageSubstrings2()
 	{
 		cLine = v_marriages.at(i).marriageSubstr.Trim();
 
-/*
-		// a végérõl leszedi a [] substringeket Erre nincs szükség, mert korábban megtörténe
-		if( cLine.Right( 1 ) == ']' )  // leszedi az [ág]-at
-		{
-			if( ( pos1 = cLine.ReverseFind( '[' ) ) != -1 && ( pos2 = cLine.Find( ']') ) != -1 )
-			{
-				arm = cLine.Mid( pos1+1, pos2-pos1-1 );
-				v_marriages.at(i).arm = arm;
-				cLine = cLine.Left( pos1-1 );
-			}
-			else
-			{
-				fwprintf( fh1, L"%s !!!<br>", cLine );   // ez a hibajelzés nem ide való!!!
-			}
-		}
-*/		
 		// a végérõl leszedi a () substringeket   
 		relativesSubstr.Empty();
 		spouseSubstr = cLine;
@@ -82,9 +66,12 @@ void CGaInput::splitMarriageSubstrings2()
 
 // spouseSubstr-rõl le kell venni az esetleges esküvõ helyét és dátumát
 		peopleSubstr = processWedding( spouseSubstr, &w );
+		if( peopleSubstr.IsEmpty() )continue;			// elõfordul = 1848.03.15 minden további adat nélkül
+
 		v_marriages.at(i).place = w.place;
 		v_marriages.at(i).date	= w.date;
 
+// a people blokk felbontása
 		processPeopleStr( peopleSubstr, &s );
 		v_marriages.at(i).sex_id		= checkSex( s.sex_id );
 		v_marriages.at(i).title			= s.title;
@@ -102,28 +89,45 @@ void CGaInput::splitMarriageSubstrings2()
 		if( relativesSubstr.IsEmpty() ) continue;
 
 		// felbontások
+
 		if( !relativesSubstr.IsEmpty() )
 		{
-			moreSpouses.Empty();
-			if( ( pos = relativesSubstr.Find( L"f." ) ) != -1 )
+			if( (pos = relativesSubstr.Find( L"f." ) ) != -1 )
 			{
-				moreSpouses = relativesSubstr.Mid( pos - 1, relativesSubstr.GetLength() - pos + 1 );
-				v_marriages.at(i).spousesSubstr = moreSpouses;
-				relativesSubstr = relativesSubstr.Left( pos - 3 );
+				if( pos > 1 )
+				{
+					parentsSubstr = relativesSubstr.Left( pos-2 );
+					parentsSubstr.Replace( ',', ' ' );
+					parentsSubstr.Trim();
+					moreSpouses = relativesSubstr.Mid( pos-1 );
+				}
+				else
+					moreSpouses = relativesSubstr;
 			}
-			parentsSubstr = relativesSubstr;
+			else
+				parentsSubstr = relativesSubstr;
+
+			if( ( pos = parentsSubstr.Find( L" fia" ) ) != -1 )
+				parentsSubstr = parentsSubstr.Left( pos );
+			else if( ( pos = parentsSubstr.Find( L" lánya" ) ) != -1 )
+				parentsSubstr = parentsSubstr.Left( pos );
+
+			v_marriages.at(i).parents		= parentsSubstr;
+			v_marriages.at(i).moreSpouses	= moreSpouses;
 		}
+
 
 
 // házastárs szüleinek feldolgozása
 		
 		father.Empty();
 		mother.Empty();
-		if( ( pos = parentsSubstr.Find( wchar_t('-') ) ) != -1 )					// szülõk szétválasztása
+		if( ( pos = parentsSubstr.Find( '-' ) ) != -1 )					// szülõk szétválasztása
 		{
+//			v_marriages.at(i).father = parentsSubstr.Left( pos );
+//			v_marriages.at(i).mother = parentsSubstr.Mid( pos + 1 );				// itt kellene tovább bontani a mothert, mert lehetnek adatai!! (164076 sor )
 			father = parentsSubstr.Left( pos );
 			mother = parentsSubstr.Mid( pos + 1 );				// itt kellene tovább bontani a mothert, mert lehetnek adatai!! (164076 sor )
-
 		}	
 		else														// a zárójelben csak apa és megjegyzés van!!
 		{
@@ -131,15 +135,19 @@ void CGaInput::splitMarriageSubstrings2()
 			if( isFirstName( str ) != - 1 )
 				father = str;
 		}
+		
 		str.Format( L"%s %s %s", v_marriages.at(i).titolo, v_marriages.at(i).last_name, father );
-
+		str.Format( L"XXX %s",  father );
+		str.Trim();
+			
 		PEOPLE	spf;
 		processPeopleStr( str, &spf );
+
 		v_marriages.at(i).sex_idF		= spf.sex_id;
 		v_marriages.at(i).titleF		= spf.title;
-		v_marriages.at(i).titoloF		= spf.titolo;
+		v_marriages.at(i).titoloF		= v_marriages.at(i).titolo;
 		v_marriages.at(i).firstNameF	= spf.first_name;
-		v_marriages.at(i).lastNameF		= spf.last_name;
+		v_marriages.at(i).lastNameF		= v_marriages.at(i).last_name;
 		v_marriages.at(i).posteriorF	= spf.posterior;
 		v_marriages.at(i).birthPlaceF	= spf.birth_place;
 		v_marriages.at(i).birthDateF	= spf.birth_date;
@@ -201,6 +209,7 @@ void CGaInput::splitMarriageSubstrings2()
 				ss.titolo		= v_p.at(j).titolo;
 				ss.last_name	= v_p.at(j).last_name;
 				ss.first_name	= v_p.at(j).first_name;
+				ss.posterior	= v_p.at(j).posterior;
 
 				ss.birth_place	= v_p.at(j).birth_place;
 				ss.birth_date	= v_p.at(j).birth_date;

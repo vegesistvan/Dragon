@@ -38,6 +38,8 @@ protected:
 	CString _filterText;
 
 	void CHtmlBrackets::fillTable();
+	void OnHtmlEdit();
+	void OnHtmlNotepad();
 
 	DECLARE_MESSAGE_MAP()
 	DECLARE_EASYSIZE
@@ -49,10 +51,7 @@ public:
 	afx_msg LRESULT OnSetColumnColor(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnColumnSorted(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult);
-	
-
-	
-	
+	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnFilterMindAll();
 	afx_msg void OnFilterMindAg();
 	afx_msg void OnFilterMindAdopt();

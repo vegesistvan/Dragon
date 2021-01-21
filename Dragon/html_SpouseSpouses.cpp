@@ -65,6 +65,11 @@ BEGIN_MESSAGE_MAP(CSpouseSpouses, CDialogEx)
 	ON_EN_CHANGE(IDC_SEARCH, &CSpouseSpouses::OnChangeSearch)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CSpouseSpouses::OnDblclkList)
 	ON_COMMAND(ID_NEWTABLE, &CSpouseSpouses::OnNewtable)
+
+	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
+	ON_COMMAND(ID_HTML_EDIT, &CSpouseSpouses::OnHtmlEdit)
+	ON_COMMAND(ID_HTML_NOTEPAD, &CSpouseSpouses::OnHtmlNotepad)
+
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////4
 BOOL CSpouseSpouses::OnInitDialog()
@@ -382,3 +387,40 @@ void CSpouseSpouses::PostNcDestroy()
 	}
 	delete this;
 }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+LRESULT CSpouseSpouses::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
+{
+	CPoint* point=(CPoint*) lParam;
+    CMenu	Menu;
+	CMenu*	pPopup;
+	int		MENU_IDR;
+
+	MENU_IDR = IDR_DROPDOWN_HTML_EDIT;
+	if(Menu.LoadMenu( MENU_IDR ))
+    {
+		pPopup = Menu.GetSubMenu(0);
+		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
+		{
+//			pPopup->EnableMenuItem(ID_RELATIONS,MF_BYCOMMAND | MF_GRAYED);
+//			pPopup->EnableMenuItem(ID_EDIT_DELETE,MF_BYCOMMAND | MF_GRAYED);
+		}
+		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
+    }
+	return TRUE;
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CSpouseSpouses::OnHtmlEdit()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	L_LINE_NUMBER ) );
+	theApp.listHtmlLine( lineNumber );
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CSpouseSpouses::OnHtmlNotepad()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	CString lineNumber = m_ListCtrl.GetItemText( nItem, L_LINE_NUMBER );
+	if( !lineNumber.IsEmpty() ) 
+		theApp.editNotepad( lineNumber );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

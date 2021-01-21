@@ -45,6 +45,9 @@ protected:
 
 	void setRow( int nItem );
 	void CTableTables::editUpdate( CString tableNUmber );
+
+	void OnHtmlEdit();
+	void OnHtmlNotepad();
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnInitDialog();

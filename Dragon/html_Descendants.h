@@ -35,6 +35,9 @@ protected:
 	void CDescendant::fillTable( );
 	BOOL PreTranslateMessage(MSG* pMsg);
 	virtual void PostNcDestroy();
+	void OnHtmlEdit();
+	void OnHtmlNotepad();
+
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnInitDialog();
@@ -42,6 +45,7 @@ public:
 	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
 	CListCtrlEx m_ListCtrl;
 	afx_msg void OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnSetColumnColor(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnColumnSorted(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnNewtable();

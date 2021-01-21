@@ -429,7 +429,12 @@ CString CGaDescendants::getFullname( PPEOPLE* p )
 	if( !p->first_name.IsEmpty() )
 	{
 		fullname += p->first_name;
-	}		
+		fullname += L" ";
+	}
+	if( !p->posterior.IsEmpty() )
+	{
+		fullname += p->posterior;
+	}
 	fullname.Trim();
 	fullname += attrib[m_ixName].code2;
 	return( fullname.Trim() );

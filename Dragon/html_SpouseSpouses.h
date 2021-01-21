@@ -37,6 +37,8 @@ protected:
 	void CSpouseSpouses::menu();
 	virtual void PostNcDestroy();
 
+	void OnHtmlEdit();
+	void OnHtmlNotepad();
 	DECLARE_MESSAGE_MAP()
 
 public:
@@ -49,6 +51,7 @@ public:
 	afx_msg LRESULT OnColumnSorted(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnChangeSearch();
 	afx_msg void OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	
 	afx_msg void OnNewtable();

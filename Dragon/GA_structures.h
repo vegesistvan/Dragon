@@ -272,6 +272,7 @@ typedef struct
 	CString titolo;
 	CString last_name;
 	CString first_name;
+	CString posterior;
 	CString comment;
 	CString birth_place;
 	CString birth_date;
