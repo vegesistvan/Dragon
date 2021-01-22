@@ -415,6 +415,7 @@ void CContract::processPeople()
 {
 	UINT group = 1;
 	UINT db = 0;
+	int i;
 	int z;
 	int mi2;
 	int g;
@@ -500,11 +501,27 @@ void CContract::processPeople()
 							}
 							vPeople.at( i1 ).group = group;
 							vPeople.at( i2 ).group = group;
+/*
+// i1 marad, i2 törlve lesz
+// itt vizsglódni kellene, hogy melyiket cseréljük le!! Ha nõt vonunk össze, akkor nem jó a 1 hierarchiát megtartani, mert 
+// annak nincsenek gyerekei!!! Alapesetben H(i1) <= H(i2)
+// Ha i1 nõ, akko meg kell nézni H(i1)-et és H(i2)-t és ha h(I1)==1 és H(i2) == 2 akkor i1 és i2 felcserélendõ, azaz H(i2)-t tarsuk meg!!!
+							if( vPeople.at(i1).sex_id == WOMAN )
+							{
+								if( vPeople.at(i1).source == 1 && vPeople.at(i2).source == 2 )
+								{
+									i  = i1;
+									i1 = i2;
+									i2 = i;
+								}
+							}
+*/
+
 							vPeople.at( i1 ).status = 1;
 							vPeople.at( i2 ).status = -1;
 							vPeople.at( i2 ).match	= m_match;
-
 							contract( i1, i2 );
+
 							setRef( i1 );	// ha i1 és i2 azonos, akkor a ref-be másoljuk át a megadott adatokat
 							setRef( i2 );
 
@@ -808,7 +825,7 @@ void CContract::contractFull()
 	}
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Az azonos házaspárokat tartalmazó házasságokat törli.
+// Az azonos (==rowid) házaspárokat tartalmazó házasságokat törli.
 // Nem a nevek, hanem a rowid-k azonosságát vizsgálja!!
 void CContract::deleteMarriages()
 {
@@ -818,6 +835,9 @@ void CContract::deleteMarriages()
 	wndP.SetText( str );
 #endif
 	// A legkisebb szerepkódú házasságot tartja meg ( ORDER BY ... source )
+
+
+
 	m_command = L"SELECT rowid, spouse1_id, spouse2_id FROM marriages ORDER BY spouse1_id, spouse2_id, source ";
 	if( !query( m_command ) ) return;
 

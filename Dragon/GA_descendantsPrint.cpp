@@ -161,7 +161,7 @@ void CGaDescendants::printDescendant( int ix )
 		if( !str.IsEmpty() )
 			cLine.Format( L"%s %s", (CString)cLine, str );
 
-		str = getCommentBlock( p.comment, p.occupation );
+		str = getCommentBlock( p.comment );
 		if( !str.IsEmpty() )
 			cLine.Format( L"%s %s", (CString)cLine, str );
 	}
@@ -170,7 +170,7 @@ void CGaDescendants::printDescendant( int ix )
 	{
 		cLine += getPlaceDateBlock( p.birth_place, p.birth_date, '*' );
 		cLine += getPlaceDateBlock( p.death_place, p.death_date, '+' );
-		cLine += getCommentBlock( p.comment, p.occupation );
+		cLine += getCommentBlock( p.comment );
 	}
 	cLine.Trim();
 
@@ -276,7 +276,7 @@ void CGaDescendants::printSpouse()
 	spouse = getFullname( &s );
 	spouse += getPlaceDateBlock( s.birth_place, s.birth_date, '*' );
 	spouse += getPlaceDateBlock( s.death_place, s.death_date, '+' );
-	spouse += getCommentBlock( s.comment, s.occupation );
+	spouse += getCommentBlock( s.comment );
 
 //	if( m_code == UTF8 ) spouse =  UnicodeToUtf8( spouse );
 //	fwprintf( fl, L"%s", spouse );
@@ -431,12 +431,13 @@ CString CGaDescendants::getFullname( PPEOPLE* p )
 		fullname += p->first_name;
 		fullname += L" ";
 	}
-	if( !p->posterior.IsEmpty() )
-	{
-		fullname += p->posterior;
-	}
 	fullname.Trim();
 	fullname += attrib[m_ixName].code2;
+	if( !p->posterior.IsEmpty() )
+	{
+		fullname += L" ";
+		fullname += p->posterior;
+	}
 	return( fullname.Trim() );
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -463,42 +464,11 @@ CString CGaDescendants::getPlaceDateBlock( CString place, CString date, TCHAR je
 	return block;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CGaDescendants::getCommentBlock( CString comment, CString occupation  )
+CString CGaDescendants::getCommentBlock( CString comment )
 {
 	CString block = attrib[m_ixComment].code1;
-	CString str;
-
-	str = occupation;
-	if( !occupation.IsEmpty() && !comment.IsEmpty() )
-	{
-		str += L", ";
-	}
-	str += comment;
 	block += L" ";
-	block += str;
-	block.Trim();
-
-
-/*	
-	if( !occupation.IsEmpty() )
-	{
-		if( !comment.IsEmpty() )
-		{
-			comment += L", ";
-			comment += occupation;
-		}
-		else
-		{
-			comment = occupation;
-		}
-	}
-
-	if( !comment.IsEmpty() )
-	{
-		block += L" ";
-		block += comment;
-	}
-*/
+	block += comment.Trim();
 	block += attrib[m_ixComment].code2;
 	return block;
 }

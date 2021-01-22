@@ -161,13 +161,10 @@ public:
 	void	splitSpouseString( CString marriageString, SNAMEBLOCK *snb );
 	void	splitSpouseStringNew( CString marriageString, SNAMEBLOCK *snb );
 	void	splitSpouseStringNew2( CString marriageString, SNAMEBLOCK *snb );
-//	void	splitSpouseString2( CString marriageString, SNAMEBLOCK *snb );
 
 	int		getOrderSpouse( std::vector<PEOPLE>* vp );
-//CString	isItRelatives( CString cLine );
 
 	void	splitDescendantSubstring( CString cLine );
-	void	splitDescendantSubstring2( CString cLine );
 	void	splitPeopleString( int who, CString cLine, PEOPLE * p );
 	void	splitDescNameString( CString nameSubstring );
 	void	splitSpousesSpouses( CString sLine, std::vector<PEOPLE> *v_p);
@@ -196,6 +193,7 @@ public:
 	CString	insertSpouseFather( std::vector<MARRIAGES>* vM, UINT i);
 	CString	insertSpouseMother( std::vector<MARRIAGES>* vM, UINT i);
 
+
 	
 
 	int		insertMarriage( CString spouse1_id, CString spouse2_id, int sex_id1, int sex_id2, CString order1, CString order2, CString place, CString date, int source );
@@ -203,7 +201,7 @@ public:
 	int		insertSpouseParentsMarriage( UINT i );
 	int		insertSpouseSpousesMarriage( UINT i );
 	void	updatePreviousDescendant( CString cLine );
-//	void	updatePreviousTable( CString cLine );
+
 
 	void	insertIntoFiles( CString fileSpec );	
 
@@ -213,10 +211,20 @@ public:
 	BOOL	InputLine( int lineNumber );
 	BOOL	InputFileFromLine( int lineNUmber);
 
+	bool	regi;
 
+	void	processDescendantSubstring( CString cLine );
+	void	processMarriageSubstrings();
 	void	processPeopleStr( CString cLine,  PEOPLE* any );
-	void	splitNameSubstr( CString cLine, PEOPLE* any );
+	void	processPeopleString( int who,  CString cLine, PEOPLE * p );
+	void	processNameSubstr( CString nameSubstr, PEOPLE* any );
 	CString processWedding( CString cLine, PLACE_DATE_BLOCK* w );
+	void	processPlaceDateComment( CString placeDateComment, PLACE_DATE_BLOCK* ns );
+	void	processSpousesSpouses( CString spouses,  std::vector<PEOPLE> *v_p );
+	void	processSpFatherName( CString nameStr, NAME* name ) ;
+	void	processSpouseNameString( CString nameComment, NAME* name );
+	int		getSpouseOrder( std::vector<PEOPLE>* vp );
+
 	int		checkSex( int sex_id );
 
 };

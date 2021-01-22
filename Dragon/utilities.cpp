@@ -673,6 +673,7 @@ bool sortByNameKids(const KIDS &v1, const KIDS &v2)
 }
 bool isLastCharacter( CString str, TCHAR kar )
 {
+	if( str.IsEmpty() ) return false;
 	TCHAR kar1 = str.GetAt( str.GetLength() - 1 );
 	if( kar == kar1 ) return TRUE;
 	return FALSE;

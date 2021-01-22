@@ -44,7 +44,7 @@ CGaDescendants::CGaDescendants(CWnd* pParent /*=NULL*/)
 	,m_tableNumber(L"")		// tablenumber, ha a táblázat leszármazotti listáját kérjük
 	,m_CheckLastName(FALSE)	// családnév kiírása
 	,m_code(FALSE)			// ANSI vagy UTF8 kódrendszer
-	,m_numbering(0)			// milyen számozási rendszer legyen (0,1,2) 
+	,m_numbering(2)			// milyen számozási rendszer legyen (0,1,2) 
 	,m_checkFamily(TRUE)	// %%% családnév,elõnév kiemelése
 {
 
@@ -66,8 +66,8 @@ void CGaDescendants::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_LASTNAME, m_CheckLastName);
 	DDX_Radio(pDX, IDC_ANSI, m_code);
 	DDX_Control(pDX, IDC_COMBO_BGRD, m_ComboBgrd);
-	DDX_Radio(pDX, IDC_OLD, m_numbering);
 	DDX_Check(pDX, IDC_CHECK_FAMILY, m_checkFamily);
+	DDX_Control(pDX, IDC_SZLUHA, m_szluhaCtrl);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CGaDescendants, CDialogEx)
@@ -115,6 +115,12 @@ BOOL CGaDescendants::OnInitDialog()
 		m_connect	= true;
 		m_woman		= true;
 	}
+
+	m_numbering = 2;
+	((CButton *)GetDlgItem(IDC_SZLUHA))->SetCheck(FALSE); 
+	((CButton *)GetDlgItem(IDC_VILLERS))->SetCheck(FALSE);
+	((CButton *)GetDlgItem(IDC_TUPIGNY))->SetCheck(TRUE);
+
 	UpdateData( TOSCREEN );
 	return TRUE;
 }

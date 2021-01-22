@@ -111,7 +111,7 @@ protected:
 	CString getLastFirst( PPEOPLE* p );
 	CString getFullname( PPEOPLE* p );
 	CString getPlaceDateBlock( CString place, CString date, TCHAR jel );
-	CString getCommentBlock( CString comment, CString occupation  );
+	CString getCommentBlock( CString comment );
 
 	CString getFamilyName( CString family );
 	DECLARE_MESSAGE_MAP()
@@ -121,7 +121,7 @@ public:
 	BOOL m_connect;
 	BOOL m_woman;
 
-	int		m_numbering;
+//	int		m_numbering;
 
 	CComboBox m_ComboSpec;
 	int	m_ixName;
@@ -151,5 +151,7 @@ public:
 	BOOL m_checkFamily;
 	afx_msg void OnClickedCheckFamily();
 	afx_msg void OnClickedCheckLastname();
+	int m_numbering;
+	CButton m_szluhaCtrl;
 };
 #endif // !defined(AFX_DESCENDANT_H__930379D8_BDD1_4973_93FF_041F3F3811E4__INCLUDED_)

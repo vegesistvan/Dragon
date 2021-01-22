@@ -4,71 +4,6 @@
 #include "utilities.h"
 #include "GA_input.h"
 #include "GAtoDB.h"
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// A d struktúra elõállítása insertálásra
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CGaInput::splitDescendantSubstring2( CString cLine )
-{
-	TCHAR	generation;
-	int	pos;
-
-
-	if( (pos = cLine.Find( ',' ) ) != -1 )
-		pos = 0;
-
-
-	generation = cLine.GetAt(0);				// generáció karakterének leszedése
-	
-	
-	if( generation < m_generationPrev ) m_known_as.Empty();
-
-	if( theApp.v_mother_index.size() )			// ha visszalép a generation, akkor törli az utolsó generációs bejegyzéseket
-	{
-		if( generation < m_generationPrev )
-		{
-			int i = theApp.v_mother_index.size() - 1;
-			while( i && generation < theApp.v_mother_index.at(i).generation )
-			{
-				theApp.v_mother_index.pop_back();
-				--i;
-			}
-		}
-	}
-	m_generationPrev = generation;
-
-	cLine = cLine.Mid(2);						// G és szóköz leszedése
-
-	d.mother_index2	= getMotherIndex( generation, d.mother_index );		// a felülírt index
-	d.generation		= generation;
-	if( generation == '%' )
-	{
-		d.generation = generation;
-		d.last_name = cLine.Trim();
-		return;
-	}
-	if( m_tableAncestry )
-		m_generationFirst = generation;
-	if( generation == m_generationFirst )
-		d.tableRoman = m_tableHeader.tableRoman;  // csak az õst jelöli meg, hogy az összekötésnél megtalálják
-	else
-		d.tableRoman.Empty();
-
-// Megjelölöli minden tábla ösével azonos generációt, hogy a connectBranches() mindegyiket beállíthassa az õt hívó másik táblában lévõ 
-// szülökre.
-
-	d.folyt			= m_folyt;
-	d.tableAncestry	= m_tableAncestry;
-	d.source		= 1;
-
-	// egy dummy családnevet tesz elé, és utána írja be a helyes elõ- és családnevet
-	// Ez akkor jó pl. ha Farkas Jánost kellene szétbontani, ahol Farkas kerszetnév is lehet
-	str.Format( L"XXXX %s", cLine );
-	cLine = str.Trim();
-	processPeopleStr( cLine, &d );
-	d.titolo = m_tableHeader.titolo;
-	d.last_name = m_tableHeader.familyName;
-
-}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // A d struktúra elõállítása insertálásra
@@ -180,7 +115,8 @@ void CGaInput::splitDescendantSubstring( CString cLine )
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // A generation-mother_index-bõl meghatározza az mother_index2-t, ami az anya indexe a v_generation.spouse_id[mother_index2]-ben 
-//
+// Mert a leszármazoitti listán csak az elsõ gyereknél van a mother_index, az utána következõknél nem!
+// Ezért határozza meg a generáció utolsó mother_index-ét, amit visszaad 
 //
 // Visszamegy az v_mother_index vektorban a megadott generációhoz, ha volt ilyen. és annak mother-indexét visszadja
 // és a ezzel a mother_index-el és az aktuális generációval beteszi a v_mother_index vektorba.
@@ -190,9 +126,8 @@ void CGaInput::splitDescendantSubstring( CString cLine )
 int CGaInput::getMotherIndex( TCHAR generation, int n_mother_index )
 {
 	MOTHERINDEX mx;
-	mx.generation = generation;
+	
 	int mother_index = n_mother_index;
-
 
 	if( n_mother_index == 0 )   // ha a /n nincs megadva, akkor megnézi hogy volt-e már korábban ez a generáció?
 	{
@@ -211,6 +146,7 @@ int CGaInput::getMotherIndex( TCHAR generation, int n_mother_index )
 		}
 	}
 
+	mx.generation	= generation;									// az adott generáció utolsó indexe
 	mx.mother_index = mother_index;									// elteszi az aktuális beállítást
 	theApp.v_mother_index.push_back( mx );
 	return mother_index;
