@@ -278,7 +278,7 @@ void CCheckFatherDeath9::fatherDeathChildBirth()
 
 
 	// gyerekek lekérdezése
-	m_command = L"SELECT rowid, lineNumber, tableNumber, source, united, mother_index, last_name, first_name, birth_date, death_date, father_id, mother_id FROM people ORDER BY last_name, first_name";
+	m_command = L"SELECT rowid, lineNumber, tableNumber, source, united, parent2Index, last_name, first_name, birth_date, death_date, father_id, mother_id FROM people ORDER BY last_name, first_name";
 	if( !query( m_command ) ) return;
 
 	wndP.SetRange(0, m_recordset->RecordsCount() );
@@ -358,7 +358,7 @@ void CCheckFatherDeath9::fatherDeathChildBirth()
 						
 							// apa-anya gyermeke adatai
 
-							m_command.Format( L"SELECT rowid, lineNumber, tableNumber, source, united, mother_index2, last_name, first_name, birth_date, death_date FROM people WHERE father_id='%s' AND mother_id='%s'", rowidF, rowidM );
+							m_command.Format( L"SELECT rowid, lineNumber, tableNumber, source, united, parent2IndexCalc, last_name, first_name, birth_date, death_date FROM people WHERE father_id='%s' AND mother_id='%s'", rowidF, rowidM );
 							if( !query3( m_command ) ) return;
 
 							for( UINT k = 0; k < m_recordset3->RecordsCount(); ++k, m_recordset3->MoveNext() )

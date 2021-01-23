@@ -165,7 +165,7 @@ public:
 	int		getOrderSpouse( std::vector<PEOPLE>* vp );
 
 	void	splitDescendantSubstring( CString cLine );
-	void	splitPeopleString( int who, CString cLine, PEOPLE * p );
+//	void	splitPeopleString( int who, CString cLine, PEOPLE * p );
 	void	splitDescNameString( CString nameSubstring );
 	void	splitSpousesSpouses( CString sLine, std::vector<PEOPLE> *v_p);
 	void	splitSpFatherName( CString cLine, NAME* name );
@@ -211,7 +211,6 @@ public:
 	BOOL	InputLine( int lineNumber );
 	BOOL	InputFileFromLine( int lineNUmber);
 
-	bool	regi;
 
 	void	processDescendantSubstring( CString cLine );
 	void	processMarriageSubstrings();
@@ -224,8 +223,11 @@ public:
 	void	processSpFatherName( CString nameStr, NAME* name ) ;
 	void	processSpouseNameString( CString nameComment, NAME* name );
 	int		getSpouseOrder( std::vector<PEOPLE>* vp );
+	int		getParent2Index( TCHAR generation, int n_mother_index );
+	void	splitFullnameA( CStringArray* A, NAME* name );
 
 	int		checkSex( int sex_id );
 
+	std::vector<PARENT2INDEX> vParent2Index;
 };
 

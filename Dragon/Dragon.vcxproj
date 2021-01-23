@@ -371,8 +371,6 @@
     <ClCompile Include="Table_places.cpp" />
     <ClCompile Include="SelectMother.cpp" />
     <ClCompile Include="Setup.cpp" />
-    <ClCompile Include="GA_input_splitDescendantSubstring.cpp" />
-    <ClCompile Include="GA_input_splitMarriageSubstrings.cpp" />
     <ClCompile Include="html_Descendants.cpp" />
     <ClCompile Include="html_Spouses.cpp" />
     <ClCompile Include="GA_input_common.cpp" />

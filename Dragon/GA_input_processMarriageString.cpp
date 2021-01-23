@@ -137,6 +137,9 @@ void CGaInput::processMarriageSubstrings()
 				father = str;
 		}
 		
+		if( !father.IsEmpty() )
+
+		{
 		str.Format( L"%s %s %s", v_marriages.at(i).titolo, v_marriages.at(i).last_name, father );
 		str.Format( L"XXX %s",  father );
 		str.Trim();
@@ -155,6 +158,10 @@ void CGaInput::processMarriageSubstrings()
 		v_marriages.at(i).deathPlaceF	= spf.death_place;
 		v_marriages.at(i).deathDateF	= spf.death_date;
 		v_marriages.at(i).commentF		= spf.comment;
+		}
+
+		if( !mother.IsEmpty() )
+		{
 
 		PEOPLE	spm;
 		processPeopleStr( mother, &spm );
@@ -170,7 +177,7 @@ void CGaInput::processMarriageSubstrings()
 		v_marriages.at(i).deathDateM	= spm.death_date;
 		v_marriages.at(i).commentM		= spm.comment;
 
-
+		}
 // házastárs további házastársainak feldolgozása
 // 2f. Gaiger György, 3f. Nicky Sándor
 		if( moreSpouses.IsEmpty() ) continue;
@@ -217,7 +224,7 @@ void CGaInput::processMarriageSubstrings()
 				ss.death_place	= v_p.at(j).death_place;
 				ss.death_date	= v_p.at(j).death_date;
 				ss.comment		= v_p.at(j).comment;
-				ss.order		= v_p.at(j).mother_index;
+				ss.order		= v_p.at(j).parent2Index;
 				ss.spouseIndex	= i;
 				v_spouseSpouses.push_back( ss );				// házastársak házastársai 
 
@@ -274,6 +281,7 @@ CString CGaInput::processWedding( CString cLine, PLACE_DATE_BLOCK* pdb )
 	int ret;
 	int i, j;
 
+	cLine.Trim();
 	int n = wordList( &A, cLine, ' ', FALSE );
 
 	pdb->comment.Empty();
@@ -306,7 +314,7 @@ CString CGaInput::processWedding( CString cLine, PLACE_DATE_BLOCK* pdb )
 	}
 	if( !volt )												// nem talált kersztnevet, baj van!!
 	{
-		if( fh4 != NULL )									// Privát->Házastársak nem nyitja meg az fh4-et!!!
+		if( fh4 != NULL && !cLine.IsEmpty() )									// Privát->Házastársak nem nyitja meg az fh4-et!!!
 		{
 			fwprintf( fh4, L"%6d<br>\n", m_lineNumber, cLine );
 		}
@@ -347,275 +355,6 @@ CString CGaInput::processWedding( CString cLine, PLACE_DATE_BLOCK* pdb )
 	}
 	return peopleSubstr;
 }
-/*
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// [place][date] name [[,] [posterior][comment]] szétszedése elemeire
-// A name[[,] [comment] elválasztó index keresése.
-// Az elválasztó index biztos nagyobb mint 1, mert vezetéknévnek mindenképpen kell lenni
-// A 'name' vége: 
-// 'name,' vagy 
-//	a balról-jobbra elsõ keresztnév, amit nem keresztnév követ
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CGaInput::splitNameSubstr( CString cLine, int ix )
-{
-	CStringArray A;
-	int n;
-	int i;
-	int j;
-	int z;
-	CString name;
-	CString datum;
-	int ret;
-	int sex_id;
-	bool volt = false;
-
-
-	if( cLine == L"Palásthy Judit 1689" )
-		z = 1;
-	n = wordList( &A, cLine, ' ', FALSE );
-
-	// megkeresi a név és a comment elválasztó indexét
-	for( i = 1 ; i < n; ++i )			// az elsõ keresztmevet keresi, de az lehet helyiség (pl. Gyula is, és lehet családnév is (pl. péter Zoltán
-	{
-		str = A[i];
-		str.Replace( ',', ' ' );						// a név után lehet vesszõ !!
-		str.Replace( '?', ' ' );
-		str.TrimRight();
-		
-		if( ( ret = isFirstName( str ) ) != -1 )			//  =Budaörs 1944.12.17 Richard Rostoczil Mária
-		{
-			sex_id = ret;									// az utolsó keresztnév számít. pl  Behárfalvi Urbán Anna
-															// hamis firsName kiszûrése
-			if( A[i-1].Right(1) == ',' ) continue;			// ha az elõzõ szó végén , van  Mikor???
-			if( i+1 < n && A[i+1] == L"és" ) continue;		// Márkus és Batiizfalvi....ez nem keresztnév!
-			if( iswdigit( A[i-1].GetAt(0) ) ) continue;		// ha elõtte szám van, akkor nem fogadja el
-
-			volt = true;									// ez már elfogadott keresztnév
-			if( isLastCharacter( A[i], ',' ) )
-			{
-				A[i].Replace( ',', ' ' );
-				A[i].TrimRight();
-				++i;
-				break;										// i: elválasztó index!
-			}												// ha nincs elválasztó index, akkor további keresztnevet keres!!
-		}
-		else												
-		{
-			if( volt ) break;								// keresztnevet követõ elsõ nem kersztnév. Elválasztó index!
-		}
-	}
-	if( !volt )												// nem talált kersztnevet, baj van!!
-	{
-		if( fh4 != NULL )									// Privát->Házastársak nem nyitja meg az fh4-et!!!
-		{
-			fwprintf( fh4, L"%6d<br>\n", m_lineNumber, cLine );
-		}
-		++m_error_cnt4;
-		return;
-	}
-
-	if( i <= n )   // megvan a  keresztnév. Ha van utána valami, akkor az posterior vagy comment
-	{
-		for( ; i < n; ++i )
-		{
-			if( isTitle( A[i] ) )
-			{
-				v_marriages.at(ix).title += A[i];
-			}
-			else
-				break;
-		}
-
-		v_marriages.at(ix).comment = packWords( &A, i, n-i );
-		name = packWords(&A, 0, i );
-		n = wordList(&A, name, ' ', FALSE );
-	}
-
-	//	[place] [date] name
-	// ami i elõtt van az [place][date] name
-	// Elölrõl keeesi van dátum ?
-	for( j = 0; j < i; ++j )						// j a 'date' és 'name' határa
-	{
-		ret = isDate( &A, j, &datum );
-		if( ret )									// van datum!! és az ret szóból áll!
-		{
-			if( datum.Left(2) == L"kb" ) --j;		// a place 1 szóval kevesebb!  ( kb 1944)
-			v_marriages.at(ix).place	= packWords( &A, 0, j );	// dátum elõtt 'place'  (ha van)
- 			v_marriages.at(ix).date	= datum;
-			v_marriages.at(ix).fullname = packWords( &A, j + ret , i-j - ret );
-			break;
-		}
-	}
-
-	// [place] name
-	if( j == i )		// nincs dátum, marad a [place,] name
-	{
-		for( j = 0; j < i; ++j )
-		{
-			if( isLastCharacter( A[j], ',' ) ) break;
-		}
-		if( j < i )			// place, name
-		{
-			v_marriages.at(ix).place = packWords( &A, 0, j );
-			v_marriages.at(ix).fullname = packWords( &A, j+1, i - j -1 );
-		}
-		else					// name
-		{
-			v_marriages.at(ix).fullname = packWords( &A, 0, i );
-		}
-	}
-	if( v_marriages.at(ix).fullname.IsEmpty() )
-		z = 4;
-//	splitSpouseNameString( ix );
-}
-*/
-/*
-void CGaInput::splitRelativesSubstr( int ix )
-{
-
-// (brace) szétszedése parents és spouse_spouses-ra
-		if( !brace.IsEmpty() )
-		{
-			if( (pos = brace.Find( L"f." ) ) != -1 )
-			{
-				if( pos > 1 )
-				{
-					parents = brace.Left( pos-2 );
-					parents.Replace( ',', ' ' );
-					parents.Trim();
-					spouse_spouses = brace.Mid( pos-1 );
-				}
-				else
-					spouse_spouses = brace;
-			}
-			else
-				parents = brace;
-
-			if( ( pos = parents.Find( L" fia" ) ) != -1 )
-				parents = parents.Left( pos );
-			else if( ( pos = parents.Find( L" lánya" ) ) != -1 )
-				parents = parents.Left( pos );
-
-			v_marriages.at(i).parents			= parents;
-			v_marriages.at(i).spouse_spouses	= spouse_spouses;
-		}
-
-// házastárs szüleinek feldolgozása
-
-		if( ( pos = parents.Find( wchar_t('-') ) ) != -1 || ( pos = parents.Find( wchar_t('–') ) ) !=  -1 )					// szülõk szétválasztása
-		{
-			v_marriages.at(i).father = parents.Left( pos );
-			v_marriages.at(i).mother = parents.Mid( pos + 1 );				// itt kellene tovább bontani a mothert, mert lehetnek adatai!! (164076 sor )
-
-		}	
-		else														// a zárójelben csak apa és megjegyzés van!!
-		{
-			str = getUntil( parents, ' ' );
-			if( isFirstName( str ) != - 1 )
-				v_marriages.at(i).father = str;
-		}
-
-//		splitPeopleString( 1, v_marriages.at(i).father, &spf );
-		v_marriages.at(i).sex_idF		= 1; //spf.sex_id;
-	
-		if( !spf.first_name.IsEmpty() )						// van apa a () zárójelben?
-		{
-			if( spf.last_name.IsEmpty() )					// meg van ott adva a vezeték név?
-			{												// nincs, akkor a gyerek vezeték nebvét veszi át
-				v_marriages.at(i).titleF		= v_marriages.at(i).title;
-				v_marriages.at(i).titoloF		= v_marriages.at(i).titolo;
-				v_marriages.at(i).lastNameF		= v_marriages.at(i).last_name;
-			}
-			else									
-			{												// igen, akkor ezt használja
-				v_marriages.at(i).titoloF		= spf.titolo;
-				v_marriages.at(i).titleF		= spf.title;
-				v_marriages.at(i).lastNameF		= spf.last_name;
-			}
-		}
-
-		v_marriages.at(i).firstNameF	= spf.first_name;
-		v_marriages.at(i).birthPlaceF	= spf.birth_place;
-		v_marriages.at(i).birthDateF	= spf.birth_date;
-		v_marriages.at(i).deathPlaceF	= spf.death_place;
-		v_marriages.at(i).deathDateF	= spf.death_date;
-		v_marriages.at(i).commentF		= spf.comment;
-		
-//		splitPeopleString( 2, v_marriages.at(i).mother, &spf );
-		v_marriages.at(i).sex_idM		= 2;
-		v_marriages.at(i).titleM		= spf.title;
-		v_marriages.at(i).titoloM		= spf.titolo;
-		v_marriages.at(i).lastNameM		= spf.last_name;
-		v_marriages.at(i).firstNameM	= spf.first_name;
-		v_marriages.at(i).birthPlaceM	= spf.birth_place;
-		v_marriages.at(i).birthDateM	= spf.birth_date;
-		v_marriages.at(i).deathPlaceM	= spf.death_place;
-		v_marriages.at(i).deathDateM	= spf.death_date;
-		v_marriages.at(i).commentM		= spf.comment;
-
-// házastárs további házastársainak feldolgozása
-// 2f. Gaiger György, 3f. Nicky Sándor
-		brace = v_marriages.at(i).spouse_spouses;
-		if( brace.IsEmpty() ) continue;
-
-
-		SPOUSESPOUSES ss;
-		std::vector<PEOPLE> v_p;
-		v_spouseSpouses.clear();	
-		v_p.clear();
-
-		if( (pos = brace.Find( L"f." ) ) != -1 )
-		{
-			v_marriages.at(i).spouses = brace.Mid( pos -1 );
-			splitSpousesSpouses( v_marriages.at(i).spouses, &v_p );	//v_p-be házastársanként felbontja a stringet
-
-			for( UINT j = 0; j < v_p.size(); ++j )
-			{
-				switch( v_p.at(j).sex_id )
-				{
-				case 0:
-					if( v_marriages.at(i).sex_id == 1 )
-						v_p.at(j).sex_id = 2;
-					else if ( v_marriages.at(i).sex_id == 2 )
-						v_p.at(j).sex_id = 1;
-					break;
-				case 1:
-					if( v_marriages.at(i).sex_id == 0 )
-						v_marriages.at(i).sex_id = 2;
-					break;
-				case 2:
-					if( v_marriages.at(i).sex_id == 0 )
-						v_marriages.at(i).sex_id = 1;
-					break;
-				}
-				ss.sex_id		= v_p.at(j).sex_id;
-				ss.title		= v_p.at(j).title;
-				ss.titolo		= v_p.at(j).titolo;
-				ss.last_name	= v_p.at(j).last_name;
-				ss.first_name	= v_p.at(j).first_name;
-
-				ss.birth_place	= v_p.at(j).birth_place;
-				ss.birth_date	= v_p.at(j).birth_date;
-				ss.death_place	= v_p.at(j).death_place;
-				ss.death_date	= v_p.at(j).death_date;
-				ss.comment		= v_p.at(j).comment;
-				ss.order		= v_p.at(j).mother_index;
-				ss.spouseIndex	= i;
-				v_spouseSpouses.push_back( ss );				// házastársak házastársai 
-
-				
-			}
-			// minden házastársnak kiszámítja a házasság-sorszámot
-			if( v_spouseSpouses.size() == 0 )	// ha a házastársnak nincsenek további házastársai, akkor neki ez az 1. házassága;
-				v_marriages.at(i).orderSpouse = 1;
-			else
-			{
-				v_marriages.at(i).orderSpouse = getOrderSpouse( &v_p );
-			}
-		}
-	}
-}
-*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // vp-ben a házastársa házastársai
 //
@@ -632,7 +371,7 @@ int CGaInput::getSpouseOrder( std::vector<PEOPLE>* vp )
 
 	for( i = 0; i < vp->size(); ++i )
 	{
-		index = vp->at(i).mother_index;
+		index = vp->at(i).parent2Index;
 		if( index != indexPrev + 1 )
 		{
 			if( index < indexPrev + 1 )
@@ -678,7 +417,7 @@ void CGaInput::processSpousesSpouses( CString spouses,  std::vector<PEOPLE> *v_p
 			spouse = spouses.Mid( pos+3 );
 
 		processPeopleString( 0,  spouse,  &people );
-		people.mother_index = order;   // a házastárs házastársának nincs megadva az anyja, ezért a mother_index-et a házasság sorszámára használjuk
+		people.parent2Index = order;   // a házastárs házastársának nincs megadva az anyja, ezért a parent2Index-et a házasság sorszámára használjuk
 		v_p->push_back( people );
 	};
 }
@@ -868,10 +607,114 @@ void CGaInput::processSpouseNameString( CString nameComment, NAME* name )
 			A.RemoveAt( i, dbComment );		// eldobja a comment-et
 			n -= dbComment;
 		}
-		splitFullname( &A, name );
+		splitFullnameA( &A, name );
 	}
 	else
 	{	// nincs name csak comment. Ilyen azért nem fordulhat elõ
 		name->comment = nameComment;
+	}
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// title nélküli fullname szétszedése
+// Ghyczi, Assa és Ablánczkürti Ghyczy János
+// [titolo] last_name first_name [first_name] 
+void CGaInput::splitFullnameA( CStringArray* A, NAME* name ) 
+{
+	CString word;
+	CString titolo(L"");
+	CString first_name( L"" );
+	CString last_name( L"" );
+
+	int sex_id;
+	int n	= A->GetCount();
+	int i = 0;
+	int pos;
+	// Liptószentiváni Szent Ivány Júlia
+
+	for( i = 0; i < n; ++i )
+	{
+		word = A->GetAt(i);
+		if( !word.Compare( L"és" ) )
+		{
+			name->titolo = packWords( A, 0, i + 2 );
+			++i;
+			++i;
+			break;
+		}
+	}
+	if( i == n ) i = 0;  // nem volt 'x és y' titolo
+
+	
+	if( n > 2 )   // Chempernai Anchel ??
+	{
+		if( A->GetAt(0).Right(1) == 'i' && name->titolo.IsEmpty() )  // egy tagú elõnév
+		{
+			name->titolo = A->GetAt(0);
+			i = 1;
+		}
+	
+/*
+		if( A->GetAt( 1 ) == L"és" )
+		{
+			titolo.Format( L"%s és %s", A->GetAt(0), A->GetAt( 2 ) );
+			i = 3;
+		}
+		titolo.Trim();
+		name->titolo = titolo;
+*/
+	}
+
+	word = A->GetAt( i );		// a titolo utáni elsõ szó mindenképpen vezetéknév. Nem!! Szentmiklósi és Óvári br Pongrácz Eszter
+	if( isTitle( word ) )
+	{
+		name->title = word;
+	}
+	else
+	{
+		last_name = word;
+		last_name += L" ";
+	}
+	++i;
+	if( n - i == 1 )		// kéttagú neveknél nem vizsgál
+	{
+		first_name = A->GetAt( i );
+	}
+	else					// többtagú neveknél nézi az  isFirstName-et
+	{
+		for( ; i < n; ++i )
+		{
+			word = A->GetAt( i );
+			if( isFirstName( word ) == - 1 )
+			{
+				last_name += word;
+				last_name += L" ";
+			}
+			else
+			{
+				first_name += word;
+				first_name += L" ";
+			}
+		}
+	}
+	last_name.TrimRight();
+	first_name.TrimRight();
+	if( last_name.IsEmpty() )  // a családnév egyúttal utónév is!!
+	{
+		last_name	= getWord( first_name, 1, &pos );
+		first_name	= dropFirstWord( first_name );
+	}
+	first_name.Replace( ',', ' ' );
+	first_name.TrimRight();
+	name->first_name	= first_name;
+	name->last_name		= last_name;
+
+	sex_id = getSexId( first_name );
+	if( sex_id != -1 )
+		name->sex_id = sex_id;
+	else						// többtagú keresztnév 1. és 2. nevének neme különbözõ. first_name1 talán vezetéknév? 
+	{
+		name->last_name += L" ";
+		name->last_name += getWord( first_name, 1, &pos );
+		name->first_name = getWord( first_name, 2, &pos );
 	}
 }

@@ -192,8 +192,8 @@ v_indi.at(i).refI,\
 name,\
 v_indi.at(i).orderFather,\
 v_indi.at(i).orderMother,\
-v_indi.at(i).mother_index,\
-v_indi.at(i).mother_index2,\
+v_indi.at(i).parent2Index,\
+v_indi.at(i).parent2IndexCalc,\
 v_indi.at(i).numOfSpouses,\
 v_indi.at(i).birth_place,\
 v_indi.at(i).birth_date,\
@@ -291,14 +291,14 @@ A következõ sorokban a gyerekek nevei vannak, és ha az apának több felesége volt
 				refC	= v_chil.at(j).refC;
 				if( v_fam.at(i).marriageHAll > 1 )
 				{
-//				if( v_chil.at(j).mother_index != 0 )
+//				if( v_chil.at(j).parent2Index != 0 )
 					fwprintf( theApp.fl, L"%4d. %3d. %-10s %s/%d /%d\n",\
 					v_chil.at(j).orderFather,\
 					v_chil.at(j).orderMother,\
 					refC,\
 					getIndi( refC),\
-					v_chil.at(j).mother_index,\
-					v_chil.at(j).mother_index2 );
+					v_chil.at(j).parent2Index,\
+					v_chil.at(j).parent2IndexCalc );
 				}
 				else
 				{
@@ -585,7 +585,7 @@ bool sortSexRefI(const INDIFAMS &v1, const INDIFAMS &v2)
     return( v1.sex < v2.sex ); 
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// v_indi mother_index-ébe átteszi a v_fam marriageH-ját
+// v_indi parent2Index-ébe átteszi a v_fam marriageH-ját
 CString CGedcomIn::getIndi( CString ref )
 {
 	CString name(L"");

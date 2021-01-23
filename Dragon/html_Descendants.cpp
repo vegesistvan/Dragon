@@ -240,7 +240,7 @@ void CDescendant::fillTable( )
 			str.Format( L"%d", split.d.sex_id );
 			m_ListCtrl.SetItemText( nItem, PS_SEX_ID, str );
 
-			str.Format( L"%d", split.d.mother_index );
+			str.Format( L"%d", split.d.parent2Index );
 			if( !str.Compare( L"0" ) ) str.Empty();
 			m_ListCtrl.SetItemText( nItem, PS_MOTHER_INDEX, str );
 

@@ -17,18 +17,18 @@ void CGaInput::splitLine( CString cLine)
 	m_descendant = getDescendant( cLine );
 	getMarriageSubstrings( cLine );
 
-	regi = false;
+//	bool regi = false;
 
-	if( !regi )
-	{
+//	if( !regi )
+//	{
 		processDescendantSubstring( m_descendant );			// d struktúrába teszi az elemeket
 		processMarriageSubstrings();							// a v_marriages vektor substringjeit felbontja és visszateszi a vektorba
-	}
-	else
-	{
-		splitDescendantSubstring( m_descendant );			// d struktúrába teszi az elemeket
-		splitMarriageSubstrings();							// a v_marriages vektor substringjeit felbontja és visszateszi a vektorba
-	}
+//	}
+//	else
+//	{
+//		splitDescendantSubstring( m_descendant );			// d struktúrába teszi az elemeket
+//		splitMarriageSubstrings();							// a v_marriages vektor substringjeit felbontja és visszateszi a vektorba
+//	}
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Leszedi a sor végérõl az elágazás jelzését, amit megtisztítva az 'm_folyt' változóba tesz;

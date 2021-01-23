@@ -75,7 +75,7 @@ typedef struct
 typedef struct
 {
 	CString rowid;
-	CString	mother_index;
+	CString	parent2Index;
 	BOOL	numOfSpouses;			// az õ házastársainak száma
 	BOOL	numOfMothers;			// az apának több felesége van
 	int		sex_id;
@@ -93,7 +93,7 @@ typedef struct
 	TCHAR	gen;
 	CString	descendant_id;
 	CString spouse_id[10];
-	int		mother_index;
+	int		parent2Index;
 	int		descendant_sex_id;
 	int		orderFather;
 	int		numOfSpouses;
@@ -126,8 +126,8 @@ typedef struct
 	CString comment;
 	CString	father_id;
 	CString	mother_id;
-	CString	mother_index;
-	CString	mother_index2;
+	int		parent2Index;
+	int		parent2IndexCalc;
 	CString orderFather;
 	CString	orderMother;
 	CString folyt;						// "folyt" utáni római szám, ha van.
@@ -162,8 +162,8 @@ typedef struct
 	CString comment;
 	CString	father_id;
 	CString	mother_id;
-	int		mother_index;
-	int		mother_index2;
+	int		parent2Index;
+	int		parent2IndexCalc;
 	int		orderFather;
 	int		orderMother;
 	CString folyt;						// "folyt" utáni római szám, ha van.
@@ -290,7 +290,7 @@ typedef struct
 	CString posterior;
 	CString comment;
 	CString fullname;
-	int		mother_index;
+	int		parent2Index;
 }NAME;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -318,8 +318,8 @@ typedef struct
 	CString comment;
 	CString father_id;;
 	CString mother_id;
-	CString mother_index;
-	CString mother_index2;
+	CString parent2Index;
+	CString parent2IndexCalc;
 	CString folyt;
 	CString tableAncestry;
 	CString tableRoman;
@@ -348,7 +348,7 @@ typedef struct
 	CString title;
 	CString first_name;
 	CString posterior;
-	int		mother_index;
+	int		parent2Index;
 }NAMEBLOCK;
 
 typedef struct

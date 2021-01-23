@@ -855,10 +855,10 @@ void CTablePeople::fillRow( UINT i )
 	if( father_id == L"0" ) father_id = L""; 
 	if( mother_id == L"0" ) mother_id = L""; 
 
-	int mother_index = _wtoi( m_recordset->GetFieldString( PEOPLE_MOTHER_INDEX ) );
-	if( mother_index )
+	int parent2Index = _wtoi( m_recordset->GetFieldString( PEOPLE_MOTHER_INDEX ) );
+	if( parent2Index )
 	{
-		m_index.Format( L"%d", mother_index );
+		m_index.Format( L"%d", parent2Index );
 	}
 
 	CString rowid;
@@ -1334,10 +1334,10 @@ void CTablePeople::updateRow( int nItem )
 	}
 
 	
-	int mother_index = _wtoi( m_recordset->GetFieldString( PEOPLE_MOTHER_INDEX ) );
-	if( mother_index )
+	int parent2Index = _wtoi( m_recordset->GetFieldString( PEOPLE_MOTHER_INDEX ) );
+	if( parent2Index )
 	{
-		indexM.Format( L"%d", mother_index );
+		indexM.Format( L"%d", parent2Index );
 	}
 
 	rowid_father = m_recordset->GetFieldString( PEOPLE_FATHER_ID );

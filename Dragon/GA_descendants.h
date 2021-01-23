@@ -11,6 +11,7 @@ enum
 	SZLUHA = 0,
 	VIL,
 	TUP,
+
 };
 
 

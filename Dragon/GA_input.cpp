@@ -81,8 +81,8 @@ death_date,\
 comment,\
 father_id,\
 mother_id,\
-mother_index,\
-mother_index2,\
+parent2Index,\
+parent2IndexCalc,\
 folyt,\
 tableAncestry,\
 tableRoman,\
@@ -298,7 +298,7 @@ Az alábbi sorokban ismeretlen keresztnevû embereket talált.<br>\
 			processTableHeader( cLine );			// ez beállítja az m_tableNuber-t és az m_familyNumbert-t
 			v_generations.clear();					// új táblánál újrakezdi a generációkat
 			v_orderFather.clear();					// új tábla
-			theApp.v_mother_index.clear();
+			vParent2Index.clear();
 			m_known_as.Empty();						// új táblánál megszûnik a known_as
 			m_tableAncestry = TRUE;					// az új tábla elsõ embere lesz a tábla õse
 
@@ -335,7 +335,7 @@ Az alábbi sorokban ismeretlen keresztnevû embereket talált.<br>\
 			gen.descendant_sex_id	= d.sex_id;							// leszármazott neme
 			gen.descendant_id		= d.rowid;							// leszármazott rowid-je
 			gen.numOfSpouses		= v_marriages.size();				// házastársak száma
-			gen.mother_index		= d.mother_index2;					// anya-index  ( apja hanyadik feleségae az anyja )
+			gen.parent2Index		= d.parent2IndexCalc;					// anya-index  ( apja hanyadik feleségae az anyja )
 			gen.orderFather			= d.orderFather;					//új
 			for( UINT i = 0; i < v_marriages.size(); ++i )
 			{
@@ -568,7 +568,7 @@ void CGaInput::fillFatherMother( )
 	// d.gen a descendant generációja, akinek az apját-anyját keressük
 	// Megkeresi a v_generations vektorban a legközelebbi korábbi generációt
 	// Ennek father_id-je és mother_id-je lesz az apja és az anyja.
-	// A mother_id-t a mother_index alapján választja ki.
+	// A mother_id-t a parent2Index alapján választja ki.
 
 	// az elsõ generációnak nincs apja,anyja ezért ha üres a v_generation, nincs semmi baj
 	if( v_generations.size() )
@@ -586,9 +586,9 @@ void CGaInput::fillFatherMother( )
 				d.father_id = v_generations.at(i).descendant_id;				// leszedi az apa azonosítóját
 //				d.orderFather = v_generations.at(i).orderFather + 1;
 
-				if( d.mother_index2  <= v_generations.at(i).numOfSpouses )
-					d.mother_id = v_generations.at(i).spouse_id[d.mother_index2-1];
-				else if( v_generations.at(i).numOfSpouses && d.mother_index )
+				if( d.parent2IndexCalc  <= v_generations.at(i).numOfSpouses )
+					d.mother_id = v_generations.at(i).spouse_id[d.parent2IndexCalc-1];
+				else if( v_generations.at(i).numOfSpouses && d.parent2Index != 0 )
 				{
 					fwprintf( fh2, L"%8dL %s<br>\n", m_lineNumber, m_cLine );
 					++m_error_cnt2;
@@ -598,7 +598,7 @@ void CGaInput::fillFatherMother( )
 			{
 				d.mother_id = v_generations.at(i).descendant_id;
 //				if( v_marriages.size() )   // ez kell? nem értem miért van itt?
-					d.father_id = v_generations.at(i).spouse_id[d.mother_index2 - 1 ];				// leszedi az apa azonosítóját
+					d.father_id = v_generations.at(i).spouse_id[d.parent2IndexCalc - 1 ];				// leszedi az apa azonosítóját
 			}
 		}
 //		else
@@ -637,7 +637,7 @@ void CGaInput::connectBranches()
 	CString firstName;
 
 	CString rowid;
-	UINT	mother_index2;
+	UINT	parent2IndexCalc;
 
 	std::vector<CString> v_rowid;
 
@@ -688,17 +688,17 @@ void CGaInput::connectBranches()
 		else if( v_rowid.size() )		// több anya van. Ki kell válastani, hogy melyik gyereknek ki az anyja
 		{
 			// a gyerekek lekérdezése
-			m_command.Format( L"SELECT rowid, mother_index2 FROM people WHERE familyNumber='%s' AND tableRoman='%s'", familyNumber, folyt );
+			m_command.Format( L"SELECT rowid, parent2IndexCalc FROM people WHERE familyNumber='%s' AND tableRoman='%s'", familyNumber, folyt );
 			if( !query3( m_command ) ) return;
 				
 			for( UINT i = 0; i < m_recordset3.RecordsCount(); ++i, m_recordset3.MoveNext() )
 			{
 				rowid = m_recordset3.GetFieldString( 0);
-				mother_index2 = _wtoi( m_recordset3.GetFieldString(1 ) ) - 1;
+				parent2IndexCalc = _wtoi( m_recordset3.GetFieldString(1 ) ) - 1;
 
-				if( mother_index2 < v_rowid.size() )
+				if( parent2IndexCalc < v_rowid.size() )
 				{
-					m_command.Format( L"UPDATE people SET father_id = '%s', mother_id='%s' WHERE rowid = '%s'", rowid_father, v_rowid.at( mother_index2 ), rowid ); 
+					m_command.Format( L"UPDATE people SET father_id = '%s', mother_id='%s' WHERE rowid = '%s'", rowid_father, v_rowid.at( parent2IndexCalc ), rowid ); 
 					if( !theApp.execute( m_command ) ) return;
 				}
 			}

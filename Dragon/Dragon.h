@@ -199,7 +199,7 @@ public:
 	
 	std::vector<FAMS> v_fams;
 	std::vector<CString> v_tables;
-	std::vector<MOTHERINDEX> v_mother_index;
+//	std::vector<PARENT2INDEX> vParent2Index;
 	std::vector<SPOUSES> v_spouses;
 	std::vector<SPOUSES> v_spouses2;
 	std::vector<REPLACE> v_Replace;

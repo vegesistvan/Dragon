@@ -417,8 +417,8 @@ void clearPeople( PEOPLE *p)
 	p->title.Empty();
 	p->titolo.Empty();
 	p->posterior.Empty();
-	p->mother_index = 0;
-	p->mother_index2 = 0;
+	p->parent2Index = 0;
+	p->parent2IndexCalc = 0;
 	p->tableAncestry = 0;
 	p->tableNumber.Empty();
 	p->lineNumber = 0;
@@ -438,7 +438,7 @@ void cleanNameBlock( NAMEBLOCK *n )
 	n->first_name.Empty();
 	n->title.Empty();
 	n->posterior.Empty();
-	n->mother_index = 0;
+	n->parent2Index = 0;
 	n->sex_id = 0;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -460,7 +460,7 @@ void clearName( NAME* name )
 	name->first_name.Empty();
 	name->last_name.Empty();
 	name->posterior.Empty();
-	name->mother_index  = 0;
+	name->parent2Index  = 0;
 	name->fullname.Empty();
 	name->comment.Empty();
 }

@@ -12,6 +12,7 @@ void CGaInput::processDescendantSubstring( CString cLine )
 {
 	TCHAR	generation;
 	int	pos;
+	int i;
 
 
 	if( (pos = cLine.Find( ',' ) ) != -1 )
@@ -23,14 +24,14 @@ void CGaInput::processDescendantSubstring( CString cLine )
 	
 	if( generation < m_generationPrev ) m_known_as.Empty();
 	
-	if( theApp.v_mother_index.size() )			// ha visszalép a generation, akkor törli az utolsó generációs bejegyzéseket
+	if( vParent2Index.size() )			// ha visszalép a generation, akkor törli az utolsó generációs bejegyzéseket
 	{
 		if( generation < m_generationPrev )
 		{
-			int i = theApp.v_mother_index.size() - 1;
-			while( i && generation < theApp.v_mother_index.at(i).generation )
+			i = vParent2Index.size() - 1;
+			while( i && generation < vParent2Index.at(i).generation )
 			{
-				theApp.v_mother_index.pop_back();
+				vParent2Index.pop_back();
 				--i;
 			}
 		}
@@ -67,10 +68,10 @@ void CGaInput::processDescendantSubstring( CString cLine )
 	d.titolo = m_tableHeader.titolo;
 	d.last_name = m_tableHeader.familyName;
 	
-	// a mother_index csak ott van megadva, ahol változás történt, az ezt követõ gyerekek értelemszerûen ugyanannak az anyának a gyerekei.
-	// mother_index-t kell kiírni gyerekhez a leszármazotti listánál ( 0-t nem kell )
-	// mother_index2-t pedig minden gyereknél meg van adva, az  anya meghatározásához használjuk
-	d.mother_index2	= getMotherIndex( generation, d.mother_index );		// a felülírt index
+	// a parent2Index csak ott van megadva, ahol változás történt, az ezt követõ gyerekek értelemszerûen ugyanannak az anyának a gyerekei.
+	// parent2Index-t kell kiírni gyerekhez a leszármazotti listánál ( 0-t nem kell )
+	// parent2IndexCalc-t pedig minden gyereknél meg van adva, az  anya meghatározásához használjuk
+	d.parent2IndexCalc	= getParent2Index( generation, d.parent2Index );		// a felülírt index
 
 
 
@@ -136,13 +137,13 @@ void CGaInput::processNameSubstr( CString nameSubstr, PEOPLE* any )
 	CString comment;
 	CString title;
 	CString posterior;
-	CString mother_index;
+	int parent2Index;
 	int ret;
 	int sex_id;
 	bool volt = false;
 
-
-	// mother_index leszedése, ha van
+	nameSubstr.Trim();
+	// parent2Index leszedése, ha van
 	int n = wordList(&A, nameSubstr, ' ', FALSE );
 	for( i = 0; i < n; ++i )
 	{
@@ -152,8 +153,8 @@ void CGaInput::processNameSubstr( CString nameSubstr, PEOPLE* any )
 			str = word.Left( pos );
 			if( ( ret = isFirstName( str ) ) != -1 )
 			{
-				mother_index = word.Mid(pos+1);
-				any->mother_index = _wtoi( mother_index );
+				parent2Index = _wtoi(word.Mid(pos+1));
+				any->parent2Index = parent2Index;
 				A[i] = str;
 				break;
 			}
@@ -196,9 +197,9 @@ void CGaInput::processNameSubstr( CString nameSubstr, PEOPLE* any )
 	}
 	if( !volt )												// nem talált kersztnevet, baj van!!
 	{
-		if( fh4 != NULL )									// Privát->Házastársak nem nyitja meg az fh4-et!!!
+		if( fh4 != NULL && !nameSubstr.IsEmpty() )									// Privát->Házastársak nem nyitja meg az fh4-et!!!
 		{
-			fwprintf( fh4, L"%6d<br>\n", m_lineNumber, nameSubstr );
+			fwprintf( fh4, L"%6d %s<br>\n", m_lineNumber, nameSubstr );
 		}
 		++m_error_cnt4;
 		return;
@@ -352,4 +353,42 @@ void CGaInput::processPlaceDateComment( CString placeDateComment, PLACE_DATE_BLO
 	}
 	else
 		ns->place = placeDateComment;   // nem talált vesszõt, az egész sor place
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// A generation-parent2Index-bõl meghatározza az parent2IndexCalc-t, ami az anya indexe a v_generation.spouse_id[parent2IndexCalc]-ben 
+// Mert a leszármazoitti listán csak az elsõ gyereknél van a parent2Index, az utána következõknél nem!
+// Ezért határozza meg a generáció utolsó parent2Index-ét, amit visszaad 
+//
+// Visszamegy az vParent2Index vektorban a megadott generációhoz, ha volt ilyen. és annak mother-indexét visszadja
+// és a ezzel a parent2Index-el és az aktuális generációval beteszi a vParent2Index vektorba.
+// Ha nem talál azono sgenerációt, akkor mother_indexbe 1-et tesz.
+// A vParent2Index vektorban gyûjti a táblában lévõ generációk utolsó parent2Index-ét, ami a leszármazott keresztneve után van megadva. (/n)
+// Ha nincs megadva a leszármazott neve után index, akkor 1-et tesz bele
+int CGaInput::getParent2Index( TCHAR generation, int n_mother_index )
+{
+	PARENT2INDEX mx;
+	
+	int parent2Index = n_mother_index;
+
+	if( n_mother_index == 0 )   // ha a /n nincs megadva, akkor megnézi hogy volt-e már korábban ez a generáció?
+	{
+		int i;
+		for( i= vParent2Index.size() - 1; i >= 0; i--)		// visszafele keresi a legutóbbi azonos generációt
+		{
+			if( vParent2Index.at(i).generation == generation )
+			{
+				parent2Index = vParent2Index.at(i).parent2Index;  // ha talált, akkor azt használja
+				break;
+			}
+		}
+		if( i == -1 )														// ha nem talált, akkor 1
+		{
+			parent2Index = 1;
+		}
+	}
+
+	mx.generation	= generation;									// az adott generáció utolsó indexe
+	mx.parent2Index = parent2Index;									// elteszi az aktuális beállítást
+	vParent2Index.push_back( mx );
+	return parent2Index;
 }

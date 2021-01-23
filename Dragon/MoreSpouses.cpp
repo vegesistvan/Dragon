@@ -102,7 +102,7 @@ void CMoreSpouses::fillTable()
 	CString order;
 	
 	
-	CString mother_index;
+	CString parent2Index;
 
 	if( m_sex_id == MAN )
 		m_command.Format( L"SELECT rowid,* FROM marriages WHERE spouse1_id=%s ORDER BY orderHusband", m_rowid );

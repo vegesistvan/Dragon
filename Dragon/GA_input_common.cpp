@@ -202,7 +202,7 @@ void splitPlaceDateComment( CString placeDateComment, PLACE_DATE_BLOCK* ns )
 	else
 		ns->place = placeDateComment;   // nem talált vesszõt, az egész sor place
 }
-
+/*
 // who: 1 házastárs apja
 // who: 2 házastárs anyja
 // who: 2 házastárs további házastársa
@@ -278,6 +278,7 @@ void CGaInput::splitPeopleString( int who,  CString cLine, PEOPLE * p )
 
 	p->comment		= comment;
 }
+*/
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Csak keresztnév van, nincs title,titolo,last_name!!!
 // nameStr: [keresztnév] [comment]

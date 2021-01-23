@@ -67,7 +67,7 @@ BOOL CCheckMotherIndex::OnInitDialog()
 	int		pos;
 	int		sex_id;
 	int		source;
-	int		mother_index;
+	int		parent2Index;
 	int		count;
 	int		cnt = 0;
 
@@ -104,7 +104,7 @@ Ha leányági leszármazottak gyeremekei is vannak a GA-html-ben, akkor az apa és a
 		vPos.push_back( gafile.GetPosition() );
 
 	
-	m_command = L"SELECT rowid, lineNumber, mother_index, father_id, mother_id, first_name, last_name FROM people WHERE source='1' ORDER BY lineNumber";
+	m_command = L"SELECT rowid, lineNumber, parent2Index, father_id, mother_id, first_name, last_name FROM people WHERE source='1' ORDER BY lineNumber";
 	if( !theApp.query( m_command ) )
 	{
 		OnCancel();
@@ -126,8 +126,8 @@ Ha leányági leszármazottak gyeremekei is vannak a GA-html-ben, akkor az apa és a
 		if( rowid == L"5321" )
 			z = 7;
 		lineNumber		= theApp.m_recordset->GetFieldString( 1 );
-		mother_index	= _wtoi( theApp.m_recordset->GetFieldString( 2 ) );
-		if( mother_index == 0 ) goto cont;
+		parent2Index	= _wtoi( theApp.m_recordset->GetFieldString( 2 ) );
+		if( parent2Index == 0 ) goto cont;
 
 		father_id		= theApp.m_recordset->GetFieldString( 3 );
 		mother_id		= theApp.m_recordset->GetFieldString( 4 );
@@ -165,7 +165,7 @@ Ha leányági leszármazottak gyeremekei is vannak a GA-html-ben, akkor az apa és a
 			if( !count ) goto cont;
 		}
 */
-		if( mother_index > count  )
+		if( parent2Index > count  )
 		{
 			// szülõ
 			++cnt;
@@ -179,10 +179,10 @@ Ha leányági leszármazottak gyeremekei is vannak a GA-html-ben, akkor az apa és a
 			++nItem;
 
 			// gyermek 
-			str.Format( L"%d-%d", cnt, mother_index );
+			str.Format( L"%d-%d", cnt, parent2Index );
 			nItem = m_ListCtrl.InsertItem( nItem, str );
 
-			str.Format( L"%d", mother_index );
+			str.Format( L"%d", parent2Index );
 			m_ListCtrl.SetItemText( nItem, L_INDEX, str );
 			m_ListCtrl.SetItemText( nItem, L_LINENUMBER, lineNumber );
 

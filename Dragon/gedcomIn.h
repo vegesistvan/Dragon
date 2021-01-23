@@ -36,8 +36,8 @@ typedef struct
 	CString	father_id;
 	CString mother_id;
 	CString source;
-	int		mother_index;		// apja hanyadik feleségének gyermeke, ami kiírásra kerül a html-ben
-	int		mother_index2;		// apja hanyadik feleségének gyermeke
+	int		parent2Index;		// apja hanyadik feleségének gyermeke, ami kiírásra kerül a html-ben
+	int		parent2IndexCalc;		// apja hanyadik feleségének gyermeke
 	int		orderFather;		// apja hagyadik gyermeke
 	int		orderMother;		// anyja hanyadik gyermeke
 	int		numOfSpouses;		// házastársai száma
@@ -68,8 +68,8 @@ typedef struct
 	CString refW;			// anya azonosítója
 	CString refC;			// gyerek azonosítója
 	int		numRefI;
-	int		mother_index;	// apa hanyadik felesége az anyja
-	int		mother_index2;	// apa hanyadik felesége az anyja
+	int		parent2Index;	// apa hanyadik felesége az anyja
+	int		parent2IndexCalc;	// apa hanyadik felesége az anyja
 	int		orderFather;	//
 	int		orderMother;
 }CHIL;

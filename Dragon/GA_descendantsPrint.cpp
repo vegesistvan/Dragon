@@ -130,16 +130,16 @@ void CGaDescendants::printDescendant( int ix )
 	{
 		if( m_numbering == SZLUHA || m_numbering == TUP )
 		{
-			if( !p.mother_index.IsEmpty() && p.mother_index.Compare( L"0" ) )
+			if( p.parent2Index != 0 )
 			{
-				str.Format( L"/%s", p.mother_index ); 
+				str.Format( L"/%d", p.parent2Index ); 
 				cLine += str;
 			}
 		}
 		else if( m_numbering == VIL )  // felség sorszámának kiírása a név elõtt
 		{
-			if( !p.mother_index2.IsEmpty() && p.mother_index2.Compare( L"0" ) )
-				fwprintf( fl, L"%s. ", p.mother_index2 );
+			if( p.parent2IndexCalc != 0 )
+				fwprintf( fl, L"%d. ", p.parent2IndexCalc );
 		}
 	}
 	if( !p.posterior.IsEmpty() )
@@ -150,7 +150,7 @@ void CGaDescendants::printDescendant( int ix )
 
 
 	// nem értem, hogy hogy az alábbi if-nek mi az értelme. Ezuért most kikapcsoltam 2020.10.04
-/*	
+	
 	if( m_numbering == SZLUHA || m_numbering == TUP )
 	{
 		str = getPlaceDateBlock( p.birth_place, p.birth_date, '*' );
@@ -166,7 +166,6 @@ void CGaDescendants::printDescendant( int ix )
 			cLine.Format( L"%s %s", (CString)cLine, str );
 	}
 	else if( m_numbering == VIL )
-*/
 	{
 		cLine += getPlaceDateBlock( p.birth_place, p.birth_date, '*' );
 		cLine += getPlaceDateBlock( p.death_place, p.death_date, '+' );
@@ -495,8 +494,8 @@ void CGaDescendants::queryPeople( CString rowid, PPEOPLE* p )
 	p->last_name		= m_recordset.GetFieldString( PEOPLE_LAST_NAME );
 	p->lineNumber		= m_recordset.GetFieldString( PEOPLE_LINENUMBER );
 	p->mother_id		= m_recordset.GetFieldString( PEOPLE_MOTHER_ID );
-	p->mother_index		= m_recordset.GetFieldString( PEOPLE_MOTHER_INDEX );
-	p->mother_index2	= m_recordset.GetFieldString( PEOPLE_MOTHER_INDEX2 );
+	p->parent2Index		= _wtoi( m_recordset.GetFieldString( PEOPLE_MOTHER_INDEX ));
+	p->parent2IndexCalc	= _wtoi( m_recordset.GetFieldString( PEOPLE_MOTHER_INDEX2 ));
 	p->tableAncestry	= m_recordset.GetFieldString( PEOPLE_TABLEANCESTRY );
 	p->occupation		= m_recordset.GetFieldString( PEOPLE_OCCUPATION );
 	p->orderFather		= m_recordset.GetFieldString( PEOPLE_ORDERFATHER);
