@@ -69,7 +69,7 @@ BOOL CGetPeople::OnInitDialog()
 	m_ListCtrl.InsertColumn( L_BIRTH_DATE,	L"dátum",		LVCFMT_RIGHT,	70,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_DEATH_PLACE,	L"halál",		LVCFMT_LEFT,	100,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_DEATH_DATE,	L"dátum",		LVCFMT_LEFT,	 70,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( L_COMMENT,		L"megjegyzés",	LVCFMT_LEFT,	100,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_COMMENT,		L"leírás",	LVCFMT_LEFT,	100,-1,COL_TEXT);
 
 
 //	m_sex_id		= dlg._sex_id;

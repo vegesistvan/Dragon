@@ -216,7 +216,7 @@ public:
 	void	processMarriageSubstrings();
 	void	processPeopleStr( CString cLine,  PEOPLE* any );
 	void	processPeopleString( int who,  CString cLine, PEOPLE * p );
-	void	processNameSubstr( CString nameSubstr, PEOPLE* any );
+	void	processNameSubstr( CString nameSubstr, CString birthSubstr, CString deathSubstr,  PEOPLE* any );
 	CString processWedding( CString cLine, PLACE_DATE_BLOCK* w );
 	void	processPlaceDateComment( CString placeDateComment, PLACE_DATE_BLOCK* ns );
 	void	processSpousesSpouses( CString spouses,  std::vector<PEOPLE> *v_p );

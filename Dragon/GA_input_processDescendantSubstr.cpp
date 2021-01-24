@@ -101,7 +101,7 @@ void CGaInput::processPeopleStr( CString cLine,  PEOPLE* any )
 	}
 	nameSubstr = cLine.Trim();									// név blokk
 
-	processNameSubstr( nameSubstr, any );
+	processNameSubstr( nameSubstr, birthSubstr, deathSubstr,  any );
 	processPlaceDateComment( birthSubstr, &bb );
 	processPlaceDateComment( deathSubstr, &db );
 
@@ -123,7 +123,7 @@ void CGaInput::processPeopleStr( CString cLine,  PEOPLE* any )
 // 'name,' vagy 
 //	a balról-jobbra elsõ keresztnév, amit nem keresztnév követ
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CGaInput::processNameSubstr( CString nameSubstr, PEOPLE* any )
+void CGaInput::processNameSubstr( CString nameSubstr, CString birthSubstr, CString deathSubstr,  PEOPLE* any )
 {
 	if( nameSubstr.IsEmpty() ) return;
 
@@ -205,10 +205,14 @@ void CGaInput::processNameSubstr( CString nameSubstr, PEOPLE* any )
 		return;
 	}
 	// i az elválasztó index a név és comment( posterior) között
-	// megvan a  keresztnév. Ha van utána valami, akkor az posterior
+	// megvan a  keresztnév. Ha van utána valami, akkor az posterior, ha volt birth vagy death. He nem volt, akkor comment
 	any->sex_id = sex_id;
 	posterior = packWords( &A, i, n-i );
-	any->posterior = posterior;
+	posterior.Trim();
+	if( !birthSubstr.IsEmpty() || !deathSubstr.IsEmpty() && !isdigit( posterior.GetAt(0) ) )
+		any->posterior = posterior;
+	else
+		any->comment = posterior;
 
 	fullName = packWords(&A, 0, i );
 	n = wordList(&A, fullName, ' ', FALSE );

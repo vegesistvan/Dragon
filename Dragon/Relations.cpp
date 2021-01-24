@@ -113,6 +113,7 @@ CRelations::CRelations(CWnd* pParent /*=NULL*/)
 	, m_death_place(_T(""))
 	, m_comment(_T(""))
 	, m_occupation(_T(""))
+	, m_posterior(_T(""))
 {
 	m_recordset		= new CSqliteDBRecordSet;
 	m_recordset2	= new CSqliteDBRecordSet;
@@ -154,6 +155,7 @@ void CRelations::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_STATIC_COMMENT, colorComment);
 	DDX_Control(pDX, IDC_CHILDREN, colorChildren);
 	DDX_Control(pDX, IDC_NAME, colorName);
+	DDX_Text(pDX, IDC_EDIT_POSTERIOR, m_posterior);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CRelations, CDialogEx)
@@ -205,6 +207,7 @@ ON_EN_CHANGE(IDC_COMMENT, &CRelations::OnChangeComment)
 
 
 
+ON_EN_CHANGE(IDC_EDIT_POSTERIOR, &CRelations::OnChangeEditPosterior)
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CRelations::OnInitDialog()
@@ -234,7 +237,7 @@ BOOL CRelations::OnInitDialog()
 	m_ListCtrlP.InsertColumn( LISTP_NAME,		L"név",			LVCFMT_LEFT,	210,-1,COL_TEXT );
 	m_ListCtrlP.InsertColumn( LISTP_BIRTH,		L"született",	LVCFMT_LEFT,	150,-1,COL_TEXT);
 	m_ListCtrlP.InsertColumn( LISTP_DEATH,		L"meghalt",		LVCFMT_LEFT,	150,-1,COL_TEXT);
-	m_ListCtrlP.InsertColumn( LISTP_COMMENT,	L"megjegyzés",	LVCFMT_LEFT,	240,-1,COL_TEXT);
+	m_ListCtrlP.InsertColumn( LISTP_COMMENT,	L"leírás",		LVCFMT_LEFT,	240,-1,COL_TEXT);
 
 	// házasságok
 	m_ListCtrlM.KeepSortOrder(TRUE);
@@ -247,7 +250,7 @@ BOOL CRelations::OnInitDialog()
 	m_ListCtrlM.InsertColumn( LISTM_NAME,		L"név",			LVCFMT_LEFT,	170,-1,COL_TEXT);
 	m_ListCtrlM.InsertColumn( LISTM_BIRTH,		L"született",	LVCFMT_LEFT,	150,-1,COL_TEXT);
 	m_ListCtrlM.InsertColumn( LISTM_DEATH,		L"meghalt",		LVCFMT_LEFT,	150,-1,COL_TEXT);
-	m_ListCtrlM.InsertColumn( LISTM_COMMENT,	L"megjegyzés",	LVCFMT_LEFT,	120,-1,COL_TEXT);
+	m_ListCtrlM.InsertColumn( LISTM_COMMENT,	L"leírás",		LVCFMT_LEFT,	120,-1,COL_TEXT);
 	m_ListCtrlM.InsertColumn( LISTM_MARRIAGE,	L"házasság",	LVCFMT_LEFT,	120,-1,COL_TEXT);
 
 
@@ -262,7 +265,7 @@ BOOL CRelations::OnInitDialog()
 	m_ListCtrlS.InsertColumn( LISTS_NAME,		L"név",			LVCFMT_LEFT,	170,-1,COL_TEXT);
 	m_ListCtrlS.InsertColumn( LISTS_BIRTH,		L"született",	LVCFMT_LEFT,	150,-1,COL_TEXT);
 	m_ListCtrlS.InsertColumn( LISTS_DEATH,		L"meghalt",		LVCFMT_LEFT,	150,-1,COL_TEXT);
-	m_ListCtrlS.InsertColumn( LISTS_COMMENT,	L"megjegyzés",	LVCFMT_LEFT,	240,-1,COL_TEXT);
+	m_ListCtrlS.InsertColumn( LISTS_COMMENT,	L"leírás",		LVCFMT_LEFT,	240,-1,COL_TEXT);
 
 	// gyerekek
 	m_ListCtrlC.SortByHeaderClick(TRUE);
@@ -278,7 +281,7 @@ BOOL CRelations::OnInitDialog()
 	m_ListCtrlC.InsertColumn( LISTC_NAME,			L"név",					LVCFMT_LEFT,	150,-1,COL_TEXT);
 	m_ListCtrlC.InsertColumn( LISTC_BIRTH,			L"született",			LVCFMT_LEFT,	 80,-1,COL_TEXT);
 	m_ListCtrlC.InsertColumn( LISTC_DEATH,			L"meghalt",				LVCFMT_LEFT,	 80,-1,COL_TEXT);
-	m_ListCtrlC.InsertColumn( LISTC_COMMENT,		L"megjegyzés",			LVCFMT_LEFT,	100,-1,COL_TEXT );
+	m_ListCtrlC.InsertColumn( LISTC_COMMENT,		L"leírás",				LVCFMT_LEFT,	100,-1,COL_TEXT );
 
 	m_command = L"SELECT title FROM titles ORDER BY title";
 	if( ! theApp.querySystem( m_command ) ) return false;
@@ -383,6 +386,7 @@ void CRelations::people( CString rowid )
 	m_titolo		= m_recordset->GetFieldString( PEOPLE_TITOLO );
 	m_last_name	= m_recordset->GetFieldString( PEOPLE_LAST_NAME );
 	m_first_name	= m_recordset->GetFieldString( PEOPLE_FIRST_NAME);
+	m_posterior		= m_recordset->GetFieldString( PEOPLE_POSTERIOR);
 
 	m_birth_place	= m_recordset->GetFieldString( PEOPLE_BIRTH_PLACE );
 	m_birth_date	= m_recordset->GetFieldString( PEOPLE_BIRTH_DATE );
@@ -1531,6 +1535,7 @@ titolo='%s',\
 sex_id='%d',\
 first_name='%s',\
 last_name='%s',\
+posterior='%s',\
 birth_place='%s',\
 birth_date='%s',\
 death_place='%s',\
@@ -1544,6 +1549,7 @@ m_titolo,\
 sex,\
 m_first_name,\
 m_last_name,\
+m_posterior,\
 m_birth_place,\
 m_birth_date,\
 m_death_place,\
@@ -1641,6 +1647,10 @@ void CRelations::OnSelchangeComboDeath()
 	m_changed = true;
 }
 void CRelations::OnChangeComment()
+{
+	m_changed = true;
+}
+void CRelations::OnChangeEditPosterior()
 {
 	m_changed = true;
 }
@@ -1756,3 +1766,4 @@ void CRelations::OnClickedChildren()
 
 	gyerekek( p_rowid, m_sex_id );  // m_sex_id: apa vagy anya gyerekeit listázzuk? 
 }
+

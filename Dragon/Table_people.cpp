@@ -630,7 +630,7 @@ void CTablePeople::createListColumns( )
 	m_ListCtrl.InsertColumn( G_AGE,					L"kor",				LVCFMT_LEFT,	 30,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( G_ORDERFATHER,			L"apjacnt",			LVCFMT_LEFT,	30,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( G_ORDERMOTHER,			L"anyjacnt",		LVCFMT_LEFT,	30,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( G_COMMENT,				L"megjegyzés",		LVCFMT_LEFT,	100,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( G_COMMENT,				L"leírás",			LVCFMT_LEFT,	100,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( G_OCCUPATION,			L"foglalkozás",		LVCFMT_LEFT,	100,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( G_ROWID_FATHER,		L"apa_rowid",		LVCFMT_RIGHT,	50,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( G_FATHER,				L"apja",			LVCFMT_LEFT,	200,-1,COL_TEXT);
@@ -669,7 +669,7 @@ void CTablePeople::createListColumns( )
 		m_ListCtrl.InsertColumn( H_AGE,					L"kor",				LVCFMT_LEFT,	 30,-1,COL_NUM);
 		m_ListCtrl.InsertColumn( H_ORDERFATHER,		L"apjacnt",			LVCFMT_LEFT,	30,-1,COL_NUM);
 		m_ListCtrl.InsertColumn( H_ORDERMOTHER,		L"anyjacnt",		LVCFMT_LEFT,	30,-1,COL_NUM);
-		m_ListCtrl.InsertColumn( H_COMMENT,				L"megjegyzés",		LVCFMT_LEFT,	100,-1,COL_TEXT);
+		m_ListCtrl.InsertColumn( H_COMMENT,				L"leírás",		LVCFMT_LEFT,	100,-1,COL_TEXT);
 		m_ListCtrl.InsertColumn( H_OCCUPATION,			L"foglalkozás",		LVCFMT_LEFT,	100,-1,COL_TEXT);
 		m_ListCtrl.InsertColumn( H_ROWID_FATHER,		L"apa_rowid",		LVCFMT_RIGHT,	50,-1,COL_NUM);
 		m_ListCtrl.InsertColumn( H_FATHER,				L"apja",			LVCFMT_LEFT,	200,-1,COL_TEXT);
@@ -696,7 +696,7 @@ void CTablePeople::createListColumns( )
 		m_ListCtrl.InsertColumn( N_AGE,					L"kor",				LVCFMT_LEFT,	 30,-1,COL_NUM);
 		m_ListCtrl.InsertColumn( N_ORDERFATHER,			L"apjacnt",			LVCFMT_LEFT,	30,-1,COL_NUM);
 		m_ListCtrl.InsertColumn( N_ORDERFATHER,			L"anyjacnt",		LVCFMT_LEFT,	30,-1,COL_NUM);
-		m_ListCtrl.InsertColumn( N_COMMENT,				L"megjegyzés",		LVCFMT_LEFT,	100,-1,COL_TEXT);
+		m_ListCtrl.InsertColumn( N_COMMENT,				L"leírás",		LVCFMT_LEFT,	100,-1,COL_TEXT);
 		m_ListCtrl.InsertColumn( N_OCCUPATION,			L"foglalkozás",		LVCFMT_LEFT,	100,-1,COL_TEXT);
 		m_ListCtrl.InsertColumn( N_ROWID_FATHER,		L"apa_rowid",		LVCFMT_RIGHT,	50,-1,COL_NUM);
 		m_ListCtrl.InsertColumn( N_FATHER,				L"apja",			LVCFMT_LEFT,	200,-1,COL_TEXT);

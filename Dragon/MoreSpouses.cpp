@@ -78,7 +78,7 @@ void CMoreSpouses::createScreen()
 	m_ListCtrl.InsertColumn( LISTM_NAME,		L"név",			LVCFMT_LEFT,	170,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( LISTM_BIRTH,		L"született",	LVCFMT_LEFT,	150,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( LISTM_DEATH,		L"meghalt",		LVCFMT_LEFT,	150,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( LISTM_COMMENT,		L"megjegyzés",	LVCFMT_LEFT,	120,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( LISTM_COMMENT,		L"leírás",	LVCFMT_LEFT,	120,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( LISTM_MARRIAGE,	L"házasság",	LVCFMT_LEFT,	120,-1,COL_TEXT);
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

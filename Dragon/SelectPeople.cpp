@@ -78,7 +78,7 @@ void CSelectPeople::createColumns()
 	m_ListCtrl.InsertColumn( M_FIRST_NAME,	L"keresztnév",		LVCFMT_LEFT,	100,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( M_BIRTH_DATE,	L"születés",		LVCFMT_LEFT,	 80,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( M_DEATH_DATE,	L"halál",			LVCFMT_LEFT,	 80,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( M_COMMENT,		L"megjegyzés",		LVCFMT_LEFT,	100,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( M_COMMENT,		L"leírás",		LVCFMT_LEFT,	100,-1,COL_TEXT);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSelectPeople::fillTable()

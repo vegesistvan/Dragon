@@ -430,7 +430,7 @@ void CContract::processPeople()
 	CString rowid1;
 	CString rowid2;
 
-	if( vPeople.at(0).name == L"Battyhány Zsigmond" )
+	if( vPeople.at(0).name == L"Lányi János" )
 		z = 1;
 	m_contracted = false;
 	resetRef();
@@ -516,9 +516,11 @@ void CContract::processPeople()
 								}
 							}
 */
+if( (i1 == 95921 && i2 == 141743 ) || (i1 == 141743 && i2 == 95921 ) )
+   z = 1;
 
-							vPeople.at( i1 ).status = 1;
-							vPeople.at( i2 ).status = -1;
+							vPeople.at( i1 ).status = 1;	// megtartani	
+							vPeople.at( i2 ).status = -1;   // törölni
 							vPeople.at( i2 ).match	= m_match;
 							contract( i1, i2 );
 

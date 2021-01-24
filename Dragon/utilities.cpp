@@ -1104,6 +1104,7 @@ CString Utf8ToAnsi( CString cLine )
 //  -1 : mindkettõ meg van adva és nem egyezik
 int same( CString ref, CString par1, CString par2 )
 {
+/*
 	if( !ref.IsEmpty() && !par2.IsEmpty() )
 	{
 		if( ref == par2 )
@@ -1111,6 +1112,7 @@ int same( CString ref, CString par1, CString par2 )
 		else
 			return -1;
 	}
+*/
 	if( !par1.IsEmpty() && !par2.IsEmpty() )
 	{
 		if( par1 == par2 )

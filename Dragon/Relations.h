@@ -118,6 +118,7 @@ protected:
 	CString m_titolo;
 	CString m_last_name;
 	CString m_first_name;
+//	CString m_posterior;
 	CString m_birth_date;
 	CString m_birth_place;
 	CString m_death_date;
@@ -185,4 +186,6 @@ public:
 	afx_msg void OnClickedChildren();
 	CColorStatic colorChildren;
 	CColorStatic colorName;
+	CString m_posterior;
+	afx_msg void OnChangeEditPosterior();
 };

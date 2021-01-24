@@ -105,7 +105,7 @@ BOOL CDescendant::OnInitDialog()
 	m_ListCtrl.InsertColumn( PS_BDATE,			L"b.dátum",			LVCFMT_LEFT,	 70,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( PS_DPLACE,			L"d.hely",			LVCFMT_LEFT,	 80,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( PS_DDATE,			L"d.dátum",			LVCFMT_LEFT,	 70,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( PS_COMMENT,		L"megjegyzés",		LVCFMT_LEFT,	100,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( PS_COMMENT,		L"leírás",			LVCFMT_LEFT,	100,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( PS_BRANCH,			L"elágazás",		LVCFMT_LEFT,	 80,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( PS_ARM,			L"ág",				LVCFMT_LEFT,	 80,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( PS_ROWIDF,			L"rowidF",			LVCFMT_LEFT,	 80,-1,COL_TEXT);

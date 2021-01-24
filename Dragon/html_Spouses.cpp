@@ -130,7 +130,7 @@ BOOL CHtmlSpouses::OnInitDialog()
 	
 	m_ListCtrl.InsertColumn( MG_DPLACE,			L"halál",					LVCFMT_LEFT,	100,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( MG_DDATE,			L"idõ",						LVCFMT_LEFT,	100,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( MG_COMMENT,		L"megjegyzés",				LVCFMT_LEFT,	80,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( MG_COMMENT,		L"leírás",					LVCFMT_LEFT,	80,-1,COL_TEXT);
 
 
 //	m_ListCtrl.InsertColumn( MG_FATHER,			L"apja",					LVCFMT_LEFT,	150,-1,COL_TEXT);
@@ -143,7 +143,7 @@ BOOL CHtmlSpouses::OnInitDialog()
 	m_ListCtrl.InsertColumn( MG_BDATEF,			L"idõ",						LVCFMT_LEFT,	100,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( MG_DPLACEF,		L"halál",					LVCFMT_LEFT,	100,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( MG_DDATEF,			L"idõ",						LVCFMT_LEFT,	100,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( MG_COMMENTF,		L"megjegyzés",				LVCFMT_LEFT,	80,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( MG_COMMENTF,		L"leírás",					LVCFMT_LEFT,	80,-1,COL_TEXT);
 	
 //	m_ListCtrl.InsertColumn( MG_MOTHER,			L"anyja",	LVCFMT_LEFT,	150,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( MG_TITLEM,			L"anyja",					LVCFMT_LEFT,	80,-1,COL_TEXT);
@@ -155,7 +155,7 @@ BOOL CHtmlSpouses::OnInitDialog()
 	m_ListCtrl.InsertColumn( MG_BDATEM,			L"idõ",						LVCFMT_LEFT,	100,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( MG_DPLACEM,		L"halál",					LVCFMT_LEFT,	100,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( MG_DDATEM,			L"idõ",						LVCFMT_LEFT,	100,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( MG_COMMENTM,		L"megjegyzés",				LVCFMT_LEFT,	80,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( MG_COMMENTM,		L"leírás",					LVCFMT_LEFT,	80,-1,COL_TEXT);
 
 	m_ListCtrl.InsertColumn( MG_SPOUSE_SPOUSES,	L"házastárs házastársai",	LVCFMT_LEFT,    200,-1,COL_TEXT);
 

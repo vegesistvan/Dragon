@@ -130,7 +130,7 @@ void CGaInput::processMarriageSubstrings()
 			father = parentsSubstr.Left( pos );
 			mother = parentsSubstr.Mid( pos + 1 );				// itt kellene tovább bontani a mothert, mert lehetnek adatai!! (164076 sor )
 		}	
-		else														// a zárójelben csak apa és megjegyzés van!!
+		else														// a zárójelben csak apa és leírás van!!
 		{
 			str = getUntil( parentsSubstr, ' ' );
 			if( isFirstName( str ) != - 1 )

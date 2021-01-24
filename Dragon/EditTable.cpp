@@ -105,7 +105,7 @@ BOOL CEditTable::OnInitDialog()
 	m_ListCtrl.InsertColumn( B_TITLE,			L"cím",			LVCFMT_LEFT,	100,-1,COL_TEXT );
 	m_ListCtrl.InsertColumn( B_DATE,			L"dátum",		LVCFMT_LEFT,	80,-1,COL_TEXT );
 	m_ListCtrl.InsertColumn( B_EXT,			L"ext",			LVCFMT_LEFT,	30,-1,COL_HIDDEN );
-	m_ListCtrl.InsertColumn( B_COMMENT,		L"megjegyzés",	LVCFMT_LEFT,	500,-1,COL_TEXT );
+	m_ListCtrl.InsertColumn( B_COMMENT,		L"leírás",	LVCFMT_LEFT,	500,-1,COL_TEXT );
 
 
 	if( !m_tableNumber.IsEmpty() )

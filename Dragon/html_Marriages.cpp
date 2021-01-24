@@ -121,7 +121,7 @@ BOOL CMarriages::OnInitDialog()
 	m_ListCtrl.InsertColumn( L_BIRTH_DATE,		L"birth",				LVCFMT_LEFT,	 80,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_DEATH_PLACE,		L"death",				LVCFMT_LEFT,	 80,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_DEATH_DATE,		L"death",				LVCFMT_LEFT,	 80,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( L_COMMENT,			L"megjegyzés",			LVCFMT_LEFT,	100,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_COMMENT,			L"leírás",				LVCFMT_LEFT,	100,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_PARENTS,			L"szülõk",				LVCFMT_LEFT,	100,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_FATHER,			L"apa",					LVCFMT_LEFT,	 80,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_LAST_NAMEF,		L"családnév",			LVCFMT_LEFT,	 80,-1,COL_TEXT);

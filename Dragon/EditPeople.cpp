@@ -307,7 +307,7 @@ void CEditPeople::initialScreen()
 	m_ListCtrlB.InsertColumn( B_TITLE,			L"cím",			LVCFMT_LEFT,	270,-1,COL_TEXT );
 	m_ListCtrlB.InsertColumn( B_DATE,			L"dátum",		LVCFMT_LEFT,	80,-1,COL_HIDDEN );
 	m_ListCtrlB.InsertColumn( B_EXT,			L"ext",			LVCFMT_LEFT,	30,-1,COL_HIDDEN );
-	m_ListCtrlB.InsertColumn( B_COMMENT,		L"megjegyzés",	LVCFMT_LEFT,	500,-1,COL_HIDDEN );
+	m_ListCtrlB.InsertColumn( B_COMMENT,		L"leírás",		LVCFMT_LEFT,	500,-1,COL_HIDDEN );
 
 	fillMarriageTable();
 	fillBlobTable();

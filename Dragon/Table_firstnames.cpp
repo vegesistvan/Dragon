@@ -93,7 +93,7 @@ BOOL CTableFirstnames::OnInitDialog()
 	m_ListCtrl.InsertColumn( L_LANGUAGE,	L"nyelv",		LVCFMT_LEFT,  80,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_ORIGIN,		L"eredet",		LVCFMT_LEFT,  80,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_MEANING,		L"jelentés",	LVCFMT_LEFT, 200,-1,COL_TEXT);	
-	m_ListCtrl.InsertColumn( L_COMMENT,		L"megjegyzés",	LVCFMT_LEFT, 120,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_COMMENT,		L"leírás",	LVCFMT_LEFT, 120,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_OCCURANCE,	L"elõfordult",	LVCFMT_RIGHT, 80,-1,COL_NUM);
 
 
