@@ -1583,6 +1583,8 @@ void CRelations::OnClickedStaticComment()
 {
 	CEditComment dlg;
 
+	str.Format( L"%s %s leírása", m_last_name, m_first_name );
+	dlg.m_caption = str;
 	dlg.m_comment = m_comment;
 	if( dlg.DoModal() == IDCANCEL ) return;
 	m_comment = dlg.m_comment;

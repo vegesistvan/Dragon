@@ -162,11 +162,14 @@ void CGaInput::processNameSubstr( CString nameSubstr, CString birthSubstr, CStri
 	}
 
 
+	// [titolo][title][családnév][keresztnév][leírás]
+
+	// [leírás] azonosítása
 	if( nameSubstr == L"Palásthy Judit 1689" )
 		z = 1;
 
 	// megkeresi a név és az esetleges comment elválasztó indexét, ami az utolsó keresztnevet követõ nemkeresztnévnél van
-	for( i = 1 ; i < n; ++i )	// az elsõ keresztnevet keresi, de az lehet helyiség (pl. Gyula is, és lehet családnév is (pl. péter Zoltán
+ 	for( i = 1 ; i < n; ++i )	// az elsõ keresztnevet keresi, de az lehet helyiség (pl. Gyula is, és lehet családnév is (pl. péter Zoltán
 	{
 		word = A[i];
 		word.Replace( ',', ' ' );						// a név után lehet vesszõ !!
@@ -214,12 +217,19 @@ void CGaInput::processNameSubstr( CString nameSubstr, CString birthSubstr, CStri
 	else
 		any->comment = posterior;
 
+
+//// FULLNAME FELBONTÁSA ///////////////////////////////////////////////////
+
 	fullName = packWords(&A, 0, i );
 	n = wordList(&A, fullName, ' ', FALSE );
 	if( n < 2 ) return;
-
+	i = 0;
+// [title][elõnév][title][családnév][keresztnév][utótag]
+// a title két helyen is elõfordulhat!!
+// ELÕNEVEK ELÕTTI CÍMEK AZONOSÍTÁSA
 // kisbetûvel nem lehet megkülönböztetni a rangot, mert számos idegen családnév kezdõdik kisbetûvel
 // pl. di_, la_, von_, des_, del_
+
 	for( i = 0; i < n; ++i )
 	{
 		if( iswlower( A[i].GetAt( 0 ) ) )
@@ -235,41 +245,73 @@ void CGaInput::processNameSubstr( CString nameSubstr, CString birthSubstr, CStri
 	}
 	any->title = title.TrimRight();
 
-	if( isLastCharacter( A[i], 'i' ) )						// elõnév következik
+// x és y ELÕNEVEK AZONOSÍTÁSA
+
+	if( i+1 < n && A[i+1] == L"és" )					// X és Y, ahol X nem i-re végzõdik
 	{
-		if( ( ret = isFirstName( A[i+1] )) != -1 )		// nem hamis elõnév
+		any->titolo = packWords( &A, i,  3 );
+		i += 3;
+	}
+														// Giczi, Assa és Ablánckürti Ghyczy Anna Mária
+	if( ((i + 2)  < n) && A[i+2] == L"és" )
+	{
+		any->titolo = packWords( &A, i, 4 );
+		i += 4;
+	}
+
+// Xi elõnevek azonosítása	
+	if( isLastCharacter( A[i], 'i' ) )					// i-re végzõdõ egytagú elõnebek azonosítása 
+	{													// elõnév következhet, de lehet családnév is!!
+		if( ( ret = isFirstName( A[i+1] )) != -1 )		// az ezt követõ szó keresznév, ami lehet családnév is
 		{
-			if( i+2 < n )  // azzaz már csak 3 tag vamn hátra
+			if( i+2 < n )								// azzaz már csak 3 tag van hátra, akkor ezek: titolo, lastname, firstname
 			{
 				any->titolo		= A[i];
 				any->last_name	= A[i+1];
 				any->first_name	= A[i+2];			
 				return;
 			}
-			else if( i+1 < n )
+			else if( i+1 < n )							// már csak 2 szó van hátra, akkor azok: lasstname, firstname
 			{
 				any->last_name = A[i];
 				any->first_name = A[i+1];
 				return;
 			}
 		}
-		if( A[i+1] == L"és" )					// kettõs elõnév
+		any->titolo = A[i];
+		++i;
+	}
+
+// most már csak ilyen lehet: [tile] [családnév] {keresztnév]
+// title azonsítása
+// kisbetûvel nem lehet megkülönböztetni a rangot, mert számos idegen családnév kezdõdik kisbetûvel
+// pl. di_, la_, von_, des_, del_
+
+// ELÕNEVEK ELÕTTI CÍMEK AZONOSÍTÁSA
+	for( ; i < n; ++i )
+	{
+		if( iswlower( A[i].GetAt( 0 ) ) )
 		{
-			any->titolo = packWords( &A, i, 3 );
-			i += 3;
+			if( A[i].Find( '_' ) != -1 ) break;		// ezek elfordulhatnak idegen családnevekben
+			if( A[i].Find( '|' ) != -1 ) break;		// a családnevekben elõforduló '-t helyettesíti a | karkter
+
+			title += A[i];
+			title += L" ";
 		}
 		else
-		{
-			any->titolo = A[i];
-			++i;
-		}
+			break;
 	}
+	any->title = title.TrimRight();
+
+
 	any->last_name = A[i];		// családnév
+	// a végérõl leszedi az utótagot
 	if( iswlower( A[n-1][0] ) )
 	{
 		any->posterior = A[n-1];
 		--n;
 	}
+	// ami marad, aza keresztnév
 	any->first_name = packWords( &A, i+1, n-i-1 );
 
 }

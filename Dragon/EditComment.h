@@ -21,6 +21,7 @@ protected:
 public:
 	virtual BOOL OnInitDialog();
 	CString m_comment;
+	CString m_caption;
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
 };

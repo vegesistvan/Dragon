@@ -39,6 +39,7 @@ BOOL CEditComment::OnInitDialog()
 	CDialogEx::OnInitDialog();
 	EASYSIZE_ADD( IDC_EDIT,	ES_BORDER,	ES_BORDER,		ES_BORDER,		ES_BORDER,	0 );
 	EASYSIZE_INIT();
+	SetWindowTextW( m_caption );
 	return TRUE;
 
 }

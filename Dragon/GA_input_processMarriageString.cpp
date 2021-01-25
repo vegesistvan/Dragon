@@ -269,6 +269,8 @@ int CGaInput::checkSex( int sex_id )
 	return sexid;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// [place] [date]
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CGaInput::processWedding( CString cLine, PLACE_DATE_BLOCK* pdb )
 {
 	CStringArray A;
@@ -337,7 +339,7 @@ CString CGaInput::processWedding( CString cLine, PLACE_DATE_BLOCK* pdb )
 			return peopleSubstr;
 		}
 	}
-
+	
 	// [place] name vagy csak name
 	for( j = 0; j < i; ++j )
 	{
