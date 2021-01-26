@@ -89,7 +89,7 @@ void CGaInput::processMarriageSubstrings()
 		if( relativesSubstr.IsEmpty() ) continue;
 
 		// felbontások
-
+		parentsSubstr.Empty();
 		moreSpouses.Empty();
 		if( !relativesSubstr.IsEmpty() )
 		{

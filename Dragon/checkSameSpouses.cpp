@@ -584,7 +584,6 @@ void CCheckSameSpouses::printHtml()
 	CString deathDateM0;
 	CString source0;
 
-
 	CString birthDateJ;
 	CString deathDateJ;
 	CString fatherJ;
@@ -598,6 +597,7 @@ void CCheckSameSpouses::printHtml()
 	int nItemH;
 
 	CString rowidBy;
+	
 	CString sex_id;
 
 
@@ -873,7 +873,7 @@ vSameSpouses.at(0).deathDateM\
 
 		nItem = m_ListCtrl.InsertItem( nItem, L"" );
 		
-		m_ListCtrl.SetItemText( nItem, L_ROWID, rowid );
+		m_ListCtrl.SetItemText( nItem, L_ROWID, vSameSpouses.at(j).rowid );
 		m_ListCtrl.SetItemText( nItem, L_LINENUMBER, vSameSpouses.at(j).lineNumber );
 		m_ListCtrl.SetItemText( nItem, L_TABLENUMBER, vSameSpouses.at(j).tableNumber );
 		m_ListCtrl.SetItemText( nItem, L_UNITED, vSameSpouses.at(j).united );

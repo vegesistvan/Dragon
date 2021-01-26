@@ -321,6 +321,8 @@ cont:	m_recordset->MoveNext();
 	theApp.execute( L"COMMIT" );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Az azonos nevû emberek adatainak összegyûjtése a vPeople vetorba
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContract::putPeople( CString name, UINT i )
 {
 	m_recordset->MoveTo( i );
@@ -407,10 +409,26 @@ void CContract::putPeople( CString name, UINT i )
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Az alábbi algoritmusban az a probléma, hogy a legmagasabb prioritású bejegyzéshez (LPB) passzoló bejegyzések (BP)
-// egymással ellentmondásban lehetnek!
-// Pl: LPB: birth, BP1= birth death1, BP2:birth death2
-// A kijelölt bejegyzések közötti ellentmondásokat ki kellen szûrni. De akkor melyik a jó bejegyzés?
+// A vPeople vetorban vannak az azonos nevû emberek adataikkal együtt.
+// A bejegyzéseket csoportokba osztja, olyképpen, hogy egy csoportba teszi az azonos emberhez tartozó bejegyzéseket.
+// A csoportokat megszámozza a "group" változóban. Ha egy ember egy csoporthoz sem tartozik, akkor a 'group' értéke 0.
+// Egy csoportba tartozó bejegyzések közül a legmagasabb prioritásút tartja meg, a többit törli.
+// A megtartandó bejegyzést 'csoprtfõ"-nek nevezzük.
+// Minden bejegyzésnek van egy 'status' szava, amely -1, ha törlendõ és 1 ha megtartandó bejegyzés.
+// Természetesen a törlendõ bejegyzésre hivatkozó 'father_id, 'mother_id' mezõket is felülírja a megtartott bejegyzéssel.
+// Egy bejejegyzés 'match" szavában lesz benne, hogy hány adata egyezik a megtartandó bejegyzéssel.
+//
+// A probléma lehet, ha egy bejegyzés egy-két adat alapján egyezik a csoportfõ adataival, egy másik pedig más adatok alapján
+// egyezik a csoportfõvel, de egymással ellentmondásban vannak. Ez adathibák, adat hinyosságok miatt is elõfordulhat. 
+// Ezért egy csoport egyezõ adatait gyûjtjük egy SAMENAMES r strukturában, és az újabb megtartandó bejegyzés adatit 
+// ebben a strukturában gyüjtött adatokkal hasonlítjuk össze. 
+// Ezzel biztosíthatjuk, hogy a csoportban nem lesz ellentmondás, de nincs rá garancia, hogy valóban a helyes értékek \\
+// gyûlnek az 'r' strukturában. 
+// Másik típusú összevonási hiba, ha azonos emeberek bejegyzéseit nem vonjuk össze, amit szintén adathiba vagy adathiány
+// okozhat.
+// A hibás összevonásokat az összevonást követõ ellenõrzési funkciók valamelyikával feltárhatjuk, és ha ennek 
+// adathiba volt az oka, azt javíthatjuk. 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContract::processPeople()
 {
 	UINT group = 1;
@@ -905,14 +923,14 @@ void CContract::listPeople()
 
 		str.Format( L"\
 %9s %2s %1s %1s \
-%-30s %8s %12s %12s \
-%-30s %8s %12s %12s \
-%-30s %8s, %12s %12s \
+%8s,%-30s,%12s %12s \
+%8s,%-30s,%12s %12s \
+%8s,%-30s,%12s %12s \
 %8s %s",\
 x.line, x.united, x.generation, x.source,\
-x.name,   x.rowid, x.birth,  x.death,\
-x.father, x.rowidF, x.birthF, x.deathF,\
-x.mother, x.rowidM, x.birthM, x.deathM,\
+x.rowid, x.name, x.birth,  x.death,\
+x.rowidF, x.father, x.birthF, x.deathF,\
+x.rowidM, x.mother, x.birthM, x.deathM,\
 x.rowidS, x.spouses\
 ); 
 		ident += str;
@@ -972,9 +990,9 @@ x.rowidS, x.spouses\
 %s\t%s\t%s\t\n",\
 colorIndex, m_loop, x.group, x.match, x.group2, x.status, rgbColor,\
 x.line, x.united, x.generation, x.source,\
-x.name, x.rowid,  x.birth,  x.death,\
-x.father, x.rowidF, x.birthF, x.deathF,\
-x.mother, x.rowidM, x.birthM, x.deathM,\
+x.rowid,x.name,x.birth,  x.death,\
+x.rowidF,x.father,x.birthF, x.deathF,\
+x.rowidM,x.mother,x.birthM, x.deathM,\
 x.rowidS, x.spouses, x.lineF\
 );
 

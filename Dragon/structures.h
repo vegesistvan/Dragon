@@ -16,27 +16,6 @@
     BUILD_SEC_CH0, BUILD_SEC_CH1,
     '\0'
 };
-/*
-typedef struct
-{
-	TCHAR	*name;
-	TCHAR	*type;
-}COLUMN;
-
-typedef struct
-{
-	TCHAR	*name;
-	const COLUMN	*columns;
-	int		size;
-}DB;
-
-typedef struct
-{
-	TCHAR	*table;
-	TCHAR	*column;
-	TCHAR	*name;
-}INDEXES;
-*/
 
 typedef struct
 {
@@ -233,37 +212,6 @@ typedef struct
 	CString fatherS2;
 
 }COUPLES;
-
-typedef struct
-{
-	UINT	cnt;
-	UINT	group;				// 0 - nem tartozik csoportba, egyedi adatai vannak
-								// 1-n az 1-n csoportba tartozik
-	UINT	group2;				// más csoporttól vette el
-	int		status;				// 1 = megtartandó, -1 törlendõ 
-	UINT	rgbcolor;
-	UINT	match;
-	CString rowid;
-	CString line;
-	CString generation;
-	CString source;
-	CString united;
-	CString	sex_id;
-	CString name;
-	CString birth;
-	CString death;
-	CString father;				// father
-	CString rowidF;
-	CString birthF;
-	CString deathF;
-	CString mother;				// mother
-	CString rowidM;			
-	CString birthM;
-	CString deathM;
-	CString spouses;
-	CString rowidS;				// spouse 
-	CString lineF;
-}SAMENAMES;
 
 typedef struct
 {

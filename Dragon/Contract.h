@@ -2,6 +2,39 @@
 
 #include "ProgressWnd.h"
 
+
+typedef struct
+{
+	UINT	cnt;			// számláló  
+	UINT	group;			// csoport száma ( 0: nem tartozik csoportba, azaz nincs még egy olyan ember, mint õ
+	UINT	group2;			// más csoporttól vette el
+	int		status;			// 1 = megtartandó, -1 törlendõ 
+	UINT	rgbcolor;		// color kód, csak ellenõrzésra
+	UINT	match;			// 
+
+	CString rowid;			// az ember és apja, anyaja adatai, házastársainak név-listája
+	CString line;
+	CString generation;
+	CString source;
+	CString united;
+	CString	sex_id;
+
+	CString name;
+	CString birth;
+	CString death;
+	CString father;				// father
+	CString rowidF;
+	CString birthF;
+	CString deathF;
+	CString mother;				// mother
+	CString rowidM;			
+	CString birthM;
+	CString deathM;
+	CString spouses;
+	CString rowidS;				// spouse 
+	CString lineF;
+}SAMENAMES;
+
 class CContract : public CWnd
 {
 	DECLARE_DYNAMIC(CContract)
