@@ -9,6 +9,7 @@
 #include "ProgressWnd.h"
 #include "SamePeopleInfo.h"
 #include "html_Lines.h"
+#include "Relations.h"
 //#include "FilterLoop.h"
 
 // CContractedPeople dialog
@@ -81,6 +82,8 @@ BEGIN_MESSAGE_MAP(CContractedPeople, CDialogEx)
 	ON_COMMAND(ID_HTML_PEOPLEFATHER, &CContractedPeople::OnHtmlPeoplefather)
 	ON_COMMAND(ID_EDIT_NOTEPAD_PARENTS, &CContractedPeople::OnEditNotepadParents)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CContractedPeople::OnHtmlNotepad)
+//	ON_NOTIFY(NM_RDBLCLK, IDC_LIST, &CContractedPeople::OnRdblclkList)
+	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CContractedPeople::OnDblclkList)
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CContractedPeople::OnInitDialog()
@@ -526,4 +529,25 @@ void CContractedPeople::OnEditNotepadParents()
 	}
 	CString lineNumberF	= m_ListCtrl.GetItemText( nItem, 	S_LINEF );
 	if( !lineNumberF.IsEmpty() ) theApp.editNotepad( lineNumberF );
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedPeople::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+
+	int nItem = pNMItemActivate->iItem;
+	if( m_ListCtrl.GetItemText( nItem, S_STATUS ) == L"-1" )
+	{
+		AfxMessageBox( L"Ez összevont bejegyzés, nincs mögötte már ember!" );
+		return;
+	}
+
+	CString rowid	= m_ListCtrl.GetItemText( nItem, S_ROWID );
+
+	CRelations dlg;
+	dlg.nItem		= nItem;
+	dlg.m_rowid		= rowid;
+	if( dlg.DoModal() == IDCANCEL ) return;
+
+	*pResult = 0;
 }

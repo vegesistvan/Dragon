@@ -48,9 +48,10 @@ protected:
 	void fatherDeathChildBirth();
 	void fillTable();
 
+	void OnHtmlShows();
 	void OnHtmlEdit();
 	void OnHtmlNotepad();
-	void OnHtmlShows();
+	void OnRokonsag();
 
 	DECLARE_MESSAGE_MAP()
 public:

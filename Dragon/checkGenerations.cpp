@@ -255,7 +255,10 @@ void CCheckGenerations::fillTable()
 	wndProgress.DestroyWindow();
 
 	if( !m_cnt )
+	{
 		AfxMessageBox( L"Nem találtam hibás generációs kódot!" );
+		CDialog::OnCancel();
+	}
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckGenerations::OnSize(UINT nType, int cx, int cy)

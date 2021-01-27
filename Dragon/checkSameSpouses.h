@@ -1,5 +1,6 @@
 #pragma once
 #include "listctrlex.h"
+#include "colorstatic.h"
 
 
 // CCheckSameSpouses dialog
@@ -105,8 +106,8 @@ protected:
 	void sameSpouses();
 	void sameSpouses2();
 	void same();
-
-	
+	void keress( int start );
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnInitDialog();
@@ -123,4 +124,9 @@ public:
 	afx_msg void OnHtml();
 	afx_msg void OnInfo();
 	afx_msg void OnSpousesDiff();
+	CString m_search;
+	CColorStatic colorKeress;
+	afx_msg void OnClickedKeress();
+	afx_msg void OnClickedNext();
+	CColorStatic colorNext;
 };

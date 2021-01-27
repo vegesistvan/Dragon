@@ -911,8 +911,17 @@ TCHAR * string2char( CString str )
 	return sT;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Elfogadott formátum:
+// az évnek 1000 és az aktuális év közé kell esni
+
+// 1944
+// 1944.12.
+// 1944.12.17
+
+
 bool checkDate( CString datum)
 {
+	datum.Trim();
 	int length = datum.GetLength();
 	if( length < 4 ) return false;
 

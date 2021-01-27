@@ -30,6 +30,7 @@ protected:
 	CString getHtmlLine( CString lineNumber );
 	void OnHtmlEdit();
 	void OnHtmlNotepad();
+	void OnRokonsag();
 
 	DECLARE_MESSAGE_MAP()
 public:

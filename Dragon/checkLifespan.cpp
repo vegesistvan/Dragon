@@ -69,13 +69,10 @@ BEGIN_MESSAGE_MAP(CLifeSpan, CDialogEx)
 	ON_WM_SIZING()
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
 	ON_COMMAND(ID_HTML_EDIT, &CLifeSpan::OnHtmlEdit)
-	ON_COMMAND(ID_HTML_SHOWS, &CLifeSpan::OnHtmlShows)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CLifeSpan::OnHtmlNotepad)
 	ON_COMMAND(ID_ROKONSAG, &CLifeSpan::OnRokonsag)
-	ON_COMMAND(ID_GAHTML_LINE, &CLifeSpan::OnGahtmlLine)
-
-	ON_NOTIFY(NM_CLICK, IDC_LIST, &CLifeSpan::OnClickList)
 	ON_COMMAND(ID_LIST, &CLifeSpan::OnList)
+
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CLifeSpan::OnInitDialog()
@@ -240,6 +237,7 @@ death_date\
 	}
 
 }
+/*
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 LRESULT CLifeSpan:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 {
@@ -311,6 +309,7 @@ void CLifeSpan::OnHtmlShows()
 
 	dlg.DoModal();
 }
+*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CLifeSpan::OnList()
 {
@@ -320,6 +319,7 @@ void CLifeSpan::OnList()
 	theApp.exportAll( logFile, title, &m_ListCtrl );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 void CLifeSpan::OnGahtmlLine()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
@@ -347,15 +347,7 @@ void CLifeSpan::OnRokonsag()
 	dlg.DoModal();
 
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CLifeSpan::OnClickList(NMHDR *pNMHDR, LRESULT *pResult)
-{
-//	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	OnGahtmlLine();
-	*pResult = 0;
-}
-
-
+*/
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CLifeSpan::query( CString command )
 {
@@ -389,4 +381,43 @@ BOOL CLifeSpan::query2( CString command )
 	}
 	return TRUE;
 }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+LRESULT CLifeSpan::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
+{
+	CPoint* point=(CPoint*) lParam;
+    CMenu	Menu;
+	CMenu*	pPopup;
 
+
+	if(Menu.LoadMenu( IDR_DROPDOWN_HTML_EDIT ))
+    {
+		pPopup = Menu.GetSubMenu(0);
+		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
+    }
+	return TRUE;
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CLifeSpan::OnHtmlEdit()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, L_LINENUMBER ) );
+	theApp.listHtmlLine( lineNumber );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CLifeSpan::OnHtmlNotepad()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	CString lineNumber = m_ListCtrl.GetItemText( nItem, L_LINENUMBER );
+	if( !lineNumber.IsEmpty() ) 
+		theApp.editNotepad( lineNumber );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CLifeSpan::OnRokonsag()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
+	CRelations dlg;
+	dlg.m_rowid = rowid;
+	dlg.DoModal();
+}

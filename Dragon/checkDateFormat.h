@@ -21,12 +21,11 @@ protected:
 	void CDateFormat::fillTable();
 	void OnHtmlEdit();
 	void OnHtmlNotepad();
-	void OnHtmlShows();
+	void OnRokonsag();
 	CListCtrlEx m_ListCtrl;
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnInitDialog();
 	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
-	afx_msg void OnClickList(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnUjlista();
 };

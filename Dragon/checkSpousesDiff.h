@@ -39,7 +39,6 @@ public:
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
 	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
-	afx_msg void OnGahtmlLine();
 	
 	afx_msg void OnList();
 };

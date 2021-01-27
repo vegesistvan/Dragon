@@ -5,6 +5,7 @@
 #include "html_Lines.h"
 #include "ProgressWnd.h"
 #include "utilities.h"
+#include "Relations.h"
 // CCheckFatherDeath9 dialog
 // txt fájl oszlopok
 enum
@@ -98,10 +99,13 @@ BEGIN_MESSAGE_MAP(CCheckFatherDeath9, CDialogEx)
 	ON_WM_SIZE()
 	ON_WM_SIZING()
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST, &CCheckFatherDeath9::OnCustomdrawList)
+	
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_HTML_EDIT, &CCheckFatherDeath9::OnHtmlEdit)
 	ON_COMMAND(ID_HTML_SHOWS, &CCheckFatherDeath9::OnHtmlShows)
+	ON_COMMAND(ID_HTML_EDIT, &CCheckFatherDeath9::OnHtmlEdit)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CCheckFatherDeath9::OnHtmlNotepad)
+	ON_COMMAND(ID_ROKONSAG, &CCheckFatherDeath9::OnRokonsag)
+
 	ON_COMMAND(ID_LIST, &CCheckFatherDeath9::OnList)
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -523,9 +527,34 @@ void CCheckFatherDeath9::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
 		break;
 	}
 }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckFatherDeath9::OnList()
+{
+	CString	logFile(L"checkFatherDeath9"); 
+	CString	title(L"Apa halála után több mint 9 hónapra született gyerekek");;
+	
+	theApp.exportAll( logFile, title, &m_ListCtrl );
+
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
+void CCheckFatherDeath9::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+
+	int nItem = pNMItemActivate->iItem;
+	CString rowid	= m_ListCtrl.GetItemText( nItem, L_ROWID );
+
+	CRelations dlg;
+	dlg.nItem		= nItem;
+	dlg.m_rowid		= rowid;
+	if( dlg.DoModal() == IDCANCEL ) return;
+
+	*pResult = 0;
+}
+*/
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-LRESULT CCheckFatherDeath9:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
+LRESULT CCheckFatherDeath9::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 {
 	CPoint* point=(CPoint*) lParam;
     CMenu	Menu;
@@ -535,12 +564,6 @@ LRESULT CCheckFatherDeath9:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 	if(Menu.LoadMenu( IDR_DROPDOWN_HTML ))
     {
 		pPopup = Menu.GetSubMenu(0);
-		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
-		{
-			pPopup->EnableMenuItem(ID_HTML_SHOWS, MF_BYCOMMAND | MF_GRAYED);
-			pPopup->EnableMenuItem(ID_HTML_NOTEPAD, MF_BYCOMMAND | MF_GRAYED);
-			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
-		}
 		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
     }
 	return TRUE;
@@ -549,14 +572,14 @@ LRESULT CCheckFatherDeath9:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 void CCheckFatherDeath9::OnHtmlEdit()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	L_LINENUMBER ) );
+	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, L_LINENUMBER ) );
 	theApp.listHtmlLine( lineNumber );
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckFatherDeath9::OnHtmlNotepad()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	CString lineNumber = m_ListCtrl.GetItemText( nItem, 	L_LINENUMBER );
+	CString lineNumber = m_ListCtrl.GetItemText( nItem, L_LINENUMBER );
 	if( !lineNumber.IsEmpty() ) 
 		theApp.editNotepad( lineNumber );
 }
@@ -595,12 +618,13 @@ void CCheckFatherDeath9::OnHtmlShows()
 
 	dlg.DoModal();
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckFatherDeath9::OnList()
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckFatherDeath9::OnRokonsag()
 {
-	CString	logFile(L"checkFatherDeath9"); 
-	CString	title(L"Apa halála után több mint 9 hónapra született gyerekek");;
-	
-	theApp.exportAll( logFile, title, &m_ListCtrl );
-
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
+	CRelations dlg;
+	dlg.m_rowid = rowid;
+	dlg.DoModal();
 }
+

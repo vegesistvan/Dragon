@@ -9,9 +9,11 @@
 #include "html_Lines.h"
 #include "ProgressWnd.h"
 #include "utilities.h"
+#include "Relations.h"
 
 enum
 {
+	L_ROWID = 0,
 	L_LINENUMBER,
 	L_DATE,
 };
@@ -36,12 +38,12 @@ void CDateFormat::DoDataExchange(CDataExchange* pDX)
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CDateFormat, CDialogEx)
-//	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
+	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
 	ON_COMMAND(ID_HTML_EDIT, &CDateFormat::OnHtmlEdit)
-	ON_COMMAND(ID_HTML_SHOWS, &CDateFormat::OnHtmlShows)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CDateFormat::OnHtmlNotepad)
-	ON_NOTIFY(NM_CLICK, IDC_LIST, &CDateFormat::OnClickList)
-	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CDateFormat::OnDblclkList)
+	ON_COMMAND(ID_ROKONSAG, &CDateFormat::OnRokonsag)
+
+	ON_COMMAND(ID_UJLISTA, &CDateFormat::OnUjlista)
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CDateFormat::OnInitDialog()
@@ -53,12 +55,14 @@ Az alábbi dátum formátumokat fogadja el a program:\r\n\
 1848\r\n\
 1848.03.\r\n\
 1848.03.15\r\n\r\n\
+Az évnek 1000 és aktuáli sév közötti számnak kell lenni.\r\n\
 A dátum elõtt a 'kb' módosító szó állhat.\r\n\
 A dátum után a 'kb', 'elõtt', 'után', 'körül' módosító szavak valamelyike állhat.\
 \r\n\r\n\
 Az ezektõl eltérõ születési, halálozási és esküvõi dátumokat listázza a program.\
 \r\n\r\n\
-A bal egérgombbal egy sorra kattintva, a html fájl megfelelõ sora szerkeszthetõ.\
+A jobb egérgombbal egy sorra kattintva, a legördülö menübõl választhatunk, \
+hogy az adatbázisban vagy a GA.html fájlban módosítsuk a hibás dátumot.\
 ";
 
 	GetDlgItem( IDC_EDIT )->SetWindowText( info );
@@ -81,6 +85,7 @@ void CDateFormat::createColumns()
 	m_ListCtrl.SortByHeaderClick(TRUE);
 	m_ListCtrl.KeepSortOrder(TRUE);
 	m_ListCtrl.SetExtendedStyle(m_ListCtrl.GetExtendedStyle()| LVS_EX_GRIDLINES );
+	m_ListCtrl.InsertColumn( L_ROWID,		L"rowid",	LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_LINENUMBER,	L"line#",	LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_DATE,		L"dátum",	LVCFMT_LEFT,	150,-1,COL_NUM);
 }
@@ -97,7 +102,7 @@ void CDateFormat::fillTable()
 	CProgressWnd wndP(NULL, L"Dátumok beolvasása..." );
 	wndP.GoModal();
 
-	command = L"SELECT linenumber, birth_date, death_date FROM people";
+	command = L"SELECT rowid, linenumber, birth_date, death_date FROM people";
 	if( !theApp.query( command ) ) return;
 	
 	wndP.SetRange(0, theApp.m_recordset->RecordsCount() );
@@ -109,10 +114,10 @@ void CDateFormat::fillTable()
 #endif
 
 
-
+	m_ListCtrl.DeleteAllItems();
 	for( UINT i = 0 ; i < theApp.m_recordset->RecordsCount(); ++i, theApp.m_recordset->MoveNext() )
 	{
-		datum = theApp.m_recordset->GetFieldString( 1 );
+		datum = theApp.m_recordset->GetFieldString( 2 );
 		A.RemoveAll();
 		n = wordList( &A, datum, ' ', FALSE );
 		if( n > 1 )
@@ -127,16 +132,14 @@ void CDateFormat::fillTable()
 
 		length = datum.GetLength();
 		if( length && !checkDate( datum) )	// születési dátum
-
-//		if( length != 0 && length != 4 && length != 8 && length != 10 )
 		{
 			nItem = m_ListCtrl.InsertItem( nItem, theApp.m_recordset->GetFieldString( 0 ) );
-			m_ListCtrl.SetItemText( nItem, L_DATE, theApp.m_recordset->GetFieldString( 1 ) );
+			m_ListCtrl.SetItemText( nItem, L_LINENUMBER, theApp.m_recordset->GetFieldString( 1 ) );
+			m_ListCtrl.SetItemText( nItem, L_DATE, theApp.m_recordset->GetFieldString( 2 ) );
 		}
 
 
-
-		datum = theApp.m_recordset->GetFieldString( 2 );
+		datum = theApp.m_recordset->GetFieldString( 3 );
 		A.RemoveAll();
 		n = wordList( &A, datum, ' ', FALSE );
 		if( n > 1 )
@@ -150,10 +153,10 @@ void CDateFormat::fillTable()
 
 		length = datum.GetLength();
 		if( length && !checkDate( datum) )		// halálozási dátum
-//		if( length != 0 && length != 4 && length != 8  && length != 10 )
 		{
 			nItem = m_ListCtrl.InsertItem( nItem, theApp.m_recordset->GetFieldString( 0 ) );
-			m_ListCtrl.SetItemText( nItem, L_DATE, theApp.m_recordset->GetFieldString( 2 ) );
+			m_ListCtrl.SetItemText( nItem, L_LINENUMBER, theApp.m_recordset->GetFieldString( 1 ) );
+			m_ListCtrl.SetItemText( nItem, L_DATE, theApp.m_recordset->GetFieldString( 3 ) );
 		}
 		wndP.StepIt();
 		wndP.PeekAndPump();
@@ -163,7 +166,7 @@ void CDateFormat::fillTable()
 #ifndef _DEBUG
 	wndP.SetText( L"Esküvõi dátumok beolvasásas..." );
 #endif
-	command = L"SELECT linenumber, date FROM marriages";
+	command = L"SELECT spouse1_id, linenumber, date FROM marriages";
 	if( !theApp.query( command ) ) return;
 	
 	wndP.SetRange(0, theApp.m_recordset->RecordsCount() );
@@ -172,7 +175,7 @@ void CDateFormat::fillTable()
 
 	for( UINT i = 0 ; i < theApp.m_recordset->RecordsCount(); ++i, theApp.m_recordset->MoveNext() )
 	{
-		datum = theApp.m_recordset->GetFieldString( 1 );
+		datum = theApp.m_recordset->GetFieldString( 3 );
 		A.RemoveAll();
 		n = wordList( &A, datum, ' ', FALSE );
 		if( n > 1 )
@@ -186,10 +189,10 @@ void CDateFormat::fillTable()
 
 		length = datum.GetLength();
 		if( length && !checkDate( datum) )		// esküvõ dátuma
-//		if( length != 0 && length != 4 && length != 8 && length != 10 )
 		{
 			nItem = m_ListCtrl.InsertItem( nItem, theApp.m_recordset->GetFieldString( 0 ) );
-			m_ListCtrl.SetItemText( nItem, L_DATE, theApp.m_recordset->GetFieldString( 1 ) );
+			m_ListCtrl.SetItemText( nItem, L_LINENUMBER, theApp.m_recordset->GetFieldString( 1 ) );
+			m_ListCtrl.SetItemText( nItem, L_DATE, theApp.m_recordset->GetFieldString( 2 ) );
 		}
 		wndP.StepIt();
 		wndP.PeekAndPump();
@@ -197,63 +200,64 @@ void CDateFormat::fillTable()
 	}
 	wndP.DestroyWindow();
 }
+/*
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDateFormat::OnClickList(NMHDR *pNMHDR, LRESULT *pResult)
-{
-//	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-
-	OnHtmlEdit();
-
-	*pResult = 0;
-}
 void CDateFormat::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
 {
-//	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	OnHtmlEdit();
+	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+
+	int nItem = pNMItemActivate->iItem;
+	CString rowid	= m_ListCtrl.GetItemText( nItem, L_ROWID );
+
+	CRelations dlg;
+	dlg.nItem		= nItem;
+	dlg.m_rowid		= rowid;
+	if( dlg.DoModal() == IDCANCEL ) return;
+
 	*pResult = 0;
 }
+*/
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void CDateFormat::OnHtmlShows()
+LRESULT CDateFormat::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 {
-	POSITION	pos = m_ListCtrl.GetFirstSelectedItemPosition();
-	int			nItem;
-	std::vector<CString> vLines;
+	CPoint* point=(CPoint*) lParam;
+    CMenu	Menu;
+	CMenu*	pPopup;
 
-	int cnt = 0;
-	CString name(L"");
 
-	while( pos )
-	{
-		nItem = m_ListCtrl.GetNextSelectedItem( pos );
-		vLines.push_back( m_ListCtrl.GetItemText( nItem, L_LINENUMBER ) );
-	}
-
-	CHtmlLines dlg;
-
-	if( cnt == 1 )
-		dlg.child = name;
-	else
-		dlg.child = L"";
-
-	dlg._what = 1;
-	dlg.vLines = &vLines;
-
-	dlg.DoModal();
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDateFormat::OnHtmlNotepad()
-{
-
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	CString lineNumber = m_ListCtrl.GetItemText( nItem, 	L_LINENUMBER );
-	if( !lineNumber.IsEmpty() ) 
-		theApp.editNotepad( lineNumber );
+	if(Menu.LoadMenu( IDR_DROPDOWN_HTML_EDIT ))
+    {
+		pPopup = Menu.GetSubMenu(0);
+		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
+    }
+	return TRUE;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDateFormat::OnHtmlEdit()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	L_LINENUMBER ) );
+	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, L_LINENUMBER ) );
 	theApp.listHtmlLine( lineNumber );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDateFormat::OnHtmlNotepad()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	CString lineNumber = m_ListCtrl.GetItemText( nItem, L_LINENUMBER );
+	if( !lineNumber.IsEmpty() ) 
+		theApp.editNotepad( lineNumber );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDateFormat::OnRokonsag()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
+	CRelations dlg;
+	dlg.m_rowid = rowid;
+	dlg.DoModal();
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDateFormat::OnUjlista()
+{
+	fillTable();
 }

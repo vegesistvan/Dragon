@@ -314,7 +314,7 @@ void CRelations:: createScreen( CString rowid )
 //		str.Format( L"%s - %s       LDblClick: váltás az ember rokonságára   RDblClick: a list aembereinek ga.html sorai", tableHeader, theApp.sourceA[sourceI] );
 //	else
 //		str.Format( L"%s - %s       LDblClick: váltás az ember rokonságára", tableHeader, theApp.sourceA[sourceI] );
-	str.Format( L"%s (rowid=%s) és rokonai", m_name, rowid );
+	str.Format( L"Hároom generációs személyi adatlap -  %s (rowid=%s) és rokonai", m_name, rowid );
 	SetWindowText( str );
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

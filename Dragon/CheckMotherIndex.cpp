@@ -7,11 +7,13 @@
 #include "afxdialogex.h"
 #include "ProgressWnd.h"
 #include "utilities.h"
-// CCheckMotherIndex dialog
+#include "Relations.h"
+#include "html_Lines.h"
 
 enum
 {
 	L_CNT = 0,
+	L_ROWID,
 	L_LINENUMBER,
 	L_INDEX,
 	L_LINE
@@ -42,7 +44,7 @@ BEGIN_MESSAGE_MAP(CCheckMotherIndex, CDialogEx)
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
 	ON_COMMAND(ID_HTML_EDIT, &CCheckMotherIndex::OnHtmlEdit)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CCheckMotherIndex::OnHtmlNotepad)
-
+	ON_COMMAND(ID_ROKONSAG, &CCheckMotherIndex::OnRokonsag)
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CCheckMotherIndex::OnInitDialog()
@@ -51,6 +53,14 @@ BOOL CCheckMotherIndex::OnInitDialog()
 	EASYSIZE_ADD( IDC_EDIT,	ES_BORDER,	ES_BORDER,		ES_BORDER,		ES_KEEPSIZE,	0 );
 	EASYSIZE_ADD( IDC_LIST,	ES_BORDER,	ES_BORDER,		ES_BORDER,		ES_BORDER,	0 );
 	EASYSIZE_INIT()
+
+
+	if( theApp.getUserVersion() )
+	{
+		AfxMessageBox( L"Csak összevonás elõtt van értelme ezt az ellenõrzést elvégezni!" );
+		CDialog::OnCancel();
+		return false;
+	}
 
 	int nItem = 0;
 	CString rowid;
@@ -61,6 +71,7 @@ BOOL CCheckMotherIndex::OnInitDialog()
 	CString gaLine;
 	CString father_id;
 	CString mother_id;
+	CString parent_id;
 	CString parent;
 
 	int		z;
@@ -92,6 +103,7 @@ Ha leányági leszármazottak gyeremekei is vannak a GA-html-ben, akkor az apa és a
 	m_ListCtrl.SetExtendedStyle(m_ListCtrl.GetExtendedStyle()| LVS_EX_GRIDLINES );
 	
 	m_ListCtrl.InsertColumn( L_CNT,			L"#",		LVCFMT_RIGHT,	 60,-1,COL_NUM );
+	m_ListCtrl.InsertColumn( L_ROWID,		L"rowid",	LVCFMT_RIGHT,	 60,-1,COL_NUM );
 	m_ListCtrl.InsertColumn( L_LINENUMBER,	L"line#",	LVCFMT_RIGHT,	 60,-1,COL_NUM );
 	m_ListCtrl.InsertColumn( L_INDEX,		L"X",		LVCFMT_RIGHT,	 20,-1,COL_NUM );
 	m_ListCtrl.InsertColumn( L_LINE,		L"név",		LVCFMT_LEFT,	200,-1,COL_TEXT);
@@ -103,7 +115,7 @@ Ha leányági leszármazottak gyeremekei is vannak a GA-html-ben, akkor az apa és a
 	while( 	gafile.ReadString( cLine ) )
 		vPos.push_back( gafile.GetPosition() );
 
-	
+// gyerekek lekérdezése	
 	m_command = L"SELECT rowid, lineNumber, parent2Index, father_id, mother_id, first_name, last_name FROM people WHERE source='1' ORDER BY lineNumber";
 	if( !theApp.query( m_command ) )
 	{
@@ -123,8 +135,6 @@ Ha leányági leszármazottak gyeremekei is vannak a GA-html-ben, akkor az apa és a
 	for( int i = 0; i < theApp.m_recordset->RecordsCount(); ++i, theApp.m_recordset->MoveNext() )
 	{
 		rowid			= theApp.m_recordset->GetFieldString( 0 );
-		if( rowid == L"5321" )
-			z = 7;
 		lineNumber		= theApp.m_recordset->GetFieldString( 1 );
 		parent2Index	= _wtoi( theApp.m_recordset->GetFieldString( 2 ) );
 		if( parent2Index == 0 ) goto cont;
@@ -135,7 +145,7 @@ Ha leányági leszármazottak gyeremekei is vannak a GA-html-ben, akkor az apa és a
 		if( mother_id == L"42691" )
 			z = 1;
 //		name.Format( L"%s %s", theApp.m_recordset->GetFieldString(6), theApp.m_recordset->GetFieldString(5) );
-		// hány házastársa van az apának?
+		// a szülõk html sora
 		m_command.Format( L"SELECT lineNumber FROM marriages WHERE spouse1_id='%s' AND spouse2_id= '%s'", father_id, mother_id );  // az ember apjának házasságai
 		if( !theApp.query1( m_command ) ) OnCancel();
 		if( !theApp.m_recordset1->RecordsCount() ) goto cont;
@@ -143,12 +153,13 @@ Ha leányági leszármazottak gyeremekei is vannak a GA-html-ben, akkor az apa és a
 		lineNumberP	= theApp.m_recordset1->GetFieldString( 0 );
 		lineP = getHtmlLine( lineNumberP );
 		
-
+		// hány házassága van az apának?
 		m_command.Format( L"SELECT lineNumber FROM marriages WHERE spouse1_id='%s'", father_id );  // az ember apjának házasságai
 		if( !theApp.query1( m_command ) ) OnCancel();
 		count =theApp.m_recordset1->RecordsCount();
 		if( !count ) goto cont;
 
+		parent_id = father_id;
 		parent = getWord( lineP,2, &pos );
 		if( (pos = parent.Find( '/' )) != -1 )
 			parent = parent.Left( pos );
@@ -156,15 +167,16 @@ Ha leányági leszármazottak gyeremekei is vannak a GA-html-ben, akkor az apa és a
 		parent.TrimRight();
 		sex_id = theApp.isFirstName( parent );
 		if( sex_id == -1 ) goto cont;  // nem tudja milyen nemû
-/* Nme értem, hogy miért nem jó????
+
 		if( sex_id == 2 ) // hány házastársa van az anyának
 		{
 			m_command.Format( L"SELECT count() FROM marriages WHERE spouse2_id='%s'", mother_id );  // az ember apjának házasságai
 			if( !theApp.query1( m_command ) ) OnCancel();
 			count = _wtoi( theApp.m_recordset1->GetFieldString( 0 ) );
+			parent_id = mother_id;
 			if( !count ) goto cont;
 		}
-*/
+
 		if( parent2Index > count  )
 		{
 			// szülõ
@@ -174,6 +186,7 @@ Ha leányági leszármazottak gyeremekei is vannak a GA-html-ben, akkor az apa és a
 		
 			str.Format( L"%d", count );
 			m_ListCtrl.SetItemText( nItem, L_INDEX, str );
+			m_ListCtrl.SetItemText( nItem, L_ROWID, parent_id );
 			m_ListCtrl.SetItemText( nItem, L_LINENUMBER, lineNumberP);
 			m_ListCtrl.SetItemText( nItem, L_LINE, lineP );
 			++nItem;
@@ -184,6 +197,7 @@ Ha leányági leszármazottak gyeremekei is vannak a GA-html-ben, akkor az apa és a
 
 			str.Format( L"%d", parent2Index );
 			m_ListCtrl.SetItemText( nItem, L_INDEX, str );
+			m_ListCtrl.SetItemText( nItem, L_ROWID, rowid );
 			m_ListCtrl.SetItemText( nItem, L_LINENUMBER, lineNumber );
 
 			str = getHtmlLine( lineNumber );
@@ -203,7 +217,11 @@ cont:	wndP.StepIt();
 	vPos.clear();
 	gafile.Close();
 
-
+	if( !m_ListCtrl.GetItemCount() )
+	{
+		AfxMessageBox( L"Nincs hiba az anya-indexekkel!" );
+		CDialog::OnCancel();
+	}
 	return TRUE;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -268,3 +286,52 @@ void CCheckMotherIndex::OnHtmlNotepad()
 		theApp.editNotepad( lineNumber );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckMotherIndex::OnRokonsag()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+
+	CString rowid = m_ListCtrl.GetItemText( nItem, 2 );
+	CRelations dlg;
+
+	dlg.m_rowid = rowid;
+	dlg.DoModal();
+
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
+void CCheckMotherIndex::OnHtmlShows()
+{
+	POSITION	pos = m_ListCtrl.GetFirstSelectedItemPosition();
+	int			nItem;
+	std::vector<CString> vLines;
+
+	int cnt = 0;
+	CString name(L"");
+
+	while( pos )
+	{
+		nItem = m_ListCtrl.GetNextSelectedItem( pos );
+		vLines.push_back( m_ListCtrl.GetItemText( nItem, L_LINENUMBER ) );
+		if( name.Compare( m_ListCtrl.GetItemText( nItem, L_LINE ) ) )
+		{
+			name = m_ListCtrl.GetItemText( nItem, L_LINE );
+			++cnt;
+		}
+	
+
+	}
+
+	CHtmlLines dlg;
+
+	if( cnt == 1 )
+		dlg.child = name;
+	else
+		dlg.child = L"";
+
+	dlg._what = 1;
+	dlg.vLines = &vLines;
+
+	dlg.DoModal();
+}
+*/

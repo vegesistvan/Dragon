@@ -65,11 +65,9 @@ BEGIN_MESSAGE_MAP(CCheckSpousesDiff, CDialogEx)
 
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
 	ON_COMMAND(ID_HTML_EDIT, &CCheckSpousesDiff::OnHtmlEdit)
-	ON_COMMAND(ID_HTML_SHOWS, &CCheckSpousesDiff::OnHtmlShows)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CCheckSpousesDiff::OnHtmlNotepad)
+	ON_COMMAND(ID_HTML_SHOWS, &CCheckSpousesDiff::OnHtmlShows)
 	ON_COMMAND(ID_ROKONSAG, &CCheckSpousesDiff::OnRokonsag)
-	ON_COMMAND(ID_GAHTML_LINE, &CCheckSpousesDiff::OnGahtmlLine)
-
 	ON_COMMAND(ID_LIST, &CCheckSpousesDiff::OnList)
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -285,6 +283,13 @@ void CCheckSpousesDiff::spousesDiff()
 		CDialogEx::OnOK();
 	}
 }
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckSpousesDiff::OnList()
+{
+	CString	logFile(L"spousesdiff"); 
+	
+	theApp.exportAll( logFile, m_title, &m_ListCtrl );
+}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 LRESULT CCheckSpousesDiff:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 {
@@ -356,29 +361,6 @@ void CCheckSpousesDiff::OnHtmlShows()
 
 	dlg.DoModal();
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSpousesDiff::OnList()
-{
-	CString	logFile(L"spousesdiff"); 
-	
-	theApp.exportAll( logFile, m_title, &m_ListCtrl );
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSpousesDiff::OnGahtmlLine()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
-
-	if( nItem == - 1 )
-	{
-		theApp.message( L"Házastársak korkülönbsége", L"Nincs kijelölve ember!" );
-		return;
-	}
-	
-
-	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	L_LINENUMBER ) );
-
-	theApp.listHtmlLine( lineNumber );
-}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckSpousesDiff::OnRokonsag()
 {
@@ -391,4 +373,4 @@ void CCheckSpousesDiff::OnRokonsag()
 	dlg.DoModal();
 
 }
-
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

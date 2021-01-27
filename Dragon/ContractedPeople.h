@@ -64,4 +64,6 @@ public:
 	afx_msg void OnHtmlNotepad();
 	afx_msg void OnEditNotepadParents();
 
+//	afx_msg void OnRdblclkList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult);
 };

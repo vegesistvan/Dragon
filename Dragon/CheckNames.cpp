@@ -7,6 +7,7 @@
 #include "afxdialogex.h"
 #include "ProgressWnd.h"
 #include "utilities.h"
+#include "Relations.h"
 
 IMPLEMENT_DYNAMIC(CCheckNames, CDialogEx)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -33,6 +34,7 @@ BEGIN_MESSAGE_MAP(CCheckNames, CDialogEx)
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
 	ON_COMMAND(ID_HTML_EDIT, &CCheckNames::OnHtmlEdit)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CCheckNames::OnHtmlNotepad)
+	ON_COMMAND(ID_ROKONSAG, &CCheckNames::OnRokonsag)
 
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -277,10 +279,14 @@ LRESULT CCheckNames:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
     {
 		pPopup = Menu.GetSubMenu(0);
 
-		if( m_ListCtrl.GetItemText( nItem, 1 ).IsEmpty() )
+		if( m_ListCtrl.GetItemText( nItem, 1 ).IsEmpty() )  // linenumber
 		{
 			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
 			pPopup->EnableMenuItem(ID_HTML_NOTEPAD, MF_BYCOMMAND | MF_GRAYED);
+		}
+		if( m_ListCtrl.GetItemText( nItem, 2 ).IsEmpty() )  // rowid
+		{
+			pPopup->EnableMenuItem(ID_ROKONSAG, MF_BYCOMMAND | MF_GRAYED);
 		}
 		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
     }
@@ -302,3 +308,15 @@ void CCheckNames::OnHtmlNotepad()
 		theApp.editNotepad( lineNumber );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckNames::OnRokonsag()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+
+	CString rowid = m_ListCtrl.GetItemText( nItem, 2 );
+	CRelations dlg;
+
+	dlg.m_rowid = rowid;
+	dlg.DoModal();
+
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
