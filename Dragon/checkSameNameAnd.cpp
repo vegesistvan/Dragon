@@ -762,6 +762,14 @@ void CcheckSameNameAnd::OnHtmlShows()
 void CcheckSameNameAnd::OnHtmlPeoplefather()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	CHtmlLines dlg;
+	dlg.m_rowid = m_ListCtrl.GetItemText( nItem, L_ROWID );
+	dlg.DoModal();
+
+
+
+
+/*
 	if( nItem == - 1 )
 	{
 		theApp.message( L"", L"Nincs kijelölve ember!" );
@@ -787,6 +795,7 @@ void CcheckSameNameAnd::OnHtmlPeoplefather()
 	dlg.child	= m_ListCtrl.GetItemText( nItem,L_NAME );
 	dlg.vLines	= &vLines;
 	dlg.DoModal();
+*/
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

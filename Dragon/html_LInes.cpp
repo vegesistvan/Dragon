@@ -47,54 +47,111 @@ BOOL CHtmlLines::OnInitDialog()
 
 	EASYSIZE_ADD( IDCANCEL,	ES_KEEPSIZE,ES_KEEPSIZE,	ES_BORDER,		ES_BORDER,		0);
 	EASYSIZE_INIT()
-
+/*
 	CProgressWnd wndP(NULL, L"html sorok keresése..." ); 
 	wndP.GoModal();
 	wndP.SetRange( 0, int(vLines->size()) );
 	wndP.SetPos( 0 );
 	wndP.SetStep( 1 );
-
+*/
 //	SetWindowPos(&wndTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 
 	int		nItem = 0;
 	CString parentsL;
-	CString childL;
+	CString line;
 	CString caption;
 	CString cLine;
 	CString htmlLine(L"");
+	CString command;
+	CString father_id;
+	CString mother_id;
+	CString grandpa_id;
+	CString linenumberP;
+	CString linenumberF;
+	CString linenumberGP;
+	CString lineGP;
+	CString lineF;
+	CString lineP;
+	std::vector<CString> vLinenumbers;
 
 	m_ListCtrl.KeepSortOrder(TRUE);
 	m_ListCtrl.SetExtendedStyle(m_ListCtrl.GetExtendedStyle()| LVS_EX_GRIDLINES );
-	m_ListCtrl.InsertColumn( 0,	L"line#",	LVCFMT_RIGHT,	 80,-1,COL_HIDDEN);
-	m_ListCtrl.InsertColumn( 1,	L"line#",	LVCFMT_RIGHT,	 80,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( 2,	L"ga.line",	LVCFMT_LEFT,	 1500,-1,COL_EDIT);
-
+	
 
 	GetDlgItem( IDC_MODIFY )->EnableWindow( FALSE );
 
+	CStringArray A;
+	A.Add( L"anyai nagyapa" );
+	A.Add( L"apa" );
+	A.Add( L"ember" );	
+	
+	
 
-	for( UINT i = 0; i < vLines->size(); ++ i )
+	if( !m_rowid.IsEmpty() )
 	{
-		nItem = m_ListCtrl.InsertItem( i, vLines->at(i) );
-		m_ListCtrl.SetItemText( nItem, 1, vLines->at(i) );
-		childL = getHtmlLine( vLines->at(i) );
-		m_ListCtrl.SetItemText( nItem, 2, getHtmlLine( vLines->at(i) ) );
-		wndP.StepIt();
-		wndP.PeekAndPump();
-		if (wndP.Cancelled()) break;
-	}
-	wndP.DestroyWindow();
+		m_ListCtrl.InsertColumn( 0,	L"",		LVCFMT_RIGHT,	 120,-1,COL_TEXT );
+		m_ListCtrl.InsertColumn( 1,	L"line#",	LVCFMT_RIGHT,	  80,-1,COL_NUM);
+		m_ListCtrl.InsertColumn( 2,	L"ga.line",	LVCFMT_LEFT,    1500,-1,COL_EDIT);
 
-	if( _what == 1 )
-	{
-		if( child.IsEmpty() )
-			caption = L"Kijelölt sorok a htm fájlban";
-		else
-			caption.Format( L"%s kijelölt sora a html fájlban", child ); 
+		command.Format( L"SELECT linenumber, father_id, mother_id FROM people WHERE rowid ='%s'", m_rowid );
+		if( !theApp.query( command ) ) return false;
+		linenumberP = theApp.m_recordset->GetFieldString( 0 );
+		father_id	= theApp.m_recordset->GetFieldString( 1 );
+		mother_id	= theApp.m_recordset->GetFieldString( 2 );
+		
+		command.Format( L"SELECT linenumber FROM people WHERE rowid ='%s'", father_id );
+		if( !theApp.query( command ) ) return false;
+		linenumberF = theApp.m_recordset->GetFieldString( 0 );
+
+		command.Format( L"SELECT father_id FROM people WHERE rowid ='%s'", mother_id );
+		if( !theApp.query( command ) ) return false;
+		grandpa_id = theApp.m_recordset->GetFieldString( 0 );
+		command.Format( L"SELECT linenumber FROM people WHERE rowid ='%s'", grandpa_id );
+		if( !theApp.query( command ) ) return false;
+		linenumberGP = theApp.m_recordset->GetFieldString( 0 );
+
+		lineGP	= getHtmlLine( linenumberGP );
+		lineF	= getHtmlLine( linenumberF );
+		lineP	= getHtmlLine( linenumberP );
+
+		nItem = m_ListCtrl.InsertItem( 0, A[0] );
+		m_ListCtrl.SetItemText( nItem, 1, linenumberGP );
+		m_ListCtrl.SetItemText( nItem, 2, lineGP );
+
+		nItem = m_ListCtrl.InsertItem( 1, A[1] );
+		m_ListCtrl.SetItemText( nItem, 1, linenumberF );
+		m_ListCtrl.SetItemText( nItem, 2, lineF );
+
+		nItem = m_ListCtrl.InsertItem( 2, A[2] );
+		m_ListCtrl.SetItemText( nItem, 1, linenumberP );
+		m_ListCtrl.SetItemText( nItem, 2, lineP );
+
+		caption = L"Egy ember, annak apja és anyai nagyapja";
 	}
 	else
-		caption.Format( L"%s és szülei a ga.html fájlban", child );
-
+	{
+		m_ListCtrl.InsertColumn( 0,	L"",		LVCFMT_RIGHT,	 120,-1,COL_HIDDEN );
+		m_ListCtrl.InsertColumn( 1,	L"line#",	LVCFMT_RIGHT,	  80,-1,COL_NUM);
+		m_ListCtrl.InsertColumn( 2,	L"ga.line",	LVCFMT_LEFT,    1500,-1,COL_EDIT);
+	
+		for( UINT i = 0; i < vLines->size(); ++ i )
+		{
+			nItem = m_ListCtrl.InsertItem( i, L"" );
+			m_ListCtrl.SetItemText( nItem, 1, vLines->at(i) );
+			line = getHtmlLine( vLines->at(i) );
+			m_ListCtrl.SetItemText( nItem, 2, line );
+		}
+	
+		if( _what == 1 )
+		{
+			if( child.IsEmpty() )
+				caption = L"Kijelölt sorok a htm fájlban";
+			else
+				caption.Format( L"%s kijelölt sora a html fájlban", child ); 
+		}
+		else
+			caption.Format( L"%s és szülei a ga.html fájlban", child );
+	}
 	SetWindowTextW( caption );
 	return TRUE;
 }
@@ -113,6 +170,7 @@ void CHtmlLines::OnSizing(UINT fwSide, LPRECT pRect)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CHtmlLines::getHtmlLine( CString lineNumber )
 {
+	if( lineNumber.IsEmpty() ) return L"";
 	theApp.m_inputCode = GetInputCode( theApp.m_htmlFileSpec );
 	CStdioFile file( theApp.m_htmlFileSpec, CFile::modeRead); 
 	

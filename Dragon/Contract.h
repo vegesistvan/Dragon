@@ -33,6 +33,8 @@ typedef struct
 	CString spouses;
 	CString rowidS;				// spouse 
 	CString lineF;
+
+	CString linenumberMF;
 }SAMENAMES;
 
 class CContract : public CWnd

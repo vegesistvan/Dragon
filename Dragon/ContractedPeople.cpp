@@ -42,6 +42,7 @@ enum
 	S_ROWIDS,
 	S_SPOUSES,
 	S_LINEF,
+	S_LINENUMBERMF,
 };
 IMPLEMENT_DYNAMIC(CContractedPeople, CDialogEx)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -329,6 +330,7 @@ void CContractedPeople::createColumns()
 	m_ListCtrl.InsertColumn( S_ROWIDS,			L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( S_SPOUSES,			L"házastársak",	LVCFMT_LEFT,	500,-1,COL_TEXT );
 	m_ListCtrl.InsertColumn( S_LINEF,			L"line#F",		LVCFMT_LEFT,	 60,-1,COL_HIDDEN );
+	m_ListCtrl.InsertColumn( S_LINENUMBERMF,	L"line#MF",		LVCFMT_RIGHT,	 60,-1,COL_NUM );
 	m_columnsCount	= m_ListCtrl.GetHeaderCtrl()->GetItemCount();
 }
 
@@ -503,26 +505,10 @@ void CContractedPeople::OnHtmlShows()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedPeople::OnHtmlPeoplefather()
 {
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	CString lineNumber	= m_ListCtrl.GetItemText( nItem, 	S_LINE );
-	CString lineNumberF	= m_ListCtrl.GetItemText( nItem, 	S_LINEF );
-	if( lineNumberF.IsEmpty() )
-	{
-		AfxMessageBox( L"A kijelölt embernek nem ismerjük az apját!" );
-		return;
-	}
-
-
-	std::vector<CString> vLines;
-
-	vLines.push_back( lineNumberF );
-	vLines.push_back( lineNumber );
-
+	int nItem		= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	CString rowid	= m_ListCtrl.GetItemText( nItem, S_ROWID );
 	CHtmlLines dlg;
-	dlg._what = 2;
-	dlg.parents.Format( L"%s - %s",  m_ListCtrl.GetItemText( nItem,S_FATHER ), m_ListCtrl.GetItemText( nItem,S_MOTHER ) );
-	dlg.child	= m_ListCtrl.GetItemText( nItem,S_NAME );
-	dlg.vLines	= &vLines;
+	dlg.m_rowid = rowid;
 	dlg.DoModal();
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

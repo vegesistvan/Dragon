@@ -53,6 +53,7 @@ enum
 	S_ROWIDS,
 	S_SPOUSES,
 	S_LINEF,
+	S_LINNUMBERMF,
 	COLUMNSCOUNT,
 };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -332,6 +333,7 @@ void CContract::putPeople( CString name, UINT i )
 	CString spouses;
 	CString fullname;
 	CString spouse_id;
+	CString father_id;
 
 
 	int z;
@@ -353,7 +355,7 @@ void CContract::putPeople( CString name, UINT i )
 	vpeople.birth		= m_recordset->GetFieldString( P_BIRTH_DATE );
 	vpeople.death		= m_recordset->GetFieldString( P_DEATH_DATE );
 
-	CString father_id = m_recordset->GetFieldString( P_FATHER_ID );
+	father_id			= m_recordset->GetFieldString( P_FATHER_ID );
 	m_command.Format( L"SELECT last_name, first_name, birth_date, death_date, lineNumber FROM people WHERE rowid = '%s'", father_id );
 	if( !query1( m_command ) ) return;
 
@@ -369,7 +371,7 @@ void CContract::putPeople( CString name, UINT i )
 	vpeople.lineF	= m_recordset1->GetFieldString( 4 );
 
 	CString mother_id = m_recordset->GetFieldString( P_MOTHER_ID );
-	m_command.Format( L"SELECT last_name, first_name, birth_date, death_date FROM people WHERE rowid = '%s'", mother_id );
+	m_command.Format( L"SELECT last_name, first_name, birth_date, death_date, father_id FROM people WHERE rowid = '%s'", mother_id );
 	if( !query1( m_command ) ) return;
 
 	name.Empty();
@@ -380,8 +382,11 @@ void CContract::putPeople( CString name, UINT i )
 	vpeople.rowidM	= mother_id;
 	vpeople.birthM	= m_recordset1->GetFieldString( 2 );
 	vpeople.deathM	= m_recordset1->GetFieldString( 3 );
-	
 
+	father_id		= m_recordset1->GetFieldString( 4 );		// anyai nagyapa
+	m_command.Format( L"SELECT linenumber FROM people WHERE rowid = '%s'", father_id );
+	if( !query2( m_command ) ) return;
+	vpeople.linenumberMF = m_recordset1->GetFieldString( 0 );
 
 	if( vpeople.sex_id == L"1" )
 		m_command.Format( L"SELECT spouse2_id FROM marriages WHERE spouse1_id = '%s'", rowid );
@@ -987,13 +992,13 @@ x.rowidS, x.spouses\
 %s\t%s\t%s\t%s\t\
 %s\t%s\t%s\t%s\t\
 %s\t%s\t%s\t%s\t\
-%s\t%s\t%s\t\n",\
+%s\t%s\t%s\t%s\t\n",\
 colorIndex, m_loop, x.group, x.match, x.group2, x.status, rgbColor,\
 x.line, x.united, x.generation, x.source,\
 x.rowid,x.name,x.birth,  x.death,\
 x.rowidF,x.father,x.birthF, x.deathF,\
 x.rowidM,x.mother,x.birthM, x.deathM,\
-x.rowidS, x.spouses, x.lineF\
+x.rowidS, x.spouses, x.lineF,x.linenumberMF\
 );
 
 		if( m_contracted )

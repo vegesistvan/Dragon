@@ -22,7 +22,7 @@ public:
 	CString m_line;
 	int	 m_linenumber;
 	std::vector<CString>* vLines;
-
+	CString m_rowid;
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	CListCtrlEx m_ListCtrl;

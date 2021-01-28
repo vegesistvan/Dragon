@@ -1108,7 +1108,13 @@ void CCheckSameSpouses::OnHtmlShows()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckSameSpouses::OnHtmlPeoplefather()
 {
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	int nItem		= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	CString rowid	= m_ListCtrl.GetItemText( nItem, L_ROWID );
+	CHtmlLines dlg;
+	dlg.m_rowid = rowid;
+	dlg.DoModal();
+
+	/*
 	CString lineNumber	= m_ListCtrl.GetItemText( nItem, 	L_LINENUMBER );
 	CString lineNumberF	= m_ListCtrl.GetItemText( nItem, 	L_LINENUMBERF );
 	if( lineNumberF.IsEmpty() )
@@ -1129,6 +1135,7 @@ void CCheckSameSpouses::OnHtmlPeoplefather()
 	dlg.child	= m_ListCtrl.GetItemText( nItem,L_NAME );
 	dlg.vLines	= &vLines;
 	dlg.DoModal();
+	*/
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool sortBySpouses(const MORESPOUSES &v1, const MORESPOUSES &v2) 
