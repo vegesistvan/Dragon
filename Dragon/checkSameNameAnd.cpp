@@ -103,8 +103,7 @@ BEGIN_MESSAGE_MAP(CcheckSameNameAnd, CDialogEx)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST, &CcheckSameNameAnd::OnCustomdrawList)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CcheckSameNameAnd::OnDblclkList)
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-
-	ON_COMMAND(ID_HTML_EDIT, &CcheckSameNameAnd::OnHtmlEdit)
+	ON_COMMAND(ID_EDIT2LINES, &CcheckSameNameAnd::OnEdit2lines)
 	ON_COMMAND(ID_HTML_SHOWS, &CcheckSameNameAnd::OnHtmlShows)
 	ON_COMMAND(ID_HTML_PEOPLEFATHER, &CcheckSameNameAnd::OnHtmlPeoplefather)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CcheckSameNameAnd::OnHtmlNotepad)
@@ -706,19 +705,12 @@ LRESULT CcheckSameNameAnd:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
     }
 	return TRUE;
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CcheckSameNameAnd::OnHtmlEdit()
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CcheckSameNameAnd::OnEdit2lines()
 {
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	if( nItem == - 1 )
-	{
-		theApp.message( L"", L"Nincs kijelölve ember!" );
-		return;
-	}
-	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	L_LINENUMBER ) );
-	theApp.listHtmlLine( lineNumber );
+	theApp.editHtmlLines( &m_ListCtrl, L_LINENUMBER );
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CcheckSameNameAnd::OnHtmlNotepad()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);

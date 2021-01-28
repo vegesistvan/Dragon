@@ -129,4 +129,6 @@ public:
 	afx_msg void OnClickedKeress();
 	afx_msg void OnClickedNext();
 	CColorStatic colorNext;
+	afx_msg void OnEdit2lines();
+	afx_msg void OnEditNotepadParents();
 };

@@ -19,6 +19,8 @@ public:
 	int _what;
 	CString parents;
 	CString child;
+	CString m_line;
+	int	 m_linenumber;
 	std::vector<CString>* vLines;
 
 protected:
@@ -36,4 +38,8 @@ public:
 	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
 	afx_msg void OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnListLines();
+//	afx_msg void OnClickList(NMHDR *pNMHDR, LRESULT *pResult);
+//	afx_msg void OnRclickList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnClickedModify();
+	afx_msg void OnChangeEdit();
 };

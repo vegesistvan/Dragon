@@ -24,9 +24,10 @@ enum
 	PS_TITLE,
 	PS_LAST_NAME,
 	PS_FIRST_NAME,
+	PS_MOTHER_INDEX,
+	PS_MINDEX_CALC,
 	PS_POSTERIOR,
 	PS_SEX_ID,
-	PS_MOTHER_INDEX,
 	PS_BPLACE,
 	PS_BDATE,
 	PS_DPLACE,
@@ -98,9 +99,10 @@ BOOL CDescendant::OnInitDialog()
 	m_ListCtrl.InsertColumn( PS_TITLE,			L"title",			LVCFMT_LEFT,	 50,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( PS_LAST_NAME,		L"családnév",		LVCFMT_LEFT,	 50,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( PS_FIRST_NAME,		L"utónév",			LVCFMT_LEFT,	 50,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( PS_MOTHER_INDEX,	L"anyaIx",			LVCFMT_LEFT,	 50,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( PS_MINDEX_CALC,	L"anyaIx2",			LVCFMT_LEFT,	 50,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( PS_POSTERIOR,		L"utótag",			LVCFMT_LEFT,	 50,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( PS_SEX_ID,			L"sex",				LVCFMT_LEFT,	 30,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( PS_MOTHER_INDEX,	L"motherindex",		LVCFMT_LEFT,	 50,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( PS_BPLACE,			L"b.hely",			LVCFMT_LEFT,	 80,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( PS_BDATE,			L"b.dátum",			LVCFMT_LEFT,	 70,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( PS_DPLACE,			L"d.hely",			LVCFMT_LEFT,	 80,-1,COL_TEXT);
@@ -234,15 +236,19 @@ void CDescendant::fillTable( )
 			m_ListCtrl.SetItemText( nItem, PS_LAST_NAME, split.d.last_name );
 //			m_ListCtrl.SetItemText( nItem, PS_LAST_NAME, split.m_tableHeader.familyName );
 			m_ListCtrl.SetItemText( nItem, PS_FIRST_NAME, split.d.first_name );
+			str.Format( L"%d", split.d.parent2Index );
+			if( !str.Compare( L"0" ) ) str.Empty();
+			m_ListCtrl.SetItemText( nItem, PS_MOTHER_INDEX, str );
+
+				str.Format( L"%d", split.d.parent2IndexCalc );
+			if( !str.Compare( L"0" ) ) str.Empty();
+			m_ListCtrl.SetItemText( nItem, PS_MINDEX_CALC, str );
+
 			m_ListCtrl.SetItemText( nItem, PS_POSTERIOR, split.d.posterior );
 	
 
 			str.Format( L"%d", split.d.sex_id );
 			m_ListCtrl.SetItemText( nItem, PS_SEX_ID, str );
-
-			str.Format( L"%d", split.d.parent2Index );
-			if( !str.Compare( L"0" ) ) str.Empty();
-			m_ListCtrl.SetItemText( nItem, PS_MOTHER_INDEX, str );
 
 			m_ListCtrl.SetItemText( nItem, PS_BPLACE, split.d.birth_place );
 			m_ListCtrl.SetItemText( nItem, PS_BDATE, split.d.birth_date );

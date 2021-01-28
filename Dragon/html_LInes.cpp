@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 #include "ProgressWnd.h"
 #include "utilities.h"
-
+#include "EditItem.h"
 // CHtmlLines dialog
 
 IMPLEMENT_DYNAMIC(CHtmlLines, CDialogEx)
@@ -33,6 +33,10 @@ BEGIN_MESSAGE_MAP(CHtmlLines, CDialogEx)
 	ON_WM_SIZING()
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CHtmlLines::OnDblclkList)
 	ON_COMMAND(ID_LIST_LINES, &CHtmlLines::OnListLines)
+//	ON_NOTIFY(NM_CLICK, IDC_LIST, &CHtmlLines::OnClickList)
+//ON_NOTIFY(NM_RCLICK, IDC_LIST, &CHtmlLines::OnRclickList)
+ON_BN_CLICKED(IDC_MODIFY, &CHtmlLines::OnClickedModify)
+ON_EN_CHANGE(IDC_EDIT, &CHtmlLines::OnChangeEdit)
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CHtmlLines::OnInitDialog()
@@ -63,9 +67,10 @@ BOOL CHtmlLines::OnInitDialog()
 	m_ListCtrl.SetExtendedStyle(m_ListCtrl.GetExtendedStyle()| LVS_EX_GRIDLINES );
 	m_ListCtrl.InsertColumn( 0,	L"line#",	LVCFMT_RIGHT,	 80,-1,COL_HIDDEN);
 	m_ListCtrl.InsertColumn( 1,	L"line#",	LVCFMT_RIGHT,	 80,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( 2,	L"ga.line",	LVCFMT_LEFT,	 1500,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( 2,	L"ga.line",	LVCFMT_LEFT,	 1500,-1,COL_EDIT);
 
 
+	GetDlgItem( IDC_MODIFY )->EnableWindow( FALSE );
 
 
 	for( UINT i = 0; i < vLines->size(); ++ i )
@@ -74,7 +79,6 @@ BOOL CHtmlLines::OnInitDialog()
 		m_ListCtrl.SetItemText( nItem, 1, vLines->at(i) );
 		childL = getHtmlLine( vLines->at(i) );
 		m_ListCtrl.SetItemText( nItem, 2, getHtmlLine( vLines->at(i) ) );
-
 		wndP.StepIt();
 		wndP.PeekAndPump();
 		if (wndP.Cancelled()) break;
@@ -153,7 +157,11 @@ void CHtmlLines::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
 	CString line;
 
+	m_linenumber = _wtoi( m_ListCtrl.GetItemText( nItem, 1 ) );
 	line = m_ListCtrl.GetItemText( nItem, 2 );
+	line = line.Mid( 2 );		// geerációs kód eldobása
+		
+
 	GetDlgItem( IDC_EDIT )->SetWindowTextW( line );
 	*pResult = 0;
 }
@@ -163,4 +171,18 @@ void CHtmlLines::OnListLines()
 	CString	logFile(L"problémás_html_Sorok"); 
 	CString	title = logFile;
 	theApp.exportSelected( logFile, title, &m_ListCtrl );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CHtmlLines::OnClickedModify()
+{
+	GetDlgItem( IDC_EDIT )->GetWindowTextW( m_line );
+	if( AfxMessageBox( L"Felülírod a ga.html fájl sorát ezzel a módosított sorral?", MB_YESNO ) == IDNO ) return;
+
+	theApp.saveHtmlLine( m_linenumber, m_line );
+	CDialogEx::OnOK();
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CHtmlLines::OnChangeEdit()
+{
+	GetDlgItem( IDC_MODIFY )->EnableWindow( TRUE );
 }

@@ -66,9 +66,8 @@ protected:
 	void CcheckSameNameAnd::OnHtmlPeoplefather();
 	void CcheckSameNameAnd::OnHtmlShows();
 	void CcheckSameNameAnd::OnHtmlNotepad();
-	void CcheckSameNameAnd::OnHtmlEdit();
 	void OnEditNotpadParents();
-
+	void OnEdit2lines();
 
 	void CcheckSameNameAnd::init( CString title );
 	void CcheckSameNameAnd::listSameVector();
@@ -88,10 +87,6 @@ public:
 	
 	afx_msg void OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult);
 	
-//	afx_msg void OnEditnotepad();
-//	afx_msg void OnEditNotpadParents();
-//	afx_msg void OnListPeople();
-
 	afx_msg void OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
 	

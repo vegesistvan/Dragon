@@ -265,6 +265,11 @@ public:
 	bool	selectFile(  CString fileSpec, BLOBSTAT* stat);
 	bool	selectFiles( );
 
+	void CDragonApp::change( CString linenumber, CString line );
+	void CDragonApp::edit1line( int lineNumber );
+	void CDragonApp::edit2lines( std::vector<CString>* vLines );
+	void CDragonApp::editHtmlLines( CListCtrlEx * p_ListCtrl, int col_linennumber );
+	void	saveHtmlLine( int lineNumber, CString line );
 	BOOL	openDatabase();
 	BOOL	openSystemDatabase();
 	BOOL	openBlob();

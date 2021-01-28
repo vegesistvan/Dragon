@@ -43,6 +43,7 @@ protected:
 
 //	SAMENAMES r;				// referencia adatok az összehasonlításnál
 	
+	void OnEdit2lines();
 	BOOL PreTranslateMessage(MSG* pMsg);
 	DECLARE_MESSAGE_MAP()
 public:
@@ -58,7 +59,7 @@ public:
 	afx_msg void OnFilter2();
 
 	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
-	afx_msg void OnHtmlEdit();
+//	afx_msg void OnHtmlEdit();
 	afx_msg void OnHtmlShows();
 	afx_msg void OnHtmlPeoplefather();
 	afx_msg void OnHtmlNotepad();

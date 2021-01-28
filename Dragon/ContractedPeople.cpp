@@ -76,8 +76,8 @@ BEGIN_MESSAGE_MAP(CContractedPeople, CDialogEx)
 	ON_COMMAND(ID_FILTER_2, &CContractedPeople::OnFilter2)
 
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-
-	ON_COMMAND(ID_HTML_EDIT, &CContractedPeople::OnHtmlEdit)
+	ON_COMMAND(ID_EDIT2LINES, &CContractedPeople::OnEdit2lines)
+//	ON_COMMAND(ID_HTML_EDIT, &CContractedPeople::OnHtmlEdit)
 	ON_COMMAND(ID_HTML_SHOWS, &CContractedPeople::OnHtmlShows)
 	ON_COMMAND(ID_HTML_PEOPLEFATHER, &CContractedPeople::OnHtmlPeoplefather)
 	ON_COMMAND(ID_EDIT_NOTEPAD_PARENTS, &CContractedPeople::OnEditNotepadParents)
@@ -444,13 +444,20 @@ LRESULT CContractedPeople::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
     }
 	return TRUE;
 }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedPeople::OnEdit2lines()
+{
+	theApp.editHtmlLines( &m_ListCtrl, S_LINE );
+}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 void CContractedPeople::OnHtmlEdit()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
 	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	S_LINE ) );
 	theApp.listHtmlLine( lineNumber );
 }
+*/
 void CContractedPeople::OnHtmlNotepad()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);

@@ -12,6 +12,7 @@
 #include "GetLastFirst.h"
 #include "ProgressWnd.h"
 #include "utilities.h"
+#include "EditTwoLines.h"
 
 // txt fájl oszlopok
 enum
@@ -162,7 +163,7 @@ BEGIN_MESSAGE_MAP(CCheckSameSpouses, CDialogEx)
 	ON_COMMAND(ID_LIST_PEOPLE, &CCheckSameSpouses::OnListPeople)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CCheckSameSpouses::OnDblclkList)
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_HTML_EDIT, &CCheckSameSpouses::OnHtmlEdit)
+	ON_COMMAND(ID_EDIT2LINES, &CCheckSameSpouses::OnEdit2lines)
 	ON_COMMAND(ID_HTML_SHOWS, &CCheckSameSpouses::OnHtmlShows)
 	ON_COMMAND(ID_HTML_PEOPLEFATHER, &CCheckSameSpouses::OnHtmlPeoplefather)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CCheckSameSpouses::OnHtmlNotepad)
@@ -172,6 +173,8 @@ BEGIN_MESSAGE_MAP(CCheckSameSpouses, CDialogEx)
 	ON_COMMAND(ID_SPOUSES_DIFF, &CCheckSameSpouses::OnSpousesDiff)
 	ON_STN_CLICKED(IDC_KERESS, &CCheckSameSpouses::OnClickedKeress)
 	ON_STN_CLICKED(IDC_NEXT, &CCheckSameSpouses::OnClickedNext)
+
+	ON_COMMAND(ID_EDIT_NOTEPAD_PARENTS, &CCheckSameSpouses::OnEditNotepadParents)
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckSameSpouses::OnSize(UINT nType, int cx, int cy)
@@ -1046,18 +1049,24 @@ LRESULT CCheckSameSpouses:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
     }
 	return TRUE;
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSameSpouses::OnHtmlEdit()
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckSameSpouses::OnEdit2lines()
 {
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	L_LINENUMBER ) );
-	theApp.listHtmlLine( lineNumber );
+	theApp.editHtmlLines( &m_ListCtrl, L_LINENUMBER );
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckSameSpouses::OnHtmlNotepad()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	CString lineNumber = m_ListCtrl.GetItemText( nItem, 	L_LINENUMBER );
+	CString lineNumber = m_ListCtrl.GetItemText( nItem,	L_LINENUMBER );
+	if( !lineNumber.IsEmpty() ) 
+		theApp.editNotepad( lineNumber );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckSameSpouses::OnEditNotepadParents()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	CString lineNumber = m_ListCtrl.GetItemText( nItem,	L_LINENUMBERF );
 	if( !lineNumber.IsEmpty() ) 
 		theApp.editNotepad( lineNumber );
 }
@@ -1320,3 +1329,4 @@ BOOL CCheckSameSpouses::PreTranslateMessage(MSG* pMsg)
 	return CWnd::PreTranslateMessage(pMsg);
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,7 +1,7 @@
 #pragma once
 
 
-#define VERSION L"1.5.4"
+#define VERSION L"1.5.5"
 
 //#define VERSION L"1.3.18"
 
