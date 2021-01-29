@@ -12,7 +12,8 @@
 #include "SaveFirstName.h"
 #include "version.h"
 #include "ProgressWnd.h"
-#include "EditTwoLines.h"
+#include "html_Edit2Lines.h"
+
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

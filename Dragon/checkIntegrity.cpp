@@ -14,6 +14,7 @@ CCheckIntegrity::CCheckIntegrity()
 {
 	m_recordset		= new CSqliteDBRecordSet;
 	m_recordset1	= new CSqliteDBRecordSet;
+	m_hiba = false;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CCheckIntegrity::~CCheckIntegrity()
@@ -38,7 +39,11 @@ void CCheckIntegrity::integrity()
 
 	wndP.DestroyWindow();
 	fclose( fl );
-	theApp.showLogFile();
+
+	if( m_hiba )
+		theApp.showLogFile();
+	else
+		AfxMessageBox( L"Minden házaspár és minden apa és anya létezik az adatbázisban!", MB_ICONINFORMATION );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckIntegrity::couples()
@@ -49,17 +54,23 @@ void CCheckIntegrity::couples()
 	CString line;
 	int		db;
 	int summa = 0;
+	int rangeMax;
 
+	m_command = L"SELECT count() FROM people";
+	if( !query( m_command ) ) return;
+	rangeMax = _wtoi( m_recordset->GetFieldString(0) ) *2;
 
 	m_command = L"SELECT rowid, spouse1_id, spouse2_id, linenumber FROM marriages";
 	if( !query( m_command ) ) return;
+	rangeMax += (m_recordset->RecordsCount() * 2);
+	
 
-	wndP.SetRange( 0, m_recordset->RecordsCount()*2 );
+	wndP.SetRange( 0, rangeMax );
 	wndP.SetPos(0 );
 	wndP.SetStep(1 );
 
 #ifndef _DEBUG
-	str.Format( L"Házasságok ellenõrzése..." );
+	str.Format( L"Házaspárok létezésének ellenõrzése..." );
 	wndP.SetText( str );
 #endif
 
@@ -80,6 +91,7 @@ void CCheckIntegrity::couples()
 				fwprintf( fl, L"Az alábbiak nemlétezõ férjre való hivatkozások a házaspárok táblában.\n\n" );
 				fwprintf( fl, L"%10s %8s %9s\n", L"line", L"marriage", L"spouse_id" ); 
 				first = false;
+				m_hiba = true;
 			}
 			rowid	= m_recordset->GetFieldString( 0 );
 			line	= m_recordset->GetFieldString( 3 );
@@ -112,6 +124,7 @@ void CCheckIntegrity::couples()
 				fwprintf( fl, L"Az alábbiak nemlétezõ feleségre való hivatkozások a házaspárok táblában.\n\n" );
 				fwprintf( fl, L"%8s %9s\n", L"marriage", L"spouse_id" ); 
 				first = false;
+				m_hiba = true;
 			}
 			rowid = m_recordset->GetFieldString( 0 );
 			fwprintf( fl, L"%8s %9s\n", rowid, spouse2_id );
@@ -136,10 +149,11 @@ void CCheckIntegrity::fathers()
 	m_command = L"SELECT rowid, last_name, first_name, father_id, mother_id FROM people";
 	if( !query( m_command ) ) return;
 
+/*
 	wndP.SetRange( 0, m_recordset->RecordsCount()*2 );
 	wndP.SetPos(0 );
 	wndP.SetStep(1 );
-
+*/
 	CString rowid;
 	CString name;
 	int		father_id;
@@ -165,6 +179,7 @@ void CCheckIntegrity::fathers()
 				fwprintf( fl, L"Az alábbiak nemlétezõ apára való hivatkozások\n\n" );
 				fwprintf( fl, L"%8s %-30s %8s\n", L"rowid", L"name", L"father_id" ); 
 				first = false;
+				m_hiba = true;
 			}
 			rowid = m_recordset->GetFieldString( 0 );
 			name.Format( L"%s %s", m_recordset->GetFieldString(1), m_recordset->GetFieldString( 2 ) );
@@ -204,6 +219,7 @@ cont1:	m_recordset->MoveNext();
 				fwprintf( fl, L"Az alábbiak nemlétezõ anyára való hivatkozások\n\n" );
 				fwprintf( fl, L"%8s %-30s %8s\n", L"rowid", L"name", L"mother_id" ); 
 				first = false;
+				m_hiba = true;
 			}
 			rowid = m_recordset->GetFieldString( 0 );
 			name.Format( L"%s %s", m_recordset->GetFieldString(1), m_recordset->GetFieldString( 2 ) );

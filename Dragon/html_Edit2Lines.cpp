@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 #include "Dragon.h"
-#include "EditTwoLines.h"
+#include "html_edit2Lines.h"
 #include "afxdialogex.h"
 
 
@@ -54,6 +54,7 @@ BOOL CEditTwoLines::OnInitDialog()
 	caption.Format( L"%s fájl szerkesztése", theApp.m_htmlFileSpec );
 	SetWindowTextW( caption );
 
+	GetDlgItem( IDOK )->EnableWindow( FALSE );
 	m_change1 = false;
 	m_change2 = false;
 	return TRUE;
@@ -74,11 +75,13 @@ void CEditTwoLines::OnSizing(UINT fwSide, LPRECT pRect)
 void CEditTwoLines::OnChangeEdit1()
 {
 	m_change1 = true;
+	GetDlgItem( IDOK )->EnableWindow( TRUE );
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CEditTwoLines::OnChangeEdit2()
 {
 	m_change2 = true;
+	GetDlgItem( IDOK )->EnableWindow( TRUE );
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CEditTwoLines::OnBnClickedOk()
@@ -86,8 +89,8 @@ void CEditTwoLines::OnBnClickedOk()
 	CString line1;
 	if( m_change1 && m_change2 )
 	{
-		if( (AfxMessageBox( L"Mindkét sort cserélni akarod?", MB_YESNO ) ) == IDNO )
-			return;
+//		if( (AfxMessageBox( L"Mindkét sort cserélni akarod?", MB_YESNO ) ) == IDNO )
+//			return;
 		GetDlgItem( IDC_EDIT1)->GetWindowTextW( m_line1 );
 		GetDlgItem( IDC_EDIT2)->GetWindowTextW( m_line2 );
 		theApp.change( vLines->at(0), m_line1 ); 
@@ -95,15 +98,15 @@ void CEditTwoLines::OnBnClickedOk()
 	}
 	else if( m_change1 )
 	{
-		if( (AfxMessageBox( L"Cserélni akarod?", MB_YESNO ) ) == IDNO )
-			return;
+//		if( (AfxMessageBox( L"Cserélni akarod?", MB_YESNO ) ) == IDNO )
+//			return;
 		GetDlgItem( IDC_EDIT1)->GetWindowTextW( m_line1 );
 		theApp.change( vLines->at(0), m_line1 ); 
 	}
 	else if( m_change2 )
 	{
-		if( (AfxMessageBox( L"Cserélni akarod?", MB_YESNO ) ) == IDNO )
-			return;
+//		if( (AfxMessageBox( L"Cserélni akarod?", MB_YESNO ) ) == IDNO )
+//			return;
 		GetDlgItem( IDC_EDIT2)->GetWindowTextW( m_line2 );
 		theApp.change( vLines->at(1), m_line2 ); 
 	}

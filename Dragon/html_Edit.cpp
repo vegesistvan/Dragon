@@ -70,7 +70,7 @@ void CHtmlEdit::OnSizing(UINT fwSide, LPRECT pRect)
 void CHtmlEdit::OnBnClickedOk()
 {
 	GetDlgItem( IDC_EDIT )->GetWindowTextW( m_line );
-	if( AfxMessageBox( L"Felülírod a ga.html fájl sorát ezzel a módosított sorral?", MB_YESNO ) == IDNO ) return;
+//	if( AfxMessageBox( L"Felülírod a ga.html fájl sorát ezzel a módosított sorral?", MB_YESNO ) == IDNO ) return;
 
 	CDialogEx::OnOK();
 }

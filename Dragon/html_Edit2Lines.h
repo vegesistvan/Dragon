@@ -12,7 +12,7 @@ public:
 	virtual ~CEditTwoLines();
 
 // Dialog Data
-	enum { IDD = IDD_EDITTWOLINES };
+	enum { IDD = IDD_HTML_EDIT2LINES };
 	std::vector<CString> *vLines;
 	CString m_line1;
 	CString m_line2;

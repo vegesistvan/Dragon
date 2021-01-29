@@ -11,7 +11,7 @@
 #include "OpenDatabase.h"
 #include "checkIntegrity.h"
 #include "CheckGenerations.h"
-#include "CheckMarriageOrder.h"
+//#include "CheckMarriageOrder.h"
 #include "ContractedPeople.h"
 
 #ifdef _DEBUG
@@ -703,8 +703,8 @@ void CDragonApp::OnCheckGenerations()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonApp::OnMoreMarriages()
 {
-	CCheckMarriageOrder dlg;
-	dlg.DoModal();
+//	CCheckMarriageOrder dlg;
+//	dlg.DoModal();
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonApp::OnShowSamePeople()

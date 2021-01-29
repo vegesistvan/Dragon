@@ -420,10 +420,11 @@ public:
 	afx_msg void OnDisplayBlob();
 	afx_msg void OnGedcomTagtable();
 	afx_msg void OnGedcomINDIFAMS();
-	afx_msg void OnSameNames();
+	afx_msg void OnSameCouples();
 	afx_msg void OnSame();
 	afx_msg void OnClose();
 	afx_msg void OnSamenameandspouse();
 //	afx_msg void OnInfo();
 	afx_msg void OnAppExit();
+	afx_msg void OnContractedcouples();
 };

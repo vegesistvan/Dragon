@@ -12,7 +12,7 @@
 #include "GetLastFirst.h"
 #include "ProgressWnd.h"
 #include "utilities.h"
-#include "EditTwoLines.h"
+#include "html_Edit2Lines.h"
 
 // txt fájl oszlopok
 enum
@@ -630,6 +630,8 @@ void CCheckSameSpouses::printHtml()
 	CString birthDateMJ;
 	CString deathDateMJ;
 	CString sourceJ;
+	CString sourceFJ;
+	CString sourceMJ;
 
 	int nItemH;
 
@@ -639,7 +641,7 @@ void CCheckSameSpouses::printHtml()
 
 
 
-	fwprintf( fh1, L"<br><font color='red'>%4d. %6s %6s %6s %s %s %s %-25s %-15s %-15s %-25s %-15s %-15s %-25s %-15s %-15s</font><br>",\
+	fwprintf( fh1, L"<br><font color='red'>%4d. %6s %6s %6s %s %s %s %-25s %-15s %-15s %1s %-25s %-15s %-15s %1s %-25s %-15s %-15s</font><br>",\
 m_cnt+1,\
 rowid,\
 lineNumber,\
@@ -650,9 +652,11 @@ united,\
 name,\
 birth,\
 death,\
+sourceF,\
 father,\
 birthDateF,\
 deathDateF,\
+sourceM,\
 mother,\
 birthDateM,\
 deathDateM\
@@ -689,7 +693,7 @@ deathDateM\
 
 
 
-	fwprintf( fh1, L"%12s %6s %6s %s %s %s %-25s %-15s %-15s %-25s %-15s %-15s %-25s %-15s %-15s<br>",\
+	fwprintf( fh1, L"%12s %6s %6s %s %s %s %-25s %-15s %-15s %1s %-25s %-15s %-15s %1s %-25s %-15s %-15s<br>",\
 vSameSpouses.at(0).rowid,\
 vSameSpouses.at(0).lineNumber,\
 vSameSpouses.at(0).tableNumber,\
@@ -699,9 +703,11 @@ vSameSpouses.at(0).united,\
 vSameSpouses.at(0).spouse,\
 vSameSpouses.at(0).birthDate,\
 vSameSpouses.at(0).deathDate,\
+vSameSpouses.at(0).sourceF,\
 vSameSpouses.at(0).father,\
 vSameSpouses.at(0).birthDateF,\
 vSameSpouses.at(0).deathDateF,\
+vSameSpouses.at(0).sourceM,\
 vSameSpouses.at(0).mother,\
 vSameSpouses.at(0).birthDateM,\
 vSameSpouses.at(0).deathDateM\
@@ -777,6 +783,8 @@ vSameSpouses.at(0).deathDateM\
 		fwprintf( fh1, L"%s %-25s ", vSameSpouses.at(j).united, vSameSpouses.at(j).spouse );
 
 		sourceJ		= vSameSpouses.at(j).source.Trim();
+		sourceFJ	= vSameSpouses.at(j).sourceF;
+		sourceMJ	= vSameSpouses.at(j).sourceM;
 		birthDateJ	= vSameSpouses.at(j).birthDate.Left(15).Trim();
 		deathDateJ	= vSameSpouses.at(j).deathDate.Left(15).Trim();
 		fatherJ		= vSameSpouses.at(j).father.Left(25).Trim();
@@ -785,18 +793,6 @@ vSameSpouses.at(0).deathDateM\
 		motherJ		= vSameSpouses.at(j).mother.Left(25).Trim();
 		birthDateMJ = vSameSpouses.at(j).birthDateM.Trim();
 		deathDateMJ = vSameSpouses.at(j).deathDateM.Trim();
-
-/*
-		sourceJ.TrimRight();
-		birthDateJ.TrimRight();
-		deathDateJ.TrimRight();
-		fatherJ.TrimRight();
-		birthDateFJ.TrimRight();
-		deathDateFJ.TrimRight();
-		motherJ.TrimRight();
-		birthDateMJ.TrimRight();
-		deathDateMJ.TrimRight();
-*/
 
 
 // birthDate
@@ -826,6 +822,9 @@ vSameSpouses.at(0).deathDateM\
 		else
 			fwprintf( fh1, L"%-15s ", deathDateJ );
 
+// mother source
+
+		fwprintf( fh1, L"%s ", sourceFJ );
 // father
 		if( father0.IsEmpty() || fatherJ.IsEmpty() )
 		{
@@ -866,6 +865,9 @@ vSameSpouses.at(0).deathDateM\
 		else
 			fwprintf( fh1, L"%-15s ", deathDateFJ );
 
+// mother source
+
+		fwprintf( fh1, L"%s ", sourceMJ );
 // mother
 		if( mother0.IsEmpty() || motherJ.IsEmpty() )
 		{
@@ -1220,7 +1222,7 @@ void CCheckSameSpouses::htmlHeader( CString title )
 //	fwprintf( fh1, L"%-20s %d<br>", L"Összevonások száma:", theApp._iterationCount );
 	fwprintf( fh1, L"%-20s %s<br><br><br>\n", L"lista készült:", theApp.getPresentDateTime() );
 	
-	str.Format( L"\n%12s %6s %6s %1s %1s %1s %-25s %-15s %-15s %-25s %-25s<br>\n", L"rowid", L"line#", L"table#", L"G", L"S", L"U", L"name", L"születés", L"halál", L"apja neve", L"anyja neve" );
+	str.Format( L"\n%12s %6s %6s %1s %1s %1s %-25s %-15s %-15s %1s %-25s %-15s %-15s %1s %-25s %-15s %-15s<br>\n", L"rowid", L"line#", L"table#", L"G", L"S", L"U", L"name", L"születés", L"halál", L"s", L"apja neve", L"születés", L"halál", L"s", L"anyja neve", L"születés", L"halál" );
 	fwprintf( fh1, str );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

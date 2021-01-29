@@ -54,7 +54,9 @@
 
 
 #include "GA_ascendantsChain.h"
-#include "SameCouples.h"
+//#include "SameCouples.h"
+#include "ContractCouples.h"
+#include "ContractedCouples.h"
 #include "checkLifespan.h"
 
 #include "SamePeopleInfo.h"
@@ -184,12 +186,13 @@ ON_COMMAND(ID_MOTHER_INDEX, &CDragonDlg::OnMotherIndex)
 ON_COMMAND(ID_DISPLAY_BLOB, &CDragonDlg::OnDisplayBlob)
 ON_COMMAND(ID_GEDCOM_TAGTABLE, &CDragonDlg::OnGedcomTagtable)
 ON_COMMAND(ID_GEDCOM_INDIFAMS, &CDragonDlg::OnGedcomINDIFAMS)
-ON_COMMAND(ID_SAME_NAMES, &CDragonDlg::OnSameNames)
+ON_COMMAND(ID_SAME_NAMES, &CDragonDlg::OnSameCouples)
 ON_COMMAND(ID_SAME, &CDragonDlg::OnSame)
 ON_WM_CLOSE()
 ON_COMMAND(ID_SAMENAMEANDSPOUSE, &CDragonDlg::OnSamenameandspouse)
 //ON_COMMAND(ID_INFO, &CDragonDlg::OnInfo)
 ON_COMMAND(ID_APP_EXIT, &CDragonDlg::OnAppExit)
+ON_COMMAND(ID_CONTRACTEDCOUPLES, &CDragonDlg::OnContractedcouples)
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CDragonDlg::OnInitDialog()
@@ -1114,10 +1117,10 @@ void CDragonDlg::OnGedcomINDIFAMS()
 	ged.indiFams();
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragonDlg::OnSameNames()
+void CDragonDlg::OnSameCouples()
 {
-	CSameCouples dlg;
-	dlg.DoModal();
+	CContractCouples cc;
+	cc.contractCouples();		
 	mainTitle( );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1160,4 +1163,12 @@ void CDragonDlg::OnClose()
 void CDragonDlg::OnAppExit()
 {
 	MessageBox( L"AppExit" );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDragonDlg::OnContractedcouples()
+{
+	CContractedCouples dlg;
+	dlg.m_filter = L"code1=1 AND code2=1";
+	dlg.m_contracted = true;
+	dlg.DoModal();
 }

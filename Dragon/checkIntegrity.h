@@ -22,7 +22,8 @@ protected:
 	CString str;
 	CString m_command;
 	FILE* fl;
-
+	bool m_hiba;
+	
 	BOOL query( CString command );
 	BOOL query1( CString command );
 
