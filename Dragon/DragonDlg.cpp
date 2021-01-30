@@ -1168,7 +1168,6 @@ void CDragonDlg::OnAppExit()
 void CDragonDlg::OnContractedcouples()
 {
 	CContractedCouples dlg;
-	dlg.m_filter = L"code1=1 AND code2=1";
 	dlg.m_contracted = true;
 	dlg.DoModal();
 }

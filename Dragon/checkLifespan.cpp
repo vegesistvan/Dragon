@@ -237,79 +237,6 @@ death_date\
 	}
 
 }
-/*
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-LRESULT CLifeSpan:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
-{
-	CPoint* point=(CPoint*) lParam;
-    CMenu	Menu;
-	CMenu*	pPopup;
-
-
-	if(Menu.LoadMenu( IDR_DROPDOWN_HTML ))
-    {
-		pPopup = Menu.GetSubMenu(0);
-		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
-		{
-			pPopup->EnableMenuItem(ID_HTML_SHOWS, MF_BYCOMMAND | MF_GRAYED);
-			pPopup->EnableMenuItem(ID_HTML_NOTEPAD, MF_BYCOMMAND | MF_GRAYED);
-			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
-		}
-		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
-    }
-	return TRUE;
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CLifeSpan::OnHtmlEdit()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	L_LINENUMBER ) );
-	theApp.listHtmlLine( lineNumber );
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CLifeSpan::OnHtmlNotepad()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	CString lineNumber = m_ListCtrl.GetItemText( nItem, 	L_LINENUMBER );
-	if( !lineNumber.IsEmpty() ) 
-		theApp.editNotepad( lineNumber );
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CLifeSpan::OnHtmlShows()
-{
-	POSITION	pos = m_ListCtrl.GetFirstSelectedItemPosition();
-	int			nItem;
-	std::vector<CString> vLines;
-
-	int cnt = 0;
-	CString name(L"");
-
-	while( pos )
-	{
-		nItem = m_ListCtrl.GetNextSelectedItem( pos );
-		vLines.push_back( m_ListCtrl.GetItemText( nItem, L_LINENUMBER ) );
-		if( name.Compare( m_ListCtrl.GetItemText( nItem, L_NAME ) ) )
-		{
-			name = m_ListCtrl.GetItemText( nItem, L_NAME );
-			++cnt;
-		}
-	
-
-	}
-
-	CHtmlLines dlg;
-
-	if( cnt == 1 )
-		dlg.child = name;
-	else
-		dlg.child = L"";
-
-	dlg._what = 1;
-	dlg.vLines = &vLines;
-
-	dlg.DoModal();
-}
-*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CLifeSpan::OnList()
 {
@@ -319,36 +246,6 @@ void CLifeSpan::OnList()
 	theApp.exportAll( logFile, title, &m_ListCtrl );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-void CLifeSpan::OnGahtmlLine()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
-
-	if( nItem == - 1 )
-	{
-		theApp.message( L"GA.html szerkesztése", L"Nincs kijelölve ember!" );
-		return;
-	}
-	
-
-	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	L_LINENUMBER ) );
-
-	theApp.listHtmlLine( lineNumber );
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CLifeSpan::OnRokonsag()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
-
-	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
-	CRelations dlg;
-
-	dlg.m_rowid = rowid;
-	dlg.DoModal();
-
-}
-*/
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CLifeSpan::query( CString command )
 {
 	if( m_recordset->Query(command,theApp.mainDB))

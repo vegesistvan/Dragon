@@ -7,14 +7,19 @@
 #include "afxdialogex.h"
 #include "ProgressWnd.h"
 #include "utilities.h"
+#include "ContractCouples.h"
+#include "html_Lines.h"
+#include "html_Edit2Lines.h"
+#include "html_Edit.h"
 
 enum
 {
 	L_LOOP = 0,
+	L_GROUP,
+	L_SUBGROUP,
 	L_COLORCODE,
 	L_MARRIAGE_ID,
 	L_WEDDING,
-	L_GROUP,
 	L_STATUSH,
 	L_LINENUMBERH,
 	L_GENERATIONH, 
@@ -32,7 +37,7 @@ enum
 	L_SOURCEW,
 	L_UNITEDW,
 	L_ROWIDW,
-	L_WIFW,
+	L_WIFE,
 	L_BIRTHW,
 	L_DEATHW,
 	L_FATHERW,
@@ -58,13 +63,28 @@ void CContractedCouples::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_LIST, m_ListCtrl);
+	DDX_Control(pDX, IDC_KERESS, colorKeress);
+	DDX_Control(pDX, IDC_NEXT, colorNext);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CContractedCouples, CDialogEx)
 	ON_WM_SIZE()
 	ON_WM_SIZING()
-	ON_COMMAND(IDC_KERESS, &CContractedCouples::OnKeress)
+	ON_COMMAND(IDC_KERESS, &CContractedCouples::OnClickedKeress)
 	ON_STN_CLICKED(IDC_NEXT, &CContractedCouples::OnClickedNext)
+	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST, &CContractedCouples::OnCustomdrawList)
+	ON_COMMAND(ID_INPUT_DIFFERENT, &CContractedCouples::OnInputDifferent)
+	ON_COMMAND(ID_INPUT_UNITED, &CContractedCouples::OnInputUnited)
+	ON_COMMAND(ID_FILTER_ALL, &CContractedCouples::OnFilterAll)
+	ON_COMMAND(ID_FILTER_1, &CContractedCouples::OnFilter1)
+	ON_COMMAND(ID_FILTER_2, &CContractedCouples::OnFilter2)
+
+	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
+	ON_COMMAND(ID_EDIT2LINES, &CContractedCouples::OnEdit2lines)
+	ON_COMMAND(ID_HTML_SHOWS, &CContractedCouples::OnHtmlShows)
+	ON_COMMAND(ID_HTML_PEOPLEFATHER, &CContractedCouples::OnHtmlPeoplefather)
+	ON_COMMAND(ID_HTML_NOTEPAD, &CContractedCouples::OnHtmlNotepad)
+
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CContractedCouples::OnInitDialog()
@@ -74,73 +94,16 @@ BOOL CContractedCouples::OnInitDialog()
 	EASYSIZE_ADD( IDC_CAPTION,	ES_BORDER,	ES_BORDER,	ES_BORDER,		ES_KEEPSIZE,	0 );
 	EASYSIZE_INIT();
 
-	 m_command.Format( L"SELECT filespec FROM contracted WHERE %s", m_filter );
-	 if( !theApp.query( m_command ) ) return false;
-	 m_fileSpec = theApp.m_recordset->GetFieldString( 0 );
+	menu.LoadMenu( IDR_CONTRACTED_COUPLES );
+	SetMenu(&menu);
 
-	 if( m_fileSpec.IsEmpty() )
-	 {
-		 AfxMessageBox( L"Elõször el kel végezni az összevonásokat!" );
-		 CDialog::OnOK();
-		 return false;
-	 }
+	colorKeress.SetTextColor( theApp.m_colorClick );
+	colorNext.SetTextColor( theApp.m_colorClick );
 
-	 if( _waccess( m_fileSpec, 0 ) )
-	 {
-		 str.Format( L"%s\nfájl nem létezik", m_fileSpec );
-		 AfxMessageBox( str );
-		 CDialog::OnOK();
-		 return false;
-	 }
-
-	 	 CStdioFile file( m_fileSpec, CFile::modeRead);   // input csv fájl
-	 int fileLength = (int)file.GetLength();
-
-	CStringArray A;
-	int		n;
-	int		cnt = 0;
-	int		items = 0;
-	int		pos;
-	int		loop;
-
-	vCouples.clear();
+	createColumns();
+	OnInputUnited();
 	
-	if( m_contracted )
-		str = L"Összevont házaspárok táblázatának elkészítése...";
-	else
-		str = L"A nem összevonható házaspárok táblázatának elkészítése...";
-
-	CProgressWnd wndP( NULL, str ); 
-	wndP.GoModal();
-	wndP.SetRange( 0, fileLength );
-	wndP.SetPos(0 );
-	while( file.ReadString( cLine ) )
-	{
-		++cnt;
-		n = wordList( &A, cLine, '\t', true );
-		if( n != L_COLUMNSCOUNT )
-		{
-			str.Format( L"Az %d. sorban az elemek száma %d.\n%d kellen lenni.", cnt, n, L_COLUMNSCOUNT );
-			AfxMessageBox( str );
-			break;
-			return false;
-		}
-
-		if( A[0].IsEmpty() ) ++items;		// azonos snevû emberek száma
-
-		str.Format( L"%d", cnt );
-		push( str );
-		for( UINT i = 1; i < A.GetSize(); ++i )
-		{
-			push( A[i] );
-		}
-		wndP.SetPos( file.GetPosition() );
-		wndP.PeekAndPump();
-		if (wndP.Cancelled()) break;
-	}
-
 	return TRUE;
-
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedCouples::push( CString item )
@@ -159,36 +122,38 @@ void CContractedCouples::createColumns()
 {
 	m_ListCtrl.KeepSortOrder(TRUE);
 	m_ListCtrl.SetExtendedStyle(m_ListCtrl.GetExtendedStyle()| LVS_EX_GRIDLINES );
-	/*
-	m_ListCtrl.InsertColumn( S_CNT,				L"cnt",			LVCFMT_RIGHT,	 20,-1,COL_HIDDEN);
-	m_ListCtrl.InsertColumn( S_LOOP,			L"loop",		LVCFMT_RIGHT,	 30,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_GROUP,			L"gr",			LVCFMT_RIGHT,	 30,-1,COL_HIDDEN);
-	m_ListCtrl.InsertColumn( S_MATCH,			L"m#",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_GROUP2,			L"gr2",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_STATUS,			L"st",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_RGBCOLOR,		L"color",		LVCFMT_RIGHT,	 30,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_LINE,			L"line#",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_UNITED,			L"U",			LVCFMT_LEFT,	 20,-1,COL_NUM );
-	m_ListCtrl.InsertColumn( S_SOURCE,			L"S",			LVCFMT_RIGHT,	 20,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_GENERATION,		L"G",			LVCFMT_RIGHT,	 20,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_ROWID,			L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_NAME,			L"név",			LVCFMT_LEFT,	200,-1,COL_TEXT );
-	m_ListCtrl.InsertColumn( S_BIRTH,			L"születés",	LVCFMT_LEFT,	 70,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_DEATH,			L"halálozás",	LVCFMT_LEFT,	 70,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_ROWIDF,			L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_FATHER,			L"apa",			LVCFMT_LEFT,	200,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( S_BIRTHF,			L"születés",	LVCFMT_LEFT,	 70,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_DEATHF,			L"halál",		LVCFMT_LEFT,	 70,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_ROWIDM,			L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_MOTHER,			L"anya",		LVCFMT_LEFT,	200,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( S_BIRTHM,			L"születés",	LVCFMT_LEFT,	 70,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_DEATHM,			L"halál",		LVCFMT_LEFT,	 70,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_ROWIDS,			L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_SPOUSES,			L"házastársak",	LVCFMT_LEFT,	500,-1,COL_TEXT );
-	m_ListCtrl.InsertColumn( S_LINEF,			L"line#F",		LVCFMT_LEFT,	 60,-1,COL_HIDDEN );
-	m_ListCtrl.InsertColumn( S_LINENUMBERMF,	L"line#MF",		LVCFMT_RIGHT,	 60,-1,COL_NUM );
+
+	m_ListCtrl.InsertColumn( L_LOOP,			L"L",			LVCFMT_RIGHT,	 20,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_GROUP,			L"GR",			LVCFMT_RIGHT,	 30,-1,COL_HIDDEN );
+	m_ListCtrl.InsertColumn( L_SUBGROUP,		L"gr",			LVCFMT_RIGHT,	 25,-1,COL_HIDDEN );
+	m_ListCtrl.InsertColumn( L_COLORCODE,		L"color",		LVCFMT_RIGHT,	 20,-1,COL_HIDDEN );
+	m_ListCtrl.InsertColumn( L_MARRIAGE_ID,		L"m_id",		LVCFMT_RIGHT,	 80,-1,COL_HIDDEN);
+	m_ListCtrl.InsertColumn( L_WEDDING,			L"esküvõ",		LVCFMT_LEFT,	 70,-1,COL_TEXT);
+
+	m_ListCtrl.InsertColumn( L_STATUSH,			L"st",			LVCFMT_RIGHT,	 20,-1,COL_HIDDEN );
+	m_ListCtrl.InsertColumn( L_LINENUMBERH,		L"line#",		LVCFMT_RIGHT,	 50,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_GENERATIONH,		L"G",			LVCFMT_RIGHT,	 20,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_SOURCEH,			L"S",			LVCFMT_LEFT,	 20,-1,COL_NUM );
+	m_ListCtrl.InsertColumn( L_UNITEDH,			L"U",			LVCFMT_RIGHT,	 20,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_ROWIDH,			L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_HUSBAND,			L"férj",		LVCFMT_LEFT,	100,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_BIRTHH,			L"születés",	LVCFMT_LEFT,	 70,-1,COL_NUM );
+	m_ListCtrl.InsertColumn( L_DEATHH,			L"halálozás",	LVCFMT_LEFT,	 70,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_FATHERH,			L"apja",		LVCFMT_LEFT,	100,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_MOTHERH,			L"anyja",		LVCFMT_LEFT,	100,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_STATUSW,			L"st",			LVCFMT_RIGHT,	 30,-1,COL_HIDDEN);
+	m_ListCtrl.InsertColumn( L_LINENUMBERW,		L"line#",		LVCFMT_RIGHT,	 50,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_GENERATIONW,		L"G",			LVCFMT_RIGHT,	 20,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_SOURCEW,			L"S",			LVCFMT_LEFT,	 20,-1,COL_NUM );
+	m_ListCtrl.InsertColumn( L_UNITEDW,			L"U",			LVCFMT_RIGHT,	 20,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_ROWIDW,			L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_WIFE,			L"feleség",		LVCFMT_LEFT,	100,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_BIRTHW,			L"születés",	LVCFMT_LEFT,	 70,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_DEATHW,			L"halál",		LVCFMT_LEFT,	 70,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_FATHERW,			L"apa",			LVCFMT_LEFT,	100,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_MOTHERW,			L"anya",		LVCFMT_LEFT,	100,-1,COL_TEXT);
 	m_columnsCount	= m_ListCtrl.GetHeaderCtrl()->GetItemCount();
-	*/
+	
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -204,13 +169,387 @@ void CContractedCouples::OnSizing(UINT fwSide, LPRECT pRect)
 	EASYSIZE_MINSIZE(430,314,fwSide,pRect); 
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CContractedCouples::OnKeress()
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedCouples::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
 {
+	NMLVCUSTOMDRAW* pLVCD = reinterpret_cast<NMLVCUSTOMDRAW*>( pNMHDR );
+	
+	int nItem;
+	int nCol;
+	int iData;
+	ULONG mask;
+	CString	statusH;
+	CString	statusW;
+	bool husband;
+	bool wife;
 
+	*pResult = 0;
+
+	switch( pLVCD->nmcd.dwDrawStage )
+	{
+	case CDDS_PREPAINT:
+		*pResult = CDRF_NOTIFYITEMDRAW;
+		break;
+	case CDDS_ITEMPREPAINT:
+		*pResult = CDRF_NOTIFYSUBITEMDRAW;
+		break;
+	case CDDS_ITEMPREPAINT|CDDS_SUBITEM:
+		nItem	= pLVCD->nmcd.dwItemSpec;
+		nCol	= pLVCD->iSubItem;
+		husband = 4 < nCol && nCol < 16;
+		wife	= 15 < nCol && nCol < 27;
+		if( UNITED )
+		{
+			statusH = m_ListCtrl.GetItemText( nItem, L_STATUSH );
+			statusW = m_ListCtrl.GetItemText( nItem, L_STATUSW );
+			if( statusH == L"1" && husband )
+				pLVCD->clrTextBk = LIGHTGREEN;
+			else if( statusW == L"1" && wife ) 
+				pLVCD->clrTextBk = YELLOW;
+			else if( statusH == L"-1" && husband)
+				pLVCD->clrTextBk = GRAY;
+			else if( statusW == L"-1" && wife )
+				pLVCD->clrTextBk = GRAY;
+			else if( statusW == L"0" && (wife || husband ))
+				pLVCD->clrTextBk = RGB( 255, 204, 204 );
+		}
+		else
+		{
+			mask = 1 << nCol;
+			if( mask & _wtol( m_ListCtrl.GetItemText( nItem, L_COLORCODE  ) ) )
+				pLVCD->clrTextBk = LIGHTGREEN;
+		}
+		*pResult = CDRF_DODEFAULT;
+		break;
+	}
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedCouples::OnInputDifferent()
+{
+	if( !inputFile( DIFFERENTTXT ) )return;
+
+	menu.EnableMenuItem( ID_INPUT_UNITED, MF_BYCOMMAND | MF_ENABLED);
+	menu.EnableMenuItem( ID_INPUT_DIFFERENT, MF_BYCOMMAND | MF_GRAYED);
+	UNITED = false;
+
+	str.Format( L"Azonos nevû házaspárok, akik nem vonhatóak össze" );
+	SetWindowTextW( str );
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedCouples::OnInputUnited()
+{
+	if( !inputFile( UNITEDTXT ) )return;
+
+	UNITED = true;
+	menu.EnableMenuItem( ID_INPUT_UNITED, MF_BYCOMMAND | MF_GRAYED);
+	menu.EnableMenuItem( ID_INPUT_DIFFERENT, MF_BYCOMMAND | MF_ENABLED);
+
+	str.Format( L"Azonos nevû házaspárok, akik között összevonások történtek (%d azonos nevû házaspár )", m_numOfGroups );
+	SetWindowTextW( str );
+	ShowWindow( SW_MAXIMIZE );
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bool CContractedCouples::inputFile( int subType )
+{
+	CString filespec;
+
+	while( true )
+	{
+		m_command.Format( L"SELECT filespec FROM files WHERE type=%d AND subtype=%d", CONTRACTED_COUPLES, subType );
+		if( !theApp.query( m_command ) );
+		filespec = theApp.m_recordset->GetFieldString( 0 );
+		if( filespec.IsEmpty() || _waccess( filespec, 0 ) )
+		{
+			CContractCouples cc;
+			cc.contractCouples();
+		}
+		else
+			break;
+	}
+
+	CStdioFile file( filespec, CFile::modeRead);   // input csv fájl
+	int fileLength = (int)file.GetLength();
+
+	CStringArray A;
+	int n;
+	int cnt = 0;
+	m_numOfGroups = 0;
+	
+	vCouples.clear();
+	CProgressWnd wndP( NULL, str ); 
+	wndP.GoModal();
+	wndP.SetRange( 0, fileLength );
+	wndP.SetPos(0 );
+	while( file.ReadString( cLine ) )
+	{
+		++cnt;
+		n = wordList( &A, cLine, '\t', true );
+		if( n != L_COLUMNSCOUNT )
+		{
+			str.Format( L"Az %d. sorban az elemek száma %d.\n%d kellen lenni.", cnt, n, L_COLUMNSCOUNT );
+			AfxMessageBox( str );
+			break;
+			return false;
+		}
+
+		if( A[1].IsEmpty() ) ++m_numOfGroups;		// azonos snevû emberek száma
+
+		for( UINT i = 0; i < A.GetSize(); ++i )
+		{
+			push( A[i] );
+		}
+		wndP.SetPos( file.GetPosition() );
+		wndP.PeekAndPump();
+		if (wndP.Cancelled()) break;
+	}
+	wndP.DestroyWindow();
+	file.Close();
+	m_ListCtrl.SetItemCountEx( vCouples.size() + 1  );
+	m_ListCtrl.AttachDataset( &vCouples );
+
+	GetDlgItem( IDC_CAPTION )->SetWindowTextW( filespec );
+	ShowWindow( SW_MAXIMIZE );
+	return true;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedCouples::OnFilterAll()
+{
+	if( UNITED )
+		str = L"Azonos nevû házastársak, akik között összevonások történtek";
+	else
+		str.Format( L"Azonos nevû házaspárok, akik között összevonások történtek (%d azonos nevû házaspár )", m_numOfGroups );
+	SetWindowTextW( str );
+	vFiltered.clear();
+	m_ListCtrl.SetItemCountEx( vCouples.size() + 1  );
+	m_ListCtrl.AttachDataset( &vCouples );
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedCouples::OnFilter1()
+{
+	int loop;
+	vFiltered.clear();
+	for( UINT i = 0; i < vCouples.size()- m_columnsCount+1; i += m_columnsCount )
+	{
+		loop = _wtoi( vCouples.at(i) );
+		if( loop == 1 )
+		{
+			for( UINT j = 0; j < m_columnsCount; ++j ) // ix-1 a cnt-re mutat
+			{
+				vFiltered.push_back( vCouples.at( i + j  ) );
+			}
+		}
+	}
+	if( UNITED )
+		str = L"Azonos nevû házastársdak, akik között összevonások történtek az 1. ciklusban";
+	else
+		str = L"Azonos nevû házaspárok, akik nem vonhatók össze az 1. ciklusban";
+	SetWindowTextW( str );
+	m_ListCtrl.SetItemCountEx( vFiltered.size() + 1  );
+	m_ListCtrl.AttachDataset( &vFiltered );
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedCouples::OnFilter2()
+{
+	int loop;
+	vFiltered.clear();
+	for( UINT i = 0; i < vCouples.size()- m_columnsCount+1; i += m_columnsCount )
+	{
+		loop = _wtoi( vCouples.at(i) );
+		if( loop == 2 )
+		{
+			for( UINT j = 0; j < m_columnsCount; ++j ) // ix-1 a cnt-re mutat
+			{
+				vFiltered.push_back( vCouples.at( i + j  ) );
+			}
+		}
+	}
+	if( UNITED )
+		str = L"Azonos nevû házastársdak, akik között összevonások történtek a 2. ciklusban";
+	else
+		str = L"Azonos nevû házaspárok, akik nem vonhatók össze a 2. ciklusban";
+	SetWindowTextW( str );
+	m_ListCtrl.SetItemCountEx( vFiltered.size() + 1  );
+	m_ListCtrl.AttachDataset( &vFiltered );	
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedCouples::OnClickedKeress()
+{
+	keress( 0 );
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedCouples::OnClickedNext()
 {
-
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	if( nItem == -0 )
+	{
+		AfxMessageBox( L"Nincs kijelölve sor!" );
+		return;
+	}
+	keress( nItem + 1 );
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedCouples::keress( int start )
+{
+	CString	search;
+	GetDlgItem( IDC_SEARCH )->GetWindowText( search );
+	if( search.IsEmpty() )
+	{
+		AfxMessageBox( L"Meg kell adni a keresendõ stringet!");
+		return;
+	}
+
+	CProgressWnd wndProgress(NULL, L"Folyik a keresés.." ); 
+	wndProgress.GoModal();
+	wndProgress.SetRange(0, m_ListCtrl.GetItemCount() );
+	wndProgress.SetPos(0);
+	wndProgress.SetStep(1);
+
+
+
+	int		itemCnt	= m_ListCtrl.GetItemCount();
+	int		length	= search.GetLength();
+	int		nItem;
+	int		topIndex = m_ListCtrl.GetTopIndex();
+	CString	str;
+
+	theApp.unselectAll( &m_ListCtrl );
+
+	for( nItem = start; nItem < itemCnt-1; ++nItem )
+	{
+		str = m_ListCtrl.GetItemText( nItem, L_HUSBAND );
+		str = str.Left(length);						// az aktuális search string hosszával azonos hosszúság leválasztása
+		if( str == search )	break;
+		wndProgress.StepIt();
+		wndProgress.PeekAndPump();
+		if (wndProgress.Cancelled()) break;
+	}
+	wndProgress.DestroyWindow();
+
+	if( nItem < itemCnt-1 )			// megtalálta a keresett embert,. aki az nItem-1 sorban van
+	{
+		m_ListCtrl.EnsureVisible( nItem, FALSE );
+
+		if( nItem > topIndex )   // lefele megy, fel kell hozni a tábla tetejére a megtalált sort
+		{
+			int countPP = m_ListCtrl.GetCountPerPage();
+			int nItemEV	= nItem - 1 + countPP;			// alaphelyzet: a kijelölt sor az ablak tetején
+
+			if( nItemEV > itemCnt - 1 )					// már nem lehet az ablak tetejére hozni, mert nincs annyi adat
+				nItemEV = itemCnt - 1;
+
+			m_ListCtrl.EnsureVisible( nItemEV, FALSE );
+		}
+		m_ListCtrl.SetItemState( nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED );
+		Invalidate( false );
+	}
+	else
+	{
+		str.Format( L"%s nevû embert nem találtam!", search );
+		AfxMessageBox( str );
+	}
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////44
+BOOL CContractedCouples::PreTranslateMessage(MSG* pMsg)
+{
+	int x=(int)pMsg->wParam;
+
+    if( pMsg->message==WM_KEYDOWN)
+    {
+		switch( x )
+		{
+		case VK_RETURN:
+			GetDlgItem( IDC_SEARCH )->GetWindowTextW( str );
+			if( str.GetLength() ) 
+			OnClickedKeress();
+			break;
+		case VK_ESCAPE:
+			CDialogEx::OnCancel();
+		}
+	}
+	return CWnd::PreTranslateMessage(pMsg);
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+LRESULT CContractedCouples:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
+{
+	CPoint* point=(CPoint*) lParam;
+    CMenu	Menu;
+	CMenu*	pPopup;
+
+
+	if(Menu.LoadMenu( IDR_DROPDOWN_HTML_P ))
+    {
+		pPopup = Menu.GetSubMenu(0);
+		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
+		{
+			pPopup->EnableMenuItem(ID_HTML_SHOWS, MF_BYCOMMAND | MF_GRAYED);
+			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
+		}
+		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
+    }
+	return TRUE;
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedCouples::OnEdit2lines()
+{
+	theApp.editHtmlLines( &m_ListCtrl, L_LINENUMBERH );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedCouples::OnHtmlNotepad()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	CString lineNumber = m_ListCtrl.GetItemText( nItem,	L_LINENUMBERH );
+	if( !lineNumber.IsEmpty() ) 
+		theApp.editNotepad( lineNumber );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedCouples::OnEditNotepadParents()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	CString lineNumber = m_ListCtrl.GetItemText( nItem,	L_LINENUMBERH );
+	if( !lineNumber.IsEmpty() ) 
+		theApp.editNotepad( lineNumber );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedCouples::OnHtmlShows()
+{
+	POSITION	pos = m_ListCtrl.GetFirstSelectedItemPosition();
+	int			nItem;
+	std::vector<CString> vLines;
+
+	int cnt = 0;
+	CString name(L"");
+
+	while( pos )
+	{
+		nItem = m_ListCtrl.GetNextSelectedItem( pos );
+		vLines.push_back( m_ListCtrl.GetItemText( nItem, L_LINENUMBERH ) );
+		if( name.Compare( m_ListCtrl.GetItemText( nItem, L_HUSBAND ) ) )
+		{
+			name = m_ListCtrl.GetItemText( nItem, L_HUSBAND );
+			++cnt;
+		}
+	
+
+	}
+
+	CHtmlLines dlg;
+
+	if( cnt == 1 )
+		dlg.child = name;
+	else
+		dlg.child = L"";
+
+	dlg._what = 1;
+	dlg.vLines = &vLines;
+
+	dlg.DoModal();
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedCouples::OnHtmlPeoplefather()
+{
+	int nItem		= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	CString rowid	= m_ListCtrl.GetItemText( nItem, L_ROWIDH );
+	CHtmlLines dlg;
+	dlg.m_rowid = rowid;
+	dlg.DoModal();
+}

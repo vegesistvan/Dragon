@@ -710,7 +710,6 @@ void CDragonApp::OnMoreMarriages()
 void CDragonApp::OnShowSamePeople()
 {
 	CContractedPeople dlg;
-	dlg.m_filter = L"code1=1 AND code2=0";
 	dlg.m_contracted = true;
 	dlg.DoModal();
 }
@@ -718,7 +717,6 @@ void CDragonApp::OnShowSamePeople()
 void CDragonApp::OnShowDifferentPeople()
 {
 	CContractedPeople dlg;
-	dlg.m_filter = L"code1=2 AND code2=0";
 	dlg.m_contracted = false;
 	dlg.DoModal();
 }

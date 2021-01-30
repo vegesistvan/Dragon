@@ -99,7 +99,7 @@ BOOL CContractedPeople::OnInitDialog()
 	colorNext.SetTextColor( theApp.m_colorClick );
 	createColumns();
 
-	 m_command.Format( L"SELECT filespec FROM contracted WHERE %s", m_filter );
+	 m_command.Format( L"SELECT filespec FROM files WHERE type=%d AND subtype=%d", CONTRACTED_PEOPLE, UNITEDTXT );
 	 if( !theApp.query( m_command ) ) return false;
 	 m_fileSpec = theApp.m_recordset->GetFieldString( 0 );
 
@@ -304,7 +304,7 @@ void CContractedPeople::createColumns()
 	m_ListCtrl.KeepSortOrder(TRUE);
 	m_ListCtrl.SetExtendedStyle(m_ListCtrl.GetExtendedStyle()| LVS_EX_GRIDLINES );
 	
-	m_ListCtrl.InsertColumn( S_CNT,				L"cnt",			LVCFMT_RIGHT,	 20,-1,COL_HIDDEN);
+	m_ListCtrl.InsertColumn( S_LOOP,			L"loop",		LVCFMT_RIGHT,	 30,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( S_LOOP,			L"loop",		LVCFMT_RIGHT,	 30,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( S_GROUP,			L"gr",			LVCFMT_RIGHT,	 30,-1,COL_HIDDEN);
 	m_ListCtrl.InsertColumn( S_MATCH,			L"m#",			LVCFMT_RIGHT,	 30,-1,COL_NUM);

@@ -20,6 +20,7 @@
 
 
 
+
 #define	TOSCREEN FALSE
 #define	FROMSCREEN TRUE
 
@@ -43,6 +44,18 @@
 #else 
 #define PLATFORM L"32 bites"
 #endif
+
+enum
+{
+	CONTRACTED_COUPLES = 0,
+	CONTRACTED_PEOPLE,
+};
+enum
+{
+	UNITEDTXT = 0,
+	DIFFERENTTXT,
+};
+
 
 bool openFileSpec( FILE** ff, CString fileSpec, CString mode );
 CString getTimeTag();

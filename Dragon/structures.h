@@ -173,7 +173,8 @@ typedef struct
 typedef struct
 {
 	UINT	cnt;
-	UINT	group;				// az azonos nevû házastársak között több összevonható csoport lehet. Ez jelzi, hogy melyik csoportba tartozik
+	UINT	group;
+	UINT	subGroup;			// az azonos nevû házastársak között több összevonható csoport lehet. Ez jelzi, hogy melyik csoportba tartozik
 								// 0 - nem tartozik csoportba, egyedi adatai vannak
 								// 1-n az 1-n csoportba tartozik
 	int		status1;			// férj: 1 = megtartandó, -1 törlendõ 

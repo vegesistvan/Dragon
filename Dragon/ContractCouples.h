@@ -26,6 +26,7 @@ protected:
 	CString _wife;
 	int		m_loop;
 	int		m_loopMax;
+	int		m_group;
 
 	CString str;
 	CString m_command;
@@ -83,7 +84,7 @@ protected:
 	void contractFull( int loop );
 	void deleteMarriages( int loop );
 	void printYellow( UINT i );
-	void emptyLine( FILE* fl );
+	void emptyLine( FILE* fl, int group );
 	bool identical( UINT i1, UINT i2 );
 
 	void ReplaceSpouse1( CString rowid, CString rowidBy, CString name, int source );

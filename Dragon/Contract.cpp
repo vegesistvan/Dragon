@@ -232,12 +232,12 @@ bool CContract::contractPeople()
 	}
 	wndP.DestroyWindow();
 	
-	if( tableLines.size() )
+//	if( tableLines.size() )
 	{
-		m_command.Format( L"INSERT INTO contracted ( code1, code2, filespec) VALUES ( 1, 0, '%s')", m_fileSpecTextU );
+		m_command.Format( L"INSERT INTO files( type, subtype, filespec) VALUES ( %d, %d,'%s')", CONTRACTED_PEOPLE, UNITEDTXT, m_fileSpecTextU );
 		if( !theApp.execute( m_command ) ) return false;
 
-		m_command.Format( L"INSERT INTO contracted ( code1, code2, filespec) VALUES ( 2, 0, '%s')", m_fileSpecTextD );
+		m_command.Format( L"INSERT INTO files( type, subtype, filespec) VALUES ( %d, %d,'%s')", CONTRACTED_PEOPLE, DIFFERENTTXT, m_fileSpecTextD );
 		if( !theApp.execute( m_command ) ) return false;
 	}
 
@@ -247,7 +247,6 @@ bool CContract::contractPeople()
 	fclose( textD );
 
 	CContractedPeople dlg;
-	dlg.m_filter = L"code1=1 AND code2=0";
 	dlg.m_contracted = true;
 	dlg.DoModal();
 	return true;

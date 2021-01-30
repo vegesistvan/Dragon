@@ -27,10 +27,13 @@ enum
 enum
 {
 	L_LOOP = 0,
+	L_GROUP,
+	L_SUBGROUP,
 	L_COLORCODE,
 	L_MARRIAGE_ID,
 	L_WEDDING,
-	L_GROUP,
+
+
 	L_STATUSH,
 	L_LINENUMBERH,
 	L_GENERATIONH, 
@@ -42,13 +45,14 @@ enum
 	L_DEATHH,
 	L_FATHERH,
 	L_MOTHERH,
+
 	L_STATUSW,
 	L_LINENUMBERW,
 	L_GENERATIONW, 
 	L_SOURCEW,
 	L_UNITEDW,
 	L_ROWIDW,
-	L_WIFW,
+	L_WIFE,
 	L_BIRTHW,
 	L_DEATHW,
 	L_FATHERW,
@@ -83,9 +87,9 @@ bool sortBySpouses(const COUPLES &v1, const COUPLES &v2)
 // return FALS cseréljen
 bool sortByGroupStatus(const COUPLES &v1, const COUPLES &v2) 
 { 
-	if( v1.group > v2.group )
+	if( v1.subGroup > v2.subGroup )
 		return false;
-	if( v1.group == v2.group )
+	if( v1.subGroup == v2.subGroup )
 	{
 		if( v1.status1 < v2.status1 )
 			return true;
@@ -97,7 +101,7 @@ bool sortByGroupStatus(const COUPLES &v1, const COUPLES &v2)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool sortByGroup(const COUPLES &v1, const COUPLES &v2) 
 {
-	return( v1.group < v2.group );
+	return( v1.subGroup < v2.subGroup );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool sortByMarriage(const COUPLES &v1, const COUPLES &v2) 
@@ -207,8 +211,8 @@ L"rowid", L"feleség", L"születés", L"halál", L"apja", L"anyja" \
 //	_wife		= L"N N";			// feleség neve
 	m_contract	= false;		
 	m_contract	= true;			// végrejatsa-e az összevonásokat	
-	m_loopMax		= 3;			// max loop
-	m_azonos	= 1;			// legalább ennyi egyezés ellemtmondás nélkül
+	m_loopMax	= 3;			// max loop
+	m_azonos	= 0;			// legalább ennyi egyezés ellemtmondás nélkül
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CContractCouples::~CContractCouples()
@@ -304,18 +308,18 @@ void CContractCouples::contractCouples()
 #endif
 			theApp.execute( L"VACUUM");
 		}
+		fflush( textU );
+		fflush( textD );
 	}
 	wndP.DestroyWindow();	
-	if( vContract.size() )
-		m_command.Format( L"INSERT INTO contracted ( code1, code2, filespec) VALUES ( 1, 1, '%s')", m_fileSpecTextU );
-	else
-		m_command.Format( L"INSERT INTO contracted ( code1, code2, filespec) VALUES ( 2, 1, '%s')", m_fileSpecTextD );
-
-	if( !theApp.execute( m_command ) ) return;
-
-
 	fclose( textU );
 	fclose( textD );
+
+	m_command.Format( L"INSERT INTO files (type, subtype, filespec) VALUES( %d, %d, '%s')", CONTRACTED_COUPLES, UNITEDTXT,m_fileSpecTextU );
+	if( !theApp.execute( m_command ) ) return;
+	
+	m_command.Format( L"INSERT INTO files (type, subtype, filespec) VALUES( %d, %d, '%s')", CONTRACTED_COUPLES, DIFFERENTTXT, m_fileSpecTextD );
+	if( !theApp.execute( m_command ) ) return;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractCouples::core( int loop )
@@ -330,7 +334,7 @@ void CContractCouples::core( int loop )
 
 	int		z;
 
-	str.Format( L"Azonos nevû emberek házasságainak vizsgálata és összevonása - %d. iteráció", loop );
+	str.Format( L"Azonos nevû házastársak vizsgálata és összevonása - %d. iteráció", loop );
 	wndP.m_strTitle = str;
 
 #ifndef _DEBUG
@@ -349,7 +353,7 @@ void CContractCouples::core( int loop )
 	vCouples.clear();
 	for( int i = 0; i < m_recordset->RecordsCount(); ++i, m_recordset->MoveNext() )
 	{
-		vcouples.group		= 0;
+		vcouples.subGroup	= 0;
 		vcouples.status1	= 0;
 		vcouples.status2	= 0;
 		
@@ -465,6 +469,7 @@ void CContractCouples::core( int loop )
 		
 		vcouples.generationS2.Trim();
 		vcouples.cnt = i;
+		vcouples.subGroup	= 0;
 		vCouples.push_back( vcouples );
 cont:	wndP.StepIt();
 		wndP.PeekAndPump();
@@ -499,7 +504,7 @@ cont:	wndP.StepIt();
 	wndP.SetStep(1 );
 
 	vSame.clear();
-
+	m_group = 1;
 	// leszedi a vSame vektorba az azaonos nevû házaspárokat és azt feldolgozza
 	for( ic = 0; ic < vCouples.size(); ++ic )
 	{
@@ -513,9 +518,11 @@ cont:	wndP.StepIt();
 		{
 			if( first )			// a csoport elsõ házaspárjának mentése
 			{
+				vCouples.at(ic-1).group = m_group;
 				vSame.push_back( vCouples.at(ic-1) );
 				first = false;
 			}
+			vCouples.at(ic).group = m_group;
 			vSame.push_back( vCouples.at(ic) );
 		}
 		else
@@ -523,12 +530,12 @@ cont:	wndP.StepIt();
 			if( vSame.size() )
 			{
 				processSame();
+				++m_group;
 				vSame.clear();
 			}
 			first = true;
 		}
 		namePrev = name;
-
 cont2:	wndP.StepIt();
 		wndP.PeekAndPump();
 		if (wndP.Cancelled()) break;
@@ -536,6 +543,7 @@ cont2:	wndP.StepIt();
 	if( vSame.size() )
 	{
 		processSame();
+		++m_group;
 		vSame.clear();
 	}
 
@@ -561,35 +569,32 @@ void CContractCouples::processSame()
 	for( UINT i1 = 0; i1 < vSame.size(); ++i1 )
 	{
 		rowid1 = vSame.at(i1).rowidS1;
-		
 		if( db ) 
 		{
 			resetRef();
 			++group;
 		}
 		db = 0;
-		if( vSame.at(i1).group == 0 )		// az i1. házaspárt még nem rendelték hozzá egyik csoporthoz sem
+		if( vSame.at(i1).subGroup == 0 )		// az i1. házaspárt még nem rendelték hozzá egyik csoporthoz sem
 		{
 			for( UINT i2 = 0; i2 < vSame.size(); ++i2 )
 			{
 				rowid2 = vSame.at(i2).rowidS1;
-				if( i1 != i2 && vSame.at(i2).group == 0 )	// természetesen csak különbözõ házaspárokat vizsgál, amelyeket még nem redneltek hozzá egyik csooprthoz sem
+				if( i1 != i2 && vSame.at(i2).subGroup == 0 )	// természetesen csak különbözõ házaspárokat vizsgál, amelyeket még nem redneltek hozzá egyik csooprthoz sem
 				{
 					if( identical( i1, i2 ) )
 					{
 						setRef( i1 );
 						setRef( i2 );
 
-						vSame.at( i1 ).group = group;
-						vSame.at( i2 ).group = group;
+						vSame.at( i1 ).subGroup = group;
+						vSame.at( i2 ).subGroup = group;
 						++db;
 					}
 				}
  			}
 		}
 	}
-
-
 
 	// a legalacsonyabb szerep kiválasztása csoportonként
 	// status1 = 1, a legalacsonyabb szerepre, ami megtartásra kerül
@@ -618,7 +623,7 @@ void CContractCouples::processSame()
 			str = vSame.at(j).spouse1;
 			if( str == L"Amadé István" )
 				z = 1;
-			if( vSame.at(j).group == i )
+			if( vSame.at(j).subGroup == i )
 			{
 				sourceS1 = _wtoi( vSame.at(j).sourceS1 );
 				if( sourceS1 < sourceMin1 )	ix1 = j;
@@ -631,7 +636,7 @@ void CContractCouples::processSame()
 		}
 		for( UINT j = 0; j < vSame.size(); ++j )
 		{
-			if( vSame.at(j).group == i )
+			if( vSame.at(j).subGroup == i )
 			{
 				if( j == ix1 ) vSame.at(j).status1 = 1;
 				else vSame.at(j).status1 = -1;
@@ -663,7 +668,7 @@ void CContractCouples::resetRef()
 	r.father_idS2.Empty();
 	r.generationS1.Empty();
 	r.generationS2.Empty();
-	r.group = 0;
+	r.subGroup = 0;
 	r.lineS1.Empty();
 	r.lineS2.Empty();
 	r.motherS1.Empty();
@@ -692,15 +697,15 @@ void CContractCouples::setRef( int i )
 
 	if( r.birthS1.IsEmpty() && !a.birthS1.IsEmpty() )				r.birthS1 = a.birthS1;
 	if( r.deathS1.IsEmpty() && !a.deathS1.IsEmpty() )				r.deathS1 = a.deathS1;
-	if( r.fatherS1.IsEmpty() && !a.fatherS1.IsEmpty() )				r.fatherS1 = a.fatherS1;
-	if( r.father_idS1.IsEmpty() && !a.father_idS1.IsEmpty() )				r.father_idS1 = a.father_idS1;
-	if( r.motherS1.IsEmpty() && !a.motherS1.IsEmpty() )				r.motherS1 = a.motherS1;
-	if( r.mother_idS1.IsEmpty() && !a.mother_idS1.IsEmpty() )		r.mother_idS1 = a.mother_idS1;
+
+	if( r.fatherS1.IsEmpty() && !a.fatherS1.IsEmpty() )				r.fatherS1		= a.fatherS1;
+	if( r.father_idS1.IsEmpty() && !a.father_idS1.IsEmpty() )		r.father_idS1	= a.father_idS1;
+	if( r.motherS1.IsEmpty() && !a.motherS1.IsEmpty() )				r.motherS1		= a.motherS1;
+	if( r.mother_idS1.IsEmpty() && !a.mother_idS1.IsEmpty() )		r.mother_idS1	= a.mother_idS1;
 
 	if( r.birthS2.IsEmpty() && !a.birthS2.IsEmpty() )				r.birthS2 = a.birthS2;
 	if( r.deathS2.IsEmpty() && !a.deathS2.IsEmpty() )				r.deathS2 = a.deathS2;
-	if( r.fatherS2.IsEmpty() && !a.fatherS2.IsEmpty() )				
-		r.fatherS2 = a.fatherS2;
+	if( r.fatherS2.IsEmpty() && !a.fatherS2.IsEmpty() )				r.fatherS2 = a.fatherS2;
 	if( r.motherS2.IsEmpty() && !a.motherS2.IsEmpty() )				r.motherS2 = a.motherS2;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -776,7 +781,7 @@ void CContractCouples::contract()
 		// megtartandó férj bejegyzés
 		for( UINT j = 0; j < vSame.size(); ++j )
 		{
-			if( vSame.at(j).group == group && vSame.at(j).status1 == 1 )
+			if( vSame.at(j).subGroup == group && vSame.at(j).status1 == 1 )
 			{
 				rowidBy = vSame.at(j).rowidS1;
 				rowidM  = vSame.at(j).rowidM;
@@ -791,7 +796,7 @@ void CContractCouples::contract()
 		// törlendõ férj bejegyzés
 		for( UINT j = 0; j < vSame.size(); ++j )
 		{
-			if( vSame.at(j).group == group )
+			if( vSame.at(j).subGroup == group )
 			{
 				if( vSame.at(j).status1 == -1 )
 				{
@@ -814,7 +819,7 @@ void CContractCouples::contract()
 		// negtartandó feleség bejegyzés
 		for( UINT j = 0; j < vSame.size(); ++j )
 		{
-			if( vSame.at(j).group == group && vSame.at(j).status2 == 1 )  // miért nem lép ki, ha megvan?
+			if( vSame.at(j).subGroup == group && vSame.at(j).status2 == 1 )  // miért nem lép ki, ha megvan?
 			{
 				rowidBy = vSame.at(j).rowidS2;
 				rowidM  = vSame.at(j).rowidM;
@@ -828,7 +833,7 @@ void CContractCouples::contract()
 		// törlendõ feleség bejegyzés
 		for( UINT j = 0; j < vSame.size(); ++j )
 		{
-			if( vSame.at(j).group == group )
+			if( vSame.at(j).subGroup == group )
 			{
 				if( vSame.at(j).status2 == -1 )
 				{
@@ -961,12 +966,13 @@ void CContractCouples::deleteMarriages( int loop )
 void CContractCouples::listDiff()
 {
 	bool first;
-	for( UINT j = 0; j <= m_numOfGroups; ++j )
+	UINT j;
+	for( j = 0; j <= m_numOfGroups; ++j )
 	{
 		first = true;
 		for( UINT i = 0; i < vSame.size();++i )
 		{
-			if( vSame.at(i).group == j )
+			if( vSame.at(i).subGroup == j )
 			{
 				if( first )
 				{
@@ -978,7 +984,7 @@ void CContractCouples::listDiff()
 		}
 	}
 	fwprintf( fD, L"\n" );
-	emptyLine( textD );
+	emptyLine( textD, vSame.at(j).group );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Kiírja az i2 rekordot, az i1 rekordhoz képesti eltéréseket sárga háttárrel
@@ -987,7 +993,7 @@ void CContractCouples::printYellow( UINT i )
 	COUPLES a = vSame.at( i );
 	int col = 0;
 
-	str.Format( L"%6s %12s %2d %2d %8s ", a.rowidM, a.dateM, a.group, a.status1, a.lineS1 );
+	str.Format( L"%6s %12s %2d %2d %8s ", a.rowidM, a.dateM, a.subGroup, a.status1, a.lineS1 );
 	fwprintf( fD, L"%s", str );
 
 	if( !r.generationS1.IsEmpty() && !a.generationS1.IsEmpty() && r.generationS1 != a.generationS1 )
@@ -1095,7 +1101,7 @@ void CContractCouples::printYellow( UINT i )
 // kiírás a teb fájlba
 
 // házasság
-		str.Format( L"%d\t%d\t%s\t%s\t%d\t", m_loop,col, a.rowidM, a.dateM, a.group );
+		str.Format( L"%d\t%d\t%d\t%d\t%s\t%s\t", m_loop, a.group, a.subGroup, col, a.rowidM, a.dateM );
 		fwprintf( textD, L"%s", str );
 //férj
 		str.Format( L"\
@@ -1123,6 +1129,7 @@ void CContractCouples::listUnited()
 	COUPLES a;
 	std::sort( vSame.begin(), vSame.end(), sortByGroupStatus );
 
+
 	for( UINT i = 0; i < vSame.size();++i )
 	{
 		a = vSame.at(i);
@@ -1131,12 +1138,12 @@ void CContractCouples::listUnited()
 %6s %12s %2d \
 %2d %8s %1s %1s %2s \
 %8s %-30s %-13s %-13s %-30s %-30s",\
-a.rowidM, a.dateM, a.group, \
+a.rowidM, a.dateM, m_group, \
 a.status1, a.lineS1, a.generationS1, a.sourceS1, a.unitedS1,\
 a.rowidS1, a.spouse1, a.birthS1, a.deathS1, a.fatherS1, a.motherS1 );
 		if( a.status1 != 0 && a.status1 != -1 )
 		{
-			index = a.group;
+			index = a.subGroup;
 			if( index > 5 ) index = 0;
 			if( index == 2 )
 				z = 1;
@@ -1155,7 +1162,7 @@ a.status2, a.lineS2, a.generationS2, a.sourceS2, a.unitedS2, \
 a.rowidS2, a.spouse2, a.birthS2, a.deathS2, a.fatherS2, a.motherS2 );
 		if( a.status2 != 0 && a.status2 != -1 )
 		{
-			index = a.group;
+			index = a.subGroup;
 			if( index > 5 ) index = 0;
 			color = m_colors.GetAt( index );
 			fwprintf( fU, L"<span style=\"background:%s\">%s</span>", color, str );
@@ -1168,17 +1175,14 @@ a.rowidS2, a.spouse2, a.birthS2, a.deathS2, a.fatherS2, a.motherS2 );
 		fwprintf( fU, L"\n");
 	}
 	fwprintf( fU, L"\n" );
-
-
-
-
+	
 	int col = 0;
 // kiírás tab fájlba
 	for( UINT i = 0; i < vSame.size();++i )
 	{
 		a = vSame.at(i);
 // házasság  a szín kódnak az elején kihagy egy oszlopot, amit csak a különbözõ házastársaknál használunk
-		str.Format( L"%d\t%d\t%s\t%s\t%d\t", m_loop,col,a.rowidM, a.dateM, a.group );
+		str.Format( L"%d\t%d\t%d\t%d\t%s\t%s\t", m_loop,a.group, a.subGroup, col,a.rowidM, a.dateM );
 		fwprintf( textU, L"%s", str );
 //férj
 		str.Format( L"\
@@ -1196,7 +1200,7 @@ a.status2, a.lineS2, a.generationS2, a.sourceS2, a.unitedS2, \
 a.rowidS2, a.spouse2, a.birthS2, a.deathS2, a.fatherS2, a.motherS2 );
 		fwprintf( textU, L"%s\n", str );
 	}
-	emptyLine( textU );
+	emptyLine( textU, a.group );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractCouples::openUnited()
@@ -1291,11 +1295,13 @@ BOOL CContractCouples::query2( CString command )
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CContractCouples::emptyLine( FILE* fl )
+void CContractCouples::emptyLine( FILE* fl, int group )
 {
 	UINT i;
-	fwprintf( fl, L"%d\t", m_loop );
-	for( i = 0; i < L_COLUMNSCOUNT-1; i++ )  // eg yüres sor az azonos nevû emberek után
+	fwprintf( fl, L"%d\t%d", m_loop, group  );
+	for( i = 0; i < L_GROUP; i++ )  // eg yüres sor az azonos nevû emberek után
+		fwprintf( fl, L"\t" );
+	for( ; i < L_COLUMNSCOUNT-1; i++ )  // eg yüres sor az azonos nevû emberek után
 		fwprintf( fl, L"\t" );
 	fwprintf( fl, L"\n" );
 }

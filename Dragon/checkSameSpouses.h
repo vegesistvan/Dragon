@@ -96,11 +96,11 @@ protected:
 
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
-	void CCheckSameSpouses::createColumns();
-	void CCheckSameSpouses::OnHtmlEdit();
+	void createColumns();
+	void OnHtmlEdit();
 	
-	void CCheckSameSpouses::OnHtmlShows();
-	void CCheckSameSpouses::OnHtmlPeoplefather();
+	void OnHtmlShows();
+	void OnHtmlPeoplefather();
 	
 
 	void sameSpouses();
