@@ -25,24 +25,25 @@ protected:
 	void createColumns();
 	void push( CString item );
 	void keress( int start );
-
+	CMenu menu;
 	CListCtrlEx		m_ListCtrl;
 	CEdit			m_search;
 	CColorStatic	colorKeress;
 	CColorStatic	colorNext;
-	int				m_columnsCount;
-
+	int		m_numOfGroups;
 	CString m_fileSpec;
 	CString str;
 	CString cLine;
 	CString m_command;
+	bool UNITED;
 
-
-	std::vector<TCHAR*> vTablePeople; 
+	std::vector<TCHAR*> vPeople; 
 	std::vector<TCHAR*> vFiltered; 
 
 //	SAMENAMES r;				// referencia adatok az összehasonlításnál
 	
+	bool inputFile( int subType );
+
 	void OnEdit2lines();
 	BOOL PreTranslateMessage(MSG* pMsg);
 	DECLARE_MESSAGE_MAP()
@@ -64,6 +65,8 @@ public:
 	afx_msg void OnHtmlPeoplefather();
 	afx_msg void OnHtmlNotepad();
 	afx_msg void OnEditNotepadParents();
+	afx_msg void OnInputDifferent();
+	afx_msg void OnInputUnited();
 
 //	afx_msg void OnRdblclkList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult);

@@ -4,10 +4,11 @@
 #include "stdafx.h"
 #include "Dragon.h"
 #include "ContractedPeople.h"
+#include "ContractPeople.h"
 #include "afxdialogex.h"
 #include "utilities.h"
 #include "ProgressWnd.h"
-#include "SamePeopleInfo.h"
+#include "ContractInfo.h"
 #include "html_Lines.h"
 #include "Relations.h"
 //#include "FilterLoop.h"
@@ -42,7 +43,7 @@ enum
 	S_ROWIDS,
 	S_SPOUSES,
 	S_LINEF,
-	S_LINENUMBERMF,
+	S_COLUMNSCOUNT,
 };
 IMPLEMENT_DYNAMIC(CContractedPeople, CDialogEx)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -78,13 +79,13 @@ BEGIN_MESSAGE_MAP(CContractedPeople, CDialogEx)
 
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
 	ON_COMMAND(ID_EDIT2LINES, &CContractedPeople::OnEdit2lines)
-//	ON_COMMAND(ID_HTML_EDIT, &CContractedPeople::OnHtmlEdit)
 	ON_COMMAND(ID_HTML_SHOWS, &CContractedPeople::OnHtmlShows)
 	ON_COMMAND(ID_HTML_PEOPLEFATHER, &CContractedPeople::OnHtmlPeoplefather)
 	ON_COMMAND(ID_EDIT_NOTEPAD_PARENTS, &CContractedPeople::OnEditNotepadParents)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CContractedPeople::OnHtmlNotepad)
-//	ON_NOTIFY(NM_RDBLCLK, IDC_LIST, &CContractedPeople::OnRdblclkList)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CContractedPeople::OnDblclkList)
+	ON_COMMAND(ID_INPUT_UNITED, &CContractedPeople::OnInputUnited)
+	ON_COMMAND(ID_INPUT_DIFFERENT, &CContractedPeople::OnInputDifferent)
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CContractedPeople::OnInitDialog()
@@ -94,46 +95,73 @@ BOOL CContractedPeople::OnInitDialog()
 	EASYSIZE_ADD( IDC_CAPTION,	ES_BORDER,	ES_BORDER,	ES_BORDER,		ES_KEEPSIZE,	0 );
 	EASYSIZE_INIT();
 
+	menu.LoadMenu( IDR_CONTRACTED_PEOPLE );
+	SetMenu(&menu);
 	
 	colorKeress.SetTextColor( theApp.m_colorClick );
 	colorNext.SetTextColor( theApp.m_colorClick );
+
 	createColumns();
+	OnInputUnited();
 
-	 m_command.Format( L"SELECT filespec FROM files WHERE type=%d AND subtype=%d", CONTRACTED_PEOPLE, UNITEDTXT );
-	 if( !theApp.query( m_command ) ) return false;
-	 m_fileSpec = theApp.m_recordset->GetFieldString( 0 );
+	GetDlgItem( IDC_CAPTION )->SetWindowTextW( m_fileSpec );
+//	SetWindowPos(&wndTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+	return true;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedPeople::OnInputDifferent()
+{
+	str.Format( L"Azonos nevû emberek bejegyzései, akik nem vonhatóak össze" );
+	if( !inputFile( DIFFERENTTXT ) )return;
 
-	 if( m_fileSpec.IsEmpty() )
-	 {
-		 AfxMessageBox( L"Elõször el kel végezni az összevonásokat!" );
-		 CDialog::OnOK();
-		 return false;
-	 }
+	UNITED = false;
+	menu.EnableMenuItem( ID_INPUT_UNITED, MF_BYCOMMAND | MF_ENABLED);
+	menu.EnableMenuItem( ID_INPUT_DIFFERENT, MF_BYCOMMAND | MF_GRAYED);
 
-	 if( _waccess( m_fileSpec, 0 ) )
-	 {
-		 str.Format( L"%s\nfájl nem létezik", m_fileSpec );
-		 AfxMessageBox( str );
-		 CDialog::OnOK();
-		 return false;
-	 }
+	SetWindowTextW( str );
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedPeople::OnInputUnited()
+{
+	str.Format( L"Azonos nevû emberek bejegyzései, amik részben összevonásra kerületk"  );
+	if( !inputFile( UNITEDTXT ) )return;
 
-	 CStdioFile file( m_fileSpec, CFile::modeRead);   // input csv fájl
-	 int fileLength = (int)file.GetLength();
+	UNITED = true;
+	menu.EnableMenuItem( ID_INPUT_UNITED, MF_BYCOMMAND | MF_GRAYED);
+	menu.EnableMenuItem( ID_INPUT_DIFFERENT, MF_BYCOMMAND | MF_ENABLED);
+
+	SetWindowTextW( str );
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bool CContractedPeople::inputFile( int subType )
+{
+	CString filespec;
+
+	// Ha nincs a "files" táblában a keresett fájl, akkor elõször összevonást végez
+	while( true )
+	{
+		m_command.Format( L"SELECT filespec FROM files WHERE type=%d AND subtype=%d", CONTRACTED_PEOPLE, subType );
+		if( !theApp.query( m_command ) );
+		filespec = theApp.m_recordset->GetFieldString( 0 );
+		if( filespec.IsEmpty() || _waccess( filespec, 0 ) )
+		{
+			CContractPeople cc;
+			cc.contractPeople();
+		}
+		else
+			break;
+	}
+
+	CStdioFile file( filespec, CFile::modeRead);   // input csv fájl
+	int fileLength = (int)file.GetLength();
 
 	CStringArray A;
-	int		n;
-	int		cnt = 0;
-	int		items = 0;
-	int		pos;
-	int		loop;
-
-	vTablePeople.clear();
+	int n;
+	int cnt = 0;
+	m_numOfGroups = 0;
 	
-	if( m_contracted )
-		str = L"Összevont emberek táblázatának elkészítése...";
-	else
-		str = L"A nem összevonható emberek táblázatának elkészítése...";
+	vPeople.clear();
 	CProgressWnd wndP( NULL, str ); 
 	wndP.GoModal();
 	wndP.SetRange( 0, fileLength );
@@ -142,18 +170,17 @@ BOOL CContractedPeople::OnInitDialog()
 	{
 		++cnt;
 		n = wordList( &A, cLine, '\t', true );
-		if( n != m_columnsCount )
+		if( n != S_COLUMNSCOUNT )
 		{
-			str.Format( L"Az %d. sorban az elemek száma %d.\n%d kellen lenni.", cnt, n, m_columnsCount );
+			str.Format( L"Az %d. sorban az elemek száma %d.\n%d kellen lenni.", cnt, n, S_COLUMNSCOUNT );
 			AfxMessageBox( str );
 			break;
 			return false;
 		}
-		if( A[0].IsEmpty() ) ++items;		// azonoi snevû emberek száma
 
-		str.Format( L"%d", cnt );
-		push( str );
-		for( UINT i = 1; i < A.GetSize(); ++i )
+		if( A[1].IsEmpty() ) ++m_numOfGroups;		// azonos snevû emberek száma
+
+		for( UINT i = 0; i < A.GetSize(); ++i )
 		{
 			push( A[i] );
 		}
@@ -163,16 +190,11 @@ BOOL CContractedPeople::OnInitDialog()
 	}
 	wndP.DestroyWindow();
 	file.Close();
-	m_ListCtrl.SetItemCountEx( vTablePeople.size() + 1  );
-	m_ListCtrl.AttachDataset( &vTablePeople );
+	m_ListCtrl.SetItemCountEx( vPeople.size() + 1  );
+	m_ListCtrl.AttachDataset( &vPeople );
 
-	if( m_contracted )
-		str.Format( L"Azonos nevû emberek, akik között összevonások történtek (%d azonos nevû ember )", items );
-	else
-		str = L"A nem összevonható azonos nevû emberek";
-	SetWindowTextW( str );
-	GetDlgItem( IDC_CAPTION )->SetWindowTextW( m_fileSpec );
-	SetWindowPos(&wndTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+	GetDlgItem( IDC_CAPTION )->SetWindowTextW( filespec );
+	ShowWindow( SW_MAXIMIZE );
 	return true;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -184,7 +206,7 @@ void CContractedPeople::push( CString item )
 	tLen	= item.GetLength()+1;
 	sT		= new TCHAR[tLen];
 	_tcscpy_s( sT, tLen, item.GetBuffer() );
-	vTablePeople.push_back( sT );
+	vPeople.push_back( sT );
 
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -200,8 +222,6 @@ void CContractedPeople::OnSizing(UINT fwSide, LPRECT pRect)
 	EASYSIZE_MINSIZE(430,314,fwSide,pRect); 
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////44
 BOOL CContractedPeople::PreTranslateMessage(MSG* pMsg)
 {
 	int x=(int)pMsg->wParam;
@@ -306,7 +326,7 @@ void CContractedPeople::createColumns()
 	
 	m_ListCtrl.InsertColumn( S_LOOP,			L"loop",		LVCFMT_RIGHT,	 30,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( S_LOOP,			L"loop",		LVCFMT_RIGHT,	 30,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_GROUP,			L"gr",			LVCFMT_RIGHT,	 30,-1,COL_HIDDEN);
+	m_ListCtrl.InsertColumn( S_GROUP,			L"gr",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( S_MATCH,			L"m#",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( S_GROUP2,			L"gr2",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( S_STATUS,			L"st",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
@@ -330,8 +350,6 @@ void CContractedPeople::createColumns()
 	m_ListCtrl.InsertColumn( S_ROWIDS,			L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( S_SPOUSES,			L"házastársak",	LVCFMT_LEFT,	500,-1,COL_TEXT );
 	m_ListCtrl.InsertColumn( S_LINEF,			L"line#F",		LVCFMT_LEFT,	 60,-1,COL_HIDDEN );
-	m_ListCtrl.InsertColumn( S_LINENUMBERMF,	L"line#MF",		LVCFMT_RIGHT,	 60,-1,COL_NUM );
-	m_columnsCount	= m_ListCtrl.GetHeaderCtrl()->GetItemCount();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -356,10 +374,13 @@ void CContractedPeople::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
 		nItem	= pLVCD->nmcd.dwItemSpec;
 		nCol	= pLVCD->iSubItem;
 
-		if( vFiltered.size() )
-			pLVCD->clrTextBk = _wtoi( vFiltered.at( nItem*m_columnsCount + S_RGBCOLOR ) );
-		else
-			pLVCD->clrTextBk = _wtoi( vTablePeople.at( nItem*m_columnsCount + S_RGBCOLOR ) );
+		if( UNITED )
+		{
+			if( vFiltered.size() )
+				pLVCD->clrTextBk = _wtoi( vFiltered.at( nItem*S_COLUMNSCOUNT + S_RGBCOLOR ) );
+			else
+				pLVCD->clrTextBk = _wtoi( vPeople.at( nItem*S_COLUMNSCOUNT + S_RGBCOLOR ) );
+		}
 		*pResult = CDRF_DODEFAULT;
 		break;
 	}
@@ -367,7 +388,7 @@ void CContractedPeople::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedPeople::OnInfo()
 {
-	CSamePeopleInfo dlg;
+	CContractInfo dlg;
 	dlg.DoModal();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -379,22 +400,22 @@ void CContractedPeople::OnFilterAll()
 		str = L"Nem összevonható azonos nevû emberek";
 	SetWindowTextW( str );
 	vFiltered.clear();
-	m_ListCtrl.SetItemCountEx( vTablePeople.size() + 1  );
-	m_ListCtrl.AttachDataset( &vTablePeople );
+	m_ListCtrl.SetItemCountEx( vPeople.size() + 1  );
+	m_ListCtrl.AttachDataset( &vPeople );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedPeople::OnFilter1()
 {
 	int loop;
 	vFiltered.clear();
-	for( UINT i = 0; i < vTablePeople.size()- m_columnsCount+1; i += m_columnsCount )
+	for( UINT i = 0; i < vPeople.size()- S_COLUMNSCOUNT+1; i += S_COLUMNSCOUNT)
 	{
-		loop = _wtoi( vTablePeople.at(i+1) );
+		loop = _wtoi( vPeople.at(i+1) );
 		if( loop == 1 )
 		{
-			for( UINT j = 0; j < m_columnsCount; ++j ) // ix-1 a cnt-re mutat
+			for( UINT j = 0; j < S_COLUMNSCOUNT; ++j ) // ix-1 a cnt-re mutat
 			{
-				vFiltered.push_back( vTablePeople.at( i + j  ) );
+				vFiltered.push_back( vPeople.at( i + j  ) );
 			}
 		}
 	}
@@ -412,14 +433,14 @@ void CContractedPeople::OnFilter2()
 {
 	int loop;
 	vFiltered.clear();
-	for( UINT i = 0; i < vTablePeople.size()- m_columnsCount+1; i += m_columnsCount )
+	for( UINT i = 0; i < vPeople.size()- S_COLUMNSCOUNT+1; i += S_COLUMNSCOUNT )
 	{
-		loop = _wtoi( vTablePeople.at(i+1) );
+		loop = _wtoi( vPeople.at(i+1) );
 		if( loop == 2 )
 		{
-			for( UINT j = 0; j < m_columnsCount; ++j ) // ix-1 a cnt-re mutat
+			for( UINT j = 0; j < S_COLUMNSCOUNT; ++j ) // ix-1 a cnt-re mutat
 			{
-				vFiltered.push_back( vTablePeople.at( i + j  ) );
+				vFiltered.push_back( vPeople.at( i + j  ) );
 			}
 		}
 	}
@@ -544,3 +565,4 @@ void CContractedPeople::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
 
 	*pResult = 0;
 }
+

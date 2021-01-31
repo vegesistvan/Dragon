@@ -2,19 +2,19 @@
 #include "afxwin.h"
 
 
-// CSamePeopleInfo dialog
+// CContractInfo dialog
 
-class CSamePeopleInfo : public CDialogEx
+class CContractInfo : public CDialogEx
 {
-	DECLARE_DYNAMIC(CSamePeopleInfo)
+	DECLARE_DYNAMIC(CContractInfo)
 
 public:
-	CSamePeopleInfo(CWnd* pParent = NULL);   // standard constructor
-	virtual ~CSamePeopleInfo();
+	CContractInfo(CWnd* pParent = NULL);   // standard constructor
+	virtual ~CContractInfo();
 
 // Dialog Data
 	enum { IDD = IDD_SAME_PEOPLE_INFO };
-
+	
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
@@ -22,5 +22,6 @@ protected:
 public:
 	virtual BOOL OnInitDialog();
 	CString m_info;
+	CString m_title;
 	CEdit EditCtrl;
 };

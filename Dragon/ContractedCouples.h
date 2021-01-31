@@ -17,7 +17,6 @@ public:
 	enum { IDD = IDD_CONTRACTED_COUPLES };
 
 	CString m_filter;
-	BOOL    m_contracted;
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	CString str;
@@ -60,4 +59,5 @@ public:
 	afx_msg void OnFilterAll();
 	afx_msg void OnFilter1();
 	afx_msg void OnFilter2();
+	afx_msg void OnInfo();
 };

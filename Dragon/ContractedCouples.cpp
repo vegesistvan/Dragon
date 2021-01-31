@@ -8,6 +8,7 @@
 #include "ProgressWnd.h"
 #include "utilities.h"
 #include "ContractCouples.h"
+#include "ContractInfo.h"
 #include "html_Lines.h"
 #include "html_Edit2Lines.h"
 #include "html_Edit.h"
@@ -85,6 +86,7 @@ BEGIN_MESSAGE_MAP(CContractedCouples, CDialogEx)
 	ON_COMMAND(ID_HTML_PEOPLEFATHER, &CContractedCouples::OnHtmlPeoplefather)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CContractedCouples::OnHtmlNotepad)
 
+	ON_COMMAND(ID_INFO, &CContractedCouples::OnInfo)
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CContractedCouples::OnInitDialog()
@@ -196,8 +198,8 @@ void CContractedCouples::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
 	case CDDS_ITEMPREPAINT|CDDS_SUBITEM:
 		nItem	= pLVCD->nmcd.dwItemSpec;
 		nCol	= pLVCD->iSubItem;
-		husband = 4 < nCol && nCol < 16;
-		wife	= 15 < nCol && nCol < 27;
+		husband = L_STATUSH <= nCol && nCol <= L_MOTHERH;
+		wife	= L_STATUSW <= nCol && nCol <= L_MOTHERW;
 		if( UNITED )
 		{
 			statusH = m_ListCtrl.GetItemText( nItem, L_STATUSH );
@@ -217,7 +219,7 @@ void CContractedCouples::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
 		{
 			mask = 1 << nCol;
 			if( mask & _wtol( m_ListCtrl.GetItemText( nItem, L_COLORCODE  ) ) )
-				pLVCD->clrTextBk = LIGHTGREEN;
+				pLVCD->clrTextBk = YELLOW;
 		}
 		*pResult = CDRF_DODEFAULT;
 		break;
@@ -226,25 +228,26 @@ void CContractedCouples::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedCouples::OnInputDifferent()
 {
+	str.Format( L"Azonos nevû házaspárok, akik nem vonhatóak össze" );
 	if( !inputFile( DIFFERENTTXT ) )return;
 
 	menu.EnableMenuItem( ID_INPUT_UNITED, MF_BYCOMMAND | MF_ENABLED);
 	menu.EnableMenuItem( ID_INPUT_DIFFERENT, MF_BYCOMMAND | MF_GRAYED);
 	UNITED = false;
 
-	str.Format( L"Azonos nevû házaspárok, akik nem vonhatóak össze" );
+	
 	SetWindowTextW( str );
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedCouples::OnInputUnited()
 {
+	str.Format( L"Azonos nevû házaspárok, akik között összevonások történtek (%d azonos nevû házaspár )", m_numOfGroups );
 	if( !inputFile( UNITEDTXT ) )return;
 
 	UNITED = true;
 	menu.EnableMenuItem( ID_INPUT_UNITED, MF_BYCOMMAND | MF_GRAYED);
 	menu.EnableMenuItem( ID_INPUT_DIFFERENT, MF_BYCOMMAND | MF_ENABLED);
 
-	str.Format( L"Azonos nevû házaspárok, akik között összevonások történtek (%d azonos nevû házaspár )", m_numOfGroups );
 	SetWindowTextW( str );
 	ShowWindow( SW_MAXIMIZE );
 }
@@ -253,6 +256,7 @@ bool CContractedCouples::inputFile( int subType )
 {
 	CString filespec;
 
+	// Ha nincs a "files" táblában a keresett fájl, akkor elõször összevonást végez
 	while( true )
 	{
 		m_command.Format( L"SELECT filespec FROM files WHERE type=%d AND subtype=%d", CONTRACTED_COUPLES, subType );
@@ -551,5 +555,35 @@ void CContractedCouples::OnHtmlPeoplefather()
 	CString rowid	= m_ListCtrl.GetItemText( nItem, L_ROWIDH );
 	CHtmlLines dlg;
 	dlg.m_rowid = rowid;
+	dlg.DoModal();
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedCouples::OnInfo()
+{
+	CString info = L"\
+Az azonos nevû házaspárok férfi ill. nõ tagjainak azonosságát vizsgáljuk, és az azonosnak talált bejegyzésket összevonjuk.\r\n\
+\r\n\
+Az összehasonlításhoz az alábbi adatokat vizsgáljuk:\r\n\
+\r\n\
+- az ember születési dátuma\r\n\
+- az ember halálozási dátuma\r\n\
+- az ember apja neve\r\n\
+- az ember anyja neve\r\n\\r\n\
+. a házastárs neve (a vizsgált emberek alap feltétele )\r\n\
+- a házastárs születési dátuma\r\n\
+- a házastárs halálozási dátuma\r\n\
+- a házastárs apja neve\r\n\
+- a házastárs anyja neve\r\n\
+\r\n\
+A vizsgált emberek kiválaszásánal a házastárs nevének azonosságát is elõírjuk, tehát ez egy eleve teljesülû kritérium.\n\r\
+Az azonossági kritériumok tehát gyengébbek, mint az azonos nevû emberek összevonásánál használt kritériumok, mert nem vizsgáljuk\
+az apa és anya születési és halálozási dátumát. Ugyanakkor a házastárs nevének azonossága szigrúbb feltétel, mert az elõbbinél \
+megengedjük, hogy a házastársak egyyike legyen, nem azonos.\r\n\
+";
+
+
+	CContractInfo dlg;
+	dlg.m_title = L"Azonos nevû házastársak házaspárjaink azonossági vizsgálata és bejegyzések összevonása"; 
+	dlg.m_info = info;
 	dlg.DoModal();
 }

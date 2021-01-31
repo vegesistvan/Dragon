@@ -31,9 +31,6 @@ ON_COMMAND(ID_HUSBAND_WIFE, &CDragonApp::OnHusbandWife)
 ON_COMMAND(ID_EMAIL, &CDragonApp::OnEmail)
 ON_COMMAND(ID_CHECK_INEGRITY, &CDragonApp::OnCheckIntegrity)
 ON_COMMAND(ID_CHECK_GENERATIONS, &CDragonApp::OnCheckGenerations)
-ON_COMMAND(ID_MOREMARRIAGES, &CDragonApp::OnMoreMarriages)
-ON_COMMAND(ID_SHOW_SAME_PEOPLE, &CDragonApp::OnShowSamePeople)
-ON_COMMAND(ID_SHOW_DIFFERENT_PEOPLE, &CDragonApp::OnShowDifferentPeople)
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CDragonApp::CDragonApp()
@@ -266,14 +263,7 @@ BOOL CDragonApp::openDatabase()
 	if( _waccess( m_workingDirectory, 0 ) )
 		_wmkdir( m_workingDirectory );
 
-/*
-	if( !query( L"SELECT count() FROM people" ) ) return FALSE;
-	m_cntPeople = _wtoi( m_recordset->GetFieldString( 0 ) );
 
-	if( !m_cntPeople )
-		setUserVersion( 0 );
-*/
-	_iterationCount = getUserVersion();
 	m_inputMode = getInputMode();
 	if( m_inputMode.IsEmpty() )
 		return FALSE;
@@ -698,25 +688,5 @@ void CDragonApp::OnCheckIntegrity()
 void CDragonApp::OnCheckGenerations()
 {
 	CCheckGenerations dlg;
-	dlg.DoModal();
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragonApp::OnMoreMarriages()
-{
-//	CCheckMarriageOrder dlg;
-//	dlg.DoModal();
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragonApp::OnShowSamePeople()
-{
-	CContractedPeople dlg;
-	dlg.m_contracted = true;
-	dlg.DoModal();
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragonApp::OnShowDifferentPeople()
-{
-	CContractedPeople dlg;
-	dlg.m_contracted = false;
 	dlg.DoModal();
 }

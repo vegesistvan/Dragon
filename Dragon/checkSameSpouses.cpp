@@ -1219,7 +1219,6 @@ void CCheckSameSpouses::htmlHeader( CString title )
 	fwprintf( fh1, m_explanation );
 	fwprintf( fh1, L"<pre>" );
 	fwprintf( fh1, L"\n%-20s %s<br>", L"Adatbázis:", theApp.m_databaseSpec );
-//	fwprintf( fh1, L"%-20s %d<br>", L"Összevonások száma:", theApp._iterationCount );
 	fwprintf( fh1, L"%-20s %s<br><br><br>\n", L"lista készült:", theApp.getPresentDateTime() );
 	
 	str.Format( L"\n%12s %6s %6s %1s %1s %1s %-25s %-15s %-15s %1s %-25s %-15s %-15s %1s %-25s %-15s %-15s<br>\n", L"rowid", L"line#", L"table#", L"G", L"S", L"U", L"name", L"születés", L"halál", L"s", L"apja neve", L"születés", L"halál", L"s", L"anyja neve", L"születés", L"halál" );

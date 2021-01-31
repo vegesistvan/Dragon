@@ -33,17 +33,15 @@ typedef struct
 	CString spouses;
 	CString rowidS;				// spouse 
 	CString lineF;
-
-	CString linenumberMF;
 }SAMENAMES;
 
-class CContract : public CWnd
+class CContractPeople : public CWnd
 {
-	DECLARE_DYNAMIC(CContract)
+	DECLARE_DYNAMIC(CContractPeople)
 
 public:
-	CContract();
-	virtual ~CContract();
+	CContractPeople();
+	virtual ~CContractPeople();
 	bool contractPeople();
 protected:
 	CProgressWnd wndP; 
@@ -93,6 +91,7 @@ protected:
 	void createHead( CString title  );
 	void core();
 	void putPeople( CString name, UINT i );
+	void processPeopleNew();
 	void processPeople();
 	void listPeople();
 	int	 sameSpouses( CString spouse1, CString spouse2 );

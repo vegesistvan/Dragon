@@ -14,18 +14,18 @@ public:
 	CContractCouples();
 	virtual ~CContractCouples();
 	void contractCouples();
+
+	CString	_husband;		// csak ezt a házaspárt vizsgájuk!!
+	CString _wife;
+	int		m_loopMax;
+	int		m_azonos;
 protected:
 	CProgressWnd wndP; 
 
 	CString m_head;
 	CString m_description;
 	CString m_columns;
-
-	
-	CString	_husband;		// csak ezt a házaspárt vizsgájuk!!
-	CString _wife;
 	int		m_loop;
-	int		m_loopMax;
 	int		m_group;
 
 	CString str;
@@ -33,10 +33,10 @@ protected:
 	CString m_info;
 	CString m_explanation;
 	CString	_contractions;
-	CString unitedSpec;
-	CString differentSpec;
+
+	
 	CString p_fields;
-	bool	m_contract;			// végrehajtsa-e az összevonást
+	
 	CStringArray m_colors;
 
 	FILE* fU;
@@ -47,12 +47,16 @@ protected:
 
 	CString m_fileSpecTextU;
 	CString m_fileSpecTextD;
+	CString m_fileSpecHtmlU;
+	CString m_fileSpecHtmlD;
+
+
 	CString sWHITE;
 
 	UINT	ic;			// vCouples indexe
 	UINT	m_numOfGroups;
 	bool	m_contracted;
-	int		m_azonos;
+
 
 //	CComboBox ComboCtrl;
 	

@@ -182,6 +182,7 @@ CString CGaInput::insertSpouseF( UINT i )
 		sf.source			= 3;
 		sf.generation		= ' ';
 		sf.sex_id			= v_marriages.at(i).sex_idF;
+		sf.sex_id			= 1;
 		sf.title			= v_marriages.at(i).titleF;
 		sf.titolo			= v_marriages.at(i).titoloF;
 		sf.last_name		= v_marriages.at(i).lastNameF;
@@ -215,6 +216,7 @@ CString CGaInput::insertSpouseM( UINT i )
 		sm.source			= 4;
 		sm.generation		= ' ';
 		sm.sex_id			= v_marriages.at(i).sex_idM;
+		sm.sex_id			= 2;
 		sm.title			= v_marriages.at(i).titleM;
 		sm.titolo			= v_marriages.at(i).titoloM;
 		sm.last_name		= v_marriages.at(i).lastNameM;

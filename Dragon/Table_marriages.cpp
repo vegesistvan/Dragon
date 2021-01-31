@@ -1598,7 +1598,6 @@ void CTableMarriages::htmlHeader( CString title )
 	fwprintf( fh1, m_explanation );
 	fwprintf( fh1, L"<pre>" );
 	fwprintf( fh1, L"\n%-20s %s<br>", L"Adatbázis:", theApp.m_databaseSpec );
-//	fwprintf( fh1, L"%-20s %d<br>", L"Összevonások száma:", theApp._iterationCount );
 	fwprintf( fh1, L"%-20s %s<br><br><br>\n", L"lista készült:", theApp.getPresentDateTime() );
 	
 	str.Format( L"\n%10s %1s %12s %1s %8s %-25s %12s %12s %8s %-20s %12s %12s %8s %-20s %12s %12s<br>\n",\

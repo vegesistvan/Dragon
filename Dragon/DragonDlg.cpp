@@ -28,7 +28,7 @@
 #include "Table_GaTables.h"
 #include "GetString.h"
 #include "SelectTableName.h"
-//#include "textfile.h"
+
 #include "Table_people.h"
 #include "Setup.h"
 #include "Filter.h"
@@ -54,14 +54,12 @@
 
 
 #include "GA_ascendantsChain.h"
-//#include "SameCouples.h"
 #include "ContractCouples.h"
 #include "ContractedCouples.h"
 #include "checkLifespan.h"
 
-#include "SamePeopleInfo.h"
-#include "Contract.h"
-
+#include "ContractInfo.h"
+#include "ContractedPeople.h"
 #include "version.h"
 
 #ifdef _DEBUG
@@ -136,10 +134,8 @@ ON_COMMAND(ID_INPUT_GAHTML_FAMILY, &CDragonDlg::OnInputGahtmlFamily)
 ON_COMMAND(ID_INPUT_GAHTML_FROMLINE, &CDragonDlg::OnInputGahtmlFromline)
 ON_COMMAND(ID_INPUT_GAHTML_LINE, &CDragonDlg::OnInputGahtmlLine)
 ON_COMMAND(ID_INPUT_GAHTML_TABLE, &CDragonDlg::OnInputGahtmlTable)
-//ON_COMMAND(ID_CONNECT_BRANCHES, &CDragonDlg::OnConnectBranches)
 ON_COMMAND(ID_INPUT_KEYBOARD, &CDragonDlg::OnInputKeyboard)
 ON_WM_PAINT()
-//ON_COMMAND(ID_APP_EXIT, &CDragonDlg::OnAppExit)
 ON_COMMAND(ID_BRACKETS_SQUARE, &CDragonDlg::OnBracketsSquare)
 ON_COMMAND(ID_BRACKETS_ROUND, &CDragonDlg::OnBracketsRound)
 ON_COMMAND(ID_BRACES, &CDragonDlg::OnBraces)
@@ -179,20 +175,16 @@ ON_COMMAND(ID_SAMENAMEANDDEATH2, &CDragonDlg::OnSameNameAndDeath)
 ON_COMMAND(ID_SAMENAMEANDFATHER2, &CDragonDlg::OnSameNameAndFather)
 ON_COMMAND(ID_SAMENAMEANDMOTHER2, &CDragonDlg::OnSameNameAndMother)
 ON_COMMAND(ID_CHECK_SAMESPOUSENAME, &CDragonDlg::OnCheckSameSpouseName)
-//ON_COMMAND(ID_SAME_PEOPLE, &CDragonDlg::OnSamePeople)
-//ON_COMMAND(ID_SAME_PEOPLE_CONTRACT, &CDragonDlg::OnSamePeopleContract)
 ON_COMMAND(ID_NAME_PROBLEMS, &CDragonDlg::OnNameProblems)
 ON_COMMAND(ID_MOTHER_INDEX, &CDragonDlg::OnMotherIndex)
 ON_COMMAND(ID_DISPLAY_BLOB, &CDragonDlg::OnDisplayBlob)
 ON_COMMAND(ID_GEDCOM_TAGTABLE, &CDragonDlg::OnGedcomTagtable)
 ON_COMMAND(ID_GEDCOM_INDIFAMS, &CDragonDlg::OnGedcomINDIFAMS)
-ON_COMMAND(ID_SAME_NAMES, &CDragonDlg::OnSameCouples)
-ON_COMMAND(ID_SAME, &CDragonDlg::OnSame)
 ON_WM_CLOSE()
 ON_COMMAND(ID_SAMENAMEANDSPOUSE, &CDragonDlg::OnSamenameandspouse)
-//ON_COMMAND(ID_INFO, &CDragonDlg::OnInfo)
 ON_COMMAND(ID_APP_EXIT, &CDragonDlg::OnAppExit)
 ON_COMMAND(ID_CONTRACTEDCOUPLES, &CDragonDlg::OnContractedcouples)
+ON_COMMAND(ID_CONTRACT_PEOPLE, &CDragonDlg::OnContractPeople)
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CDragonDlg::OnInitDialog()
@@ -1076,20 +1068,6 @@ void CDragonDlg::OnCheckSameSpouseName()
 	CCheckSameSpouses dlg;
 	dlg.DoModal();
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//void CDragonDlg::OnSamePeople()
-//{
-//	CSameP dlg;
-//	dlg._onlyList = true;
-//	dlg.DoModal();
-//}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//void CDragonDlg::OnSamePeopleContract()
-//{
-//	CSameP dlg;
-//	dlg._onlyList = false;
-//	dlg.DoModal();
-//}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnNameProblems()
 {
@@ -1109,30 +1087,10 @@ void CDragonDlg::OnDisplayBlob()
 	dlg.DoModal();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
 void CDragonDlg::OnGedcomINDIFAMS()
 {
 	CGedcomIn ged;
 	ged.indiFams();
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragonDlg::OnSameCouples()
-{
-	CContractCouples cc;
-	cc.contractCouples();		
-	mainTitle( );
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragonDlg::OnSame()
-{
-/*
-	CSamePeople dlg;
-	dlg.DoModal();
-*/
-	CContract cc;
-	cc.contractPeople();
-	mainTitle( );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnClose()
@@ -1168,6 +1126,13 @@ void CDragonDlg::OnAppExit()
 void CDragonDlg::OnContractedcouples()
 {
 	CContractedCouples dlg;
-	dlg.m_contracted = true;
 	dlg.DoModal();
+	mainTitle( );
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDragonDlg::OnContractPeople()
+{
+	CContractedPeople dlg;
+	dlg.DoModal();
+	mainTitle( );
 }

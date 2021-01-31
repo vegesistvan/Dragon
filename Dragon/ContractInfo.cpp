@@ -3,18 +3,20 @@
 
 #include "stdafx.h"
 #include "Dragon.h"
-#include "SamePeopleInfo.h"
+#include "ContractInfo.h"
 #include "afxdialogex.h"
 
 
-// CSamePeopleInfo dialog
+// CContractInfo dialog
 
-IMPLEMENT_DYNAMIC(CSamePeopleInfo, CDialogEx)
+IMPLEMENT_DYNAMIC(CContractInfo, CDialogEx)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CSamePeopleInfo::CSamePeopleInfo(CWnd* pParent /*=NULL*/)
-	: CDialogEx(CSamePeopleInfo::IDD, pParent)
+CContractInfo::CContractInfo(CWnd* pParent /*=NULL*/)
+	: CDialogEx(CContractInfo::IDD, pParent)
 	, m_info(_T(""))
 {
+
+	m_title = L"Azonos nevû emberek bejegyzéseinek vizsgálata és összevonása";
 	m_info = L"\
 Az alábbi adatokat vizsgáljuk az azonos nevû emberek azonosságának eldöntéséhez:\r\n\
 \r\n\
@@ -77,23 +79,24 @@ Az összehasonlítás, összevonás eredményét két html fájlban is elõállítja a progr
 ";
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CSamePeopleInfo::~CSamePeopleInfo()
+CContractInfo::~CContractInfo()
 {
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSamePeopleInfo::DoDataExchange(CDataExchange* pDX)
+void CContractInfo::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_EDIT, EditCtrl);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BEGIN_MESSAGE_MAP(CSamePeopleInfo, CDialogEx)
+BEGIN_MESSAGE_MAP(CContractInfo, CDialogEx)
 END_MESSAGE_MAP()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CSamePeopleInfo::OnInitDialog()
+BOOL CContractInfo::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
+	SetWindowTextW( m_title );
 	GetDlgItem( IDC_EDIT )->SetWindowTextW( m_info );
 	GetDlgItem(IDC_EDIT)->ModifyStyle(0, WS_DISABLED);
 	return FALSE; 

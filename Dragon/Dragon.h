@@ -48,6 +48,8 @@
 enum
 {
 	CONTRACTED_COUPLES = 0,
+	CONTRACTED_COUPLES_HTML1,
+	CONTRACTED_COUPLES_HTML2,
 	CONTRACTED_PEOPLE,
 };
 enum
@@ -74,7 +76,6 @@ public:
 	// a képernyõ méretei pixelben
 	int _w;
 	int _h;
-	int	_iterationCount;
 
 	bool	NOTEPAD;
 
@@ -355,9 +356,6 @@ public:
 	afx_msg void OnCheckIntegrity();
 
 	afx_msg void OnCheckGenerations();
-	afx_msg void OnMoreMarriages();
-	afx_msg void OnShowSamePeople();
-	afx_msg void OnShowDifferentPeople();
 };
 extern CDragonApp theApp;
 

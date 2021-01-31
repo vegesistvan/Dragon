@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 #include "Dragon.h"
-#include "Contract.h"
+#include "ContractPeople.h"
 #include "utilities.h"
 #include "ProgressWnd.h"
 #include "ContractedPeople.h"
@@ -53,9 +53,9 @@ enum
 	S_ROWIDS,
 	S_SPOUSES,
 	S_LINEF,
-	S_LINNUMBERMF,
 	COLUMNSCOUNT,
 };
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool sortBySourceX(const SAMENAMES &v1, const SAMENAMES &v2) 
 {
@@ -82,9 +82,9 @@ bool sortByGroupStatusX(const SAMENAMES &v1, const SAMENAMES &v2)
 	return true;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-IMPLEMENT_DYNAMIC(CContract, CWnd)
+IMPLEMENT_DYNAMIC(CContractPeople, CWnd)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CContract::CContract()
+CContractPeople::CContractPeople()
 {
 	m_recordset		= new CSqliteDBRecordSet;
 	m_recordset1	= new CSqliteDBRecordSet;
@@ -161,14 +161,14 @@ házastársak\n\n\
 	m_loopMax   = 4;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CContract::~CContract()
+CContractPeople::~CContractPeople()
 {
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BEGIN_MESSAGE_MAP(CContract, CWnd)
+BEGIN_MESSAGE_MAP(CContractPeople, CWnd)
 END_MESSAGE_MAP()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CContract::contractPeople()
+bool CContractPeople::contractPeople()
 {
 	CString fileName;
 	
@@ -214,6 +214,8 @@ bool CContract::contractPeople()
 
 		core();
 
+		theApp.setUserVersion( vContract.size() );
+
 		if( vContract.size() > 200 )
 		{
 #ifndef _DEBUG
@@ -227,7 +229,6 @@ bool CContract::contractPeople()
 		fclose( fU );
 		fclose( fD );
 
-		theApp.setUserVersion( m_loop );
 		++m_loop;
 	}
 	wndP.DestroyWindow();
@@ -252,7 +253,7 @@ bool CContract::contractPeople()
 	return true;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CContract::core()
+void CContractPeople::core()
 {
 	CString namePrev;
 	CString name;
@@ -323,7 +324,7 @@ cont:	m_recordset->MoveNext();
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Az azonos nevû emberek adatainak összegyûjtése a vPeople vetorba
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CContract::putPeople( CString name, UINT i )
+void CContractPeople::putPeople( CString name, UINT i )
 {
 	m_recordset->MoveTo( i );
 
@@ -381,12 +382,7 @@ void CContract::putPeople( CString name, UINT i )
 	vpeople.rowidM	= mother_id;
 	vpeople.birthM	= m_recordset1->GetFieldString( 2 );
 	vpeople.deathM	= m_recordset1->GetFieldString( 3 );
-
-	father_id		= m_recordset1->GetFieldString( 4 );		// anyai nagyapa
-	m_command.Format( L"SELECT linenumber FROM people WHERE rowid = '%s'", father_id );
-	if( !query2( m_command ) ) return;
-	vpeople.linenumberMF = m_recordset1->GetFieldString( 0 );
-
+	
 	if( vpeople.sex_id == L"1" )
 		m_command.Format( L"SELECT spouse2_id FROM marriages WHERE spouse1_id = '%s'", rowid );
 	else
@@ -433,7 +429,7 @@ void CContract::putPeople( CString name, UINT i )
 // A hibás összevonásokat az összevonást követõ ellenõrzési funkciók valamelyikával feltárhatjuk, és ha ennek 
 // adathiba volt az oka, azt javíthatjuk. 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CContract::processPeople()
+void CContractPeople::processPeople()
 {
 	UINT group = 1;
 	UINT db = 0;
@@ -564,7 +560,7 @@ if( (i1 == 95921 && i2 == 141743 ) || (i1 == 141743 && i2 == 95921 ) )
 // Az i1 és i2 indexû házasspárok azonosságát állapíthja meg.
 // return true: azonosak (nincs ellentmondás az adatai között!!!) 
 // return false: különbözõek
-int CContract::identical( UINT i1, UINT i2 )
+int CContractPeople::identical( UINT i1, UINT i2 )
 {
 	SAMENAMES	a = vPeople.at(i1);
 	SAMENAMES	b = vPeople.at(i2);
@@ -584,8 +580,8 @@ int CContract::identical( UINT i1, UINT i2 )
 	if( ( g = same( r.death, a.death, b.death ) ) == -1 ) return false;
 	if( g == 1 ) ++m_match; 
 
-	if( ( g = same( r.father, a.father, b.father ) ) == -1 ) return false;
-	if( g == 1 ) ++m_match; 
+	if( ( g = same( r.father, a.father, b.father ) ) == -1 ) return false;		// egyedül az apa azonossága nem lesz elegendõ!!!
+//	if( g == 1 ) ++m_match;   
 
 	if( ( g = same( r.mother, a.mother, b.mother ) ) == -1 ) return false;
 	if( g == 1 ) ++m_match; 
@@ -626,7 +622,7 @@ int CContract::identical( UINT i1, UINT i2 )
 //  1 : mindkettõ meg van adva és egyezik;
 //  0 : csak az egyik vagy egy sincs van megadva, így nincs ellentmondás
 //  -1 : mindkettõ meg van adva és nem egyezik
-int CContract::sameSpouses( CString spouse1, CString spouse2 )
+int CContractPeople::sameSpouses( CString spouse1, CString spouse2 )
 {
 	CStringArray a;
 	CStringArray b;
@@ -718,7 +714,7 @@ int CContract::sameSpouses( CString spouse1, CString spouse2 )
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Az iBy indexû emberrel helyettesíti az iDel indexû embert
-void CContract::contract( UINT iBy, UINT iDel )
+void CContractPeople::contract( UINT iBy, UINT iDel )
 {
 	CString rowid	= vPeople.at( iDel ).rowid;
 	CString rowidBy	= vPeople.at(iBy).rowid;
@@ -726,18 +722,18 @@ void CContract::contract( UINT iBy, UINT iDel )
 	int		source	= _wtoi( vPeople.at(iBy).source );
 	CONTRACT vcontract;
 
-// if( m_contract ) 
-	{
-		vcontract.rowid		= rowid;
-		vcontract.rowidBy	= rowidBy;
-		vcontract.sex_id	= sex_id;
-		vcontract.source	= source;
-		vContract.push_back( vcontract );
-	}
+
+
+	vcontract.rowid		= rowid;
+	vcontract.rowidBy	= rowidBy;
+	vcontract.sex_id	= sex_id;
+	vcontract.source	= source;
+	vContract.push_back( vcontract );
+
 	m_contracted = true;		// csak a csoportra jelzi, hogy volt összevonás, az annak megfelleõ fájlba kell listázni
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CContract::contractFull()
+void CContractPeople::contractFull()
 {
 	CString rowid;
 	CString rowidBy;
@@ -851,7 +847,7 @@ void CContract::contractFull()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Az azonos (==rowid) házaspárokat tartalmazó házasságokat törli.
 // Nem a nevek, hanem a rowid-k azonosságát vizsgálja!!
-void CContract::deleteMarriages()
+void CContractPeople::deleteMarriages()
 {
 
 #ifndef _DEBUG
@@ -892,7 +888,7 @@ void CContract::deleteMarriages()
 	wndP.SetPos(0 );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CContract::listPeople()
+void CContractPeople::listPeople()
 {
 
 	int status;
@@ -929,7 +925,7 @@ void CContract::listPeople()
 %9s %2s %1s %1s \
 %8s,%-30s,%12s %12s \
 %8s,%-30s,%12s %12s \
-%8s,%-30s,%12s %12s \
+%8s %-30s %12s %12s \
 %8s %s",\
 x.line, x.united, x.generation, x.source,\
 x.rowid, x.name, x.birth,  x.death,\
@@ -991,13 +987,13 @@ x.rowidS, x.spouses\
 %s\t%s\t%s\t%s\t\
 %s\t%s\t%s\t%s\t\
 %s\t%s\t%s\t%s\t\
-%s\t%s\t%s\t%s\t\n",\
+%s\t%s\t%s\t\n",\
 colorIndex, m_loop, x.group, x.match, x.group2, x.status, rgbColor,\
 x.line, x.united, x.generation, x.source,\
 x.rowid,x.name,x.birth,  x.death,\
 x.rowidF,x.father,x.birthF, x.deathF,\
 x.rowidM,x.mother,x.birthM, x.deathM,\
-x.rowidS, x.spouses, x.lineF,x.linenumberMF\
+x.rowidS, x.spouses, x.lineF\
 );
 
 		if( m_contracted )
@@ -1012,7 +1008,7 @@ x.rowidS, x.spouses, x.lineF,x.linenumberMF\
 
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CContract::emptyLine( FILE* fl, int loop )
+void CContractPeople::emptyLine( FILE* fl, int loop )
 {
 	UINT i;
 	fwprintf( fl, L"\t%d\t", loop );
@@ -1025,7 +1021,7 @@ void CContract::emptyLine( FILE* fl, int loop )
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
-void CContract::printRef( int group )
+void CContractPeople::printRef( int group )
 {
 		str.Format( L"\
 %2d %2d %2s %9s %2s %1s %1s \
@@ -1045,7 +1041,7 @@ L" ", r.spouses
 }
 */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CContract::resetRef()
+void CContractPeople::resetRef()
 {
 	r.group = 0;
 	r.birth.Empty();
@@ -1061,7 +1057,7 @@ void CContract::resetRef()
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Ha vPeople.at(i) azonos egy másik emberrel, akkor a kettõbõl összeszedjük a megadott értékeket
-void CContract::setRef( int i )
+void CContractPeople::setRef( int i )
 {
 	SAMENAMES a;
 	a = vPeople.at(i);
@@ -1095,7 +1091,7 @@ void CContract::setRef( int i )
 
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CContract::openUnited()
+void CContractPeople::openUnited()
 {
 	CString fileName;
 	fileName.Format( L"peopleUnited_%d", m_loop );
@@ -1126,7 +1122,7 @@ L"rowid-házastársak---------------"\
 	fwprintf( fU, L"<font color='red'>%s</font><br>", columns );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CContract::openDifferent()
+void CContractPeople::openDifferent()
 {
 	CString fileName;
 	fileName.Format( L"peopleDifferent_%d", m_loop );
@@ -1152,7 +1148,7 @@ L"rowid-házastársak---------------"\
 
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CContract::createHead( CString title  )
+void CContractPeople::createHead( CString title  )
 {
 	m_head.Format( L"\
 <HEAD>\n\
@@ -1176,7 +1172,7 @@ m_azonos\
 );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CContract::query( CString command )
+BOOL CContractPeople::query( CString command )
 {
 	if( m_recordset->Query(command,theApp.mainDB))
 	{
@@ -1187,7 +1183,7 @@ BOOL CContract::query( CString command )
 	return TRUE;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CContract::query1( CString command )
+BOOL CContractPeople::query1( CString command )
 {
 	if( m_recordset1->Query(command,theApp.mainDB))
 	{
@@ -1198,7 +1194,7 @@ BOOL CContract::query1( CString command )
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CContract::query2( CString command )
+BOOL CContractPeople::query2( CString command )
 {
 	if( m_recordset2->Query(command,theApp.mainDB))
 	{
@@ -1209,7 +1205,7 @@ BOOL CContract::query2( CString command )
 	return TRUE;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CContract::list()
+void CContractPeople::list()
 {
 	int status;
 	int group;
@@ -1290,7 +1286,7 @@ void CContract::list()
 	++nItem;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CContract::push( CString item )
+void CContractPeople::push( CString item )
 {
 
 	int tLen;

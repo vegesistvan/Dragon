@@ -209,8 +209,6 @@ L"rowid", L"feleség", L"születés", L"halál", L"apja", L"anyja" \
 
 //	_husband	= L"Ajkay István";	// férj neve
 //	_wife		= L"N N";			// feleség neve
-	m_contract	= false;		
-	m_contract	= true;			// végrejatsa-e az összevonásokat	
 	m_loopMax	= 3;			// max loop
 	m_azonos	= 0;			// legalább ennyi egyezés ellemtmondás nélkül
 }
@@ -250,6 +248,7 @@ void CContractCouples::contractCouples()
 
 		theApp.setStartTime();
 
+	
 		splitFilespec( theApp.m_databaseSpec, &drive, &path,  &fname, &ext );
 	
 		str.Format( L"%s:%s\\%sM.%s", drive, path, fname, ext );
@@ -271,12 +270,12 @@ void CContractCouples::contractCouples()
 
 		theApp.setUserVersion( vContract.size() );
 
-
 		if( vContract.size() )
-			str.Format( L"%d ember összevonva.", vContract.size() );
+			str.Format( L"%d ember összevonható lenne.", vContract.size() );
 		else
 			str = L"Nincs összevonható ember!";
 
+		
 		fwprintf( fU, L"\n\n%s\n", str );
 		fwprintf( fD, L"\n\n%s\n", str );
 		fwprintf( fU, L"</pre>" );
@@ -286,18 +285,30 @@ void CContractCouples::contractCouples()
 
 		fclose( fU );
 		fclose( fD );
+		if( !vContract.size() ) break;
 
 
+		int type = CONTRACTED_COUPLES_HTML1;
+		if( m_loop == 2 )
+			type = CONTRACTED_COUPLES_HTML1;
+		m_command.Format( L"INSERT INTO files (type, subtype, filespec) VALUES( %d, %d, '%s')", type, UNITEDTXT, m_fileSpecHtmlU );
+		if( !theApp.execute( m_command ) ) return;
+	
+		m_command.Format( L"INSERT INTO files (type, subtype, filespec) VALUES( %d, %d, '%s')", type, DIFFERENTTXT, m_fileSpecHtmlD );
+		if( !theApp.execute( m_command ) ) return;
+
+		/*
 		if( vContract.size() )
 		{
-			theApp.showHtmlFile( unitedSpec );
-			theApp.showHtmlFile( differentSpec );
+			theApp.showHtmlFile( m_fileSpecHtmlU );
+			theApp.showHtmlFile( m_fileSpecHtmlD );
 		}
 		else
 		{
-			theApp.showHtmlFile( differentSpec );
+			theApp.showHtmlFile( m_fileSpecHtmlD );
 			break;
-		}
+		}*/
+		
 		++m_loop;
 
 		if( vContract.size() > 200 )
@@ -320,6 +331,7 @@ void CContractCouples::contractCouples()
 	
 	m_command.Format( L"INSERT INTO files (type, subtype, filespec) VALUES( %d, %d, '%s')", CONTRACTED_COUPLES, DIFFERENTTXT, m_fileSpecTextD );
 	if( !theApp.execute( m_command ) ) return;
+
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractCouples::core( int loop )
@@ -546,6 +558,7 @@ cont2:	wndP.StepIt();
 		++m_group;
 		vSame.clear();
 	}
+
 
 	theApp.execute( L"BEGIN" );
 	contractFull( loop );
@@ -859,8 +872,6 @@ void CContractCouples::contract()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractCouples::contractFull( int loop )
 {
-	if( !m_contract ) return;
-
 	CString rowid;
 	CString rowidBy;
 	CString sex_id;
@@ -1207,7 +1218,7 @@ void CContractCouples::openUnited()
 {
 	CString fileName;
 	fileName.Format( L"couplesUnited_%d", m_loop );
-	unitedSpec = theApp.openHtmlFile( &fU, fileName, L"w+" );
+	m_fileSpecHtmlU = theApp.openHtmlFile( &fU, fileName, L"w+" );
 
 	createHead( L"AZONOS NEVÛ HÁZASPÁROK, AKIK AZONOSAK, EZÉRT ÖSSZEVONHATÓAK" ); 
 
@@ -1225,7 +1236,7 @@ void CContractCouples::openDifferent()
 {
 	CString fileName;
 	fileName.Format( L"couplesDifferent_%d", m_loop );
-	differentSpec = theApp.openHtmlFile( &fD, fileName, L"w+" );
+	m_fileSpecHtmlD = theApp.openHtmlFile( &fD, fileName, L"w+" );
 
 	createHead( L"AZONOS NEVÛ HÁZASPÁROK, AKIK KÜLÖNBÖZNEK EGYMÁSTÓL" ); 
 	fwprintf( fD, m_head );

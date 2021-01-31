@@ -905,7 +905,7 @@ azonos emberek összevonását. Ebbõl az adatbázisból készített hasonló lista, már 
 	fwprintf( fh1, L"<pre>" );
 	fwprintf( fh1, L"%-25s %s<br>", L"Adatbázis", theApp.m_databaseSpec );
 	fwprintf( fh1, L"%-25s %s<br>", L"lista készült", theApp.getPresentDateTime() );
-	fwprintf( fh1, L"%-25s %d<br><br><br>", L"Elvégzett összevonások:", theApp._iterationCount );
+	fwprintf( fh1, L"%-25s %d<br><br><br>", L"Elvégzett összevonások:", theApp.getUserVersion() );
 
 	str.Format( L"\n<font color='red'>%12s %6s %6s %1s %1s %1s %-25s %-15s %-15s %s %-25s %s %-25s %s</font><br>\n", L"rowid", L"line#", L"table#", L"S", L"U",L"G",L"name", L"születés", L"halál", L"S", L"apja neve", L"s", L"anyja neve", L"házastársa" );
 	fwprintf( fh1, str );
