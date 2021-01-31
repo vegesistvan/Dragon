@@ -23,13 +23,16 @@ public:
 	int	 m_linenumber;
 	std::vector<CString>* vLines;
 	CString m_rowid;
+	CString m_type;
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	CListCtrlEx m_ListCtrl;
+	CString m_command;
 
+	void motherAndSiblings();
 
-	CString CHtmlLines::getHtmlLine( CString lineNumber );
-	CString CHtmlLines::cleanHtmlLine( CString cLine );
+	CString getHtmlLine( CString lineNumber );
+	CString cleanHtmlLine( CString cLine );
 
 	DECLARE_MESSAGE_MAP()
 public:

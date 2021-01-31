@@ -33,10 +33,8 @@ BEGIN_MESSAGE_MAP(CHtmlLines, CDialogEx)
 	ON_WM_SIZING()
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CHtmlLines::OnDblclkList)
 	ON_COMMAND(ID_LIST_LINES, &CHtmlLines::OnListLines)
-//	ON_NOTIFY(NM_CLICK, IDC_LIST, &CHtmlLines::OnClickList)
-//ON_NOTIFY(NM_RCLICK, IDC_LIST, &CHtmlLines::OnRclickList)
-ON_BN_CLICKED(IDC_MODIFY, &CHtmlLines::OnClickedModify)
-ON_EN_CHANGE(IDC_EDIT, &CHtmlLines::OnChangeEdit)
+	ON_BN_CLICKED(IDC_MODIFY, &CHtmlLines::OnClickedModify)
+	ON_EN_CHANGE(IDC_EDIT, &CHtmlLines::OnChangeEdit)
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CHtmlLines::OnInitDialog()
@@ -47,15 +45,8 @@ BOOL CHtmlLines::OnInitDialog()
 
 	EASYSIZE_ADD( IDCANCEL,	ES_KEEPSIZE,ES_KEEPSIZE,	ES_BORDER,		ES_BORDER,		0);
 	EASYSIZE_INIT()
-/*
-	CProgressWnd wndP(NULL, L"html sorok keresése..." ); 
-	wndP.GoModal();
-	wndP.SetRange( 0, int(vLines->size()) );
-	wndP.SetPos( 0 );
-	wndP.SetStep( 1 );
-*/
-//	SetWindowPos(&wndTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 
+	
 	int		nItem = 0;
 	CString parentsL;
 	CString line;
@@ -79,6 +70,15 @@ BOOL CHtmlLines::OnInitDialog()
 	
 
 	GetDlgItem( IDC_MODIFY )->EnableWindow( FALSE );
+
+
+	if( m_type == L"SIBLINGS" )
+	{
+		motherAndSiblings();
+	}
+	else
+	{
+
 
 	CStringArray A;
 	A.Add( L"anyai nagyapa" );
@@ -153,6 +153,7 @@ BOOL CHtmlLines::OnInitDialog()
 			caption.Format( L"%s és szülei a ga.html fájlban", child );
 	}
 	SetWindowTextW( caption );
+	}
 	return TRUE;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -243,4 +244,44 @@ void CHtmlLines::OnClickedModify()
 void CHtmlLines::OnChangeEdit()
 {
 	GetDlgItem( IDC_MODIFY )->EnableWindow( TRUE );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CHtmlLines::motherAndSiblings()
+{
+	if( m_rowid.IsEmpty() ) return;
+
+	SetWindowTextW( L"Anya és gyermekei" );
+
+	int nItem;
+	CString line;
+	CString linenumber;
+	CString mother_id;
+
+	m_ListCtrl.InsertColumn( 0,	L"",		LVCFMT_RIGHT,	 120,-1,COL_TEXT );
+	m_ListCtrl.InsertColumn( 1,	L"line#",	LVCFMT_RIGHT,	  80,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( 2,	L"ga.line",	LVCFMT_LEFT,    1500,-1,COL_EDIT);
+
+	m_command.Format( L"SELECT mother_id FROM people WHERE rowid ='%s'", m_rowid );
+	if( !theApp.query( m_command ) ) return;
+	mother_id	= theApp.m_recordset->GetFieldString( 0 );
+
+	m_command.Format( L"SELECT linenumber FROM people WHERE rowid ='%s'", mother_id );
+	if( !theApp.query( m_command ) ) return;
+	linenumber	= theApp.m_recordset->GetFieldString( 0 );
+	line		= getHtmlLine( linenumber );
+	nItem = m_ListCtrl.InsertItem( 0, L"anya" );
+	m_ListCtrl.SetItemText( nItem, 1, linenumber );
+	m_ListCtrl.SetItemText( nItem, 2, line );
+
+
+	m_command.Format( L"SELECT linenumber FROM people WHERE mother_id ='%s' ORDER BY linenumber", mother_id );
+	if( !theApp.query( m_command ) ) return;
+	for( INT i = 0; i < theApp.m_recordset->RecordsCount(); ++i, theApp.m_recordset->MoveNext() )
+	{
+		linenumber	= theApp.m_recordset->GetFieldString( 0 );
+		line		= getHtmlLine( linenumber );
+		nItem = m_ListCtrl.InsertItem( i+1, L"gyerek" );
+		m_ListCtrl.SetItemText( nItem, 1, linenumber );
+		m_ListCtrl.SetItemText( nItem, 2, line );
+	}
 }

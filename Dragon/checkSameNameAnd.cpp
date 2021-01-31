@@ -111,6 +111,7 @@ BEGIN_MESSAGE_MAP(CcheckSameNameAnd, CDialogEx)
 	ON_COMMAND(ID_HTML, &CcheckSameNameAnd::OnHtml)
 	ON_COMMAND(ID_EDIT_NOTEPAD_PARENTS, &CcheckSameNameAnd::OnEditNotepadParents)
 	ON_WM_CLOSE()
+	ON_COMMAND(ID_MOTHERANDSIBLING, &CcheckSameNameAnd::OnMotherandsibling)
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CcheckSameNameAnd::OnInitDialog()
@@ -766,36 +767,6 @@ void CcheckSameNameAnd::OnHtmlPeoplefather()
 	dlg.m_rowid = m_ListCtrl.GetItemText( nItem, L_ROWID );
 	dlg.DoModal();
 
-
-
-
-/*
-	if( nItem == - 1 )
-	{
-		theApp.message( L"", L"Nincs kijelölve ember!" );
-		return;
-	}
-	CString lineNumber	= m_ListCtrl.GetItemText( nItem, 	L_LINENUMBER );
-	CString lineNumberF	= m_ListCtrl.GetItemText( nItem, 	L_LINENUMBERF );
-	if( lineNumberF.IsEmpty() )
-	{
-		AfxMessageBox( L"A kijelölt embernek nem ismerjük az apját!" );
-		return;
-	}
-
-
-	std::vector<CString> vLines;
-
-	vLines.push_back( lineNumberF );
-	vLines.push_back( lineNumber );
-
-	CHtmlLines dlg;
-	dlg._what = 2;
-	dlg.parents.Format( L"%s - %s",  m_ListCtrl.GetItemText( nItem,L_FATHER ), m_ListCtrl.GetItemText( nItem,L_MOTHER ) );
-	dlg.child	= m_ListCtrl.GetItemText( nItem,L_NAME );
-	dlg.vLines	= &vLines;
-	dlg.DoModal();
-*/
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1215,3 +1186,12 @@ void CcheckSameNameAnd::OnHtml()
 	theApp.showHtmlFile( fileSpec );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CcheckSameNameAnd::OnMotherandsibling()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	CHtmlLines dlg;
+	dlg.m_type = L"SIBLINGS";
+
+	dlg.m_rowid = m_ListCtrl.GetItemText( nItem, L_ROWID );
+	dlg.DoModal();
+}
