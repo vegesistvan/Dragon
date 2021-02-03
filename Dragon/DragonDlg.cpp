@@ -83,7 +83,6 @@ CDragonDlg::CDragonDlg(CWnd* pParent /*=NULL*/)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CDragonDlg::~CDragonDlg()
 {
-	AfxMessageBox( L"Vége" );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::DoDataExchange(CDataExchange* pDX)
@@ -183,8 +182,8 @@ ON_COMMAND(ID_GEDCOM_INDIFAMS, &CDragonDlg::OnGedcomINDIFAMS)
 ON_WM_CLOSE()
 ON_COMMAND(ID_SAMENAMEANDSPOUSE, &CDragonDlg::OnSamenameandspouse)
 ON_COMMAND(ID_APP_EXIT, &CDragonDlg::OnAppExit)
-ON_COMMAND(ID_CONTRACTEDCOUPLES, &CDragonDlg::OnContractedcouples)
-ON_COMMAND(ID_CONTRACT_PEOPLE, &CDragonDlg::OnContractPeople)
+ON_COMMAND(ID_CONTRACTEDCOUPLES, &CDragonDlg::OnContractedCouples)
+ON_COMMAND(ID_CONTRACT_PEOPLE, &CDragonDlg::OnContractedPeople)
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CDragonDlg::OnInitDialog()
@@ -350,9 +349,9 @@ void CDragonDlg::OnSelectedFiles()
 void CDragonDlg::mainTitle( )
 {
 	CString caption;
-	int userVersion = theApp.getUserVersion();
+	UINT userVersion = theApp.getUserVersion();
 
-	caption.Format( L"Dragon v. %s - %s || Családok nyilvántartása || adatbázis: %s (%d) || %s ||", BUILT, PLATFORM, theApp.m_databaseSpec, userVersion, theApp.m_inputMode );
+	caption.Format( L"Dragon v. %s - %s || Családok nyilvántartása || adatbázis: %s (%d-%d) || %s ||", BUILT, PLATFORM, theApp.m_databaseSpec, userVersion && 0XFF, userVersion >> 16, theApp.m_inputMode );
 	SetWindowText( caption );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1123,14 +1122,14 @@ void CDragonDlg::OnAppExit()
 	MessageBox( L"AppExit" );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragonDlg::OnContractedcouples()
+void CDragonDlg::OnContractedCouples()
 {
 	CContractedCouples dlg;
 	dlg.DoModal();
 	mainTitle( );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragonDlg::OnContractPeople()
+void CDragonDlg::OnContractedPeople()
 {
 	CContractedPeople dlg;
 	dlg.DoModal();

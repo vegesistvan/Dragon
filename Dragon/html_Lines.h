@@ -24,12 +24,14 @@ public:
 	std::vector<CString>* vLines;
 	CString m_rowid;
 	CString m_type;
+	CString m_title;
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	CListCtrlEx m_ListCtrl;
 	CString m_command;
 
 	void motherAndSiblings();
+	void fatherAndSiblings();
 
 	CString getHtmlLine( CString lineNumber );
 	CString cleanHtmlLine( CString cLine );

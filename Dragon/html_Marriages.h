@@ -43,6 +43,9 @@ protected:
 	BOOL PreTranslateMessage(MSG* pMsg);
 	virtual void PostNcDestroy();
 
+	void CMarriages::OnMarriagesFile();
+	void CMarriages::OnMarriagesTable();
+	void CMarriages::OnMarriagesLine();
 	void OnHtmlEdit();
 	void OnHtmlNotepad();
 	DECLARE_MESSAGE_MAP()

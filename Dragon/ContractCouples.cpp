@@ -210,7 +210,7 @@ L"rowid", L"feleség", L"születés", L"halál", L"apja", L"anyja" \
 //	_husband	= L"Ajkay István";	// férj neve
 //	_wife		= L"N N";			// feleség neve
 	m_loopMax	= 3;			// max loop
-	m_azonos	= 0;			// legalább ennyi egyezés ellemtmondás nélkül
+	m_azonos	= 1;			// legalább ennyi egyezés ellemtmondás nélkül
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CContractCouples::~CContractCouples()
@@ -268,7 +268,8 @@ void CContractCouples::contractCouples()
 		core( m_loop );
 
 
-		theApp.setUserVersion( vContract.size() );
+		int i = m_azonos << 16;
+		theApp.setUserVersion( i );
 
 		if( vContract.size() )
 			str.Format( L"%d ember összevonható lenne.", vContract.size() );
@@ -290,7 +291,7 @@ void CContractCouples::contractCouples()
 
 		int type = CONTRACTED_COUPLES_HTML1;
 		if( m_loop == 2 )
-			type = CONTRACTED_COUPLES_HTML1;
+			type = CONTRACTED_COUPLES_HTML2;
 		m_command.Format( L"INSERT INTO files (type, subtype, filespec) VALUES( %d, %d, '%s')", type, UNITEDTXT, m_fileSpecHtmlU );
 		if( !theApp.execute( m_command ) ) return;
 	

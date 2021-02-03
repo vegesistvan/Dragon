@@ -191,6 +191,7 @@
     <ClInclude Include="ContractCouples.h" />
     <ClInclude Include="ContractedCouples.h" />
     <ClInclude Include="ContractedPeople.h" />
+    <ClInclude Include="ContractPeopleDlg.h" />
     <ClInclude Include="EditComment.h" />
     <ClInclude Include="EditMarriage.h" />
     <ClInclude Include="EditPeople.h" />
@@ -308,6 +309,7 @@
     <ClCompile Include="ContractCouples.cpp" />
     <ClCompile Include="ContractedCouples.cpp" />
     <ClCompile Include="ContractedPeople.cpp" />
+    <ClCompile Include="ContractPeopleDlg.cpp" />
     <ClCompile Include="EditComment.cpp" />
     <ClCompile Include="EditMarriage.cpp" />
     <ClCompile Include="EditPeople.cpp" />

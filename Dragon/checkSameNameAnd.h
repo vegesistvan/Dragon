@@ -93,4 +93,5 @@ public:
 	afx_msg void OnHtml();
 	afx_msg void OnEditNotepadParents();
 	afx_msg void OnMotherandsibling();
+	afx_msg void OnFatherandsiblings();
 };

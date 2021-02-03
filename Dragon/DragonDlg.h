@@ -420,6 +420,6 @@ public:
 	afx_msg void OnSamenameandspouse();
 
 	afx_msg void OnAppExit();
-	afx_msg void OnContractedcouples();
-	afx_msg void OnContractPeople();
+	afx_msg void OnContractedCouples();
+	afx_msg void OnContractedPeople();
 };

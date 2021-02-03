@@ -316,12 +316,6 @@ CString CDragonApp::getInputMode()
 	if( !query( L"SELECT count() FROM people" ) ) return FALSE;
 	m_cntPeople = _wtoi( m_recordset->GetFieldString( 0 ) );
 
-	if( !m_cntPeople )
-		setUserVersion( 0 );
-
-//	m_command = L"SELECT rowid FROM people";
-//	if( !query( m_command ) ) return L"";
-
 	if( !m_cntPeople ) 
 	{
 		m_inputMode = URES;

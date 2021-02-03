@@ -4,8 +4,6 @@
 #include "colorstatic.h"
 
 
-// CContractedPeople dialog
-
 class CContractedPeople : public CDialogEx
 {
 	DECLARE_DYNAMIC(CContractedPeople)
@@ -15,7 +13,6 @@ public:
 	CContractedPeople(CWnd* pParent = NULL);   // standard constructor
 	virtual ~CContractedPeople();
 
-// Dialog Data
 	enum { IDD = IDD_CONTRACTED_PEOPLE };
 
 	CString m_filter;
@@ -35,6 +32,7 @@ protected:
 	CString str;
 	CString cLine;
 	CString m_command;
+	int m_azonos;
 	bool UNITED;
 
 	std::vector<TCHAR*> vPeople; 
@@ -42,7 +40,8 @@ protected:
 
 //	SAMENAMES r;				// referencia adatok az összehasonlításnál
 	
-	bool inputFile( int subType );
+	void inputFile( int subType );
+	void getFileSpec( int type, int subtype );
 
 	void OnEdit2lines();
 	BOOL PreTranslateMessage(MSG* pMsg);
@@ -60,7 +59,6 @@ public:
 	afx_msg void OnFilter2();
 
 	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
-//	afx_msg void OnHtmlEdit();
 	afx_msg void OnHtmlShows();
 	afx_msg void OnHtmlPeoplefather();
 	afx_msg void OnHtmlNotepad();
@@ -68,6 +66,10 @@ public:
 	afx_msg void OnInputDifferent();
 	afx_msg void OnInputUnited();
 
-//	afx_msg void OnRdblclkList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnHtml1D();
+	afx_msg void OnHtml1U();
+	afx_msg void OnHtml2D();
+	afx_msg void OnHtml2U();
+//	afx_msg void OnClickList(NMHDR *pNMHDR, LRESULT *pResult);
 };

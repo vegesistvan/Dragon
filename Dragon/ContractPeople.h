@@ -43,6 +43,7 @@ public:
 	CContractPeople();
 	virtual ~CContractPeople();
 	bool contractPeople();
+	int m_azonos;			// az egyesítéshez szükséges azonosságok száma
 protected:
 	CProgressWnd wndP; 
 
@@ -71,7 +72,7 @@ protected:
 	CString sWHITE;
 
 	bool	m_contracted;		// jelzi, hogy vannak összevont bejegyzések a vPeople vektorban
-	int		m_azonos;			// az egyesítéshez szükséges azonosságok száma
+	
 	std::vector<SAMENAMES> vPeople;
 	std::vector<CONTRACT> vContract;
 	std::vector<TCHAR*> tableLines; 
@@ -89,8 +90,8 @@ protected:
 
 
 	void createHead( CString title  );
-	void core();
-	void putPeople( CString name, UINT i );
+	bool core();
+	bool putPeople( CString name, UINT i );
 	void processPeopleNew();
 	void processPeople();
 	void listPeople();

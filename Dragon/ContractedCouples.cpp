@@ -87,6 +87,10 @@ BEGIN_MESSAGE_MAP(CContractedCouples, CDialogEx)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CContractedCouples::OnHtmlNotepad)
 
 	ON_COMMAND(ID_INFO, &CContractedCouples::OnInfo)
+	ON_COMMAND(ID_HTML_1_D, &CContractedCouples::OnHtml1D)
+	ON_COMMAND(ID_HTML_1_U, &CContractedCouples::OnHtml1U)
+	ON_COMMAND(ID_HTML_2_D, &CContractedCouples::OnHtml2D)
+	ON_COMMAND(ID_HTML_2_U, &CContractedCouples::OnHtml2U)
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CContractedCouples::OnInitDialog()
@@ -586,4 +590,39 @@ megengedjük, hogy a házastársak egyyike legyen, nem azonos.\r\n\
 	dlg.m_title = L"Azonos nevû házastársak házaspárjaink azonossági vizsgálata és bejegyzések összevonása"; 
 	dlg.m_info = info;
 	dlg.DoModal();
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedCouples::OnHtml1D()
+{
+	getFileSpec( CONTRACTED_COUPLES_HTML1, DIFFERENTTXT );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedCouples::OnHtml1U()
+{
+	getFileSpec( CONTRACTED_COUPLES_HTML1, UNITEDTXT );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedCouples::OnHtml2D()
+{
+	getFileSpec( CONTRACTED_COUPLES_HTML2, DIFFERENTTXT );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedCouples::OnHtml2U()
+{
+	getFileSpec( CONTRACTED_COUPLES_HTML2, UNITEDTXT );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedCouples::getFileSpec( int type, int subType )
+{
+	CString filespec;
+	m_command.Format( L"SELECT filespec FROM files WHERE type=%d AND subtype=%d", type, subType );
+	if( !theApp.query( m_command ) );
+	filespec = theApp.m_recordset->GetFieldString( 0 );
+	if( filespec.IsEmpty() || _waccess( filespec, 0 ) )
+	{
+		str.Format( L"%s\nfájl nem létezik!", filespec );
+		AfxMessageBox( str );
+	}
+	theApp.showHtmlFile( filespec );
 }

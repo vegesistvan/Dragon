@@ -51,6 +51,8 @@ enum
 	CONTRACTED_COUPLES_HTML1,
 	CONTRACTED_COUPLES_HTML2,
 	CONTRACTED_PEOPLE,
+	CONTRACTED_PEOPLE_HTML1,
+	CONTRACTED_PEOPLE_HTML2,
 };
 enum
 {
@@ -222,7 +224,7 @@ public:
 	bool	checkIntegrity( CSqliteDB* db );
 	void	createColumnVector( CString list, std::vector<CString>* vColumns );
 	int		getUserVersion();
-	void	setUserVersion( int iterationCount );
+	void	setUserVersion( int user_version );
 	void	insertIntoFiles( CString fileSpec );
 // Implementation
 	void	replaceBy( CString rowid, CString rowidBy, CString sex_id, int source );

@@ -86,6 +86,11 @@ BEGIN_MESSAGE_MAP(CContractedPeople, CDialogEx)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CContractedPeople::OnDblclkList)
 	ON_COMMAND(ID_INPUT_UNITED, &CContractedPeople::OnInputUnited)
 	ON_COMMAND(ID_INPUT_DIFFERENT, &CContractedPeople::OnInputDifferent)
+ON_COMMAND(ID_HTML_1_D, &CContractedPeople::OnHtml1D)
+ON_COMMAND(ID_HTML_1_U, &CContractedPeople::OnHtml1U)
+ON_COMMAND(ID_HTML_2_D, &CContractedPeople::OnHtml2D)
+ON_COMMAND(ID_HTML_2_U, &CContractedPeople::OnHtml2U)
+//ON_NOTIFY(NM_CLICK, IDC_LIST, &CContractedPeople::OnClickList)
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CContractedPeople::OnInitDialog()
@@ -101,8 +106,12 @@ BOOL CContractedPeople::OnInitDialog()
 	colorKeress.SetTextColor( theApp.m_colorClick );
 	colorNext.SetTextColor( theApp.m_colorClick );
 
+	m_azonos = theApp.getUserVersion() && 0XFF;
+
 	createColumns();
 	OnInputUnited();
+
+	
 
 	GetDlgItem( IDC_CAPTION )->SetWindowTextW( m_fileSpec );
 //	SetWindowPos(&wndTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
@@ -111,8 +120,8 @@ BOOL CContractedPeople::OnInitDialog()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedPeople::OnInputDifferent()
 {
-	str.Format( L"Azonos nevû emberek bejegyzései, akik nem vonhatóak össze" );
-	if( !inputFile( DIFFERENTTXT ) )return;
+	str.Format( L"Azonos nevû emberek bejegyzései, akik nem vonhatóak össze (adat-azonosságok megkövetelt száma: %d )", m_azonos );
+	inputFile( DIFFERENTTXT );
 
 	UNITED = false;
 	menu.EnableMenuItem( ID_INPUT_UNITED, MF_BYCOMMAND | MF_ENABLED);
@@ -123,8 +132,8 @@ void CContractedPeople::OnInputDifferent()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedPeople::OnInputUnited()
 {
-	str.Format( L"Azonos nevû emberek bejegyzései, amik részben összevonásra kerületk"  );
-	if( !inputFile( UNITEDTXT ) )return;
+	str.Format( L"Azonos nevû emberek bejegyzései, amik részben összevonásra kerültek (adat-azonosságok megkövetelt száma: %d)", m_azonos );
+	inputFile( UNITEDTXT );
 
 	UNITED = true;
 	menu.EnableMenuItem( ID_INPUT_UNITED, MF_BYCOMMAND | MF_GRAYED);
@@ -134,7 +143,7 @@ void CContractedPeople::OnInputUnited()
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CContractedPeople::inputFile( int subType )
+void CContractedPeople::inputFile( int subType )
 {
 	CString filespec;
 
@@ -147,7 +156,8 @@ bool CContractedPeople::inputFile( int subType )
 		if( filespec.IsEmpty() || _waccess( filespec, 0 ) )
 		{
 			CContractPeople cc;
-			cc.contractPeople();
+			if( !cc.contractPeople() )
+				CDialog::OnCancel();
 		}
 		else
 			break;
@@ -174,8 +184,7 @@ bool CContractedPeople::inputFile( int subType )
 		{
 			str.Format( L"Az %d. sorban az elemek száma %d.\n%d kellen lenni.", cnt, n, S_COLUMNSCOUNT );
 			AfxMessageBox( str );
-			break;
-			return false;
+			CDialog::OnCancel();
 		}
 
 		if( A[1].IsEmpty() ) ++m_numOfGroups;		// azonos snevû emberek száma
@@ -193,9 +202,9 @@ bool CContractedPeople::inputFile( int subType )
 	m_ListCtrl.SetItemCountEx( vPeople.size() + 1  );
 	m_ListCtrl.AttachDataset( &vPeople );
 
+	m_azonos = theApp.getUserVersion() && 0XFF;
 	GetDlgItem( IDC_CAPTION )->SetWindowTextW( filespec );
 	ShowWindow( SW_MAXIMIZE );
-	return true;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedPeople::push( CString item )
@@ -324,30 +333,34 @@ void CContractedPeople::createColumns()
 	m_ListCtrl.KeepSortOrder(TRUE);
 	m_ListCtrl.SetExtendedStyle(m_ListCtrl.GetExtendedStyle()| LVS_EX_GRIDLINES );
 	
+	m_ListCtrl.InsertColumn( S_CNT,				L"xyz",			LVCFMT_RIGHT,	 30,-1,COL_HIDDEN);
 	m_ListCtrl.InsertColumn( S_LOOP,			L"loop",		LVCFMT_RIGHT,	 30,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_LOOP,			L"loop",		LVCFMT_RIGHT,	 30,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_GROUP,			L"gr",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_MATCH,			L"m#",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_GROUP2,			L"gr2",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_STATUS,			L"st",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_RGBCOLOR,		L"color",		LVCFMT_RIGHT,	 30,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( S_GROUP,			L"gr",			LVCFMT_RIGHT,	 30,-1,COL_HIDDEN);
+	m_ListCtrl.InsertColumn( S_MATCH,			L"m#",			LVCFMT_RIGHT,	 30,-1,COL_HIDDEN);
+	m_ListCtrl.InsertColumn( S_GROUP2,			L"gr2",			LVCFMT_RIGHT,	 30,-1,COL_HIDDEN);
+	m_ListCtrl.InsertColumn( S_STATUS,			L"st",			LVCFMT_RIGHT,	 30,-1,COL_HIDDEN);
+	m_ListCtrl.InsertColumn( S_RGBCOLOR,		L"color",		LVCFMT_RIGHT,	 30,-1,COL_HIDDEN);
 	m_ListCtrl.InsertColumn( S_LINE,			L"line#",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( S_UNITED,			L"U",			LVCFMT_LEFT,	 20,-1,COL_NUM );
 	m_ListCtrl.InsertColumn( S_SOURCE,			L"S",			LVCFMT_RIGHT,	 20,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( S_GENERATION,		L"G",			LVCFMT_RIGHT,	 20,-1,COL_NUM);
+	
 	m_ListCtrl.InsertColumn( S_ROWID,			L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( S_NAME,			L"név",			LVCFMT_LEFT,	200,-1,COL_TEXT );
 	m_ListCtrl.InsertColumn( S_BIRTH,			L"születés",	LVCFMT_LEFT,	 70,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( S_DEATH,			L"halálozás",	LVCFMT_LEFT,	 70,-1,COL_NUM);
+	
 	m_ListCtrl.InsertColumn( S_ROWIDF,			L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( S_FATHER,			L"apa",			LVCFMT_LEFT,	200,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( S_BIRTHF,			L"születés",	LVCFMT_LEFT,	 70,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( S_DEATHF,			L"halál",		LVCFMT_LEFT,	 70,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( S_ROWIDM,			L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
+	
 	m_ListCtrl.InsertColumn( S_MOTHER,			L"anya",		LVCFMT_LEFT,	200,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( S_BIRTHM,			L"születés",	LVCFMT_LEFT,	 70,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( S_DEATHM,			L"halál",		LVCFMT_LEFT,	 70,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( S_ROWIDS,			L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
+	
 	m_ListCtrl.InsertColumn( S_SPOUSES,			L"házastársak",	LVCFMT_LEFT,	500,-1,COL_TEXT );
 	m_ListCtrl.InsertColumn( S_LINEF,			L"line#F",		LVCFMT_LEFT,	 60,-1,COL_HIDDEN );
 }
@@ -473,14 +486,6 @@ void CContractedPeople::OnEdit2lines()
 	theApp.editHtmlLines( &m_ListCtrl, S_LINE );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-void CContractedPeople::OnHtmlEdit()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	S_LINE ) );
-	theApp.listHtmlLine( lineNumber );
-}
-*/
 void CContractedPeople::OnHtmlNotepad()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
@@ -565,4 +570,58 @@ void CContractedPeople::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
 
 	*pResult = 0;
 }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedPeople::OnHtml1D()
+{
+	getFileSpec( CONTRACTED_PEOPLE_HTML1, DIFFERENTTXT );
+}
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedPeople::OnHtml1U()
+{
+	getFileSpec( CONTRACTED_PEOPLE_HTML1, UNITEDTXT );
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedPeople::OnHtml2D()
+{
+	getFileSpec( CONTRACTED_PEOPLE_HTML2, DIFFERENTTXT );
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedPeople::OnHtml2U()
+{
+	getFileSpec( CONTRACTED_PEOPLE_HTML2, UNITEDTXT );
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedPeople::getFileSpec( int type, int subType )
+{
+	CString filespec;
+	m_command.Format( L"SELECT filespec FROM files WHERE type=%d AND subtype=%d", type, subType );
+	if( !theApp.query( m_command ) );
+	filespec = theApp.m_recordset->GetFieldString( 0 );
+	if( filespec.IsEmpty() || _waccess( filespec, 0 ) )
+	{
+		str.Format( L"%s\nfájl nem létezik!", filespec );
+		AfxMessageBox( str );
+	}
+	theApp.showHtmlFile( filespec );
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
+void CContractedPeople::OnClickList(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+	int nItem		= pNMItemActivate->iItem;
+	int nSubItem	= pNMItemActivate->iSubItem;
+
+	if( nSubItem == S_NAME )
+	{
+		CString rowid	= m_ListCtrl.GetItemText( nItem, S_ROWID );
+		CRelations dlg;
+		dlg.nItem		= nItem;
+		dlg.m_rowid		= rowid;
+		if( dlg.DoModal() == IDCANCEL ) return;
+	}
+	*pResult = 0;
+}
+*/
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

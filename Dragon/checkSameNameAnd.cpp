@@ -53,8 +53,10 @@ enum
 	L_BIRTH,
 	L_DEATH,
 	L_SF,
+	L_ROWIDF,
 	L_FATHER,
 	L_SM,
+	L_ROWIDM,
 	L_MOTHER,
 	L_SPOUSES,
 	L_LINENUMBERF,
@@ -112,6 +114,7 @@ BEGIN_MESSAGE_MAP(CcheckSameNameAnd, CDialogEx)
 	ON_COMMAND(ID_EDIT_NOTEPAD_PARENTS, &CcheckSameNameAnd::OnEditNotepadParents)
 	ON_WM_CLOSE()
 	ON_COMMAND(ID_MOTHERANDSIBLING, &CcheckSameNameAnd::OnMotherandsibling)
+	ON_COMMAND(ID_FATHERANDSIBLINGS, &CcheckSameNameAnd::OnFatherandsiblings)
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CcheckSameNameAnd::OnInitDialog()
@@ -616,8 +619,10 @@ void CcheckSameNameAnd::createColumns()
 	m_ListCtrl.InsertColumn( L_BIRTH,		L"születés",	LVCFMT_LEFT,	 70,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_DEATH,		L"halál",		LVCFMT_LEFT,	 70,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_SF,			L"s",			LVCFMT_LEFT,	 70,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_ROWIDF,		L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_FATHER,		L"apa",			LVCFMT_LEFT,	200,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_SM,			L"s",			LVCFMT_LEFT,	 70,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_ROWIDM,		L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_MOTHER,		L"anya",		LVCFMT_LEFT,	200,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_SPOUSES,		L"házastársak",	LVCFMT_LEFT,	500,-1,COL_TEXT );
 	m_ListCtrl.InsertColumn( L_LINENUMBERF,	L"line#F",		LVCFMT_LEFT,	 60,-1,COL_NUM );
@@ -896,7 +901,9 @@ void CcheckSameNameAnd::listSameVector()
 	CString name;
 	CString birthDate;
 	CString deathDate;
+	CString rowidF;
 	CString fatherName;
+	CString rowidM;
 	CString motherName;
 	CString spouses;
 	CString spouses2;
@@ -1053,8 +1060,10 @@ void CcheckSameNameAnd::listSameVector()
 		m_ListCtrl.SetItemText( nItem, L_BIRTH, birthDate );
 		m_ListCtrl.SetItemText( nItem, L_DEATH, deathDate );
 		m_ListCtrl.SetItemText( nItem, L_SF, fatherSource );
+		m_ListCtrl.SetItemText( nItem, L_ROWIDF, father_id );
 		m_ListCtrl.SetItemText( nItem, L_FATHER, fatherNamePrint );
 		m_ListCtrl.SetItemText( nItem, L_SM, motherSource );
+		m_ListCtrl.SetItemText( nItem, L_ROWIDM, mother_id );
 		m_ListCtrl.SetItemText( nItem, L_MOTHER, motherNamePrint );
 		m_ListCtrl.SetItemText( nItem, L_SPOUSES,spouses2 );
 		m_ListCtrl.SetItemText( nItem, L_LINENUMBERF, lineNumberF );
@@ -1194,4 +1203,18 @@ void CcheckSameNameAnd::OnMotherandsibling()
 
 	dlg.m_rowid = m_ListCtrl.GetItemText( nItem, L_ROWID );
 	dlg.DoModal();
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CcheckSameNameAnd::OnFatherandsiblings()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	CHtmlLines dlg;
+
+	str.Format( L"%s és gyermekei a GA.html listában", m_ListCtrl.GetItemText( nItem, L_FATHER ) );
+	dlg.m_title = str;
+	dlg.m_type = L"F_SIBLINGS";
+
+	dlg.m_rowid = m_ListCtrl.GetItemText( nItem, L_ROWID );
+	dlg.DoModal();
+
 }

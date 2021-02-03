@@ -6,7 +6,7 @@
 #include "ContractPeople.h"
 #include "utilities.h"
 #include "ProgressWnd.h"
-#include "ContractedPeople.h"
+#include "ContractPeopleDlg.h"
 #include <algorithm>
 // lekérdezett mezõk a people táblából
 enum
@@ -50,7 +50,7 @@ enum
 	S_ROWIDM,
 	S_BIRTHM,
 	S_DEATHM,
-	S_ROWIDS,
+ 	S_ROWIDS,
 	S_SPOUSES,
 	S_LINEF,
 	COLUMNSCOUNT,
@@ -170,6 +170,11 @@ END_MESSAGE_MAP()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CContractPeople::contractPeople()
 {
+	CContractPeopleDlg dlg;
+	if( dlg.DoModal() == IDCANCEL ) return false;
+
+
+
 	CString fileName;
 	
 	fileName = L"peopleUnited";
@@ -212,9 +217,9 @@ bool CContractPeople::contractPeople()
 		vContract.clear();			// az összevont emberek 
 	
 
-		core();
+		if( !core() ) return false;
 
-		theApp.setUserVersion( vContract.size() );
+		theApp.setUserVersion( m_azonos );
 
 		if( vContract.size() > 200 )
 		{
@@ -225,6 +230,18 @@ bool CContractPeople::contractPeople()
 			theApp.execute( L"VACUUM");
 		}
 
+		if( m_loop < 3 )
+		{
+			int type = CONTRACTED_PEOPLE_HTML1;
+			if( m_loop == 2 )
+				type = CONTRACTED_PEOPLE_HTML2;
+			m_command.Format( L"INSERT INTO files (type, subtype, filespec) VALUES( %d, %d, '%s')", type, UNITEDTXT, unitedSpec );
+			if( !theApp.execute( m_command ) ) return false;
+	
+			m_command.Format( L"INSERT INTO files (type, subtype, filespec) VALUES( %d, %d, '%s')", type, DIFFERENTTXT, differentSpec );
+			if( !theApp.execute( m_command ) ) return false;
+		}
+
 		if( !vContract.size() ) break;		// nincs összevont ember, vége a programnak
 		fclose( fU );
 		fclose( fD );
@@ -232,28 +249,21 @@ bool CContractPeople::contractPeople()
 		++m_loop;
 	}
 	wndP.DestroyWindow();
-	
-//	if( tableLines.size() )
-	{
-		m_command.Format( L"INSERT INTO files( type, subtype, filespec) VALUES ( %d, %d,'%s')", CONTRACTED_PEOPLE, UNITEDTXT, m_fileSpecTextU );
-		if( !theApp.execute( m_command ) ) return false;
 
-		m_command.Format( L"INSERT INTO files( type, subtype, filespec) VALUES ( %d, %d,'%s')", CONTRACTED_PEOPLE, DIFFERENTTXT, m_fileSpecTextD );
-		if( !theApp.execute( m_command ) ) return false;
-	}
+	m_command.Format( L"INSERT INTO files( type, subtype, filespec) VALUES ( %d, %d,'%s')", CONTRACTED_PEOPLE, UNITEDTXT, m_fileSpecTextU );
+	if( !theApp.execute( m_command ) ) return false;
+
+	m_command.Format( L"INSERT INTO files( type, subtype, filespec) VALUES ( %d, %d,'%s')", CONTRACTED_PEOPLE, DIFFERENTTXT, m_fileSpecTextD );
+	if( !theApp.execute( m_command ) ) return false;
 
 	fclose( fU );
 	fclose( fD );
 	fclose( textU );
 	fclose( textD );
-
-	CContractedPeople dlg;
-	dlg.m_contracted = true;
-	dlg.DoModal();
 	return true;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CContractPeople::core()
+bool CContractPeople::core()
 {
 	CString namePrev;
 	CString name;
@@ -269,7 +279,7 @@ void CContractPeople::core()
 #endif
 			
 	m_command.Format( L"SELECT %s FROM people ORDER BY last_name, first_name, source", p_fields );
-	if( !query( m_command ) ) return;
+	if( !query( m_command ) ) return false;
 
 	wndP.SetRange( 0, m_recordset->RecordsCount() );
 	wndP.SetPos(0 );
@@ -299,7 +309,7 @@ void CContractPeople::core()
 				putPeople( name, i-1 );
 				first = false;
 			}
-			putPeople( name, i );
+			if( !putPeople( name, i ) ) return false;;
 		}
 		else if( vPeople.size() )
 		{
@@ -320,11 +330,12 @@ cont:	m_recordset->MoveNext();
 	contractFull();
 	deleteMarriages();
 	theApp.execute( L"COMMIT" );
+	return true;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Az azonos nevû emberek adatainak összegyûjtése a vPeople vetorba
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CContractPeople::putPeople( CString name, UINT i )
+bool CContractPeople::putPeople( CString name, UINT i )
 {
 	m_recordset->MoveTo( i );
 
@@ -357,7 +368,7 @@ void CContractPeople::putPeople( CString name, UINT i )
 
 	father_id			= m_recordset->GetFieldString( P_FATHER_ID );
 	m_command.Format( L"SELECT last_name, first_name, birth_date, death_date, lineNumber FROM people WHERE rowid = '%s'", father_id );
-	if( !query1( m_command ) ) return;
+	if( !query1( m_command ) ) return false;
 
 	name.Empty();
 	if( m_recordset1->RecordsCount() )
@@ -372,7 +383,7 @@ void CContractPeople::putPeople( CString name, UINT i )
 
 	CString mother_id = m_recordset->GetFieldString( P_MOTHER_ID );
 	m_command.Format( L"SELECT last_name, first_name, birth_date, death_date, father_id FROM people WHERE rowid = '%s'", mother_id );
-	if( !query1( m_command ) ) return;
+	if( !query1( m_command ) ) return false;
 
 	name.Empty();
 	if( m_recordset1->RecordsCount() )
@@ -387,13 +398,13 @@ void CContractPeople::putPeople( CString name, UINT i )
 		m_command.Format( L"SELECT spouse2_id FROM marriages WHERE spouse1_id = '%s'", rowid );
 	else
 		m_command.Format( L"SELECT spouse1_id FROM marriages WHERE spouse2_id = '%s'", rowid );
-	if( !query1( m_command ) ) return;
+	if( !query1( m_command ) ) return false;
 
 	for( UINT i = 0; i < m_recordset1->RecordsCount(); ++i )
 	{
 		spouse_id = m_recordset1->GetFieldString( 0 );
 		m_command.Format( L"SELECT last_name, first_name FROM people WHERE rowid = '%s'", spouse_id );
-		if( !query2( m_command ) ) return;
+		if( !query2( m_command ) ) return false;
 			fullname.Format( L"%s %s", m_recordset2->GetFieldString(0), sepFirstName( m_recordset2->GetFieldString(1) ) );
 		spouses += fullname.Trim();
 		spouses += L",";
@@ -406,6 +417,7 @@ void CContractPeople::putPeople( CString name, UINT i )
 	vpeople.rowidS	= spouse_id;
 
 	vPeople.push_back( vpeople );
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

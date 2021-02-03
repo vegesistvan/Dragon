@@ -283,11 +283,11 @@ int CDragonApp::getUserVersion()
 	return( _wtoi( m_recordset->GetFieldString( 0 ) ) );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragonApp::setUserVersion( int size )
+void CDragonApp::setUserVersion( int user_version )
 {
 	int volt = getUserVersion();
-	volt += size;
-	m_command.Format(L"PRAGMA user_version=%d", volt );
+	user_version |= getUserVersion();
+	m_command.Format(L"PRAGMA user_version=%d", user_version );
 	if( !theApp.execute( m_command ) ) return;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

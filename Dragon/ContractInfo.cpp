@@ -31,7 +31,9 @@ Az alábbi adatokat vizsgáljuk az azonos nevû emberek azonosságának eldöntéséhez:
 9. házastárs neve\r\n\
 \r\n\
 Ha két bejegyzés fenti adatokpárjai között akár egy ellentmondás van, akkor nyilvánvalóan nem azonos személy bejegyzéseirõl van szó.\r\n\
-Ha nincs ellentmondás, akkor 1 adatpár létezése és egyezése elegendõ az azonosság megállapításához.\r\n\
+Ha nincs ellentmondás, akkor 1 adatpár létezése és egyezése elegendõ az azonosság megállapításához, de az nem lehet az apa neve. Tehát \
+ha két bejegyzésnél csak az apa neve azonos, és semmi más, akkor ezeket a bejegyzéseket nem vonja össza. Az a tapasztalat, \
+hogy ez nem megbízható összevonásokhoz vezethet.\r\n\
 Leszármazottakat akkor sem egyesítünk, ha mindenben megfelelel az összevonási kritériumoknak, mert leszármazottként \n\
 csak egyszer szerepelhet egy ember.\r\n\
 Több házastárs esetén az azonosításhoz elegendõ, ha egy azonos nevû házastárs szerepel mindkét bejegyzésben.\r\n\
@@ -45,7 +47,6 @@ táblázat, fájlok is felfedhetnek hibákat.\r\n\
 \r\n\
 Az oszlopok jelentése:\r\n\
 \r\n\
-m#\tmatch, az azonosnak talált adatpárok száma\r\n\
 line\ta bejegyzés sorszáma a GA html fájlban.\r\n\
 U\tunited, az ember u számú bejegyzés összevonása.\r\n\
 G\tgeneráció, az ember generációs jele a GA fájlban.\r\n\

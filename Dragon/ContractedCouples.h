@@ -41,6 +41,7 @@ protected:
 	void OnHtmlNotepad();
 	void OnHtmlPeoplefather();
 	void OnEditNotepadParents();
+	void getFileSpec( int type, int subType );
 
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	DECLARE_MESSAGE_MAP()
@@ -60,4 +61,8 @@ public:
 	afx_msg void OnFilter1();
 	afx_msg void OnFilter2();
 	afx_msg void OnInfo();
+	afx_msg void OnHtml1D();
+	afx_msg void OnHtml1U();
+	afx_msg void OnHtml2D();
+	afx_msg void OnHtml2U();
 };
