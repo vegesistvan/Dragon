@@ -30,7 +30,7 @@ protected:
 	
 	CString m_title;
 	CString m_command;
-	CString m_parent_id_name;
+//	CString m_parent_id_name;
 	CString str;
 	int m_diff;
 
@@ -51,4 +51,5 @@ public:
 	afx_msg void OnGahtmlLine();
 	afx_msg void OnList();
 
+	afx_msg void OnFatherMotherHe();
 };

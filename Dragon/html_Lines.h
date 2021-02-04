@@ -32,6 +32,7 @@ protected:
 
 	void motherAndSiblings();
 	void fatherAndSiblings();
+	void fatherMotherHe();
 
 	CString getHtmlLine( CString lineNumber );
 	CString cleanHtmlLine( CString cLine );

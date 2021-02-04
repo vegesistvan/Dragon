@@ -1,3 +1,5 @@
+v 1.6.4 2021.02.04 Összevonás előtt a szülők és a gyerek születési dátumának ellenőrzésekor a legördülő menüben listázható a szülők és testvérek  ga.html sora
+ 
 v 1.6.3 2021.02.03 HTML fájlok megjelenítése a CListCtrl ablakból
 
 v 1.6.2 2021.01.31 Anya és gyermekei listája a szerkesztő ablakban a sameNameAndFather funkcióban

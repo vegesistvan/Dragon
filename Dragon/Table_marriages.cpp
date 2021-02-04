@@ -169,6 +169,7 @@ BEGIN_MESSAGE_MAP(CTableMarriages, CDialogEx)
 	ON_COMMAND(ID_MOREMARRIAGES, &CTableMarriages::OnMoreMarriages)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST, &CTableMarriages::OnCustomdrawList)
 	ON_STN_CLICKED(IDC_NEXT, &CTableMarriages::OnClickedNext)
+	ON_COMMAND(ID_MAN_MORESPOUSES, &CTableMarriages::OnManMorespouses)
 END_MESSAGE_MAP()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CTableMarriages::OnInitDialog()
@@ -188,6 +189,7 @@ BOOL CTableMarriages::OnInitDialog()
 	colorKeres.SetTextColor( theApp.m_colorClick ); 
 	colorNext.SetTextColor( theApp.m_colorClick );
 
+
 	m_command.Format( L"SELECT count(*) FROM marriages" );
 	if( !theApp.query( m_command ) ) return false;
 
@@ -195,8 +197,50 @@ BOOL CTableMarriages::OnInitDialog()
 	if( cnt && cnt < 10000 )
 		OnUnfilter();
 
-
 	return TRUE;
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BOOL CTableMarriages::fillVectors()
+{
+
+	CString title(L"Házastársak lekérdezése" ); 
+	wndP.Create( NULL, title );
+	wndP.GoModal();
+	
+	CString fileName;
+	fileName += L"peopleHavingMoreSpouses";
+	fileSpec = theApp.openHtmlFile( &fh1, fileName, L"w+" );
+	htmlHeader( title );
+
+#ifndef _DEBUG
+	str.Format( L"Férjek lekérdezése az adatbázisból..." );
+	wndP.SetText( str );
+#endif
+
+	m_command.Format( L"SELECT rowid,* FROM marriages ORDER BY spouse1_id" );
+	if( !query( m_command ) ) return false;
+
+	collectHusband();
+	
+#ifndef _DEBUG
+	str.Format( L"(1/6) Feleségek lekérdezése az adatbázisból..." );
+	wndP.SetText( str );
+#endif
+	m_command.Format( L"SELECT rowid,* FROM marriages ORDER BY spouse2_id" );
+	if( !query( m_command ) ) return false;
+
+	collectWife();
+
+	fillSpouse1();
+	fillSpouse2();
+
+	std::sort( vSpouse1.begin(), vSpouse1.end(), sortByNameX );
+//	listHtml();
+	fillTableF();
+
+
+	wndP.DestroyWindow();
+	return true;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTableMarriages::enableMenu( BOOL flag)
@@ -1051,7 +1095,7 @@ void CTableMarriages::OnMoreMarriages()
 
 	std::sort( vSpouse1.begin(), vSpouse1.end(), sortByNameX );
 //	listHtml();
-	fillTable();
+	fillTableF();
 
 
 	wndP.DestroyWindow();
@@ -1222,7 +1266,7 @@ void CTableMarriages::fillSpouse1()
 	CString mother_id;
 
 #ifndef _DEBUG
-	str.Format( L"(4/6) Emberek adatainak feltöltése..." );
+	str.Format( L"(4/6) Emberek adatainak lekérdezése..." );
 	wndP.SetText( str );
 #endif
 
@@ -1295,7 +1339,7 @@ void CTableMarriages::fillSpouse2()
 	CString mother_id;
 
 #ifndef _DEBUG
-	str.Format( L"(5/6) Házastársak adatainak feltöltése..." );
+	str.Format( L"(5/6) Házastársak adatainak lekérdezése..." );
 	wndP.SetText( str );
 #endif
 
@@ -1404,7 +1448,7 @@ void CTableMarriages::fillTable()
 	CString rowidS;
 
 #ifndef _DEBUG
-	str.Format( L"(6/6)Tábla feltöltése..." );
+	str.Format( L"(6/6)Házaspárok listázása..." );
 	wndP.SetText( str );
 #endif
 	str = L"Emberek, akiknek több házasságuk volt: piros az ember, fekete a házastársa.        O - házasság sorszáma  S - az ember hierarchia száma ";
@@ -1439,7 +1483,6 @@ void CTableMarriages::fillTable()
 		vColor.push_back(1);
 		for( int j = 0 ; j< vSpouse2.size(); ++j )
 		{
-
 			rowidS = vSpouse2.at(j).rowidS;
 			if( rowidS == rowid )
 			{
@@ -1472,6 +1515,124 @@ void CTableMarriages::fillTable()
 	m_ListCtrl.AttachDataset( &v_tableMarriages );
 
 	SetForegroundWindow();  // kell, mert szûrés után csak így jön vissz az ablak!!!
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTableMarriages::fillTableF()
+{
+	CString rowid;
+	CString rowidS1;
+	CString rowidS2;
+	CString name1;
+	CString name2;
+
+		m_ListCtrl.DeleteAllItems();
+	for( int i = m_ListCtrl.GetHeaderCtrl()->GetItemCount(); i >= 0; i-- )
+	{
+		m_ListCtrl.DeleteColumn(i);
+	}
+
+	m_ListCtrl.KeepSortOrder(TRUE);
+	m_ListCtrl.SetExtendedStyle(m_ListCtrl.GetExtendedStyle()| LVS_EX_GRIDLINES );
+	m_ListCtrl.InsertColumn( L_LINENUMBER,	L"line#",		LVCFMT_RIGHT,	 80,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_ORDER,		L"O",			LVCFMT_RIGHT,	 20,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_DATE,		L"esküvõ",		LVCFMT_RIGHT,	 80,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_SOURCEM,		L"M",			LVCFMT_RIGHT,	 20,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_SOURCE,		L"S",			LVCFMT_RIGHT,	 20,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_ROWID,		L"rowid",		LVCFMT_RIGHT,	 80,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_NAME,		L"név",			LVCFMT_LEFT,	200,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_BIRTH,		L"születés",	LVCFMT_RIGHT,	 80,-1,COL_TEXT );
+	m_ListCtrl.InsertColumn( L_DEATH,		L"halál",		LVCFMT_RIGHT,	 80,-1,COL_TEXT );
+	m_ListCtrl.InsertColumn( L_ROWIDF,		L"rowid",		LVCFMT_RIGHT,	 80,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_FATHER,		L"apa",			LVCFMT_LEFT,	200,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_BIRTHF,		L"születés",	LVCFMT_RIGHT,	 80,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_DEATHF,		L"halál",		LVCFMT_RIGHT,	 80,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_ROWIDM,		L"rowid",		LVCFMT_RIGHT,	 80,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_MOTHER,		L"anya",		LVCFMT_LEFT,	200,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_BIRTHM,		L"születés",	LVCFMT_RIGHT,	 80,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_DEATHM,		L"halál",		LVCFMT_RIGHT,	 80,-1,COL_TEXT);
+
+	m_columnsCount	= m_ListCtrl.GetHeaderCtrl()->GetItemCount();
+
+
+#ifndef _DEBUG
+	str.Format( L"(6/6)Házaspárok listázása..." );
+	wndP.SetText( str );
+#endif
+	str = L"Emberek, akiknek több házasságuk volt: piros az ember, fekete a házastársa.        O - házasság sorszáma  S - az ember hierarchia száma ";
+	GetDlgItem( IDC_CAPTION )->SetWindowTextW( str );
+	
+	wndP.SetRange( 0, vSpouse1.size()-1 );
+	wndP.SetPos(0 );
+	wndP.SetStep(1 );
+
+	v_tableMarriages.clear();
+	vColor.clear();
+	for( int i = 0; i < vSpouse1.size(); ++i )
+	{
+		rowid = vSpouse1.at(i).rowid;
+		for( int j = 0 ; j< vSpouse2.size()-1; ++j )
+		{
+			rowidS1	= vSpouse2.at(j).rowidS;
+			name1	= vSpouse2.at(j).name;
+			rowidS2	= vSpouse2.at(j+1).rowidS;
+			name2	= vSpouse2.at(j+1).name;
+			if( rowidS1 == rowid && rowidS2 == rowid && name1 == name2 )
+			{
+				push( vSpouse1.at(i).linenumber );
+				push( L"" );							// order
+				push( L"" );							// date
+				push( L"" );							// sourceM
+				push( vSpouse1.at(i).source );
+				push( rowid );
+				push( vSpouse1.at(i).name );
+				push( vSpouse1.at(i).birth );
+				push( vSpouse1.at(i).death );
+				push( vSpouse1.at(i).rowidF );
+				push( vSpouse1.at(i).father );
+				push( vSpouse1.at(i).birthF );
+				push( vSpouse1.at(i).deathF );
+				push( vSpouse1.at(i).rowidM );
+				push( vSpouse1.at(i).mother );
+				push( vSpouse1.at(i).birthM );
+				push( vSpouse1.at(i).deathM );
+				vColor.push_back(1);
+
+				push2( j );
+				push2( j + 1);
+				emptyRow();
+			}
+		}
+		
+		wndP.StepIt();
+		wndP.PeekAndPump();
+		if (wndP.Cancelled()) break;
+	}
+	m_ListCtrl.DeleteAllItems();
+	m_ListCtrl.AttachDataset( &v_tableMarriages );
+
+	SetForegroundWindow();  // kell, mert szûrés után csak így jön vissz az ablak!!!
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTableMarriages::push2( int i )
+{	
+	push( vSpouse2.at(i).linenumber );
+	push( vSpouse2.at(i).order );	
+	push( vSpouse2.at(i).date );	
+	push( vSpouse2.at(i).sourceM );
+	push( vSpouse2.at(i).source );
+	push( vSpouse2.at(i).rowid );
+	push( vSpouse2.at(i).name );
+	push( vSpouse2.at(i).birth );
+	push( vSpouse2.at(i).death );
+	push( vSpouse2.at(i).rowidF );
+	push( vSpouse2.at(i).father );
+	push( vSpouse2.at(i).birthF );
+	push( vSpouse2.at(i).deathF );
+	push( vSpouse2.at(i).rowidM );
+	push( vSpouse2.at(i).mother );
+	push( vSpouse2.at(i).birthM );
+	push( vSpouse2.at(i).deathM );
+	vColor.push_back(0);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTableMarriages::emptyRow()
@@ -1610,3 +1771,9 @@ L"rowid", L"anyja", L"születés", L"halál"\
 }
 
 
+
+
+void CTableMarriages::OnManMorespouses()
+{
+	// TODO: Add your command handler code here
+}

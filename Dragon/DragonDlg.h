@@ -422,4 +422,5 @@ public:
 	afx_msg void OnAppExit();
 	afx_msg void OnContractedCouples();
 	afx_msg void OnContractedPeople();
+	afx_msg void OnMarriagesDetailed();
 };

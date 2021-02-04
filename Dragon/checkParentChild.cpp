@@ -10,6 +10,8 @@
 #include "Relations.h"
 #include "ProgressWnd.h"
 #include "utilities.h"
+
+
 // CCheckParentChild dialog
 
 enum
@@ -23,9 +25,10 @@ enum
 	L_NAME,
 	L_BIRTH,
 	L_DIFF,
-	L_DEATH
+	L_DEATH,
+	L_MARRIAGES,
 };
-// SELECT oszlopok
+// gyerek SELECT oszlopok
 enum
 {
 	S_ROWID =0,
@@ -37,9 +40,25 @@ enum
 	S_FIRST_NAME,
 	S_BIRTH,
 	S_DEATH,
-	S_PARENT_ID,
+	S_FATHER_ID,
+	S_MOTHER_ID,
+	S_MOTHER_INDEX,
 };
 
+// szülõ SELECT oszlopok
+enum
+{
+	P_ROWID =0,
+	P_LINENUMBER,
+	P_GENERATION,
+	P_SOURCE,
+	P_UNITED,
+	P_LAST_NAME,
+	P_FIRST_NAME,
+	P_BIRTH,
+	P_DEATH,
+	P_NUMOFMARRIAGES,
+};
 
 IMPLEMENT_DYNAMIC(CCheckParentChild, CDialogEx)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -70,6 +89,7 @@ BEGIN_MESSAGE_MAP(CCheckParentChild, CDialogEx)
 	ON_COMMAND(ID_GAHTML_LINE, &CCheckParentChild::OnGahtmlLine)
 
 	ON_COMMAND(ID_LIST, &CCheckParentChild::OnList)
+	ON_COMMAND(ID_FATHERMOTHERHE, &CCheckParentChild::OnFatherMotherHe)
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CCheckParentChild::OnInitDialog()
@@ -116,19 +136,19 @@ BOOL CCheckParentChild::OnInitDialog()
 	{
 	case FCG:
 		m_title.Format( L"Apa és gyermeke, akikek a korkülönbsége nagyobb mint %d év", m_diff );
-		m_parent_id_name = L"father_id";
+//		m_parent_id_name = L"father_id";
 		break;
 	case FCL:
 		m_title.Format( L"Apa és gyermeke, akikek a korkülönbsége kisebb mint %d év", m_diff );
-		m_parent_id_name = L"father_id";
+//		m_parent_id_name = L"father_id";
 		break;
 	case MCG:
 		m_title.Format( L"Anya és gyermeke, akikek a korkülönbsége nagyobb mint %d év", m_diff );
-		m_parent_id_name = L"mother_id";
+//		m_parent_id_name = L"mother_id";
 		break;
 	case MCL:
 		m_title.Format( L"Anya és gyermeke, akikek a korkülönbsége kisebb mint %d év", m_diff );
-		m_parent_id_name = L"mother_id";
+//		m_parent_id_name = L"mother_id";
 		break;
 	}
 
@@ -164,6 +184,7 @@ void CCheckParentChild::createColumns()
 	m_ListCtrl.InsertColumn( L_BIRTH,		L"születés",	LVCFMT_LEFT,	 80,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_DIFF,		L"különbség",	LVCFMT_LEFT,	 80,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_DEATH,		L"halál",		LVCFMT_LEFT,	 80,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_MARRIAGES,	L"házasságok",	LVCFMT_LEFT,	 80,-1,COL_NUM);
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckParentChild::fillColumns()
@@ -191,6 +212,11 @@ void CCheckParentChild::fillColumns()
 	CString unitedP;
 	CString unitedC;
 
+	CString father_id;
+	CString mother_id;
+	int		mother_index; 
+	CString numOfMarriages;
+
 	CString diffS;
 	CString cntS;
 	int nItem = 0;
@@ -202,8 +228,12 @@ void CCheckParentChild::fillColumns()
 	wndP.SetText( L"Gyerekek lekérdezése az adatbázisból...");
 #endif
 
-	m_command.Format( L"SELECT rowid, lineNumber, generation, source, united, last_name, first_name, birth_date, death_date, %s FROM people", m_parent_id_name );
+//	m_command.Format( L"SELECT rowid, lineNumber, generation, source, united, last_name, first_name, birth_date, death_date, %s FROM people", m_parent_id_name );
+	m_command.Format( L"SELECT rowid, lineNumber, generation, source, united, last_name, first_name, birth_date, death_date, father_id, mother_id, parent2IndexCalc %s FROM people" );
 	if( !theApp.query1( m_command ) ) return;
+	 
+
+
 
 #ifndef _DEBUG
 	wndP.SetText( L"Gyerekek és szüleik korkülönbségének meghatározása..");
@@ -215,16 +245,36 @@ void CCheckParentChild::fillColumns()
 
 	for( UINT i = 0; i < theApp.m_recordset1->RecordsCount(); ++i, theApp.m_recordset1->MoveNext() )
 	{
+		father_id = theApp.m_recordset1->GetFieldString( S_FATHER_ID );
+		mother_id = theApp.m_recordset1->GetFieldString( S_MOTHER_ID );
+		mother_index = _wtoi( theApp.m_recordset1->GetFieldString( S_MOTHER_INDEX ));
+
+		switch( m_function ) 
+		{
+		case FCG:
+			rowidP	= father_id;
+			break;
+		case FCL:
+			rowidP	= father_id;
+			break;
+		case MCG:
+			rowidP	= mother_id;
+			break;
+		case MCL:
+			rowidP	= mother_id;
+			break;
+		}
+
+
 		rowidC = theApp.m_recordset1->GetFieldString( S_ROWID );
 		birthC = theApp.m_recordset1->GetFieldString( S_BIRTH );
 		birthDateC = getYearFromDate( birthC );
 		if( birthDateC  && checkDate( birthC ))
 		{
-			rowidP	= theApp.m_recordset1->GetFieldString( S_PARENT_ID );
 			if( !rowidP.IsEmpty() )
 			{
 				// szülõ lekérdezése
-				m_command.Format( L"SELECT rowid, lineNumber, generation, source, united, last_name, first_name, birth_date, death_date FROM people WHERE rowid='%s'", rowidP );
+				m_command.Format( L"SELECT rowid, lineNumber, generation, source, united, last_name, first_name, birth_date, death_date, numOfMarriages FROM people WHERE rowid='%s'", rowidP );
 				if( !theApp.query2( m_command ) ) return;
 
 				birthP = theApp.m_recordset2->GetFieldString( S_BIRTH );
@@ -234,20 +284,29 @@ void CCheckParentChild::fillColumns()
 					diff = birthDateC - birthDateP;
 					if( ( (m_function == FCG || m_function == MCG ) && diff > m_diff ) || ( ( m_function == FCL || m_function == MCL ) && diff < m_diff ) )
 					{
-						diffS.Format( L"%d", diff );
-						lineNumberP = theApp.m_recordset2->GetFieldString( S_LINENUMBER );
-						generationP	= theApp.m_recordset2->GetFieldString( S_GENERATION );
-						sourceP		= theApp.m_recordset2->GetFieldString( S_SOURCE );
-						unitedP		= theApp.m_recordset2->GetFieldString( S_UNITED );
-						deathP		= theApp.m_recordset2->GetFieldString( S_DEATH );
-						nameP.Format( L"%s %s",theApp. m_recordset2->GetFieldString( S_LAST_NAME ), theApp.m_recordset2->GetFieldString( S_FIRST_NAME ) );
+						m_command.Format( L"SELECT numOfMarriages FROM people WHERE rowid='%s'", father_id );
+						if( !theApp.query3( m_command ) ) return;
+						numOfMarriages = theApp.m_recordset3->GetFieldString( 0 );
 
+
+						diffS.Format( L"%d", diff );
+						// szülõ
+						lineNumberP = theApp.m_recordset2->GetFieldString( P_LINENUMBER );
+						generationP	= theApp.m_recordset2->GetFieldString( P_GENERATION );
+						sourceP		= theApp.m_recordset2->GetFieldString( P_SOURCE );
+						unitedP		= theApp.m_recordset2->GetFieldString( P_UNITED );
+						deathP		= theApp.m_recordset2->GetFieldString( P_DEATH );
+						nameP.Format( L"%s %s",theApp. m_recordset2->GetFieldString( P_LAST_NAME ), theApp.m_recordset2->GetFieldString( P_FIRST_NAME ) );
+
+						// gyerek
 						lineNumberC	= theApp.m_recordset1->GetFieldString( S_LINENUMBER );
 						generationC	= theApp.m_recordset1->GetFieldString( S_GENERATION );
 						sourceC		= theApp.m_recordset1->GetFieldString( S_SOURCE );
 						unitedC		= theApp.m_recordset1->GetFieldString( S_UNITED );
 						deathC		= theApp.m_recordset1->GetFieldString( S_DEATH );
 						nameC.Format( L"%s %s",theApp. m_recordset1->GetFieldString( S_LAST_NAME), theApp.m_recordset1->GetFieldString( S_FIRST_NAME ) );
+
+
 
 						cntS.Format( L"%d", cnt+1 ); 
 						nItem = m_ListCtrl.InsertItem( nItem, cntS );
@@ -260,6 +319,7 @@ void CCheckParentChild::fillColumns()
 						m_ListCtrl.SetItemText( nItem, L_BIRTH, birthP );
 						m_ListCtrl.SetItemText( nItem, L_DIFF, diffS );
 						m_ListCtrl.SetItemText( nItem, L_DEATH, deathP );
+						m_ListCtrl.SetItemText( nItem, L_MARRIAGES,  numOfMarriages );
 
 						++nItem;
 						nItem = m_ListCtrl.InsertItem( nItem, cntS );
@@ -399,4 +459,15 @@ void CCheckParentChild::OnRokonsag()
 	dlg.DoModal();
 
 }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckParentChild::OnFatherMotherHe()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
 
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
+	CHtmlLines dlg;
+	dlg.m_title.Format( L"%s szülei és testvérei", m_ListCtrl.GetItemText( nItem, L_NAME ) );
+	dlg.m_type	= L"FATHERMOTHERHE";
+	dlg.m_rowid = rowid;
+	dlg.DoModal();
+}

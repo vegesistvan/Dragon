@@ -90,7 +90,8 @@ arm,\
 orderFather,\
 orderMother,\
 csalad,\
-gap\
+gap,\
+numOfMarriages\
 ";
 
 // a "marriages' tábla oszlopai

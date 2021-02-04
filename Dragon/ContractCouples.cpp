@@ -560,11 +560,12 @@ cont2:	wndP.StepIt();
 		vSame.clear();
 	}
 
-
+/*
 	theApp.execute( L"BEGIN" );
 	contractFull( loop );
 	deleteMarriages( loop );
 	theApp.execute( L"COMMIT" );
+*/
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Egy vSame-ben adott azonos nevû házastársak rekordjaiban beállítja a group, statusS1 és statusS2 értékeit.

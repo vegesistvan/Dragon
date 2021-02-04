@@ -102,6 +102,7 @@ protected:
 	CSqliteDBRecordSet*	 m_recordset3;
 	CSqliteDBRecordSet*	 m_recordset4;
 
+	BOOL CTableMarriages::fillVectors();
 	
 	void htmlHeader( CString title );
 	void collectHusband();
@@ -110,6 +111,8 @@ protected:
 	void fillSpouse2();
 	void listHtml();
 	void fillTable();
+	void CTableMarriages::fillTableF();
+	void CTableMarriages::push2( int i );
 	void emptyRow();
 	void keress( int start );
 
@@ -168,4 +171,5 @@ public:
 	afx_msg void OnMoreMarriages();
 	CColorStatic colorNext;
 	afx_msg void OnClickedNext();
+	afx_msg void OnManMorespouses();
 };

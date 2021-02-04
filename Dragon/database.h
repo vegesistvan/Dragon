@@ -159,6 +159,7 @@ const COLUMN people[] =
 	{ L"occupation",				L"TEXT" },		// elfoglaltság, munkakör
 	{ L"csalad",					L"TEXT" },		// családalapító [ xy család õse] ?
 	{ L"gap",						L"INT" },
+	{ L"numOfMarriages",			L"INT" },		// házasságok száma
 	
 };
 
@@ -203,6 +204,7 @@ enum
 	PEOPLE_OCCUPATION,
 	PEOPLE_CSALAD,
 	PEOPLE_GAP,
+	PEOPLE_NUMOFMARRIAGES,
 };	
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //

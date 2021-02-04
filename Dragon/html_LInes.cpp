@@ -83,6 +83,11 @@ BOOL CHtmlLines::OnInitDialog()
 		return true;
 	}
 
+	if( m_type == L"FATHERMOTHERHE" )
+	{
+		fatherMotherHe();
+		return true;
+	}
 
 	CStringArray A;
 	A.Add( L"anyai nagyapa" );
@@ -324,6 +329,49 @@ void CHtmlLines::fatherAndSiblings()
 		linenumber	= theApp.m_recordset->GetFieldString( 0 );
 		line		= getHtmlLine( linenumber );
 		nItem = m_ListCtrl.InsertItem( i+1, L"gyerek" );
+		m_ListCtrl.SetItemText( nItem, 1, linenumber );
+		m_ListCtrl.SetItemText( nItem, 2, line );
+	}
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CHtmlLines::fatherMotherHe()
+{
+	if( m_rowid.IsEmpty() ) return;
+
+	SetWindowTextW( m_title );
+
+	int nItem;
+	CString line;
+	CString linenumber;
+	CString father_id;
+	CString mother_id;
+	CString linenumberC;
+
+	m_ListCtrl.InsertColumn( 0,	L"",		LVCFMT_RIGHT,	 120,-1,COL_TEXT );
+	m_ListCtrl.InsertColumn( 1,	L"line#",	LVCFMT_RIGHT,	  80,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( 2,	L"ga.line",	LVCFMT_LEFT,    1500,-1,COL_EDIT);
+
+	m_command.Format( L"SELECT father_id, mother_id, linenumber FROM people WHERE rowid ='%s'", m_rowid );
+	if( !theApp.query( m_command ) ) return;
+	father_id	= theApp.m_recordset->GetFieldString( 0 );
+	mother_id	= theApp.m_recordset->GetFieldString( 1 );
+	linenumberC	= theApp.m_recordset->GetFieldString( 2 );
+
+	m_command.Format( L"SELECT linenumber FROM people WHERE rowid ='%s'", father_id );
+	if( !theApp.query( m_command ) ) return;
+	linenumber	= theApp.m_recordset->GetFieldString( 0 );
+	line		= getHtmlLine( linenumber );
+	nItem = m_ListCtrl.InsertItem( 0, L"szülõk" );
+	m_ListCtrl.SetItemText( nItem, 1, linenumber );
+	m_ListCtrl.SetItemText( nItem, 2, line );
+
+	m_command.Format( L"SELECT linenumber FROM people WHERE father_id ='%s' ORDER BY linenumber", father_id );
+	if( !theApp.query( m_command ) ) return;
+	for( INT i = 0; i < theApp.m_recordset->RecordsCount(); ++i, theApp.m_recordset->MoveNext() )
+	{
+		linenumber	= theApp.m_recordset->GetFieldString( 0 );
+		line		= getHtmlLine( linenumber );
+		nItem = m_ListCtrl.InsertItem( 2+i, L"gyerek" );
 		m_ListCtrl.SetItemText( nItem, 1, linenumber );
 		m_ListCtrl.SetItemText( nItem, 2, line );
 	}

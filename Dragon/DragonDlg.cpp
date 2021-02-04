@@ -92,8 +92,6 @@ void CDragonDlg::DoDataExchange(CDataExchange* pDX)
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CDragonDlg, CDialogEx)
-//ON_WM_SYSCOMMAND()
-//ON_WM_SIZE()
 
 ON_MESSAGE(WM_SET_COLUMN_COLOR, OnSetColumnColor)
 ON_MESSAGE(WM_CLICKED_COLUMN, OnColumnSorted)
@@ -103,10 +101,12 @@ ON_COMMAND(ID_DESCENDANT_FILE, &CDragonDlg::OnDescendantFile)
 ON_COMMAND(ID_DESCENDANT_TABLE, &CDragonDlg::OnDescendantTable)
 ON_COMMAND(ID_DESCENDANT_LINE, &CDragonDlg::OnDescendantLine)
 
+
 // házasságok
 ON_COMMAND(ID_MARRIAGES_FILE, &CDragonDlg::OnMarriagesFile)
 ON_COMMAND(ID_MARRIAGES_TABLE, &CDragonDlg::OnMarriagesTable)
 ON_COMMAND(ID_MARRIAGES_LINE, &CDragonDlg::OnMarriagesLine)
+
 
 // házastársak
 ON_COMMAND(ID_SPOUSES_FILE, &CDragonDlg::OnSpousesFile)
@@ -184,6 +184,7 @@ ON_COMMAND(ID_SAMENAMEANDSPOUSE, &CDragonDlg::OnSamenameandspouse)
 ON_COMMAND(ID_APP_EXIT, &CDragonDlg::OnAppExit)
 ON_COMMAND(ID_CONTRACTEDCOUPLES, &CDragonDlg::OnContractedCouples)
 ON_COMMAND(ID_CONTRACT_PEOPLE, &CDragonDlg::OnContractedPeople)
+ON_COMMAND(ID_MARRIAGES_DETAILED, &CDragonDlg::OnMarriagesDetailed)
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CDragonDlg::OnInitDialog()
@@ -1134,4 +1135,9 @@ void CDragonDlg::OnContractedPeople()
 	CContractedPeople dlg;
 	dlg.DoModal();
 	mainTitle( );
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDragonDlg::OnMarriagesDetailed()
+{
+
 }

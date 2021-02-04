@@ -279,6 +279,7 @@ CString CGaInput::insertAny( PEOPLE* p )
 	CString last_name(L"");
 	CString other_names(L"");
 	int pos;
+	int numOfMarriages = v_marriages.size();
 
 	last_name = p->last_name;
 	if( (pos = p->last_name.Find( L"_(" ) ) != -1 )
@@ -294,11 +295,11 @@ CString CGaInput::insertAny( PEOPLE* p )
 '%d','%d','%d','%d','%d','%d','%d','%d','%d',\
 '%c','%d','%s','%s','%s','%s','%s','%s','%s', '%s',\
 '%s','%s','%s','%s','%s','%d','%d','%s','%d',\
-'%s','%s','%d','%d', '%s', '%d'",
+'%s','%s','%d','%d', '%s', '%d', '%d'",
 m_fileNumber, m_tableHeader.familyNumber,v_tableHeader.size(),m_lineNumber,p->source,1,0,0,0,\
 p->generation,p->sex_id,p->title,p->titolo,p->first_name.Trim(),last_name, p->posterior, other_names,p->birth_place,p->birth_date,\
 p->death_place,p->death_date,p->comment,p->father_id,p->mother_id,p->parent2Index,p->parent2IndexCalc,p->folyt,p->tableAncestry,
-p->tableRoman,p->arm,p->orderFather,p->orderMother,p->csalad,p->gap );
+p->tableRoman,p->arm,p->orderFather,p->orderMother,p->csalad,p->gap, numOfMarriages );
 
 
     m_command.Format( L"INSERT INTO people (%s) VALUES (%s)", m_fieldsP, values );
