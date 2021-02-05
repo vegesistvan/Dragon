@@ -185,6 +185,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="about.h" />
+    <ClInclude Include="CheckFamilyDates.h" />
     <ClInclude Include="CheckGenerations.h" />
     <ClInclude Include="checkIntegrity.h" />
     <ClInclude Include="ContractPeople.h" />
@@ -247,6 +248,7 @@
     <ClInclude Include="ContractInfo.h" />
     <ClInclude Include="SaveFirstName.h" />
     <ClInclude Include="sqlite3.h" />
+    <ClInclude Include="TableCouples.h" />
     <ClInclude Include="Table_blobs.h" />
     <ClInclude Include="Table_people.h" />
     <ClInclude Include="Table_places.h" />
@@ -303,6 +305,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="about.cpp" />
+    <ClCompile Include="CheckFamilyDates.cpp" />
     <ClCompile Include="CheckGenerations.cpp" />
     <ClCompile Include="checkIntegrity.cpp" />
     <ClCompile Include="ContractPeople.cpp" />
@@ -370,6 +373,7 @@
     <ClCompile Include="SameName.cpp" />
     <ClCompile Include="ContractInfo.cpp" />
     <ClCompile Include="SaveFirstName.cpp" />
+    <ClCompile Include="TableCouples.cpp" />
     <ClCompile Include="Table_blobs.cpp" />
     <ClCompile Include="Table_people.cpp" />
     <ClCompile Include="Table_places.cpp" />

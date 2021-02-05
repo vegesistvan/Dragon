@@ -14,7 +14,7 @@ public:
 	virtual ~CCheckNames();
 
 // Dialog Data
-	enum { IDD = IDD_CHECKNAMES };
+	enum { IDD = IDD_CHECK_NAMES };
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support

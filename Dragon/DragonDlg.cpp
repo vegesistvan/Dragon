@@ -61,6 +61,7 @@
 #include "ContractInfo.h"
 #include "ContractedPeople.h"
 #include "version.h"
+#include "TableCouples.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -1139,5 +1140,6 @@ void CDragonDlg::OnContractedPeople()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnMarriagesDetailed()
 {
-
+	CTableCouples dlg;
+	dlg.DoModal();
 }

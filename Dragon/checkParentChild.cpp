@@ -76,6 +76,8 @@ void CCheckParentChild::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_LIST, m_ListCtrl);
+	DDX_Control(pDX, IDC_NEXT, colorNext);
+	DDX_Control(pDX, IDC_KERES, colorKeres);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CCheckParentChild, CDialogEx)
@@ -90,6 +92,8 @@ BEGIN_MESSAGE_MAP(CCheckParentChild, CDialogEx)
 
 	ON_COMMAND(ID_LIST, &CCheckParentChild::OnList)
 	ON_COMMAND(ID_FATHERMOTHERHE, &CCheckParentChild::OnFatherMotherHe)
+	ON_STN_CLICKED(IDC_KERES, &CCheckParentChild::OnClickedKeres)
+	ON_STN_CLICKED(IDC_NEXT, &CCheckParentChild::OnClickedNext)
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CCheckParentChild::OnInitDialog()
@@ -470,4 +474,102 @@ void CCheckParentChild::OnFatherMotherHe()
 	dlg.m_type	= L"FATHERMOTHERHE";
 	dlg.m_rowid = rowid;
 	dlg.DoModal();
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckParentChild::OnClickedKeres()
+{
+	keress( 0 );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckParentChild::OnClickedNext()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	if( nItem == -0 )
+	{
+		AfxMessageBox( L"Nincs kijelölve sor!" );
+		return;
+	}
+	keress( nItem + 1 );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckParentChild::keress( int start )
+{
+	CString	search;
+	GetDlgItem( IDC_SEARCH )->GetWindowText( search );
+	if( search.IsEmpty() )
+	{
+		AfxMessageBox( L"Meg kell adni a keresendõ stringet!");
+		return;
+	}
+
+	CProgressWnd wndProgress(NULL, L"Folyik a keresés.." ); 
+	wndProgress.GoModal();
+	wndProgress.SetRange(0, m_ListCtrl.GetItemCount() );
+	wndProgress.SetPos(0);
+	wndProgress.SetStep(1);
+
+
+
+	int		itemCnt	= m_ListCtrl.GetItemCount();
+	int		length	= search.GetLength();
+	int		nItem;
+	int		topIndex = m_ListCtrl.GetTopIndex();
+	CString	str;
+
+	theApp.unselectAll( &m_ListCtrl );
+
+	for( nItem = start; nItem < itemCnt-1; ++nItem )
+	{
+		str = m_ListCtrl.GetItemText( nItem, L_NAME );
+		str = str.Left(length);						// az aktuális search string hosszával azonos hosszúság leválasztása
+		if( str == search )	break;
+		wndProgress.StepIt();
+		wndProgress.PeekAndPump();
+		if (wndProgress.Cancelled()) break;
+	}
+	wndProgress.DestroyWindow();
+
+	if( nItem < itemCnt-1 )			// megtalálta a keresett embert,. aki az nItem-1 sorban van
+	{
+		m_ListCtrl.EnsureVisible( nItem, FALSE );
+
+		if( nItem > topIndex )   // lefele megy, fel kell hozni a tábla tetejére a megtalált sort
+		{
+			int countPP = m_ListCtrl.GetCountPerPage();
+			int nItemEV	= nItem - 1 + countPP;			// alaphelyzet: a kijelölt sor az ablak tetején
+
+			if( nItemEV > itemCnt - 1 )					// már nem lehet az ablak tetejére hozni, mert nincs annyi adat
+				nItemEV = itemCnt - 1;
+
+			m_ListCtrl.EnsureVisible( nItemEV, FALSE );
+		}
+		m_ListCtrl.SetItemState( nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED );
+		Invalidate( false );
+	}
+	else
+	{
+		str.Format( L"%s nevû embert nem találtam!", search );
+		AfxMessageBox( str );
+	}
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BOOL CCheckParentChild::PreTranslateMessage(MSG* pMsg)
+{
+	int x=(int)pMsg->wParam;
+
+    if( pMsg->message==WM_KEYDOWN)
+    {
+		switch( x )
+		{
+		case VK_RETURN:
+			GetDlgItem( IDC_SEARCH )->GetWindowTextW( str );
+			if( str.GetLength() )
+				OnClickedKeres();
+			break;
+		case VK_ESCAPE:
+			CDialogEx::OnCancel();
+		}
+	}
+    return CWnd::PreTranslateMessage(pMsg);
 }

@@ -11,8 +11,8 @@
 #include "OpenDatabase.h"
 #include "checkIntegrity.h"
 #include "CheckGenerations.h"
-//#include "CheckMarriageOrder.h"
 #include "ContractedPeople.h"
+#include "CheckFamilyDates.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -31,6 +31,7 @@ ON_COMMAND(ID_HUSBAND_WIFE, &CDragonApp::OnHusbandWife)
 ON_COMMAND(ID_EMAIL, &CDragonApp::OnEmail)
 ON_COMMAND(ID_CHECK_INEGRITY, &CDragonApp::OnCheckIntegrity)
 ON_COMMAND(ID_CHECK_GENERATIONS, &CDragonApp::OnCheckGenerations)
+ON_COMMAND(ID_FAMILYDATES, &CDragonApp::OnFamilyDates)
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CDragonApp::CDragonApp()
@@ -683,4 +684,12 @@ void CDragonApp::OnCheckGenerations()
 {
 	CCheckGenerations dlg;
 	dlg.DoModal();
+}
+
+
+void CDragonApp::OnFamilyDates()
+{
+	CCheckFamilyDates dlg;
+	dlg.DoModal();
+
 }

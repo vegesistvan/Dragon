@@ -242,7 +242,7 @@ public:
 	BOOL	processFam( int ins );
 	BOOL	processContact( int ins );
 	BOOL	dateDiff( CString date1, CString date2, int month );
-	CString	getDateI( CString dateS, int month ) ;
+	_int64	getDateI( CString dateS, int month ) ;
 
 	LPTSTR	upperCase( CString str );
 	int		getTableNumber( CString tableName );
@@ -272,7 +272,7 @@ public:
 	CString	get_time_elapsed();
 	void	setStartTime();
 	CString	getDateStrFromI( CString dateI );
-	CString	getDateIFromStr( CString dateS );
+	_int64	getDateIFromStr( CString dateS );
 	void	showLogFile();
 	void	showFile(CString fileSpec );
 	void	showHtmlFile(CString fileSpec );
@@ -358,6 +358,7 @@ public:
 	afx_msg void OnCheckIntegrity();
 
 	afx_msg void OnCheckGenerations();
+	afx_msg void OnFamilyDates();
 };
 extern CDragonApp theApp;
 

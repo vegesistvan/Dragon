@@ -1,5 +1,6 @@
 #pragma once
 #include "listctrlex.h"
+#include "colorstatic.h"
 
 enum
 {
@@ -41,6 +42,8 @@ protected:
 	void OnHtmlNotepad();
 	void OnHtmlShows();
 	void OnRokonsag();
+	void keress( int start );
+	BOOL PreTranslateMessage(MSG* pMsg);
 
 	DECLARE_MESSAGE_MAP()
 public:
@@ -52,4 +55,8 @@ public:
 	afx_msg void OnList();
 
 	afx_msg void OnFatherMotherHe();
+	CColorStatic colorNext;
+	CColorStatic colorKeres;
+	afx_msg void OnClickedKeres();
+	afx_msg void OnClickedNext();
 };
