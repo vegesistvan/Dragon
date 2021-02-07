@@ -25,10 +25,10 @@ protected:
 	void createColumns();
 	void fillTable();
 
-	void OnHtmlEdit();
+//	void OnHtmlEdit();
 	void OnHtmlNotepad();
-	void OnHtmlShows();
-	void OnRokonsag();
+	void OnHtmlEditLines();
+	void OnDbEdit();
 
 	DECLARE_MESSAGE_MAP()
 public:

@@ -38,10 +38,10 @@ protected:
 	void createColumns();
 	void fillColumns();
 
-	void OnHtmlEdit();
+//	void OnHtmlEdit();
 	void OnHtmlNotepad();
-	void OnHtmlShows();
-	void OnRokonsag();
+	void OnHtmlEditLines();
+	void OnDbEdit();
 	void keress( int start );
 	BOOL PreTranslateMessage(MSG* pMsg);
 

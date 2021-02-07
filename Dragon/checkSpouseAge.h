@@ -40,8 +40,8 @@ protected:
 
 	void OnHtmlEdit();
 	void OnHtmlNotepad();
-	void OnHtmlShows();
-	void OnRokonsag();
+	void OnHtmlEditLines();
+	void OnDbEdit();
 
 
 	DECLARE_MESSAGE_MAP()

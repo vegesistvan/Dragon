@@ -50,6 +50,7 @@ enum
 enum
 {
 	Q_CNT = 0,
+	Q_TYPE,
 	Q_LINENUMBER,
 	Q_MARRIAGE,
 	Q_INDEX,
@@ -115,7 +116,7 @@ BEGIN_MESSAGE_MAP(CCheckFamilyDates, CDialogEx)
 
 // IDR_DROPDOWN_HTML funkciók	
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_HTML_EDIT, &CCheckFamilyDates::OnHtmlEdit)
+	ON_COMMAND(ID_HTML_EDIT, &CCheckFamilyDates::OnHtmlEditLines)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CCheckFamilyDates::OnHtmlNotepad)
 	ON_COMMAND(ID_HTML_FAMILY, &CCheckFamilyDates::OnHtmlFamily)
 	ON_COMMAND(ID_DB_EDIT, &CCheckFamilyDates::OnDbEdit)
@@ -136,10 +137,10 @@ BOOL CCheckFamilyDates::OnInitDialog()
 	CString fileName = L"childrenFAmily";
 	m_filespec = theApp.openTextFile( &textF, fileName, L"w+" );
 
-	m_ageDiffM = 14;
+	m_diffMotherChild = 14;
 
 
-	str.Format( L"Az anya %d éves kora után született gyerekeket fogadj el a program helyesnek.\n\n", m_ageDiffM ); 
+	str.Format( L"Az anya %d éves kora után született gyerekeket fogadj el a program helyesnek.\n\n", m_diffMotherChild ); 
 	fwprintf( textF, str );
 
 
@@ -375,6 +376,7 @@ void CCheckFamilyDates::createColumns()
 	m_ListCtrl.SetExtendedStyle(m_ListCtrl.GetExtendedStyle()| LVS_EX_GRIDLINES );
 
 	m_ListCtrl.InsertColumn( Q_CNT,			L"cnt",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( Q_TYPE,		L"type",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( Q_LINENUMBER,	L"line#",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( Q_MARRIAGE,	L"esküvõ",		LVCFMT_LEFT,	 80,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( Q_INDEX,		L"ix",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
@@ -391,6 +393,7 @@ void CCheckFamilyDates::checkFamily()
 	CHILDREN	c;
 	int	mx;
 	int age;
+	int diff;
 	bool hiba = false;;
 	
 	CString dateC;
@@ -499,15 +502,12 @@ void CCheckFamilyDates::checkFamily()
 		c = vChildren.at(i);
 
 		birthC = 0;
-		deathC = 0;
-		birthW = 0;
-		deathW = 0;
-		marriage = 0;
 		if( checkDate( c.birth ) )
 		{
 			c.birth = roundDate( c.birth );
 			birthC	= theApp.getDateI( c.birth, 0 );
 		}
+		deathC = 0;
 		if( checkDate( c.death ) )
 		{
 			c.death = roundDate( c.death );
@@ -532,16 +532,19 @@ void CCheckFamilyDates::checkFamily()
 
 		// a mother indexxel kijelölt anyának dátumaival egyeztet
 		w = vWifes.at(mx);
+		birthW = 0;
 		if( checkDate( w.birth ) )
 		{
 			w.birth = roundDate( w.birth );
 			birthW	= theApp.getDateI( w.birth, 0 );
 		}
+		deathW = 0;
 		if( checkDate( w.death ) )
 		{
 			w.death = roundDate( w.death );
 			deathW	= theApp.getDateI( w.death, 0 );
 		}
+		marriage = 0;
 		if( checkDate( w.marriage ) )
 		{
 			w.marriage	= roundDate( w.marriage );
@@ -557,17 +560,36 @@ void CCheckFamilyDates::checkFamily()
 
 		// gyerek születési dátum és anya születési dátum + 16 év
 
-		if( birthW )
+		if( birthC && birthW )
+	//	if( birthW )
 		{
-			birthW	= theApp.getDateI( w.birth, m_ageDiffM *12 );
-			if( birthC && birthW && birthC < birthW )
+			diff = dateDiff( c.birth, w.birth );
+			diff = theApp.dateDiff( c.birth, w.birth );
+			if( diff < m_diffMotherChild )
+
+//			birthW	= theApp.getDateI( w.birth, m_diffMotherChild *12 );
+//			if( birthC && birthW && birthC < birthW )
 			{
-				age = _wtoi( c.birth.Left(4) ) - _wtoi( w.birth.Left(4) );
-				str.Format( L" anyja %d éves korában született!", age ); 
-				vChildren.at(i).message = str;
+//				age = _wtoi( c.birth.Left(4) ) - _wtoi( w.birth.Left(4) );
+				str.Format( L" anyja %d éves korában született!", diff ); 
+				vChildren.at(i).message += str;
 				hiba = true;
 			}
 		}
+
+		// gyerek és apa korkülönbsége
+
+		if( birthH && birthC )
+		{
+			diff = theApp.dateDiff( c.birth, h.birth );
+			if( diff < 18 )
+			{
+				str.Format( L" apa és gyereke korkülönbsége: %d", diff ); 
+				vChildren.at(i).message += str;
+				hiba = true;
+			}
+		}
+
 
 		// gyerek születési dátum és apa halálozási + 8 hónap
 
@@ -609,6 +631,7 @@ void CCheckFamilyDates::printFamily()
 
 	str.Format( L"%d", m_cnt );
 	push( str );
+	push( L"1" );							// type
 	push( h.linenumber );
 	push( L"" );							// esküvõ
 	push( L"" );							// index
@@ -621,7 +644,8 @@ void CCheckFamilyDates::printFamily()
 	for( UINT j = 0; j < vWifes.size(); ++j )
 	{
 		w = vWifes.at(j);
-		push( L"" );							// cnt
+		push( L"" );						// cnt
+		push( L"2" );						// type
 		push( w.linenumber );
 		push( w.marriage );
 		str.Format( L"%d", w.motherOrder );
@@ -632,10 +656,13 @@ void CCheckFamilyDates::printFamily()
 		push( w.death );
 		push( w.message );
 	}
+
 	for( UINT k = 0; k < vChildren.size(); ++k )
 	{
 		c = vChildren.at(k );
+
 		push( L"" );							// cnt
+		push( L"3" );							// type
 		push( c.linenumber );
 		push( L"" );							// marriage
 		str.Format( L"%d", c.mother_index );
@@ -674,6 +701,7 @@ void CCheckFamilyDates::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
 	int nItem;
 	int nCol;
 	int index;
+	int type;
 	UINT mask;
 
 	*pResult = 0;
@@ -693,10 +721,12 @@ void CCheckFamilyDates::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
 		if( _wtoi( vList.at( nItem * Q_NUMOFCOLUMNS + Q_LINENUMBER ))  )
 		{
 			index = _wtoi( vList.at( nItem * Q_NUMOFCOLUMNS + Q_INDEX ) );
-//			if( index == 0) 
-//				pLVCD->clrTextBk = YELLOW;
-//			else
-				pLVCD->clrTextBk = m_rgb[index];
+			pLVCD->clrTextBk = m_rgb[index];
+/*
+			type = _wtoi( vList.at( nItem * Q_NUMOFCOLUMNS + Q_TYPE ) );
+			if( nCol == Q_NAME && type == 2 ) 
+				pLVCD->clrTextBk = WHITE;
+*/
 		}
 		*pResult = CDRF_DODEFAULT;
 		break;
@@ -706,8 +736,26 @@ void CCheckFamilyDates::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
 void CCheckFamilyDates::OnInfo()
 {
 	CString info = L"\
-Azon férfiak családját -feleségeit és gyerekeit- listázzuk, akiknek több felesége volt, és a dátumok elleenõrzése vaalmilyen \
-problénára hívta fel a figyelmet.\r\n\
+Azon férfiak családját -feleségeit és gyerekeit- listázzuk, akiknek több felesége volt, és a dátumok ellenõrzése valamilyen \
+problémára hívta fel a figyelmet.\r\n\
+\r\n\
+Az alábbi dátumokat ellenõrizzük:\r\n\
+- minden ember élettartamát\r\n\
+- apa és gyermeke korkülönbsége\r\n\
+- anya és gyermeke korkülönbsége\r\n\
+- apa és anya korkülönbsége\r\n\
+- apa életkora az esküvõn\r\n\
+- anya életkora az esküvõn\r\n\
+\r\n\
+A funkció indításakor beállítható, hogy a fenti ellenõrzések milyen értékhatáron belül tekintsék normálisnak az értékeket, \
+azon kívül pedig jelezze az eltérést. Természetesen csak azokat a dátumokat ellenõrzi, amelyek meg vannak adva és \
+helyes formátumúak ( 2021.02.07 - 2021.02. . 2021.02 - 2021 )\r\n\
+\r\n\
+A listán az elsõ sorban az apa áll, õt követik a feleségek, majd a gyerekek. A családokat üres  sor választja el.\r\n\
+Az apa halvány piros színû a feleségek különbözõ színûek, a gyereke ugyanolyan színûek, mint az anyjuk.\r\n\
+\r\n\
+Egy sorra kattintva jobb egérgombban, egy legördülõ menürõl választhatunk olyan funkciókat, amelyekkel megbézhetjük a \
+bementi ga.html fájlt ill. szerkeszthetjük, javíthatjuk a hibás adatokat akár a bementi html fájlban, akár az adatbázisban.\r\n\
 ";
 
 
@@ -725,7 +773,6 @@ LRESULT CCheckFamilyDates:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 	CMenu*	pPopup;
 
 
-//	if(Menu.LoadMenu( IDR_DROPDOWN_HTML_P ))
 	if(Menu.LoadMenu( IDR_DROPDOWN_HTML ))
     {
 		pPopup = Menu.GetSubMenu(0);
@@ -738,31 +785,17 @@ LRESULT CCheckFamilyDates:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckFamilyDates::OnHtmlEdit()
+void CCheckFamilyDates::OnHtmlEditLines()
 {
-	POSITION	pos = m_ListCtrl.GetFirstSelectedItemPosition();
-	int			nItem;
-	std::vector<CString> vLines;
+	CString title;
+	int selectedCount	= m_ListCtrl.GetSelectedCount();
+	int nItem			= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	if( selectedCount == 1 )
+		title.Format( L"%s a ga.html fájlban (%s. sor)", m_ListCtrl.GetItemText( nItem, Q_NAME ), m_ListCtrl.GetItemText( nItem, Q_LINENUMBER )  );
+	else
+		title.Format( L"%d kijelölt ember a ga.html fájlban", selectedCount );
 
-	int cnt = 0;
-	CString name(L"");
-
-	while( pos )
-	{
-		nItem = m_ListCtrl.GetNextSelectedItem( pos );
-		vLines.push_back( m_ListCtrl.GetItemText( nItem, Q_LINENUMBER ) );
-		if( name.Compare( m_ListCtrl.GetItemText( nItem, Q_NAME ) ) )
-		{
-			name = m_ListCtrl.GetItemText( nItem, Q_NAME );
-			++cnt;
-		}
-	}
-
-	CHtmlEditLines dlg;
-
-	dlg.m_title = L"Kijelölt sorok a htm fájlban";  
-	dlg.vLines = &vLines;
-	dlg.DoModal();
+	theApp.htmlEditLines( &m_ListCtrl, Q_LINENUMBER, title );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckFamilyDates::OnHtmlNotepad()

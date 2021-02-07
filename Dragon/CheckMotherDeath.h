@@ -29,9 +29,8 @@ protected:
 	void createColumns();
 	void fillTable();
 
-	void OnHtmlEdit();
 	void OnHtmlNotepad();
-	void OnHtmlShows();
+	void OnHtmlEditLines();
 
 	FILE* fh1;
 	FILE* fl;

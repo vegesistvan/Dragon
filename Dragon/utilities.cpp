@@ -1182,3 +1182,10 @@ bool openFileSpec( FILE** ff, CString fileSpec, CString mode )
 	}
 	return true;
 }
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int dateDiff( CString date1, CString date2 )
+{
+	int diff = _wtoi( date1.Left(4) ) - _wtoi( date2.Left(4) );
+	return diff;
+}
+

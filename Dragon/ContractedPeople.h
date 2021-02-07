@@ -59,7 +59,7 @@ public:
 	afx_msg void OnFilter2();
 
 	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
-	afx_msg void OnHtmlShows();
+	afx_msg void OnHtmlEditLines();
 	afx_msg void OnHtmlPeoplefather();
 	afx_msg void OnHtmlNotepad();
 	afx_msg void OnEditNotepadParents();

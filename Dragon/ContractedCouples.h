@@ -36,7 +36,7 @@ protected:
 	void keress( int start );
 
 	void OnHtmlEdit();
-	void OnHtmlShows();
+	void OnHtmlEditLines();
 	void OnEdit2lines();
 	void OnHtmlNotepad();
 	void OnHtmlPeoplefather();

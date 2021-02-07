@@ -41,7 +41,7 @@ BEGIN_MESSAGE_MAP(CInputErrors, CDialogEx)
 
 
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_HTML_LINE, &CInputErrors::OnHtmlEdit)
+	ON_COMMAND(ID_HTML_EDIT, &CInputErrors::OnHtmlEdit)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CInputErrors::OnHtmlNotepad)
 
 END_MESSAGE_MAP()
@@ -371,13 +371,13 @@ LRESULT CInputErrors:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 	CMenu*	pPopup;
 	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
 
-	if(Menu.LoadMenu( IDR_DROPDOWN_HTML_EDIT ))
+	if(Menu.LoadMenu( IDR_DROPDOWN_HTML ))
     {
 		pPopup = Menu.GetSubMenu(0);
 
 		if( m_ListCtrl.GetItemText( nItem, 1 ).IsEmpty() )
 		{
-			pPopup->EnableMenuItem(ID_HTML_LINE, MF_BYCOMMAND | MF_GRAYED);
+			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
 			pPopup->EnableMenuItem(ID_HTML_NOTEPAD, MF_BYCOMMAND | MF_GRAYED);
 		}
 		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);

@@ -15,7 +15,7 @@ public:
 // Dialog Data
 	enum { IDD = IDD_HTML_EDITLINE };
 	CString m_line;
-	CString m_caption;
+	CString m_title;
 	CString	m_linenumber;
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support

@@ -99,7 +99,7 @@ protected:
 	void createColumns();
 	void OnHtmlEdit();
 	
-	void OnHtmlShows();
+	void OnHtmlEditLines();
 	void OnHtmlPeoplefather();
 	
 

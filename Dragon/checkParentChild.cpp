@@ -84,10 +84,10 @@ BEGIN_MESSAGE_MAP(CCheckParentChild, CDialogEx)
 	ON_WM_SIZE()
 	ON_WM_SIZING()
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_HTML_LINE, &CCheckParentChild::OnHtmlEdit)
-	ON_COMMAND(ID_HTML_EDIT, &CCheckParentChild::OnHtmlShows)
+//	ON_COMMAND(ID_HTML_EDIT, &CCheckParentChild::OnHtmlEdit)
+	ON_COMMAND(ID_HTML_EDIT, &CCheckParentChild::OnHtmlEditLines)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CCheckParentChild::OnHtmlNotepad)
-	ON_COMMAND(ID_DB_EDIT, &CCheckParentChild::OnRokonsag)
+	ON_COMMAND(ID_DB_EDIT, &CCheckParentChild::OnDbEdit)
 	ON_COMMAND(ID_GAHTML_LINE, &CCheckParentChild::OnGahtmlLine)
 
 	ON_COMMAND(ID_LIST, &CCheckParentChild::OnList)
@@ -372,19 +372,21 @@ LRESULT CCheckParentChild:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 		{
 			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
 			pPopup->EnableMenuItem(ID_HTML_NOTEPAD, MF_BYCOMMAND | MF_GRAYED);
-			pPopup->EnableMenuItem(ID_HTML_LINE, MF_BYCOMMAND | MF_GRAYED);
+			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
 		}
 		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
     }
 	return TRUE;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 void CCheckParentChild::OnHtmlEdit()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
 	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	L_LINENUMBER ) );
 	theApp.listHtmlLine( lineNumber );
 }
+*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckParentChild::OnHtmlNotepad()
 {
@@ -394,8 +396,19 @@ void CCheckParentChild::OnHtmlNotepad()
 		theApp.editNotepad( lineNumber );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckParentChild::OnHtmlShows()
+void CCheckParentChild::OnHtmlEditLines()
 {
+	CString title;
+	int selectedCount	= m_ListCtrl.GetSelectedCount();
+	int nItem			= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	if( selectedCount == 1 )
+		title.Format( L"%s a ga.html fájlban (%s. sor)", m_ListCtrl.GetItemText( nItem, L_NAME ), m_ListCtrl.GetItemText( nItem, L_LINENUMBER )  );
+	else
+		title.Format( L"%d kijelölt ember a ga.html fájlban", selectedCount );
+
+	theApp.htmlEditLines( &m_ListCtrl, L_LINENUMBER, title );
+
+/*
 	POSITION	pos = m_ListCtrl.GetFirstSelectedItemPosition();
 	int			nItem;
 	std::vector<CString> vLines;
@@ -428,6 +441,7 @@ void CCheckParentChild::OnHtmlShows()
 	dlg.vLines = &vLines;
 
 	dlg.DoModal();
+*/
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckParentChild::OnList()
@@ -453,7 +467,7 @@ void CCheckParentChild::OnGahtmlLine()
 	theApp.listHtmlLine( lineNumber );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckParentChild::OnRokonsag()
+void CCheckParentChild::OnDbEdit()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
 

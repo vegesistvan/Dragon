@@ -88,7 +88,11 @@ protected:
 	WIFES w;
 	CHILDREN c;
 
-	int	m_ageDiffM;
+
+	int	m_diffMotherChild;		// anya és gyermeke max korkülönbsége
+
+
+
 	int m_cnt;
 
 	void createColumns();
@@ -100,7 +104,7 @@ protected:
 	void keress( int start );
 
 
-	void CCheckFamilyDates::OnHtmlEdit();
+	void CCheckFamilyDates::OnHtmlEditLines();
 	void CCheckFamilyDates::OnHtmlNotepad();
 	void CCheckFamilyDates::OnHtmlFamily();
 	void CCheckFamilyDates::OnDbEdit();

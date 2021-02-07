@@ -82,7 +82,7 @@ BEGIN_MESSAGE_MAP(CContractedCouples, CDialogEx)
 
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
 	ON_COMMAND(ID_EDIT2LINES, &CContractedCouples::OnEdit2lines)
-	ON_COMMAND(ID_HTML_EDIT, &CContractedCouples::OnHtmlShows)
+	ON_COMMAND(ID_HTML_EDIT, &CContractedCouples::OnHtmlEditLines)
 	ON_COMMAND(ID_HTML_PEOPLEFATHER, &CContractedCouples::OnHtmlPeoplefather)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CContractedCouples::OnHtmlNotepad)
 
@@ -490,7 +490,7 @@ LRESULT CContractedCouples:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
 		{
 			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
-			pPopup->EnableMenuItem(ID_HTML_LINE, MF_BYCOMMAND | MF_GRAYED);
+			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
 		}
 		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
     }
@@ -518,40 +518,17 @@ void CContractedCouples::OnEditNotepadParents()
 		theApp.editNotepad( lineNumber );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CContractedCouples::OnHtmlShows()
+void CContractedCouples::OnHtmlEditLines()
 {
-	POSITION	pos = m_ListCtrl.GetFirstSelectedItemPosition();
-	int			nItem;
-	std::vector<CString> vLines;
-
-	int cnt = 0;
-	CString name(L"");
-
-	while( pos )
-	{
-		nItem = m_ListCtrl.GetNextSelectedItem( pos );
-		vLines.push_back( m_ListCtrl.GetItemText( nItem, L_LINENUMBERH ) );
-		if( name.Compare( m_ListCtrl.GetItemText( nItem, L_HUSBAND ) ) )
-		{
-			name = m_ListCtrl.GetItemText( nItem, L_HUSBAND );
-			++cnt;
-		}
-	
-
-	}
-
-	CHtmlEditLines dlg;
-
-	if( !name.IsEmpty() )
-	{
-		str.Format( L"%s kijelölt sora a html fájlban", name ); 
-		dlg.m_title = str;
-	}
+	CString title;
+	int selectedCount	= m_ListCtrl.GetSelectedCount();
+	int nItem			= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	if( selectedCount == 1 )
+		title.Format( L"%s a ga.html fájlban  (%s. sor)", m_ListCtrl.GetItemText( nItem, L_HUSBAND ), m_ListCtrl.GetItemText( nItem, L_LINENUMBERH ) );
 	else
-		dlg.m_title = L"Kijelölt sorok a htm fájlban";
-	dlg.vLines = &vLines;
+		title.Format( L"%d kijelölt ember a ga.html fájlban", selectedCount );
 
-	dlg.DoModal();
+	theApp.htmlEditLines( &m_ListCtrl, L_LINENUMBERH, title );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedCouples::OnHtmlPeoplefather()

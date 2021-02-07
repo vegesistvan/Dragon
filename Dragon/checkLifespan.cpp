@@ -10,6 +10,7 @@
 #include "checkParam.h"
 #include "ProgressWnd.h"
 #include "utilities.h"
+#include "html_EditLine.h"
 
 // ListCtrl oszlopok
 enum
@@ -68,9 +69,9 @@ BEGIN_MESSAGE_MAP(CLifeSpan, CDialogEx)
 	ON_WM_SIZE()
 	ON_WM_SIZING()
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_HTML_LINE, &CLifeSpan::OnHtmlEdit)
+	ON_COMMAND(ID_HTML_EDIT, &CLifeSpan::OnHtmlEdit)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CLifeSpan::OnHtmlNotepad)
-	ON_COMMAND(ID_DB_EDIT, &CLifeSpan::OnRokonsag)
+	ON_COMMAND(ID_DB_EDIT, &CLifeSpan::OnDbEdit)
 	ON_COMMAND(ID_LIST, &CLifeSpan::OnList)
 
 END_MESSAGE_MAP()
@@ -286,7 +287,7 @@ LRESULT CLifeSpan::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 	CMenu*	pPopup;
 
 
-	if(Menu.LoadMenu( IDR_DROPDOWN_HTML_EDIT ))
+	if(Menu.LoadMenu( IDR_DROPDOWN_HTML ))
     {
 		pPopup = Menu.GetSubMenu(0);
 		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
@@ -297,8 +298,9 @@ LRESULT CLifeSpan::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 void CLifeSpan::OnHtmlEdit()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, L_LINENUMBER ) );
-	theApp.listHtmlLine( lineNumber );
+	CHtmlEditLine dlg;
+	dlg.m_linenumber	= m_ListCtrl.GetItemText( nItem, L_LINENUMBER );
+	dlg.DoModal();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CLifeSpan::OnHtmlNotepad()
@@ -310,7 +312,7 @@ void CLifeSpan::OnHtmlNotepad()
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CLifeSpan::OnRokonsag()
+void CLifeSpan::OnDbEdit()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
 	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );

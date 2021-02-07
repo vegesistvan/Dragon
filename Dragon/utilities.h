@@ -91,3 +91,4 @@ int			getYearFromDate( CString date );
 CString		getTimeTag();
 bool		openFileSpec( FILE** ff, CString fileSpec, CString mode );
 CString		roundDate( CString date );
+int			dateDiff( CString date1, CString date2 );

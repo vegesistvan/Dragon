@@ -101,10 +101,9 @@ BEGIN_MESSAGE_MAP(CCheckFatherDeath9, CDialogEx)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST, &CCheckFatherDeath9::OnCustomdrawList)
 	
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_HTML_EDIT, &CCheckFatherDeath9::OnHtmlShows)
-	ON_COMMAND(ID_HTML_LINE, &CCheckFatherDeath9::OnHtmlEdit)
+	ON_COMMAND(ID_HTML_EDIT, &CCheckFatherDeath9::OnHtmlEditLines)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CCheckFatherDeath9::OnHtmlNotepad)
-	ON_COMMAND(ID_DB_EDIT, &CCheckFatherDeath9::OnRokonsag)
+	ON_COMMAND(ID_DB_EDIT, &CCheckFatherDeath9::OnDbEdit)
 
 	ON_COMMAND(ID_LIST, &CCheckFatherDeath9::OnList)
 END_MESSAGE_MAP()
@@ -569,13 +568,6 @@ LRESULT CCheckFatherDeath9::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 	return TRUE;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckFatherDeath9::OnHtmlEdit()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, L_LINENUMBER ) );
-	theApp.listHtmlLine( lineNumber );
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckFatherDeath9::OnHtmlNotepad()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
@@ -584,46 +576,20 @@ void CCheckFatherDeath9::OnHtmlNotepad()
 		theApp.editNotepad( lineNumber );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckFatherDeath9::OnHtmlShows()
+void CCheckFatherDeath9::OnHtmlEditLines()
 {
-	POSITION	pos = m_ListCtrl.GetFirstSelectedItemPosition();
-	int			nItem;
-	std::vector<CString> vLines;
-
-	int cnt = 0;
-	CString name(L"");
-
-	while( pos )
-	{
-		nItem = m_ListCtrl.GetNextSelectedItem( pos );
-		vLines.push_back( m_ListCtrl.GetItemText( nItem, L_LINENUMBER ) );
-		if( name.Compare( m_ListCtrl.GetItemText( nItem, L_NAME ) ) )
-		{
-			name = m_ListCtrl.GetItemText( nItem, L_NAME );
-			++cnt;
-		}
-	
-
-	}
-
-	CHtmlEditLines dlg;
-
-
-	if( !name.IsEmpty() )
-	{
-		str.Format( L"%s kijelölt sora a html fájlban", name ); 
-		dlg.m_title = str;
-	}
+	CString title;
+	int selectedCount	= m_ListCtrl.GetSelectedCount();
+	int nItem			= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	if( selectedCount == 1 )
+		title.Format( L"%s a ga.html fájlban (%s. sor)", m_ListCtrl.GetItemText( nItem, L_NAME ), m_ListCtrl.GetItemText( nItem, L_LINENUMBER )  );
 	else
-		dlg.m_title = L"Kijelölt sorok a htm fájlban";
+		title.Format( L"%d kijelölt ember a ga.html fájlban", selectedCount );
 
-
-	dlg.vLines = &vLines;
-
-	dlg.DoModal();
+	theApp.htmlEditLines( &m_ListCtrl, L_LINENUMBER, title );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckFatherDeath9::OnRokonsag()
+void CCheckFatherDeath9::OnDbEdit()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
 	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );

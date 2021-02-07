@@ -102,8 +102,7 @@ BEGIN_MESSAGE_MAP(CCheckMotherDeath, CDialogEx)
 	ON_WM_SIZING()
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST, &CCheckMotherDeath::OnCustomdrawList)
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_HTML_LINE, &CCheckMotherDeath::OnHtmlEdit)
-	ON_COMMAND(ID_HTML_EDIT, &CCheckMotherDeath::OnHtmlShows)
+	ON_COMMAND(ID_HTML_EDIT, &CCheckMotherDeath::OnHtmlEditLines)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CCheckMotherDeath::OnHtmlNotepad)
 	ON_COMMAND(ID_LIST, &CCheckMotherDeath::OnList)
 END_MESSAGE_MAP()
@@ -324,18 +323,11 @@ LRESULT CCheckMotherDeath:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 		{
 			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
 			pPopup->EnableMenuItem(ID_HTML_NOTEPAD, MF_BYCOMMAND | MF_GRAYED);
-			pPopup->EnableMenuItem(ID_HTML_LINE, MF_BYCOMMAND | MF_GRAYED);
+			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
 		}
 		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
     }
 	return TRUE;
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckMotherDeath::OnHtmlEdit()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	L_LINENUMBER ) );
-	theApp.listHtmlLine( lineNumber );
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckMotherDeath::OnHtmlNotepad()
@@ -346,40 +338,17 @@ void CCheckMotherDeath::OnHtmlNotepad()
 		theApp.editNotepad( lineNumber );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckMotherDeath::OnHtmlShows()
+void CCheckMotherDeath::OnHtmlEditLines()
 {
-	POSITION	pos = m_ListCtrl.GetFirstSelectedItemPosition();
-	int			nItem;
-	std::vector<CString> vLines;
-
-	int cnt = 0;
-	CString name(L"");
-
-	while( pos )
-	{
-		nItem = m_ListCtrl.GetNextSelectedItem( pos );
-		vLines.push_back( m_ListCtrl.GetItemText( nItem, L_LINENUMBER ) );
-		if( name.Compare( m_ListCtrl.GetItemText( nItem, L_NAME ) ) )
-		{
-			name = m_ListCtrl.GetItemText( nItem, L_NAME );
-			++cnt;
-		}
-	
-
-	}
-
-	CHtmlEditLines dlg;
-
-	if( !name.IsEmpty() )
-	{
-		str.Format( L"%s kijelölt sora a html fájlban", name ); 
-		dlg.m_title = str;
-	}
+	CString title;
+	int selectedCount	= m_ListCtrl.GetSelectedCount();
+	int nItem			= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	if( selectedCount == 1 )
+		title.Format( L"%s a ga.html fájlban (%s. sor)", m_ListCtrl.GetItemText( nItem, L_NAME ), m_ListCtrl.GetItemText( nItem, L_LINENUMBER )  );
 	else
-		dlg.m_title = L"Kijelölt sorok a htm fájlban";
-	dlg.vLines = &vLines;
+		title.Format( L"%d kijelölt ember a ga.html fájlban", selectedCount );
 
-	dlg.DoModal();
+	theApp.htmlEditLines( &m_ListCtrl, L_LINENUMBER, title );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckMotherDeath::motherDeathChildBirth()

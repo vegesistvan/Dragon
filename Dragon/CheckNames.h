@@ -34,9 +34,9 @@ protected:
 	CString getPeople();
 	CString getName();
 
-	void OnHtmlEdit();
+	void OnHtmlEditLines();
 	void OnHtmlNotepad();
-	void OnRokonsag();
+	void OnDbEdit();
 
 	DECLARE_MESSAGE_MAP()
 public:

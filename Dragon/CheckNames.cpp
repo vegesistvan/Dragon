@@ -8,6 +8,7 @@
 #include "ProgressWnd.h"
 #include "utilities.h"
 #include "Relations.h"
+#include "html_EditLines.h"
 
 IMPLEMENT_DYNAMIC(CCheckNames, CDialogEx)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -32,9 +33,9 @@ BEGIN_MESSAGE_MAP(CCheckNames, CDialogEx)
 	ON_WM_SIZING()
 
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_HTML_LINE, &CCheckNames::OnHtmlEdit)
+	ON_COMMAND(ID_HTML_EDIT, &CCheckNames::OnHtmlEditLines)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CCheckNames::OnHtmlNotepad)
-	ON_COMMAND(ID_DB_EDIT, &CCheckNames::OnRokonsag)
+	ON_COMMAND(ID_DB_EDIT, &CCheckNames::OnDbEdit)
 
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -275,13 +276,13 @@ LRESULT CCheckNames:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 	CMenu*	pPopup;
 	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
 
-	if(Menu.LoadMenu( IDR_DROPDOWN_HTML_EDIT ))
+	if(Menu.LoadMenu( IDR_DROPDOWN_HTML ))
     {
 		pPopup = Menu.GetSubMenu(0);
 
 		if( m_ListCtrl.GetItemText( nItem, 1 ).IsEmpty() )  // linenumber
 		{
-			pPopup->EnableMenuItem(ID_HTML_LINE, MF_BYCOMMAND | MF_GRAYED);
+			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
 			pPopup->EnableMenuItem(ID_HTML_NOTEPAD, MF_BYCOMMAND | MF_GRAYED);
 		}
 		if( m_ListCtrl.GetItemText( nItem, 2 ).IsEmpty() )  // rowid
@@ -293,11 +294,13 @@ LRESULT CCheckNames:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 	return TRUE;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckNames::OnHtmlEdit()
+void CCheckNames::OnHtmlEditLines()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
 	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	1 ) );
-	theApp.listHtmlLine( lineNumber );
+	CHtmlEditLines dlg;
+	dlg.m_linenumber = lineNumber;
+	dlg.DoModal();
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckNames::OnHtmlNotepad()
@@ -308,7 +311,7 @@ void CCheckNames::OnHtmlNotepad()
 		theApp.editNotepad( lineNumber );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckNames::OnRokonsag()
+void CCheckNames::OnDbEdit()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
 

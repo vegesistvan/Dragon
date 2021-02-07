@@ -102,7 +102,7 @@ BEGIN_MESSAGE_MAP(CHtmlBrackets, CDialogEx)
 	ON_COMMAND(ID_FILTER_R_ALL, &CHtmlBrackets::OnFilterRAll)
 
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_HTML_LINE, &CHtmlBrackets::OnHtmlEdit)
+	ON_COMMAND(ID_HTML_EDIT, &CHtmlBrackets::OnHtmlEdit)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CHtmlBrackets::OnHtmlNotepad)
 
 
@@ -625,13 +625,13 @@ LRESULT CHtmlBrackets::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 	CMenu*	pPopup;
 	int		MENU_IDR;
 
-	MENU_IDR = IDR_DROPDOWN_HTML_EDIT;
+	MENU_IDR = IDR_DROPDOWN_HTML;
 	if(Menu.LoadMenu( MENU_IDR ))
     {
 		pPopup = Menu.GetSubMenu(0);
 		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
 		{
-//			pPopup->EnableMenuItem(ID_RELATIONS,MF_BYCOMMAND | MF_GRAYED);
+//			pPopup->EnableMenuItem(ID_DB_EDIT,MF_BYCOMMAND | MF_GRAYED);
 //			pPopup->EnableMenuItem(ID_EDIT_DELETE,MF_BYCOMMAND | MF_GRAYED);
 		}
 		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);

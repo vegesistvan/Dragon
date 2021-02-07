@@ -64,10 +64,10 @@ BEGIN_MESSAGE_MAP(CCheckSpousesDiff, CDialogEx)
 	ON_WM_SIZING()
 
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_HTML_LINE, &CCheckSpousesDiff::OnHtmlEdit)
+	ON_COMMAND(ID_HTML_EDIT, &CCheckSpousesDiff::OnHtmlEdit)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CCheckSpousesDiff::OnHtmlNotepad)
-	ON_COMMAND(ID_HTML_EDIT, &CCheckSpousesDiff::OnHtmlShows)
-	ON_COMMAND(ID_DB_EDIT, &CCheckSpousesDiff::OnRokonsag)
+	ON_COMMAND(ID_HTML_EDIT, &CCheckSpousesDiff::OnHtmlEditLines)
+	ON_COMMAND(ID_DB_EDIT, &CCheckSpousesDiff::OnDbEdit)
 	ON_COMMAND(ID_LIST, &CCheckSpousesDiff::OnList)
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -305,7 +305,7 @@ LRESULT CCheckSpousesDiff:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 		{
 			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
 			pPopup->EnableMenuItem(ID_HTML_NOTEPAD, MF_BYCOMMAND | MF_GRAYED);
-			pPopup->EnableMenuItem(ID_HTML_LINE, MF_BYCOMMAND | MF_GRAYED);
+			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
 		}
 		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
     }
@@ -327,8 +327,18 @@ void CCheckSpousesDiff::OnHtmlNotepad()
 		theApp.editNotepad( lineNumber );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSpousesDiff::OnHtmlShows()
+void CCheckSpousesDiff::OnHtmlEditLines()
 {
+	CString title;
+	int selectedCount	= m_ListCtrl.GetSelectedCount();
+	int nItem			= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	if( selectedCount == 1 )
+		title.Format( L"%s a ga.html fájlban (%s. sor)", m_ListCtrl.GetItemText( nItem, L_NAME ), m_ListCtrl.GetItemText( nItem, L_LINENUMBER )  );
+	else
+		title.Format( L"%d kijelölt ember a ga.html fájlban", selectedCount );
+
+	theApp.htmlEditLines( &m_ListCtrl, L_LINENUMBER, title );
+/*
 	POSITION	pos = m_ListCtrl.GetFirstSelectedItemPosition();
 	int			nItem;
 	std::vector<CString> vLines;
@@ -362,9 +372,10 @@ void CCheckSpousesDiff::OnHtmlShows()
 	dlg.vLines = &vLines;
 
 	dlg.DoModal();
+*/
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSpousesDiff::OnRokonsag()
+void CCheckSpousesDiff::OnDbEdit()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
 

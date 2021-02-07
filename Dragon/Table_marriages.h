@@ -87,9 +87,9 @@ protected:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	virtual void PostNcDestroy();
 
-	void OnHtmlEdit();
+//	void OnHtmlEdit();
 	void OnHtmlNotepad();
-	void OnHtmlShows();
+	void OnHtmlEditLines();
 
 	std::vector<SPOUSE11>	vSpouse1;
 	std::vector<SPOUSE21>	vSpouse2;
@@ -137,6 +137,7 @@ protected:
 	CString m_last_name_h;
 	CString m_last_name_w;
 	CColorStatic colorKeres;
+	CColorStatic colorNext;
 
 	DECLARE_MESSAGE_MAP()
 public:
@@ -150,7 +151,6 @@ public:
 	afx_msg void OnAzonosMarriagelist();
 	afx_msg void OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnClickedKeres();
-
 
 	afx_msg void OnUnfilter();
 	afx_msg void OnFilterHlastname();
@@ -169,7 +169,6 @@ public:
 	afx_msg void OnEditDelete();
 	afx_msg void OnEditGahtml();
 	afx_msg void OnMoreMarriages();
-	CColorStatic colorNext;
 	afx_msg void OnClickedNext();
 	afx_msg void OnManMorespouses();
 };

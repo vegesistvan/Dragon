@@ -79,7 +79,7 @@ BEGIN_MESSAGE_MAP(CContractedPeople, CDialogEx)
 
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
 	ON_COMMAND(ID_EDIT2LINES, &CContractedPeople::OnEdit2lines)
-	ON_COMMAND(ID_HTML_EDIT, &CContractedPeople::OnHtmlShows)
+	ON_COMMAND(ID_HTML_EDIT, &CContractedPeople::OnHtmlEditLines)
 	ON_COMMAND(ID_HTML_PEOPLEFATHER, &CContractedPeople::OnHtmlPeoplefather)
 	ON_COMMAND(ID_EDIT_NOTEPAD_PARENTS, &CContractedPeople::OnEditNotepadParents)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CContractedPeople::OnHtmlNotepad)
@@ -494,8 +494,18 @@ void CContractedPeople::OnHtmlNotepad()
 		theApp.editNotepad( lineNumber );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CContractedPeople::OnHtmlShows()
+void CContractedPeople::OnHtmlEditLines()
 {
+		CString title;
+	int selectedCount	= m_ListCtrl.GetSelectedCount();
+	int nItem			= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	if( selectedCount == 1 )
+		title.Format( L"%s a ga.html fájlban  (%s. sor)", m_ListCtrl.GetItemText( nItem, S_NAME ), m_ListCtrl.GetItemText( nItem, S_LINE ) );
+	else
+		title.Format( L"%d kijelölt ember a ga.html fájlban", selectedCount );
+
+	theApp.htmlEditLines( &m_ListCtrl, S_LINE, title );
+	/*
 	POSITION	pos = m_ListCtrl.GetFirstSelectedItemPosition();
 	int			nItem;
 	std::vector<CString> vLines;
@@ -527,6 +537,7 @@ void CContractedPeople::OnHtmlShows()
 	dlg.vLines = &vLines;
 
 	dlg.DoModal();
+	*/
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedPeople::OnHtmlPeoplefather()

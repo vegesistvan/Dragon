@@ -37,7 +37,7 @@ protected:
 	void fillTable();
 	CString str;
 	void OnHtmlEdit();
-	void OnRokonsag();
+	void OnDbEdit();
 	void OnHtmlNotepad();
 
 	DECLARE_MESSAGE_MAP()

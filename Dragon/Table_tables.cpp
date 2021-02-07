@@ -53,7 +53,7 @@ void CTableTables::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CTableTables, CDialogEx)
 
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_HTML_LINE, &CTableTables::OnHtmlEdit)
+	ON_COMMAND(ID_HTML_EDIT, &CTableTables::OnHtmlEdit)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CTableTables::OnHtmlNotepad)
 
 
@@ -553,7 +553,7 @@ LRESULT CTableTables::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 	if( theApp.m_inputMode == GEDCOM )
 		MENU_IDR = IDR_DROPDOWN_DELETE;
 	else if( theApp.m_inputMode == GAHTML )
-		MENU_IDR = IDR_DROPDOWN_HTML_EDIT;
+		MENU_IDR = IDR_DROPDOWN_HTML;
 	else if( theApp.m_inputMode == MANUAL )
 		MENU_IDR = IDR_DROPDOWN_DELETE;
 
@@ -562,7 +562,7 @@ LRESULT CTableTables::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 		pPopup = Menu.GetSubMenu(0);
 		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
 		{
-//			pPopup->EnableMenuItem(ID_RELATIONS,MF_BYCOMMAND | MF_GRAYED);
+//			pPopup->EnableMenuItem(ID_DB_EDIT,MF_BYCOMMAND | MF_GRAYED);
 //			pPopup->EnableMenuItem(ID_EDIT_DELETE,MF_BYCOMMAND | MF_GRAYED);
 		}
 		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);

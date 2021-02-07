@@ -40,9 +40,9 @@ void CDateFormat::DoDataExchange(CDataExchange* pDX)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CDateFormat, CDialogEx)
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_HTML_LINE, &CDateFormat::OnHtmlEdit)
+	ON_COMMAND(ID_HTML_EDIT, &CDateFormat::OnHtmlEdit)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CDateFormat::OnHtmlNotepad)
-	ON_COMMAND(ID_DB_EDIT, &CDateFormat::OnRokonsag)
+	ON_COMMAND(ID_DB_EDIT, &CDateFormat::OnDbEdit)
 
 	ON_COMMAND(ID_UJLISTA, &CDateFormat::OnUjlista)
 END_MESSAGE_MAP()
@@ -226,23 +226,23 @@ LRESULT CDateFormat::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 	CMenu*	pPopup;
 
 
-	if(Menu.LoadMenu( IDR_DROPDOWN_HTML_EDIT ))
+	if(Menu.LoadMenu( IDR_DROPDOWN_HTML ))
     {
 		pPopup = Menu.GetSubMenu(0);
+		pPopup->EnableMenuItem(ID_HTML_FAMILY, MF_BYCOMMAND | MF_GRAYED);
+		pPopup->EnableMenuItem(ID_HTML_PARENTS, MF_BYCOMMAND | MF_GRAYED);
+		pPopup->EnableMenuItem(ID_HTML_NOTEPAD_PARENTS, MF_BYCOMMAND | MF_GRAYED);
 		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
-    }
+	}
 	return TRUE;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDateFormat::OnHtmlEdit()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-
 	CHtmlEditLine dlg;
 	dlg.m_linenumber	= m_ListCtrl.GetItemText( nItem, L_LINENUMBER );
 	dlg.DoModal();
-
-//	theApp.listHtmlLine( lineNumber );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDateFormat::OnHtmlNotepad()
@@ -253,7 +253,7 @@ void CDateFormat::OnHtmlNotepad()
 		theApp.editNotepad( lineNumber );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDateFormat::OnRokonsag()
+void CDateFormat::OnDbEdit()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
 	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );

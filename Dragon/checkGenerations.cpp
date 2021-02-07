@@ -52,11 +52,9 @@ BEGIN_MESSAGE_MAP(CCheckGenerations, CDialogEx)
 	ON_WM_SIZE()
 	ON_WM_SIZING()
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_HTML_LINE, &CCheckGenerations::OnHtmlEdit)
-	ON_COMMAND(ID_HTML_EDIT, &CCheckGenerations::OnHtmlShows)
+	ON_COMMAND(ID_HTML_EDIT, &CCheckGenerations::OnHtmlEditLines)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CCheckGenerations::OnHtmlNotepad)
-	ON_COMMAND(ID_DB_EDIT, &CCheckGenerations::OnRokonsag)
-	ON_COMMAND(ID_GAHTML_LINE, &CCheckGenerations::OnGahtmlLine)
+	ON_COMMAND(ID_DB_EDIT, &CCheckGenerations::OnDbEdit)
 
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -288,18 +286,11 @@ LRESULT CCheckGenerations:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
 		{
 			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
-			pPopup->EnableMenuItem(ID_HTML_LINE, MF_BYCOMMAND | MF_GRAYED);
+			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
 		}
 		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
     }
 	return TRUE;
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckGenerations::OnHtmlEdit()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	L_LINE ) );
-	theApp.listHtmlLine( lineNumber );
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckGenerations::OnHtmlNotepad()
@@ -310,59 +301,22 @@ void CCheckGenerations::OnHtmlNotepad()
 		theApp.editNotepad( lineNumber );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckGenerations::OnHtmlShows()
+void CCheckGenerations::OnHtmlEditLines()
 {
-	POSITION	pos = m_ListCtrl.GetFirstSelectedItemPosition();
-	int			nItem;
-	std::vector<CString> vLines;
-
-	int cnt = 0;
-	CString name(L"");
-
-	while( pos )
-	{
-		nItem = m_ListCtrl.GetNextSelectedItem( pos );
-		vLines.push_back( m_ListCtrl.GetItemText( nItem, L_LINE ) );
-		if( name.Compare( m_ListCtrl.GetItemText( nItem, L_NAME ) ) )
-		{
-			name = m_ListCtrl.GetItemText( nItem, L_NAME );
-			++cnt;
-		}
-	
-
-	}
-
-	CHtmlEditLines dlg;
-	if( !name.IsEmpty() )
-	{
-		str.Format( L"%s kijelölt sora a html fájlban", name ); 
-		dlg.m_title = str;
-	}
+	CString title;
+	int selectedCount	= m_ListCtrl.GetSelectedCount();
+	int nItem			= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	if( selectedCount == 1 )
+		title.Format( L"%s a ga.html fájlban (%s. sor)", m_ListCtrl.GetItemText( nItem, L_NAME ), m_ListCtrl.GetItemText( nItem, L_LINE )  );
 	else
-		dlg.m_title = L"Kijelölt sorok a htm fájlban";
+		title.Format( L"%d kijelölt ember a ga.html fájlban", selectedCount );
 
-	dlg.vLines = &vLines;
+	theApp.htmlEditLines( &m_ListCtrl, L_LINE, title );
 
-	dlg.DoModal();
+
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckGenerations::OnGahtmlLine()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
-
-	if( nItem == - 1 )
-	{
-		theApp.message( L"Azonos nemû házastársak", L"Nincs kijelölve ember!" );
-		return;
-	}
-	
-
-	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	L_LINE ) );
-
-	theApp.listHtmlLine( lineNumber );
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckGenerations::OnRokonsag()
+void CCheckGenerations::OnDbEdit()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
 
@@ -371,6 +325,5 @@ void CCheckGenerations::OnRokonsag()
 
 	dlg.m_rowid = rowid;
 	dlg.DoModal();
-
 }
 

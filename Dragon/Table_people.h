@@ -81,27 +81,21 @@ protected:
 	int		m_insert;
 	FILE* fl;
 
-
+	CColorStatic colorKeres;
+	CListCtrlEx m_ListCtrl;
 
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnInitDialog();
-	CListCtrlEx m_ListCtrl;
+
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
 	afx_msg LRESULT OnSetColumnColor(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnColumnSorted(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnEditDelete();
-//	afx_msg void OnEditInsert();
-//	afx_msg void OnEditUpdate();
-	afx_msg void OnRelations();
 	afx_msg void OnFilterUnfilter();
 	afx_msg void OnFilterAncestors();
-
 	afx_msg void OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
-
-//	afx_msg void OnChangeSearch();
 	afx_msg void OnFilterFile();
 	afx_msg void OnFilterMen();
 	afx_msg void OnFilterNodescendant();
@@ -117,9 +111,7 @@ public:
 	afx_msg void OnExportSelected();
 	afx_msg void OnExportAll();
 	afx_msg void OnFilterFolyt();
-	//afx_msg void OnAzonosember();
 	afx_msg void OnClose();
-	//afx_msg void OnAzonosemberConc();
 	afx_msg void OnAzonosemberIdent();
 	afx_msg void OnGroupbyBirthplace();
 	afx_msg void OnGroupbyDeathplace();
@@ -138,9 +130,15 @@ public:
 	afx_msg void OnFilterSspouses();
 	afx_msg void OnFilterSfather();
 	afx_msg void OnFilterSmother();
+
+	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnHtmlParents();
-	afx_msg void OnHtmlLines();
+	afx_msg void OnHtmlFamily();
+	afx_msg void OnHtmlEditLines();
+	afx_msg void OnHtmlNotepadParents();
 	afx_msg void OnEditNotepad();
+	afx_msg void OnDbEdit();
+
 	afx_msg void OnGivenname();
 	afx_msg void OnAscendants();
 	afx_msg void OnAscendantsChain();
@@ -153,5 +151,4 @@ public:
 	afx_msg void OnFilterBisex();
 	afx_msg void OnClickedKeres();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
-	CColorStatic colorKeres;
 };

@@ -271,6 +271,7 @@ public:
 	void	Setsystemvariables( CString caption );
 	CString	get_time_elapsed();
 	void	setStartTime();
+	_int64 CDragonApp::dateDiff( CString date1, CString date2 );
 	CString	getDateStrFromI( CString dateI );
 	_int64	getDateIFromStr( CString dateS );
 	void	showLogFile();
@@ -285,6 +286,9 @@ public:
 	void CDragonApp::edit1line( int lineNumber );
 	void CDragonApp::edit2lines( std::vector<CString>* vLines );
 	void CDragonApp::editHtmlLines( CListCtrlEx * p_ListCtrl, int col_linennumber );
+	void CDragonApp::htmlEditLines( CListCtrlEx* p_ListCtrl, int col_linenumber, CString title );
+	void CDragonApp::HtmlNotepadParents( CString rowid );
+
 	void	saveHtmlLine( int lineNumber, CString line );
 	BOOL	openDatabase();
 	BOOL	openSystemDatabase();

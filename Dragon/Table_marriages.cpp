@@ -157,8 +157,7 @@ BEGIN_MESSAGE_MAP(CTableMarriages, CDialogEx)
 	ON_COMMAND(ID_MARRIAGES_PARENTS, &CTableMarriages::OnMarriagesParents)
 	ON_COMMAND(ID_ROWID_MARRIAGES, &CTableMarriages::OnRowidMarriages)
 	ON_COMMAND(ID_NAMEMARRIAGES, &CTableMarriages::OnNameMarriages)
-	ON_COMMAND(ID_HTML_LINE, &CTableMarriages::OnHtmlEdit)
-	ON_COMMAND(ID_HTML_EDIT, &CTableMarriages::OnHtmlShows)
+	ON_COMMAND(ID_HTML_EDIT, &CTableMarriages::OnHtmlEditLines)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CTableMarriages::OnHtmlNotepad)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CTableMarriages::OnDblclkList)
 	ON_STN_CLICKED(IDC_KERES, &CTableMarriages::OnClickedKeres)
@@ -702,20 +701,7 @@ void CTableMarriages::OnClose()
 	theApp.m_pMainWnd->SetForegroundWindow();
 	CDialogEx::OnClose();
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void CTableMarriages::OnHtmlEdit()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	int linenumber;
-	if( m_columnsCount == 18 )
-		linenumber = _wtoi( m_ListCtrl.GetItemText( nItem, LIST_LINENUMBER ) );
-	else
-		linenumber = _wtoi( m_ListCtrl.GetItemText( nItem, L_LINENUMBER ) );
-
-
-	theApp.listHtmlLine( linenumber );
-}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTableMarriages::OnHtmlNotepad()
 {
@@ -729,41 +715,43 @@ void CTableMarriages::OnHtmlNotepad()
 	if( !linenumber.IsEmpty() ) 
 		theApp.editNotepad( linenumber );
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTableMarriages::OnHtmlShows()
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
+void CTableMarriages::OnHtmlEdit()
 {
-	POSITION	pos = m_ListCtrl.GetFirstSelectedItemPosition();
-	int			nItem;
-	std::vector<CString> vLines;
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	int linenumber;
+	if( m_columnsCount == 18 )
+		linenumber = _wtoi( m_ListCtrl.GetItemText( nItem, LIST_LINENUMBER ) );
+	else
+		linenumber = _wtoi( m_ListCtrl.GetItemText( nItem, L_LINENUMBER ) );
 
-	int cnt = 0;
-	CString name(L"");
 
-	while( pos )
+	theApp.listHtmlLine( linenumber );
+}
+*/
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTableMarriages::OnHtmlEditLines()
+{
+	CString title;
+	int selectedCount	= m_ListCtrl.GetSelectedCount();
+	int nItem			= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	if( selectedCount == 1 )
 	{
-		nItem = m_ListCtrl.GetNextSelectedItem( pos );
 		if( m_columnsCount == 18 )
-		{
-			vLines.push_back( m_ListCtrl.GetItemText( nItem, LIST_LINENUMBER ) );
-			if( name.Compare( m_ListCtrl.GetItemText( nItem, LIST_HFIRSTNAME ) ) )
-			{
-				name = m_ListCtrl.GetItemText( nItem, LIST_HFIRSTNAME );
-				++cnt;
-			}
-		}
+			title.Format( L"%s a ga.html fájlban (%s. sor)",  m_ListCtrl.GetItemText( nItem, LIST_HFIRSTNAME), m_ListCtrl.GetItemText( nItem, LIST_LINENUMBER ) );
 		else
-		{
-			vLines.push_back( m_ListCtrl.GetItemText( nItem, L_LINENUMBER ) );
-			++cnt;
-		}
+			title.Format( L"%s. sor a ga.html fájlban",   m_ListCtrl.GetItemText( nItem, LIST_LINENUMBER ) );
 	}
+	else
+		title.Format( L"%d kijelölt ember a ga.html fájlban", selectedCount );
 
-	CHtmlEditLines dlg;
+		
 
-	dlg.m_title = name;
-	dlg.vLines = &vLines;
-
-	dlg.DoModal();
+	if( m_columnsCount == 18 )
+		theApp.htmlEditLines( &m_ListCtrl, LIST_LINENUMBER, title );
+	else
+		theApp.htmlEditLines( &m_ListCtrl, L_LINENUMBER, title );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTableMarriages::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)

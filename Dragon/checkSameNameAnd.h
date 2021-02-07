@@ -64,7 +64,7 @@ protected:
 
 
 	void CcheckSameNameAnd::OnHtmlPeoplefather();
-	void CcheckSameNameAnd::OnHtmlShows();
+	void CcheckSameNameAnd::OnHtmlEditLines();
 	void CcheckSameNameAnd::OnHtmlNotepad();
 	void OnEditNotpadParents();
 	void OnEdit2lines();

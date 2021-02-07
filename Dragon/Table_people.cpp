@@ -161,11 +161,20 @@ BEGIN_MESSAGE_MAP(CTablePeople, CDialogEx)
 	ON_WM_SIZING()
 	ON_MESSAGE(WM_SET_COLUMN_COLOR, OnSetColumnColor)
 	ON_MESSAGE(WM_CLICKED_COLUMN, OnColumnSorted)
-	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
+	
 	ON_COMMAND(ID_FILTER_UNFILTER, &CTablePeople::OnFilterUnfilter)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CTablePeople::OnDblclkList)
-	ON_COMMAND(ID_EDIT_DELETEFM, &CTablePeople::OnEditDelete)
-	ON_COMMAND(ID_RELATIONS, &CTablePeople::OnRelations)
+	ON_COMMAND(ID_EDIT_DELETE, &CTablePeople::OnEditDelete)
+
+// DROPDOWN menü funkciók
+	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
+	ON_COMMAND(ID_DB_EDIT, &CTablePeople::OnDbEdit)
+	ON_COMMAND(ID_HTML_FAMILY, &CTablePeople::OnHtmlFamily )
+	ON_COMMAND(ID_HTML_NOTEPAD_PARENTS, &CTablePeople::OnHtmlNotepadParents )
+	ON_COMMAND(ID_HTML_PARENTS, &CTablePeople::OnHtmlParents)
+	ON_COMMAND(ID_HTML_EDIT, &CTablePeople::OnHtmlEditLines)
+	ON_COMMAND(ID_HTML_NOTEPAD, &CTablePeople::OnEditNotepad)	
+	
 	ON_COMMAND(ID_FILTER_FILE, &CTablePeople::OnFilterFile)
 	ON_COMMAND(ID_FILTER_MEN, &CTablePeople::OnFilterMen)
 	ON_COMMAND(ID_FILTER_NODESCENDANT, &CTablePeople::OnFilterNodescendant)
@@ -198,9 +207,7 @@ ON_WM_SHOWWINDOW()
 ON_COMMAND(ID_GROUPBY_BIRTHDATE, &CTablePeople::OnGroupbyBirthDate)
 ON_COMMAND(ID_GROUPBY_DEATHDATE, &CTablePeople::OnGroupbyDeathdate)
 ON_COMMAND(ID_GROUPBY_COMMENT, &CTablePeople::OnGroupbyComment)
-ON_COMMAND(ID_HTML_PARENTS, &CTablePeople::OnHtmlParents)
-ON_COMMAND(ID_HTML_LINES, &CTablePeople::OnHtmlLines)
-ON_COMMAND(ID_EDIT_NOTEPAD, &CTablePeople::OnEditNotepad)
+
 ON_COMMAND(ID_GIVENNAME, &CTablePeople::OnGivenname)
 ON_COMMAND(ID_ASCENDANTS, &CTablePeople::OnAscendants)
 ON_COMMAND(ID_INPUT_MANUAL, &CTablePeople::OnInputManual)
@@ -1075,7 +1082,7 @@ LRESULT CTablePeople::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 	if( theApp.m_inputMode == GEDCOM )
 		MENU_IDR = IDR_DROPDOWN_DELETE;
 	else if( theApp.m_inputMode == GAHTML )
-		MENU_IDR = IDR_DROPDOWN_TABLE;
+		MENU_IDR = IDR_DROPDOWN_HTML;
 	else if( theApp.m_inputMode == MANUAL )
 		MENU_IDR = IDR_DROPDOWN_DELETE;
 
@@ -1084,13 +1091,14 @@ LRESULT CTablePeople::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 		pPopup = Menu.GetSubMenu(0);
 		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
 		{
-//			pPopup->EnableMenuItem(ID_RELATIONS,MF_BYCOMMAND | MF_GRAYED);
+//			pPopup->EnableMenuItem(ID_DB_EDIT,MF_BYCOMMAND | MF_GRAYED);
 //			pPopup->EnableMenuItem(ID_EDIT_DELETE,MF_BYCOMMAND | MF_GRAYED);
 		}
 		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
     }
 	return TRUE;
 }
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTablePeople::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
 {
@@ -1112,7 +1120,7 @@ void CTablePeople::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
 	}
 	else
 */
-		OnRelations();
+		OnDbEdit();
 
 	SetForegroundWindow();
 
@@ -1250,7 +1258,7 @@ void CTablePeople::OnEditDelete()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTablePeople::OnRelations()
+void CTablePeople::OnDbEdit()
 {
 
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
@@ -1689,6 +1697,16 @@ void CTablePeople::PostNcDestroy()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTablePeople::OnHtmlParents()
 {
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	H_ROWID );
+	CHtmlEditLines dlg;
+	dlg.m_title.Format( L"%s %s és szülei", m_ListCtrl.GetItemText( nItem, H_LAST_NAME ), m_ListCtrl.GetItemText( nItem, H_FIRST_NAME ) );
+	dlg.m_type	= L"PARENTS";
+	dlg.m_rowid = rowid;
+	dlg.DoModal();
+
+/*
 //	CProgressWnd wndProgress(NULL, L"Gyerek és szülõk html sorainak keresése..." ); 
 //	wndProgress.GoModal();
 
@@ -1725,26 +1743,23 @@ void CTablePeople::OnHtmlParents()
 //	wndProgress.DestroyWindow();
 
 	dlg.DoModal();
+
+
 	ShowWindow( SW_RESTORE );
+*/
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTablePeople::OnHtmlLines()
+void CTablePeople::OnHtmlEditLines()
 {
-	POSITION	pos = m_ListCtrl.GetFirstSelectedItemPosition();
-	int			nItem;
-	std::vector<CString> vLines;
+	CString title;
+	int selectedCount	= m_ListCtrl.GetSelectedCount();
+	int nItem			= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	if( selectedCount == 1 )
+		title.Format( L"%s a ga.html fájlban (%s. sor)", m_ListCtrl.GetItemText( nItem, H_LAST_NAME ), m_ListCtrl.GetItemText( nItem, H_LINENUMBER )  );
+	else
+		title.Format( L"%d kijelölt ember a ga.html fájlban", selectedCount );
 
-	while( pos )
-	{
-		nItem = m_ListCtrl.GetNextSelectedItem( pos );
-		vLines.push_back( m_ListCtrl.GetItemText( nItem, H_LINENUMBER ) );
-	}
-
-	ShowWindow( SW_HIDE );
-	CHtmlEditLines dlg;
-	dlg.vLines = &vLines;
-
-	dlg.DoModal();
+	theApp.htmlEditLines( &m_ListCtrl, H_LINENUMBER, title );
 	ShowWindow( SW_RESTORE );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1753,9 +1768,27 @@ void CTablePeople::OnEditNotepad()
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
 	CString lineNumber	= m_ListCtrl.GetItemText( nItem, 	H_LINENUMBER );
 
-//	ShowWindow( SW_HIDE );
 	theApp.editNotepad( lineNumber );
-//	ShowWindow( SW_RESTORE );
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTablePeople::OnHtmlFamily()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	H_ROWID );
+	CHtmlEditLines dlg;
+	dlg.m_title.Format( L"%s szülei és testvérei", m_ListCtrl.GetItemText( nItem, H_LAST_NAME ) );
+	dlg.m_type	= L"FATHERMOTHERHE";
+	dlg.m_rowid = rowid;
+	dlg.DoModal();
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTablePeople::OnHtmlNotepadParents()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+	CString rowid = m_ListCtrl.GetItemText( nItem, H_ROWID );
+
+	theApp.HtmlNotepadParents( rowid );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTablePeople::OnNcDestroy()

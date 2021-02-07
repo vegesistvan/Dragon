@@ -48,10 +48,10 @@ protected:
 	void fatherDeathChildBirth();
 	void fillTable();
 
-	void OnHtmlShows();
+	void OnHtmlEditLines();
 	void OnHtmlEdit();
 	void OnHtmlNotepad();
-	void OnRokonsag();
+	void OnDbEdit();
 
 	DECLARE_MESSAGE_MAP()
 public:

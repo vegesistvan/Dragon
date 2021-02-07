@@ -43,8 +43,9 @@ BOOL CHtmlEditLine::OnInitDialog()
 	EASYSIZE_ADD( IDCANCEL,	ES_BORDER,	ES_KEEPSIZE,	ES_KEEPSIZE,	ES_BORDER,	0 );
 	EASYSIZE_INIT()
 
-	m_caption.Format( L"A %s fájl %d. sora", theApp.m_htmlFileSpec, m_linenumber );
-	SetWindowTextW( m_caption );
+//	m_caption.Format( L"A %s fájl %s. sora", theApp.m_htmlFileSpec, m_linenumber );
+	
+	SetWindowTextW( m_title );
 
 	GetDlgItem( IDOK )->EnableWindow( FALSE );
 
