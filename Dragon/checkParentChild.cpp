@@ -6,7 +6,7 @@
 #include "CheckParentChild.h"
 #include "afxdialogex.h"
 #include "CheckParam.h"
-#include "html_Lines.h"
+#include "html_EditLines.h"
 #include "Relations.h"
 #include "ProgressWnd.h"
 #include "utilities.h"
@@ -84,14 +84,14 @@ BEGIN_MESSAGE_MAP(CCheckParentChild, CDialogEx)
 	ON_WM_SIZE()
 	ON_WM_SIZING()
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_HTML_EDIT, &CCheckParentChild::OnHtmlEdit)
-	ON_COMMAND(ID_HTML_SHOWS, &CCheckParentChild::OnHtmlShows)
+	ON_COMMAND(ID_HTML_LINE, &CCheckParentChild::OnHtmlEdit)
+	ON_COMMAND(ID_HTML_EDIT, &CCheckParentChild::OnHtmlShows)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CCheckParentChild::OnHtmlNotepad)
-	ON_COMMAND(ID_ROKONSAG, &CCheckParentChild::OnRokonsag)
+	ON_COMMAND(ID_DB_EDIT, &CCheckParentChild::OnRokonsag)
 	ON_COMMAND(ID_GAHTML_LINE, &CCheckParentChild::OnGahtmlLine)
 
 	ON_COMMAND(ID_LIST, &CCheckParentChild::OnList)
-	ON_COMMAND(ID_FATHERMOTHERHE, &CCheckParentChild::OnFatherMotherHe)
+	ON_COMMAND(ID_HTML_FAMILY, &CCheckParentChild::OnHtmlFamily)
 	ON_STN_CLICKED(IDC_KERES, &CCheckParentChild::OnClickedKeres)
 	ON_STN_CLICKED(IDC_NEXT, &CCheckParentChild::OnClickedNext)
 END_MESSAGE_MAP()
@@ -233,7 +233,7 @@ void CCheckParentChild::fillColumns()
 #endif
 
 //	m_command.Format( L"SELECT rowid, lineNumber, generation, source, united, last_name, first_name, birth_date, death_date, %s FROM people", m_parent_id_name );
-	m_command.Format( L"SELECT rowid, lineNumber, generation, source, united, last_name, first_name, birth_date, death_date, father_id, mother_id, parent2IndexCalc %s FROM people" );
+	m_command.Format( L"SELECT rowid, lineNumber, generation, source, united, last_name, first_name, birth_date, death_date, father_id, mother_id, parentIndexCalc %s FROM people" );
 	if( !theApp.query1( m_command ) ) return;
 	 
 
@@ -370,9 +370,9 @@ LRESULT CCheckParentChild:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 		pPopup = Menu.GetSubMenu(0);
 		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
 		{
-			pPopup->EnableMenuItem(ID_HTML_SHOWS, MF_BYCOMMAND | MF_GRAYED);
-			pPopup->EnableMenuItem(ID_HTML_NOTEPAD, MF_BYCOMMAND | MF_GRAYED);
 			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
+			pPopup->EnableMenuItem(ID_HTML_NOTEPAD, MF_BYCOMMAND | MF_GRAYED);
+			pPopup->EnableMenuItem(ID_HTML_LINE, MF_BYCOMMAND | MF_GRAYED);
 		}
 		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
     }
@@ -416,14 +416,15 @@ void CCheckParentChild::OnHtmlShows()
 
 	}
 
-	CHtmlLines dlg;
+	CHtmlEditLines dlg;
 
-	if( cnt == 1 )
-		dlg.child = name;
+	if( !name.IsEmpty() )
+	{
+		str.Format( L"%s kijelölt sora a html fájlban", name ); 
+		dlg.m_title = str;
+	}
 	else
-		dlg.child = L"";
-
-	dlg._what = 1;
+		dlg.m_title = L"Kijelölt sorok a htm fájlban";
 	dlg.vLines = &vLines;
 
 	dlg.DoModal();
@@ -464,12 +465,12 @@ void CCheckParentChild::OnRokonsag()
 
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckParentChild::OnFatherMotherHe()
+void CCheckParentChild::OnHtmlFamily()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
 
 	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
-	CHtmlLines dlg;
+	CHtmlEditLines dlg;
 	dlg.m_title.Format( L"%s szülei és testvérei", m_ListCtrl.GetItemText( nItem, L_NAME ) );
 	dlg.m_type	= L"FATHERMOTHERHE";
 	dlg.m_rowid = rowid;

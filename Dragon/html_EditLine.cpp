@@ -3,39 +3,39 @@
 
 #include "stdafx.h"
 #include "Dragon.h"
-#include "html_edit.h"
+#include "html_EditLine.h"
 #include "afxdialogex.h"
 
 
-// CHtmlEdit dialog
+// CHtmlEditLine dialog
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-IMPLEMENT_DYNAMIC(CHtmlEdit, CDialogEx)
+IMPLEMENT_DYNAMIC(CHtmlEditLine, CDialogEx)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CHtmlEdit::CHtmlEdit(CWnd* pParent /*=NULL*/)
-	: CDialogEx(CHtmlEdit::IDD, pParent)
+CHtmlEditLine::CHtmlEditLine(CWnd* pParent /*=NULL*/)
+	: CDialogEx(CHtmlEditLine::IDD, pParent)
 {
 
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CHtmlEdit::~CHtmlEdit()
+CHtmlEditLine::~CHtmlEditLine()
 {
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CHtmlEdit::DoDataExchange(CDataExchange* pDX)
+void CHtmlEditLine::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_EDIT, m_EditCtrl);
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-BEGIN_MESSAGE_MAP(CHtmlEdit, CDialogEx)
+BEGIN_MESSAGE_MAP(CHtmlEditLine, CDialogEx)
 	ON_WM_SIZE()
 	ON_WM_SIZING()
-	ON_BN_CLICKED(IDOK, &CHtmlEdit::OnBnClickedOk)
-	ON_EN_CHANGE(IDC_EDIT, &CHtmlEdit::OnChangeEdit)
+	ON_EN_CHANGE(IDC_EDIT, &CHtmlEditLine::OnChangeEdit)
+	ON_BN_CLICKED(IDOK, &CHtmlEditLine::OnClickedMent)
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CHtmlEdit::OnInitDialog()
+BOOL CHtmlEditLine::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 	EASYSIZE_ADD( IDC_EDIT,	ES_BORDER,	ES_BORDER,		ES_BORDER,		ES_BORDER,	0 );
@@ -43,40 +43,43 @@ BOOL CHtmlEdit::OnInitDialog()
 	EASYSIZE_ADD( IDCANCEL,	ES_BORDER,	ES_KEEPSIZE,	ES_KEEPSIZE,	ES_BORDER,	0 );
 	EASYSIZE_INIT()
 
-//	SetWindowPos(&wndTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-
-	m_caption.Format( L"A %s fájl %d. sora", theApp.m_htmlFileSpec, m_lineNumber );
+	m_caption.Format( L"A %s fájl %d. sora", theApp.m_htmlFileSpec, m_linenumber );
 	SetWindowTextW( m_caption );
 
 	GetDlgItem( IDOK )->EnableWindow( FALSE );
+
+	m_line = theApp.getHtmlLine( m_linenumber );
+	m_line = m_line.Mid( 2 );
+
 	GetDlgItem( IDC_EDIT )->SetWindowTextW( m_line );
-//	m_EditCtrl.Clear();
 	return TRUE;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CHtmlEdit::OnSize(UINT nType, int cx, int cy)
+void CHtmlEditLine::OnSize(UINT nType, int cx, int cy)
 {
 	CDialogEx::OnSize(nType, cx, cy);
 	EASYSIZE_RESIZE()
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CHtmlEdit::OnSizing(UINT fwSide, LPRECT pRect)
+void CHtmlEditLine::OnSizing(UINT fwSide, LPRECT pRect)
 {
 	CDialogEx::OnSizing(fwSide, pRect);
 	EASYSIZE_MINSIZE(430,100,fwSide,pRect); 
 
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CHtmlEdit::OnBnClickedOk()
+void CHtmlEditLine::OnClickedMent()
 {
 	GetDlgItem( IDC_EDIT )->GetWindowTextW( m_line );
 //	if( AfxMessageBox( L"Felülírod a ga.html fájl sorát ezzel a módosított sorral?", MB_YESNO ) == IDNO ) return;
 
-	CDialogEx::OnOK();
+	theApp.saveHtmlLine( _wtoi( m_linenumber ), m_line );
+	CDialog::OnOK();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CHtmlEdit::OnChangeEdit()
+void CHtmlEditLine::OnChangeEdit()
 {
 	GetDlgItem( IDOK )->EnableWindow( TRUE );
 
 }
+

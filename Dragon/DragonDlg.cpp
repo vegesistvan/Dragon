@@ -34,7 +34,7 @@
 #include "Filter.h"
 #include "utilities.h"
 #include <atlimage.h>
-#include "html_Edit.h"
+#include "html_EditLine.h"
 #include "FirstLetter.h"
 #include "html_Brackets.h"
 #include "EditPeople.h"

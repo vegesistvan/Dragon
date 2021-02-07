@@ -6,10 +6,11 @@
 #include "DragonDlg.h"
 #include "checkDateFormat.h"
 #include "afxdialogex.h"
-#include "html_Lines.h"
+#include "html_EditLines.h"
 #include "ProgressWnd.h"
 #include "utilities.h"
 #include "Relations.h"
+#include "html_EditLine.h"
 
 enum
 {
@@ -39,9 +40,9 @@ void CDateFormat::DoDataExchange(CDataExchange* pDX)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CDateFormat, CDialogEx)
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_HTML_EDIT, &CDateFormat::OnHtmlEdit)
+	ON_COMMAND(ID_HTML_LINE, &CDateFormat::OnHtmlEdit)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CDateFormat::OnHtmlNotepad)
-	ON_COMMAND(ID_ROKONSAG, &CDateFormat::OnRokonsag)
+	ON_COMMAND(ID_DB_EDIT, &CDateFormat::OnRokonsag)
 
 	ON_COMMAND(ID_UJLISTA, &CDateFormat::OnUjlista)
 END_MESSAGE_MAP()
@@ -236,8 +237,12 @@ LRESULT CDateFormat::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 void CDateFormat::OnHtmlEdit()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, L_LINENUMBER ) );
-	theApp.listHtmlLine( lineNumber );
+
+	CHtmlEditLine dlg;
+	dlg.m_linenumber	= m_ListCtrl.GetItemText( nItem, L_LINENUMBER );
+	dlg.DoModal();
+
+//	theApp.listHtmlLine( lineNumber );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDateFormat::OnHtmlNotepad()

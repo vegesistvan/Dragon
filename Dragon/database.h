@@ -147,8 +147,8 @@ const COLUMN people[] =
 	{ L"comment",					L"TEXT" },
 	{ L"father_id",					L"INT"	},
 	{ L"mother_id",					L"INT"	},
-	{ L"parent2Index",				L"TEXT"	},		// ami a html-ben van ( a második szülõ indexe
-	{ L"parent2IndexCalc",			L"TEXT"	},		// mindig van benne érvényes index, amit a getMotherIndex számít ki
+	{ L"parentIndex",				L"TEXT"	},		// ami a html-ben van ( a második szülõ indexe
+	{ L"parentIndexCalc",			L"TEXT"	},		// mindig van benne érvényes index, amit a getMotherIndex számít ki
 	{ L"orderFather",				L"INT"	},		// apja hanyadik gyereke A html listánál meghatározza a listázási sorrendet!!
 	{ L"orderMother",				L"INT"	},		// anyja hanyadik gyereke
 	{ L"folyt",						L"TEXT"	},		// %%% folyt VI

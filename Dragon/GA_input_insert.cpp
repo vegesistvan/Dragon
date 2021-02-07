@@ -157,8 +157,8 @@ CString CGaInput::insertDescendantSpouse( UINT i )
 	s.comment		= v_marriages.at(i).comment;
 	s.father_id		= v_marriages.at(i).rowidF;
 	s.mother_id		= v_marriages.at(i).rowidM;
-	s.parent2Index	= 0;
-	s.parent2IndexCalc = 0;
+	s.parentIndex	= 1;
+	s.parentIndexCalc = 1;
 	s.folyt			= L"";
 	s.tableAncestry	= 0;
 	s.lineNumber	= m_lineNumber;
@@ -199,6 +199,8 @@ CString CGaInput::insertSpouseF( UINT i )
 		sf.mother_id		= L"0";
 		sf.arm.Empty();
 		sf.csalad.Empty();
+		sf.parentIndex		= 1;
+		sf.parentIndexCalc = 1;
 		s.gap				= 0;
 
 		rowidF =  insertAny( &sf );
@@ -229,6 +231,8 @@ CString CGaInput::insertSpouseM( UINT i )
 		sm.comment			= v_marriages.at(i).commentM;
 		sm.father_id		= L"0";
 		sm.mother_id		= L"0";
+		sm.parentIndex		= 1;
+		sm.parentIndexCalc = 1;
 
 		sm.tableAncestry	= 0;
 		sm.lineNumber		= m_lineNumber;
@@ -267,6 +271,8 @@ CString CGaInput::insertSpouseS( UINT i )
 	ss.arm.Empty();	
 	ss.csalad.Empty();
 	ss.gap				= 0;
+	ss.parentIndex		= 1;
+	ss.parentIndexCalc = 1;
 
 	rowid = insertAny( &ss );
 	v_spouseSpouses.at(i).rowid	= rowid;
@@ -298,7 +304,7 @@ CString CGaInput::insertAny( PEOPLE* p )
 '%s','%s','%d','%d', '%s', '%d', '%d'",
 m_fileNumber, m_tableHeader.familyNumber,v_tableHeader.size(),m_lineNumber,p->source,1,0,0,0,\
 p->generation,p->sex_id,p->title,p->titolo,p->first_name.Trim(),last_name, p->posterior, other_names,p->birth_place,p->birth_date,\
-p->death_place,p->death_date,p->comment,p->father_id,p->mother_id,p->parent2Index,p->parent2IndexCalc,p->folyt,p->tableAncestry,
+p->death_place,p->death_date,p->comment,p->father_id,p->mother_id,p->parentIndex,p->parentIndexCalc,p->folyt,p->tableAncestry,
 p->tableRoman,p->arm,p->orderFather,p->orderMother,p->csalad,p->gap, numOfMarriages );
 
 

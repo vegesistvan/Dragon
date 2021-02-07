@@ -9,9 +9,9 @@
 #include "utilities.h"
 #include "ContractCouples.h"
 #include "ContractInfo.h"
-#include "html_Lines.h"
+#include "html_EditLines.h"
 #include "html_Edit2Lines.h"
-#include "html_Edit.h"
+#include "html_EditLine.h"
 
 enum
 {
@@ -82,7 +82,7 @@ BEGIN_MESSAGE_MAP(CContractedCouples, CDialogEx)
 
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
 	ON_COMMAND(ID_EDIT2LINES, &CContractedCouples::OnEdit2lines)
-	ON_COMMAND(ID_HTML_SHOWS, &CContractedCouples::OnHtmlShows)
+	ON_COMMAND(ID_HTML_EDIT, &CContractedCouples::OnHtmlShows)
 	ON_COMMAND(ID_HTML_PEOPLEFATHER, &CContractedCouples::OnHtmlPeoplefather)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CContractedCouples::OnHtmlNotepad)
 
@@ -489,8 +489,8 @@ LRESULT CContractedCouples:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 		pPopup = Menu.GetSubMenu(0);
 		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
 		{
-			pPopup->EnableMenuItem(ID_HTML_SHOWS, MF_BYCOMMAND | MF_GRAYED);
 			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
+			pPopup->EnableMenuItem(ID_HTML_LINE, MF_BYCOMMAND | MF_GRAYED);
 		}
 		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
     }
@@ -540,14 +540,15 @@ void CContractedCouples::OnHtmlShows()
 
 	}
 
-	CHtmlLines dlg;
+	CHtmlEditLines dlg;
 
-	if( cnt == 1 )
-		dlg.child = name;
+	if( !name.IsEmpty() )
+	{
+		str.Format( L"%s kijelölt sora a html fájlban", name ); 
+		dlg.m_title = str;
+	}
 	else
-		dlg.child = L"";
-
-	dlg._what = 1;
+		dlg.m_title = L"Kijelölt sorok a htm fájlban";
 	dlg.vLines = &vLines;
 
 	dlg.DoModal();
@@ -557,7 +558,7 @@ void CContractedCouples::OnHtmlPeoplefather()
 {
 	int nItem		= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
 	CString rowid	= m_ListCtrl.GetItemText( nItem, L_ROWIDH );
-	CHtmlLines dlg;
+	CHtmlEditLines dlg;
 	dlg.m_rowid = rowid;
 	dlg.DoModal();
 }

@@ -2,7 +2,7 @@
 #include "Dragon.h"
 #include "CheckFatherDeath.h"
 #include "afxdialogex.h"
-#include "html_Lines.h"
+#include "html_EditLines.h"
 #include "ProgressWnd.h"
 #include "utilities.h"
 #include "Relations.h"
@@ -101,10 +101,10 @@ BEGIN_MESSAGE_MAP(CCheckFatherDeath9, CDialogEx)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST, &CCheckFatherDeath9::OnCustomdrawList)
 	
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_HTML_SHOWS, &CCheckFatherDeath9::OnHtmlShows)
-	ON_COMMAND(ID_HTML_EDIT, &CCheckFatherDeath9::OnHtmlEdit)
+	ON_COMMAND(ID_HTML_EDIT, &CCheckFatherDeath9::OnHtmlShows)
+	ON_COMMAND(ID_HTML_LINE, &CCheckFatherDeath9::OnHtmlEdit)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CCheckFatherDeath9::OnHtmlNotepad)
-	ON_COMMAND(ID_ROKONSAG, &CCheckFatherDeath9::OnRokonsag)
+	ON_COMMAND(ID_DB_EDIT, &CCheckFatherDeath9::OnRokonsag)
 
 	ON_COMMAND(ID_LIST, &CCheckFatherDeath9::OnList)
 END_MESSAGE_MAP()
@@ -282,7 +282,7 @@ void CCheckFatherDeath9::fatherDeathChildBirth()
 
 
 	// gyerekek lekérdezése
-	m_command = L"SELECT rowid, lineNumber, tableNumber, source, united, parent2Index, last_name, first_name, birth_date, death_date, father_id, mother_id FROM people ORDER BY last_name, first_name";
+	m_command = L"SELECT rowid, lineNumber, tableNumber, source, united, parentIndex, last_name, first_name, birth_date, death_date, father_id, mother_id FROM people ORDER BY last_name, first_name";
 	if( !query( m_command ) ) return;
 
 	wndP.SetRange(0, m_recordset->RecordsCount() );
@@ -362,7 +362,7 @@ void CCheckFatherDeath9::fatherDeathChildBirth()
 						
 							// apa-anya gyermeke adatai
 
-							m_command.Format( L"SELECT rowid, lineNumber, tableNumber, source, united, parent2IndexCalc, last_name, first_name, birth_date, death_date FROM people WHERE father_id='%s' AND mother_id='%s'", rowidF, rowidM );
+							m_command.Format( L"SELECT rowid, lineNumber, tableNumber, source, united, parentIndexCalc, last_name, first_name, birth_date, death_date FROM people WHERE father_id='%s' AND mother_id='%s'", rowidF, rowidM );
 							if( !query3( m_command ) ) return;
 
 							for( UINT k = 0; k < m_recordset3->RecordsCount(); ++k, m_recordset3->MoveNext() )
@@ -606,14 +606,18 @@ void CCheckFatherDeath9::OnHtmlShows()
 
 	}
 
-	CHtmlLines dlg;
+	CHtmlEditLines dlg;
 
-	if( cnt == 1 )
-		dlg.child = name;
+
+	if( !name.IsEmpty() )
+	{
+		str.Format( L"%s kijelölt sora a html fájlban", name ); 
+		dlg.m_title = str;
+	}
 	else
-		dlg.child = L"";
+		dlg.m_title = L"Kijelölt sorok a htm fájlban";
 
-	dlg._what = 1;
+
 	dlg.vLines = &vLines;
 
 	dlg.DoModal();

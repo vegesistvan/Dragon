@@ -98,8 +98,8 @@ birth_place,\
 birth_date,\
 death_place,\
 death_date,\
-parent2Index,\
-parent2IndexCalc,\
+parentIndex,\
+parentIndexCalc,\
 comment,\
 source,\
 occupation,\
@@ -107,7 +107,7 @@ orderFather,\
 orderMother\
 ");
 
-	int parent2Index;
+	int parentIndex;
 
  	CProgressWnd wndP( NULL, L"Adatbázisba töltés..." );
 	wndP.GoModal();
@@ -119,7 +119,7 @@ orderMother\
 	for( UINT i = 0; i < v_indi.size(); ++i )
 	{
 		id = v_indi.at(i).refI;
-		parent2Index = v_indi.at(i).parent2Index;
+		parentIndex = v_indi.at(i).parentIndex;
 		values.Format( L" 1, 1, '%s','%s', '%s','%s','%s','%s','%s','%s','%s','%d', '%d','%s','%s','%s','%d','%d'",
 		v_indi.at(i).sex,\
 		v_indi.at(i).title,\
@@ -130,8 +130,8 @@ orderMother\
 		v_indi.at(i).birth_date,\
 		v_indi.at(i).death_place,\
 		v_indi.at(i).death_date,\
-		parent2Index,\
-		v_indi.at(i).parent2IndexCalc,\
+		parentIndex,\
+		v_indi.at(i).parentIndexCalc,\
 		v_indi.at(i).comment,\
 		v_indi.at(i).source,\
 		v_indi.at(i).occupation,\

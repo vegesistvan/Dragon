@@ -84,7 +84,7 @@ BEGIN_MESSAGE_MAP(CMarriages, CDialogEx)
 	ON_COMMAND(ID_NEWTABLE, &CMarriages::OnNewtable )
 
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_HTML_EDIT, &CMarriages::OnHtmlEdit)
+	ON_COMMAND(ID_HTML_LINE, &CMarriages::OnHtmlEdit)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CMarriages::OnHtmlNotepad)
 
 END_MESSAGE_MAP()

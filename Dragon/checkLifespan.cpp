@@ -5,7 +5,7 @@
 #include "Dragon.h"
 #include "checkLifespan.h"
 #include "afxdialogex.h"
-#include "html_Lines.h"
+#include "html_EditLines.h"
 #include "Relations.h"
 #include "checkParam.h"
 #include "ProgressWnd.h"
@@ -68,9 +68,9 @@ BEGIN_MESSAGE_MAP(CLifeSpan, CDialogEx)
 	ON_WM_SIZE()
 	ON_WM_SIZING()
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_HTML_EDIT, &CLifeSpan::OnHtmlEdit)
+	ON_COMMAND(ID_HTML_LINE, &CLifeSpan::OnHtmlEdit)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CLifeSpan::OnHtmlNotepad)
-	ON_COMMAND(ID_ROKONSAG, &CLifeSpan::OnRokonsag)
+	ON_COMMAND(ID_DB_EDIT, &CLifeSpan::OnRokonsag)
 	ON_COMMAND(ID_LIST, &CLifeSpan::OnList)
 
 END_MESSAGE_MAP()

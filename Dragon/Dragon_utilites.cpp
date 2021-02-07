@@ -8,12 +8,12 @@
 #include "Table_places.h"
 #include "Table_firstnames.h"
 #include "Message.h"
-#include "html_Edit.h"
+#include "html_EditLine.h"
 #include "SaveFirstName.h"
 #include "version.h"
 #include "ProgressWnd.h"
 #include "html_Edit2Lines.h"
-
+#include "html_EditLines.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -966,8 +966,10 @@ void CDragonApp::change( CString linenumber, CString line )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonApp::listHtmlLine( int lineNumber )
 {
-	CHtmlEdit dlg;
+//	CHtmlEditLine dlg;
+	CHtmlEditLines dlg;
 
+/*
 	ULONGLONG pos1;
 	ULONGLONG pos2;
 
@@ -986,10 +988,13 @@ void CDragonApp::listHtmlLine( int lineNumber )
 
 	front = cLine.Left( cLine.Find( ';' ) + 1 );
 	cLine = cLine.Mid( cLine.Find( ';' ) + 1 );
-		
-	dlg.m_line = cLine;
-	dlg.m_lineNumber = lineNumber;
-	if( dlg.DoModal() == IDCANCEL ) return;
+*/		
+//	dlg.m_line = cLine;
+	dlg.m_linenumber = lineNumber;
+	dlg.DoModal();
+
+
+	/*
 
 	CString line;
 	line.Format( L"%s%s\r\n", front, dlg.m_line );
@@ -1060,6 +1065,7 @@ void CDragonApp::listHtmlLine( int lineNumber )
 
 //	theApp.message( L"Emberek listája", L"A html fájl módosítása megtörtént!" );
 //	AfxMessageBox( L"A html fájl módisítása megtörtént!" );
+*/
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonApp::saveHtmlLine( int lineNumber, CString line )

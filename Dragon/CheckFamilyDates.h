@@ -11,6 +11,7 @@ typedef struct
 	CString birth;
 	CString death;
 	int		numOfSpouses;
+	CString message;
 }HUSBAND;
 
 typedef struct
@@ -24,6 +25,7 @@ typedef struct
 	CString death;
 	CString marriage;
 	int		motherOrder;
+	CString message;
 }WIFES;
 
 
@@ -70,26 +72,48 @@ protected:
 	FILE * textF;
 	CProgressWnd wndP;
 
-	std::vector<HUSBAND> vHusband;
+	CListCtrlEx m_ListCtrl;
+	CColorStatic colorKeres;
+	CColorStatic colorNext;
+
+//	std::vector<HUSBAND> vHusband;
 	std::vector<WIFES> vWifes;
 	std::vector<CHILDREN> vChildren;
-	
+	std::vector<TCHAR*> vList;
+
+	CStringArray m_colors;
+	UINT	m_rgb[10];
+
 	HUSBAND h;
 	WIFES w;
 	CHILDREN c;
 
-	bool collectChildren();
-	void printVector();
+	int	m_ageDiffM;
+	int m_cnt;
+
+	void createColumns();
+	bool collectFamily();
 	void printFamily();
-	void checkMother();
+	void checkFamily();
+	void push( CString item );
+	void emptyLine();
+	void keress( int start );
+
+
+	void CCheckFamilyDates::OnHtmlEdit();
+	void CCheckFamilyDates::OnHtmlNotepad();
+	void CCheckFamilyDates::OnHtmlFamily();
+	void CCheckFamilyDates::OnDbEdit();
+
 public:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
-
-	CListCtrlEx m_ListCtrl;
-	CColorStatic colorKeres;
-	CColorStatic colorNext;
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	
 	afx_msg void OnClickedKeres();
 	afx_msg void OnClickedNext();
+	afx_msg void OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnInfo();
+	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
 };

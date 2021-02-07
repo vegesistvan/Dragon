@@ -5,12 +5,12 @@
 #include "Dragon.h"
 #include "Table_marriages.h"
 #include "afxdialogex.h"
-#include "html_Edit.h"
+#include "html_EditLine.h"
 #include "Filter.h"
 #include "DragonDlg.h"
 #include "SelectOne.h"
 #include "GetString.h"
-#include "html_Lines.h"
+#include "html_EditLines.h"
 #include "GetLastFirst.h"
 #include "EditMarriage.h"
 #include "windows.h"
@@ -157,19 +157,23 @@ BEGIN_MESSAGE_MAP(CTableMarriages, CDialogEx)
 	ON_COMMAND(ID_MARRIAGES_PARENTS, &CTableMarriages::OnMarriagesParents)
 	ON_COMMAND(ID_ROWID_MARRIAGES, &CTableMarriages::OnRowidMarriages)
 	ON_COMMAND(ID_NAMEMARRIAGES, &CTableMarriages::OnNameMarriages)
-	ON_COMMAND(ID_HTML_EDIT, &CTableMarriages::OnHtmlEdit)
-	ON_COMMAND(ID_HTML_SHOWS, &CTableMarriages::OnHtmlShows)
+	ON_COMMAND(ID_HTML_LINE, &CTableMarriages::OnHtmlEdit)
+	ON_COMMAND(ID_HTML_EDIT, &CTableMarriages::OnHtmlShows)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CTableMarriages::OnHtmlNotepad)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CTableMarriages::OnDblclkList)
-	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_EDIT_UPDATE, &CTableMarriages::OnEditUpdate)
-	ON_COMMAND(ID_EDIT_DELETE, &CTableMarriages::OnEditDelete)
-	ON_COMMAND(ID_EDIT_GAHTML, &CTableMarriages::OnEditGahtml)
 	ON_STN_CLICKED(IDC_KERES, &CTableMarriages::OnClickedKeres)
 	ON_COMMAND(ID_MOREMARRIAGES, &CTableMarriages::OnMoreMarriages)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST, &CTableMarriages::OnCustomdrawList)
 	ON_STN_CLICKED(IDC_NEXT, &CTableMarriages::OnClickedNext)
 	ON_COMMAND(ID_MAN_MORESPOUSES, &CTableMarriages::OnManMorespouses)
+
+// IDR_DROPDOWN_EDIT
+	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
+	ON_COMMAND(ID_EDIT_UPDATE, &CTableMarriages::OnEditUpdate)
+	ON_COMMAND(ID_EDIT_DELETE, &CTableMarriages::OnEditDelete)
+	ON_COMMAND(ID_EDIT_GAHTML, &CTableMarriages::OnEditGahtml)
+	
+	
 END_MESSAGE_MAP()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CTableMarriages::OnInitDialog()
@@ -699,34 +703,7 @@ void CTableMarriages::OnClose()
 	CDialogEx::OnClose();
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-LRESULT CTableMarriages:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
-{
-	CPoint* point=(CPoint*) lParam;
-    CMenu	Menu;
-	CMenu*	pPopup;
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	LIST_LINENUMBER ) );
-	if( lineNumber == 0  )
-		return TRUE;
 
-
-	if(Menu.LoadMenu( IDR_DROPDOWN_HTML ))
-    {
-		pPopup = Menu.GetSubMenu(0);
-		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
-		{
-			pPopup->EnableMenuItem(ID_HTML_SHOWS, MF_BYCOMMAND | MF_GRAYED);
-			pPopup->EnableMenuItem(ID_HTML_NOTEPAD, MF_BYCOMMAND | MF_GRAYED);
-			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
-		}
-		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
-    }
-	return TRUE;
-}
-*/
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTableMarriages::OnHtmlEdit()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
@@ -781,14 +758,9 @@ void CTableMarriages::OnHtmlShows()
 		}
 	}
 
-	CHtmlLines dlg;
+	CHtmlEditLines dlg;
 
-	if( cnt == 1 )
-		dlg.child = name;
-	else
-		dlg.child = L"";
-
-	dlg._what = 1;
+	dlg.m_title = name;
 	dlg.vLines = &vLines;
 
 	dlg.DoModal();
@@ -828,7 +800,8 @@ LRESULT CTableMarriages::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 
 	if( theApp.m_inputMode == GAHTML )
 	{
-		if(Menu.LoadMenu( IDR_DROPDOWN_HTML ))
+//		if(Menu.LoadMenu( IDR_DROPDOWN_HTML ))
+		if(Menu.LoadMenu( IDR_DROPDOWN_EDIT ))
 		{
 			pPopup = Menu.GetSubMenu(0);
 			if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
@@ -902,7 +875,7 @@ void CTableMarriages::OnEditGahtml()
 	}
 
 	int htmlLineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	LIST_LINENUMBER ) );
-	CHtmlEdit dlg;
+	CHtmlEditLine dlg;
 
 	theApp.m_inputCode = GetInputCode( theApp.m_htmlFileSpec );
 	CStdioFile file( theApp.m_htmlFileSpec, CFile::modeRead); 

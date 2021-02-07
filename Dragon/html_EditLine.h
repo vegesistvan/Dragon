@@ -2,23 +2,24 @@
 #include "afxwin.h"
 
 
-// CHtmlEdit dialog
+// CHtmlEditLine dialog
 
-class CHtmlEdit : public CDialogEx
+class CHtmlEditLine : public CDialogEx
 {
-	DECLARE_DYNAMIC(CHtmlEdit)
+	DECLARE_DYNAMIC(CHtmlEditLine)
 	DECLARE_EASYSIZE
 public:
-	CHtmlEdit(CWnd* pParent = NULL);   // standard constructor
-	virtual ~CHtmlEdit();
+	CHtmlEditLine(CWnd* pParent = NULL);   // standard constructor
+	virtual ~CHtmlEditLine();
 
 // Dialog Data
-	enum { IDD = IDD_HTML_EDITOR };
+	enum { IDD = IDD_HTML_EDITLINE };
 	CString m_line;
 	CString m_caption;
-	int		m_lineNumber;
+	CString	m_linenumber;
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	CString str;
 
 	DECLARE_MESSAGE_MAP()
 public:
@@ -28,4 +29,5 @@ public:
 	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnChangeEdit();
+	afx_msg void OnClickedMent();
 };

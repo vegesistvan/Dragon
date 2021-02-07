@@ -17,8 +17,8 @@
 #include "GetString.h"
 #include "Commctrl.h"
 #include "SameParams.h"
-#include "html_Edit.h"
-#include "html_Lines.h"
+#include "html_EditLine.h"
+#include "html_EditLines.h"
 #include "GA_ascendants.h"
 #include "GetLastFirst.h"
 #include "EditPeople.h"
@@ -850,10 +850,10 @@ void CTablePeople::fillRow( UINT i )
 	if( father_id == L"0" ) father_id = L""; 
 	if( mother_id == L"0" ) mother_id = L""; 
 
-	int parent2Index = _wtoi( m_recordset->GetFieldString( PEOPLE_MOTHER_INDEX ) );
-	if( parent2Index )
+	int parentIndex = _wtoi( m_recordset->GetFieldString( PEOPLE_MOTHER_INDEX ) );
+	if( parentIndex )
 	{
-		m_index.Format( L"%d", parent2Index );
+		m_index.Format( L"%d", parentIndex );
 	}
 
 	CString rowid;
@@ -1329,10 +1329,10 @@ void CTablePeople::updateRow( int nItem )
 	}
 
 	
-	int parent2Index = _wtoi( m_recordset->GetFieldString( PEOPLE_MOTHER_INDEX ) );
-	if( parent2Index )
+	int parentIndex = _wtoi( m_recordset->GetFieldString( PEOPLE_MOTHER_INDEX ) );
+	if( parentIndex )
 	{
-		indexM.Format( L"%d", parent2Index );
+		indexM.Format( L"%d", parentIndex );
 	}
 
 	rowid_father = m_recordset->GetFieldString( PEOPLE_FATHER_ID );
@@ -1686,119 +1686,6 @@ void CTablePeople::PostNcDestroy()
 	delete this;
 }
 
-
-
-
-//void CTablePeople::OnWindowPosChanged(WINDOWPOS* lpwndpos)
-//{
-//	CDialogEx::OnWindowPosChanged(lpwndpos);
-//
-//	m_pParentWnd->ShowWindow( SW_RESTORE );
-//}
-
-/*
-void CTablePeople::OnShowWindow(BOOL bShow, UINT nStatus)
-{
-	CDialogEx::OnShowWindow(bShow, nStatus);
-//	SetForegroundWindow();
-}
-*/
-/*
-void CTablePeople::listHtmlLine( int lineNumber )
-{
-	CHtmlEdit dlg;
-
-	ULONGLONG pos1;
-	ULONGLONG pos2;
-
-	CStdioFile file( theApp.m_htmlFileSpec, CFile::modeRead); 
-	CString cLine;
-	for( int i = 0; i < lineNumber-1; ++i ) file.ReadString( cLine );
-	pos1 = file.GetPosition();
-	file.ReadString( cLine );
-	pos2 = file.GetPosition();
-	file.Close();
-	CString front;
-
-	front = cLine.Left( cLine.Find( ';' ) + 1 );
-	cLine = cLine.Mid( cLine.Find( ';' ) + 1 );
-		
-	dlg.m_line = cLine;
-	dlg.m_lineNumber = lineNumber;
-	if( dlg.DoModal() == IDCANCEL ) return;
-
-	CString line;
-	line.Format( L"%s%s\r\n", front, dlg.m_line );
-
-	USES_CONVERSION;
-	char *pl = W2A((LPCTSTR)line);
-
-	// create new html file with the modified line
-	CString newFileSpec;
-	newFileSpec.Format( L"%s\\%s_original.htm", theApp.m_htmlPath, theApp.m_htmlFileName );
-
-	CString outputFileSpec;
-	outputFileSpec.Format( L"%s\\modifiedFile.html", theApp.m_htmlPath );
-	DeleteFile( outputFileSpec );
-
-	CFile input( theApp.m_htmlFileSpec, CFile::modeRead | CFile::typeBinary );
-	CFile output( outputFileSpec, CFile::modeCreate | CFile::modeWrite  | CFile::typeBinary );
-
-	ULONGLONG inputLength = input.GetLength();
-	int		length = 1000000;
-	TCHAR *buffer = new TCHAR[ length ];
-	
-	int numOfCycles;
-	int	remains;
-
-// I. rész másolása
-	numOfCycles = int( pos1 / length );		// olvasás-írás ciklusok száma length hosszzal
-	remains = int( pos1 % length );			// utolsó olvasás-írás	remains hosszal
-
-	input.SeekToBegin();
-	for( int i = 0; i < numOfCycles; ++i )
-	{
-		input.Read( buffer, length );
-		output.Write( buffer, length );
-	}
-	if( remains )
-	{
-		input.Read( buffer, remains );
-		output.Write( buffer, remains );
-	}
-// új sor beírása
-	output.Write( pl, strlen( pl) );
-
-// II. rész másolása
-	ULONGLONG left = input.GetLength() - pos2;
-
-
-	numOfCycles = int( left / length );		// olvasás-írás ciklusok száma length hosszzal
-	remains = int( left % length );			// utolsó olvasás-írás	remains hosszal
-
-	input.Seek( pos2, SEEK_SET );
-	for( int i = 0; i < numOfCycles; ++i )
-	{
-		input.Read( buffer, length );
-		output.Write( buffer, length );
-	}
-	if( remains )
-	{
-		input.Read( buffer, remains );
-		output.Write( buffer, remains );
-	}
-	input.Close();
-	output.Close();
-
-		
-	DeleteFile( newFileSpec );
-	input.Rename( theApp.m_htmlFileSpec, newFileSpec );
-	output.Rename( outputFileSpec, theApp.m_htmlFileSpec );
-
-	theApp.message( L"Emberek listája", L"A html fájl módosítása megtörtént!" );
-//	AfxMessageBox( L"A html fájl módisítása megtörtént!" );
-}
-*/
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTablePeople::OnHtmlParents()
 {
@@ -1829,10 +1716,10 @@ void CTablePeople::OnHtmlParents()
 	vLines.push_back( lineNumber );
 
 	ShowWindow( SW_HIDE );
-	CHtmlLines dlg;
-	dlg._what = 2;
-	dlg.parents = parents;
-	dlg.child.Format( L"%s %s", m_ListCtrl.GetItemText( nItem,H_LAST_NAME ), m_ListCtrl.GetItemText( nItem,H_FIRST_NAME ) ); 
+	CHtmlEditLines dlg;
+
+	str.Format( L"%s %s", m_ListCtrl.GetItemText( nItem,H_LAST_NAME ), m_ListCtrl.GetItemText( nItem,H_FIRST_NAME ) ); 
+	dlg.m_title = str;
 	dlg.vLines	= &vLines;
 
 //	wndProgress.DestroyWindow();
@@ -1854,9 +1741,7 @@ void CTablePeople::OnHtmlLines()
 	}
 
 	ShowWindow( SW_HIDE );
-	CHtmlLines dlg;
-
-	dlg._what = 1;
+	CHtmlEditLines dlg;
 	dlg.vLines = &vLines;
 
 	dlg.DoModal();

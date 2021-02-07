@@ -48,7 +48,7 @@ typedef struct FAMS
 typedef struct 
 {
 	TCHAR	generation;
-	int		parent2Index;
+	int		parentIndex;
 }PARENT2INDEX;
 
 
@@ -129,7 +129,7 @@ typedef struct
 typedef struct
 {
 	CString rowid;
-	CString parent2Index;
+	CString parentIndex;
 	CString name;
 	CString name2;
 	CString id;
@@ -159,6 +159,8 @@ typedef struct
 	CString mother;
 	CString sourceF;
 	CString sourceM;
+	CString father_id;
+	CString mother_id;
 	CString birthDateF;
 	CString birthDateM;
 	CString deathDateF;

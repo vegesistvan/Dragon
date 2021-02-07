@@ -102,7 +102,7 @@ BEGIN_MESSAGE_MAP(CHtmlBrackets, CDialogEx)
 	ON_COMMAND(ID_FILTER_R_ALL, &CHtmlBrackets::OnFilterRAll)
 
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_HTML_EDIT, &CHtmlBrackets::OnHtmlEdit)
+	ON_COMMAND(ID_HTML_LINE, &CHtmlBrackets::OnHtmlEdit)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CHtmlBrackets::OnHtmlNotepad)
 
 

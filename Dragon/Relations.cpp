@@ -14,7 +14,7 @@
 #include "GA_input.h"
 #include "Table_tables.h"
 #include "setup.h"
-#include "html_Lines.h"
+#include "html_EditLines.h"
 #include "pictures.h"
 #include "NewPeople.h"
 #include "EditPeople.h"
@@ -562,7 +562,7 @@ void CRelations::hazastarsak( CString rowid, int sex_id )
 	CString order;
 	
 	
-	CString parent2Index;
+	CString parentIndex;
 
 	if( sex_id == MAN )
 		m_command.Format( L"SELECT rowid,* FROM marriages WHERE spouse1_id=%s OR spouse2_id=%s ORDER BY orderWife", rowid, rowid );
@@ -820,9 +820,9 @@ void CRelations::OnRdblclkListP(NMHDR *pNMHDR, LRESULT *pResult)
 			vLines.push_back( lineNumber );
 	}
 
-	CHtmlLines dlg;
-	dlg.child = L"Szülõk";
-	dlg._what = 1;
+	CHtmlEditLines dlg;
+
+	dlg.m_title = L"Szülõk";
 	dlg.vLines = &vLines;
 
 	dlg.DoModal();
@@ -847,9 +847,8 @@ void CRelations::OnRdblclkListM(NMHDR *pNMHDR, LRESULT *pResult)
 			vLines.push_back( lineNumber );
 	}
 
-	CHtmlLines dlg;
-	dlg.child = L"Házastársak";
-	dlg._what = 1;
+	CHtmlEditLines dlg;
+	dlg.m_title = L"Házastársak";
 	dlg.vLines = &vLines;
 
 	dlg.DoModal();
@@ -875,9 +874,8 @@ void CRelations::OnRdblclkListC(NMHDR *pNMHDR, LRESULT *pResult)
 			vLines.push_back( lineNumber );
 	}
 
-	CHtmlLines dlg;
-	dlg.child = L"Gyerekek";
-	dlg._what = 1;
+	CHtmlEditLines dlg;
+	dlg.m_title = L"Gyerekek";
 	dlg.vLines = &vLines;
 
 	dlg.DoModal();
@@ -903,9 +901,8 @@ void CRelations::OnRdblclkListS(NMHDR *pNMHDR, LRESULT *pResult)
 			vLines.push_back( lineNumber );
 	}
 
-	CHtmlLines dlg;
-	dlg.child = L"Testvérek";
-	dlg._what = 1;
+	CHtmlEditLines dlg;
+	dlg.m_title = L"Testvérek";
 	dlg.vLines = &vLines;
 
 	dlg.DoModal();
@@ -1042,7 +1039,7 @@ void CRelations::OnClickedSiblings()
 
 	CString father_id;
 	CString mother_id;
-	int		parent2Index = 1;
+	int		parentIndex = 1;
 
 	CNewPeople dlg;
 	dlg.m_last_name = m_last_name;
@@ -1079,20 +1076,20 @@ void CRelations::OnClickedSiblings()
 		dlg.m_rowid = m_rowid;
 		dlg.m_sex_id = m_sex_id;
 		if( dlg.DoModal() == IDCANCEL  ) return;
-		parent2Index = dlg.m_mother_index;
+		parentIndex = dlg.m_mother_index;
 		if( m_sex_id == MAN )
 		{
 			father_id = m_rowid;
-				mother_id = m_ListCtrlM.GetItemText( parent2Index - 1, LISTM_ROWID );
+				mother_id = m_ListCtrlM.GetItemText( parentIndex - 1, LISTM_ROWID );
 		}
 		else
 		{
-			father_id = m_ListCtrlM.GetItemText( parent2Index - 1, LISTM_ROWID );
+			father_id = m_ListCtrlM.GetItemText( parentIndex - 1, LISTM_ROWID );
 			mother_id = m_rowid;
 		}
 		break;
 	}
-	m_command.Format( L"UPDATE people SET father_id='%s', mother_id='%s', parent2Index=%d WHERE rowid = '%s'", father_id, mother_id, parent2Index, dlg.m_rowid );
+	m_command.Format( L"UPDATE people SET father_id='%s', mother_id='%s', parentIndex=%d WHERE rowid = '%s'", father_id, mother_id, parentIndex, dlg.m_rowid );
 	theApp.execute( m_command );
 	testverek( p_rowid, father_id, mother_id );
 }
@@ -1667,7 +1664,7 @@ void CRelations::OnClickedChildren()
 	CString mother;
 	CString rowidF;		// apa 
 	CString rowidM;		// anya
-	int		parent2Index = 1;
+	int		parentIndex = 1;
 	
 	int n = m_ListCtrlM.GetItemCount();		// házasrtásak száma
 	switch( n )
@@ -1687,7 +1684,7 @@ void CRelations::OnClickedChildren()
 				rowidM = m_rowid;
 				mother.Format( L"%s %s", m_last_name, m_first_name );
 				rowidF.Empty();
-				parent2Index = 1;
+				parentIndex = 1;
 				last_name.Empty();
 			}
 			break;
@@ -1708,7 +1705,7 @@ void CRelations::OnClickedChildren()
 				father = m_ListCtrlM.GetItemText( 0, LISTM_NAME );
 				last_name = getFirstWord( father );
 			}
-			parent2Index= 1;
+			parentIndex= 1;
 			break;
 		default:						// Az egyik szülõnke több házastûársa van
 			CMoreSpouses dlg;
@@ -1716,13 +1713,13 @@ void CRelations::OnClickedChildren()
 			dlg.m_sex_id = m_sex_id;
 			if( dlg.DoModal() == IDCANCEL  ) return;
 
-			parent2Index = dlg.m_mother_index;
+			parentIndex = dlg.m_mother_index;
 			if( m_sex_id == MAN )
 			{
 				rowidF = m_rowid;
 				rowidM = dlg.m_rowid;
 				father.Format( L"%s %s", m_last_name, m_first_name );
-				mother = m_ListCtrlM.GetItemText( parent2Index-1, LISTM_NAME );
+				mother = m_ListCtrlM.GetItemText( parentIndex-1, LISTM_NAME );
 				last_name = m_last_name;
 			}
 			else
@@ -1730,7 +1727,7 @@ void CRelations::OnClickedChildren()
 				rowidF = dlg.m_rowid;
 				rowidM = m_rowid;
 				mother.Format( L"%s %s", m_last_name, m_first_name );
-				father = m_ListCtrlM.GetItemText( parent2Index-1, LISTM_NAME );
+				father = m_ListCtrlM.GetItemText( parentIndex-1, LISTM_NAME );
 				last_name = getFirstWord( father );
 			}
 			break;

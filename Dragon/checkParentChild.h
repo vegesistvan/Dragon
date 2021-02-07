@@ -54,7 +54,7 @@ public:
 	afx_msg void OnGahtmlLine();
 	afx_msg void OnList();
 
-	afx_msg void OnFatherMotherHe();
+	afx_msg void OnHtmlFamily();
 	CColorStatic colorNext;
 	CColorStatic colorKeres;
 	afx_msg void OnClickedKeres();

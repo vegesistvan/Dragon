@@ -8,7 +8,7 @@
 #include "ProgressWnd.h"
 #include "utilities.h"
 #include "Relations.h"
-#include "html_Lines.h"
+#include "html_EditLines.h"
 
 enum
 {
@@ -42,9 +42,9 @@ BEGIN_MESSAGE_MAP(CCheckMotherIndex, CDialogEx)
 	ON_WM_SIZE()
 	ON_WM_SIZING()
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_HTML_EDIT, &CCheckMotherIndex::OnHtmlEdit)
+	ON_COMMAND(ID_HTML_LINE, &CCheckMotherIndex::OnHtmlEdit)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CCheckMotherIndex::OnHtmlNotepad)
-	ON_COMMAND(ID_ROKONSAG, &CCheckMotherIndex::OnRokonsag)
+	ON_COMMAND(ID_DB_EDIT, &CCheckMotherIndex::OnRokonsag)
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CCheckMotherIndex::OnInitDialog()
@@ -78,7 +78,7 @@ BOOL CCheckMotherIndex::OnInitDialog()
 	int		pos;
 	int		sex_id;
 	int		source;
-	int		parent2Index;
+	int		parentIndex;
 	int		count;
 	int		cnt = 0;
 
@@ -116,7 +116,7 @@ Ha leányági leszármazottak gyeremekei is vannak a GA-html-ben, akkor az apa és a
 		vPos.push_back( gafile.GetPosition() );
 
 // gyerekek lekérdezése	
-	m_command = L"SELECT rowid, lineNumber, parent2Index, father_id, mother_id, first_name, last_name FROM people WHERE source='1' ORDER BY lineNumber";
+	m_command = L"SELECT rowid, lineNumber, parentIndex, father_id, mother_id, first_name, last_name FROM people WHERE source='1' ORDER BY lineNumber";
 	if( !theApp.query( m_command ) )
 	{
 		OnCancel();
@@ -136,8 +136,8 @@ Ha leányági leszármazottak gyeremekei is vannak a GA-html-ben, akkor az apa és a
 	{
 		rowid			= theApp.m_recordset->GetFieldString( 0 );
 		lineNumber		= theApp.m_recordset->GetFieldString( 1 );
-		parent2Index	= _wtoi( theApp.m_recordset->GetFieldString( 2 ) );
-		if( parent2Index == 0 ) goto cont;
+		parentIndex	= _wtoi( theApp.m_recordset->GetFieldString( 2 ) );
+		if( parentIndex == 0 ) goto cont;
 
 		father_id		= theApp.m_recordset->GetFieldString( 3 );
 		mother_id		= theApp.m_recordset->GetFieldString( 4 );
@@ -177,7 +177,7 @@ Ha leányági leszármazottak gyeremekei is vannak a GA-html-ben, akkor az apa és a
 			if( !count ) goto cont;
 		}
 
-		if( parent2Index > count  )
+		if( parentIndex > count  )
 		{
 			// szülõ
 			++cnt;
@@ -192,10 +192,10 @@ Ha leányági leszármazottak gyeremekei is vannak a GA-html-ben, akkor az apa és a
 			++nItem;
 
 			// gyermek 
-			str.Format( L"%d-%d", cnt, parent2Index );
+			str.Format( L"%d-%d", cnt, parentIndex );
 			nItem = m_ListCtrl.InsertItem( nItem, str );
 
-			str.Format( L"%d", parent2Index );
+			str.Format( L"%d", parentIndex );
 			m_ListCtrl.SetItemText( nItem, L_INDEX, str );
 			m_ListCtrl.SetItemText( nItem, L_ROWID, rowid );
 			m_ListCtrl.SetItemText( nItem, L_LINENUMBER, lineNumber );
@@ -263,7 +263,7 @@ LRESULT CCheckMotherIndex:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 
 		if( m_ListCtrl.GetItemText( nItem, L_LINENUMBER ).IsEmpty() )
 		{
-			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
+			pPopup->EnableMenuItem(ID_HTML_LINE, MF_BYCOMMAND | MF_GRAYED);
 			pPopup->EnableMenuItem(ID_HTML_NOTEPAD, MF_BYCOMMAND | MF_GRAYED);
 		}
 		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
@@ -298,40 +298,3 @@ void CCheckMotherIndex::OnRokonsag()
 
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-void CCheckMotherIndex::OnHtmlShows()
-{
-	POSITION	pos = m_ListCtrl.GetFirstSelectedItemPosition();
-	int			nItem;
-	std::vector<CString> vLines;
-
-	int cnt = 0;
-	CString name(L"");
-
-	while( pos )
-	{
-		nItem = m_ListCtrl.GetNextSelectedItem( pos );
-		vLines.push_back( m_ListCtrl.GetItemText( nItem, L_LINENUMBER ) );
-		if( name.Compare( m_ListCtrl.GetItemText( nItem, L_LINE ) ) )
-		{
-			name = m_ListCtrl.GetItemText( nItem, L_LINE );
-			++cnt;
-		}
-	
-
-	}
-
-	CHtmlLines dlg;
-
-	if( cnt == 1 )
-		dlg.child = name;
-	else
-		dlg.child = L"";
-
-	dlg._what = 1;
-	dlg.vLines = &vLines;
-
-	dlg.DoModal();
-}
-*/

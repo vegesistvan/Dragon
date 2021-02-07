@@ -5,7 +5,7 @@
 #include "Dragon.h"
 #include "CheckSpousesSex.h"
 #include "afxdialogex.h"
-#include "html_Lines.h"
+#include "html_EditLines.h"
 #include "Relations.h"
 #include "ProgressWnd.h"
 
@@ -57,10 +57,10 @@ BEGIN_MESSAGE_MAP(CCheckSpousesSex, CDialogEx)
 //	ON_WM_SIZING()
 
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_HTML_EDIT, &CCheckSpousesSex::OnHtmlEdit)
-	ON_COMMAND(ID_HTML_SHOWS, &CCheckSpousesSex::OnHtmlShows)
+	ON_COMMAND(ID_HTML_LINE, &CCheckSpousesSex::OnHtmlEdit)
+	ON_COMMAND(ID_HTML_EDIT, &CCheckSpousesSex::OnHtmlShows)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CCheckSpousesSex::OnHtmlNotepad)
-	ON_COMMAND(ID_ROKONSAG, &CCheckSpousesSex::OnRokonsag)
+	ON_COMMAND(ID_DB_EDIT, &CCheckSpousesSex::OnRokonsag)
 	ON_COMMAND(ID_GAHTML_LINE, &CCheckSpousesSex::OnGahtmlLine)
 	ON_COMMAND(ID_LIST, &CCheckSpousesSex::OnList)
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LIST, &CCheckSpousesSex::OnLvnItemchangedList)
@@ -253,9 +253,9 @@ LRESULT CCheckSpousesSex:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 		pPopup = Menu.GetSubMenu(0);
 		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
 		{
-			pPopup->EnableMenuItem(ID_HTML_SHOWS, MF_BYCOMMAND | MF_GRAYED);
-			pPopup->EnableMenuItem(ID_HTML_NOTEPAD, MF_BYCOMMAND | MF_GRAYED);
 			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
+			pPopup->EnableMenuItem(ID_HTML_NOTEPAD, MF_BYCOMMAND | MF_GRAYED);
+			pPopup->EnableMenuItem(ID_HTML_LINE, MF_BYCOMMAND | MF_GRAYED);
 		}
 		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
     }
@@ -299,14 +299,15 @@ void CCheckSpousesSex::OnHtmlShows()
 
 	}
 
-	CHtmlLines dlg;
-
-	if( cnt == 1 )
-		dlg.child = name;
+	CHtmlEditLines dlg;
+	if( !name.IsEmpty() )
+	{
+		str.Format( L"%s kijelölt sora a html fájlban", name ); 
+		dlg.m_title = str;
+	}
 	else
-		dlg.child = L"";
+		dlg.m_title = L"Kijelölt sorok a htm fájlban";
 
-	dlg._what = 1;
 	dlg.vLines = &vLines;
 
 	dlg.DoModal();

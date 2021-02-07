@@ -224,7 +224,7 @@ void CGaInput::processMarriageSubstrings()
 				ss.death_place	= v_p.at(j).death_place;
 				ss.death_date	= v_p.at(j).death_date;
 				ss.comment		= v_p.at(j).comment;
-				ss.order		= v_p.at(j).parent2Index;
+				ss.order		= v_p.at(j).parentIndex;
 				ss.spouseIndex	= i;
 				v_spouseSpouses.push_back( ss );				// házastársak házastársai 
 
@@ -373,7 +373,7 @@ int CGaInput::getSpouseOrder( std::vector<PEOPLE>* vp )
 
 	for( i = 0; i < vp->size(); ++i )
 	{
-		index = vp->at(i).parent2Index;
+		index = vp->at(i).parentIndex;
 		if( index != indexPrev + 1 )
 		{
 			if( index < indexPrev + 1 )
@@ -419,7 +419,7 @@ void CGaInput::processSpousesSpouses( CString spouses,  std::vector<PEOPLE> *v_p
 			spouse = spouses.Mid( pos+3 );
 
 		processPeopleString( 0,  spouse,  &people );
-		people.parent2Index = order;   // a házastárs házastársának nincs megadva az anyja, ezért a parent2Index-et a házasság sorszámára használjuk
+		people.parentIndex = order;   // a házastárs házastársának nincs megadva az anyja, ezért a parentIndex-et a házasság sorszámára használjuk
 		v_p->push_back( people );
 	};
 }

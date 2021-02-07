@@ -231,8 +231,8 @@ void CGedcomIn::recordINDI( GEDLINE* gl )
 
 		v_lxtv.push_back( lxtv );
 	}
-	indi.parent2Index	= 0;
-	indi.parent2IndexCalc	= 0;
+	indi.parentIndex	= 0;
+	indi.parentIndexCalc	= 0;
 	indi.orderFather	= 0;
 	indi.orderMother	= 0;
 	v_indi.push_back( indi );
@@ -299,8 +299,8 @@ void CGedcomIn::recordFAM( GEDLINE* gl, int cnt )
 			chil.refH			= fam.refH;
 			chil.refW			= fam.refW;
 			chil.refC			= lxtv.value;
-			chil.parent2Index	= 0;
-			chil.parent2IndexCalc	= 0;
+			chil.parentIndex	= 0;
+			chil.parentIndexCalc	= 0;
 			chil.orderFather	= numOfChildren + 1;
 			chil.orderMother	= 0;
 			v_chil.push_back( chil );
@@ -423,13 +423,13 @@ void CGedcomIn::sync_fam_indi()
 	}
 
 
-// a családba tartozó gyerekek indi.parent2Index-ének beállítása az anya sorszámára
+// a családba tartozó gyerekek indi.parentIndex-ének beállítása az anya sorszámára
 
 // a v_chil eleve a refF szerint rendezett
 
 	int	cnt = 0;
 	int	z;
-	int	parent2Index;
+	int	parentIndex;
 	int	indexC;
 	int	ixF;
 	CString child;
@@ -444,31 +444,31 @@ void CGedcomIn::sync_fam_indi()
 			child = getIndi( v_chil.at(j).refC );
 
 			z = v_fam.at(ixF).marriageHAll;
-			v_chil.at(j).parent2Index		= 0;
-			v_chil.at(j+1).parent2Index		= 0;
+			v_chil.at(j).parentIndex		= 0;
+			v_chil.at(j+1).parentIndex		= 0;
 
 			if( v_fam.at(ixF).marriageHAll > 1 )   // csak 1-nél több feleség esetén ad értékel neki
 			{
-				parent2Index = v_fam.at(ixF).marriageH;
+				parentIndex = v_fam.at(ixF).marriageH;
 		
-				v_chil.at(j).parent2IndexCalc		= parent2Index;
-				v_chil.at(j+1).parent2IndexCalc	= parent2Index;
+				v_chil.at(j).parentIndexCalc		= parentIndex;
+				v_chil.at(j+1).parentIndexCalc	= parentIndex;
 
-				// csak az elsõ gyerek parent2Index-ét tölti ki
+				// csak az elsõ gyerek parentIndex-ét tölti ki
 				if( !cnt )
 				{
-					v_chil.at(j).parent2Index		= parent2Index;
+					v_chil.at(j).parentIndex		= parentIndex;
 				}
 
 			// ha az apának csak 1 felesége volt, akkor annak sorszámát nem tartja nyilván
 				refC = v_chil.at(j).refC;
 				if( ( indexC = getIndexIndi( refC ) ) != -1 )
 				{
-					v_indi.at( indexC ).parent2IndexCalc	= parent2Index; //v_chil.at(j).parent2IndexCalc;
+					v_indi.at( indexC ).parentIndexCalc	= parentIndex; //v_chil.at(j).parentIndexCalc;
 					if( !cnt )
-						v_indi.at( indexC ).parent2Index	= v_chil.at(j).parent2Index;  // ez lehet 0 is!!!!
+						v_indi.at( indexC ).parentIndex	= v_chil.at(j).parentIndex;  // ez lehet 0 is!!!!
 					else
-						v_indi.at( indexC ).parent2Index	= 0;
+						v_indi.at( indexC ).parentIndex	= 0;
 					v_indi.at( indexC ).orderFather		= v_chil.at(j).orderFather;
 					v_indi.at( indexC ).orderMother		= v_chil.at(j).orderMother;
 				}
@@ -476,11 +476,11 @@ void CGedcomIn::sync_fam_indi()
 				refC = v_chil.at(j+1).refC;
 				if( ( indexC = getIndexIndi( refC ) ) != -1 )
 				{
-					v_indi.at( indexC ).parent2IndexCalc	= parent2Index;
+					v_indi.at( indexC ).parentIndexCalc	= parentIndex;
 //					if( !cnt )
-//						v_indi.at( indexC ).parent2Index	= v_chil.at(j).parent2Index;
+//						v_indi.at( indexC ).parentIndex	= v_chil.at(j).parentIndex;
 //					else
-						v_indi.at( indexC ).parent2Index	= 0;
+						v_indi.at( indexC ).parentIndex	= 0;
 					v_indi.at( indexC ).orderFather		= v_chil.at(j).orderFather;
 					v_indi.at( indexC ).orderMother		= v_chil.at(j).orderMother;
 				}
@@ -490,7 +490,7 @@ void CGedcomIn::sync_fam_indi()
 		else
 		{
 //			if( cnt == 1 )			// ha csak 2 gyerek volt, akkor 2.-at törli
-//				v_chil.at(j).parent2Index		= 0;
+//				v_chil.at(j).parentIndex		= 0;
 			cnt = 0;
 		}
 	}

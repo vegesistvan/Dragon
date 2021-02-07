@@ -417,8 +417,8 @@ void clearPeople( PEOPLE *p)
 	p->title.Empty();
 	p->titolo.Empty();
 	p->posterior.Empty();
-	p->parent2Index = 0;
-	p->parent2IndexCalc = 0;
+	p->parentIndex = 0;
+	p->parentIndexCalc = 0;
 	p->tableAncestry = 0;
 	p->tableNumber.Empty();
 	p->lineNumber = 0;
@@ -438,7 +438,7 @@ void cleanNameBlock( NAMEBLOCK *n )
 	n->first_name.Empty();
 	n->title.Empty();
 	n->posterior.Empty();
-	n->parent2Index = 0;
+	n->parentIndex = 0;
 	n->sex_id = 0;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -460,7 +460,7 @@ void clearName( NAME* name )
 	name->first_name.Empty();
 	name->last_name.Empty();
 	name->posterior.Empty();
-	name->parent2Index  = 0;
+	name->parentIndex  = 0;
 	name->fullname.Empty();
 	name->comment.Empty();
 }
@@ -918,6 +918,7 @@ TCHAR * string2char( CString str )
 // 1944.12.
 // 1944.12.17
 
+// az üres dátumot is hibásnak értékeli
 
 bool checkDate( CString datum)
 {
@@ -968,6 +969,23 @@ bool checkDate( CString datum)
 	if( day > 31 ) return false; 
 	if( length > 10 ) return false;  // dátum után még van valami
 	return true;
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CString roundDate( CString date )
+{
+	int length = date.GetLength();
+	switch( length ) 
+	{
+	case 4:
+		date += L".01.01";
+		break;
+	case 7:
+		date += L".01";
+		break;
+	case 8:
+		date += L"01";
+	}
+	return date;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Addig olvassa a fájlt, amíg a végére nem ér vagy talált benne UTF8BOM-ot vagy UTF8 kódot

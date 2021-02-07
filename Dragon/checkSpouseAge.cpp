@@ -6,7 +6,7 @@
 #include "CheckSpouseAge.h"
 #include "afxdialogex.h"
 #include "CheckParam.h"
-#include "html_Lines.h"
+#include "html_EditLines.h"
 #include "Relations.h"
 #include "ProgressWnd.h"
 #include "utilities.h"
@@ -64,10 +64,10 @@ BEGIN_MESSAGE_MAP(CCheckSpouseAge, CDialogEx)
 	ON_WM_SIZING()
 
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_HTML_EDIT, &CCheckSpouseAge::OnHtmlEdit)
-	ON_COMMAND(ID_HTML_SHOWS, &CCheckSpouseAge::OnHtmlShows)
+	ON_COMMAND(ID_HTML_LINE, &CCheckSpouseAge::OnHtmlEdit)
+	ON_COMMAND(ID_HTML_EDIT, &CCheckSpouseAge::OnHtmlShows)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CCheckSpouseAge::OnHtmlNotepad)
-	ON_COMMAND(ID_ROKONSAG, &CCheckSpouseAge::OnRokonsag)
+	ON_COMMAND(ID_DB_EDIT, &CCheckSpouseAge::OnRokonsag)
 	ON_COMMAND(ID_GAHTML_LINE, &CCheckSpouseAge::OnGahtmlLine)
 	ON_COMMAND(ID_LIST, &CCheckSpouseAge::OnList)
 
@@ -281,9 +281,9 @@ LRESULT CCheckSpouseAge:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 		pPopup = Menu.GetSubMenu(0);
 		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
 		{
-			pPopup->EnableMenuItem(ID_HTML_SHOWS, MF_BYCOMMAND | MF_GRAYED);
-			pPopup->EnableMenuItem(ID_HTML_NOTEPAD, MF_BYCOMMAND | MF_GRAYED);
 			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
+			pPopup->EnableMenuItem(ID_HTML_NOTEPAD, MF_BYCOMMAND | MF_GRAYED);
+			pPopup->EnableMenuItem(ID_HTML_LINE, MF_BYCOMMAND | MF_GRAYED);
 		}
 		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
     }
@@ -327,14 +327,15 @@ void CCheckSpouseAge::OnHtmlShows()
 
 	}
 
-	CHtmlLines dlg;
+	CHtmlEditLines dlg;
 
-	if( cnt == 1 )
-		dlg.child = name;
+	if( !name.IsEmpty() )
+	{
+		str.Format( L"%s kijelölt sora a html fájlban", name ); 
+		dlg.m_title = str;
+	}
 	else
-		dlg.child = L"";
-
-	dlg._what = 1;
+		dlg.m_title = L"Kijelölt sorok a htm fájlban";
 	dlg.vLines = &vLines;
 
 	dlg.DoModal();

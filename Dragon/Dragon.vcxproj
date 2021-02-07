@@ -231,8 +231,8 @@
     <ClInclude Include="EditFirstName.h" />
     <ClInclude Include="EditTable.h" />
     <ClInclude Include="FirstLetter.h" />
-    <ClInclude Include="html_Edit.h" />
-    <ClInclude Include="html_Lines.h" />
+    <ClInclude Include="html_EditLine.h" />
+    <ClInclude Include="html_EditLines.h" />
     <ClInclude Include="html_Brackets.h" />
     <ClInclude Include="checkParam4.h" />
     <ClInclude Include="checkLifespan.h" />
@@ -357,8 +357,8 @@
     <ClCompile Include="EditTable.cpp" />
     <ClCompile Include="FirstLetter.cpp" />
     <ClCompile Include="html.cpp" />
-    <ClCompile Include="html_Edit.cpp" />
-    <ClCompile Include="html_Lines.cpp" />
+    <ClCompile Include="html_EditLine.cpp" />
+    <ClCompile Include="html_EditLines.cpp" />
     <ClCompile Include="html_Brackets.cpp" />
     <ClCompile Include="checkParam4.cpp" />
     <ClCompile Include="checkLifespan.cpp" />

@@ -53,7 +53,7 @@ void CTableTables::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CTableTables, CDialogEx)
 
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_HTML_EDIT, &CTableTables::OnHtmlEdit)
+	ON_COMMAND(ID_HTML_LINE, &CTableTables::OnHtmlEdit)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CTableTables::OnHtmlNotepad)
 
 

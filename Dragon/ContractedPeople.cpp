@@ -9,7 +9,7 @@
 #include "utilities.h"
 #include "ProgressWnd.h"
 #include "ContractInfo.h"
-#include "html_Lines.h"
+#include "html_EditLines.h"
 #include "Relations.h"
 //#include "FilterLoop.h"
 
@@ -79,7 +79,7 @@ BEGIN_MESSAGE_MAP(CContractedPeople, CDialogEx)
 
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
 	ON_COMMAND(ID_EDIT2LINES, &CContractedPeople::OnEdit2lines)
-	ON_COMMAND(ID_HTML_SHOWS, &CContractedPeople::OnHtmlShows)
+	ON_COMMAND(ID_HTML_EDIT, &CContractedPeople::OnHtmlShows)
 	ON_COMMAND(ID_HTML_PEOPLEFATHER, &CContractedPeople::OnHtmlPeoplefather)
 	ON_COMMAND(ID_EDIT_NOTEPAD_PARENTS, &CContractedPeople::OnEditNotepadParents)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CContractedPeople::OnHtmlNotepad)
@@ -516,14 +516,14 @@ void CContractedPeople::OnHtmlShows()
 
 	}
 
-	CHtmlLines dlg;
-
-	if( cnt == 1 )
-		dlg.child = name;
+	CHtmlEditLines dlg;
+	if( !name.IsEmpty() )
+	{
+		str.Format( L"%s kijelölt sora a html fájlban", name ); 
+		dlg.m_title = str;
+	}
 	else
-		dlg.child = L"";
-
-	dlg._what = 1;
+		dlg.m_title = L"Kijelölt sorok a htm fájlban";
 	dlg.vLines = &vLines;
 
 	dlg.DoModal();
@@ -533,7 +533,7 @@ void CContractedPeople::OnHtmlPeoplefather()
 {
 	int nItem		= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
 	CString rowid	= m_ListCtrl.GetItemText( nItem, S_ROWID );
-	CHtmlLines dlg;
+	CHtmlEditLines dlg;
 	dlg.m_rowid = rowid;
 	dlg.DoModal();
 }
@@ -606,22 +606,4 @@ void CContractedPeople::getFileSpec( int type, int subType )
 	theApp.showHtmlFile( filespec );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-void CContractedPeople::OnClickList(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	int nItem		= pNMItemActivate->iItem;
-	int nSubItem	= pNMItemActivate->iSubItem;
-
-	if( nSubItem == S_NAME )
-	{
-		CString rowid	= m_ListCtrl.GetItemText( nItem, S_ROWID );
-		CRelations dlg;
-		dlg.nItem		= nItem;
-		dlg.m_rowid		= rowid;
-		if( dlg.DoModal() == IDCANCEL ) return;
-	}
-	*pResult = 0;
-}
-*/
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

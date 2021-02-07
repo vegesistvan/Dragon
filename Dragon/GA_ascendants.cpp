@@ -545,8 +545,8 @@ CString CGaAscendants::getPeopleString_vFel( int i )
 	CString	death_date;
 	CString father_id;
 	CString mother_id;
-	int		parent2Index;
-	int		parent2IndexCalc;
+	int		parentIndex;
+	int		parentIndexCalc;
 	CString comment;
 	CString arm;
 
@@ -561,8 +561,8 @@ CString CGaAscendants::getPeopleString_vFel( int i )
 	death_date		= m_recordset3.GetFieldString( PEOPLE_DEATH_DATE );
 	father_id		= m_recordset3.GetFieldString( PEOPLE_FATHER_ID );
 	mother_id		= m_recordset3.GetFieldString( PEOPLE_MOTHER_ID );
-	parent2Index	= _wtoi( m_recordset3.GetFieldString( PEOPLE_MOTHER_INDEX ) );
-	parent2IndexCalc	= _wtoi( m_recordset3.GetFieldString( PEOPLE_MOTHER_INDEX2 ) );
+	parentIndex	= _wtoi( m_recordset3.GetFieldString( PEOPLE_MOTHER_INDEX ) );
+	parentIndexCalc	= _wtoi( m_recordset3.GetFieldString( PEOPLE_MOTHER_INDEX2 ) );
 	comment			= m_recordset3.GetFieldString( PEOPLE_COMMENT );
 	arm				= m_recordset3.GetFieldString( PEOPLE_ARM );
 
@@ -582,9 +582,9 @@ CString CGaAscendants::getPeopleString_vFel( int i )
 	
 	if( m_bold ) str += L"</b>";
 
-	if( parent2Index ) 
+	if( parentIndex ) 
 	{
-		str1.Format( L"/%d", parent2Index);
+		str1.Format( L"/%d", parentIndex);
 		str += str1;
 	}
 	
@@ -645,8 +645,8 @@ CString CGaAscendants::getPeopleString_vA( int i )
 	CString	death_date;
 	CString father_id;
 	CString mother_id;
-	int		parent2Index;
-	int		parent2IndexCalc;
+	int		parentIndex;
+	int		parentIndexCalc;
 	CString comment;
 	CString arm;
 	CString csalad;
@@ -662,8 +662,8 @@ CString CGaAscendants::getPeopleString_vA( int i )
 	death_date		= m_recordset3.GetFieldString( PEOPLE_DEATH_DATE );
 	father_id		= m_recordset3.GetFieldString( PEOPLE_FATHER_ID );
 	mother_id		= m_recordset3.GetFieldString( PEOPLE_MOTHER_ID );
-	parent2Index	= _wtoi( m_recordset3.GetFieldString( PEOPLE_MOTHER_INDEX ) );
-	parent2IndexCalc	= _wtoi( m_recordset3.GetFieldString( PEOPLE_MOTHER_INDEX2 ) );
+	parentIndex	= _wtoi( m_recordset3.GetFieldString( PEOPLE_MOTHER_INDEX ) );
+	parentIndexCalc	= _wtoi( m_recordset3.GetFieldString( PEOPLE_MOTHER_INDEX2 ) );
 	comment			= m_recordset3.GetFieldString( PEOPLE_COMMENT );
 	arm				= m_recordset3.GetFieldString( PEOPLE_ARM );
 	csalad			= m_recordset3.GetFieldString( PEOPLE_CSALAD );
@@ -683,9 +683,9 @@ CString CGaAscendants::getPeopleString_vA( int i )
 	
 	if( m_bold ) str += L"</b>";
 
-	if( parent2Index ) 
+	if( parentIndex ) 
 	{
-		str1.Format( L"/%d", parent2Index);
+		str1.Format( L"/%d", parentIndex);
 		str += str1;
 	}
 	

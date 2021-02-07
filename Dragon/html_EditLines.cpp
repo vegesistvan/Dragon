@@ -3,41 +3,60 @@
 
 #include "stdafx.h"
 #include "Dragon.h"
-#include "html_Lines.h"
+#include "html_EditLines.h"
 #include "afxdialogex.h"
 #include "ProgressWnd.h"
 #include "utilities.h"
 #include "EditItem.h"
-// CHtmlLines dialog
 
-IMPLEMENT_DYNAMIC(CHtmlLines, CDialogEx)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CHtmlLines::CHtmlLines(CWnd* pParent /*=NULL*/)
-	: CDialogEx(CHtmlLines::IDD, pParent)
+// implicit vagy explicit megadott GA.html sorokat listázza.
+// Bármelyik sorra duplakattintással a sort a szerkesztõ ablakba helyezi. Ott szerkeszthetjük, majd visszaírhatjuk a ga-html fájlba.
+// Ezt megismételhetjük bármelyik sorral, akár hányszor.
+// A "Kilép" gombra kattintva léphetünk ki.
+//
+// Public vátozók:
+//
+// CString m_type			implicit megadott sorok listázása
+//							SIBLINGS		- az m_rowid-val megadott emer anyját és testéreit listázza
+//							F_SIBLINGS		- az m_rowid-val megadott ember apját és testvéreit listázza
+//							FATHERMOTHERHE	- az m_rowid-val megadott emeber szüleit és testvéreit listázza
+//
+// CString m_rowid			a megadott ember anyai nagyapját, apját és õ magát listázza, ha nincs m_type megadva
+//
+// vector<int>*vLines		a listázandó sorok sorszámát tartalmazó vektor, ha nincs m_type megadva
+//
+// CString m_title			az ablak felirat
+
+IMPLEMENT_DYNAMIC(CHtmlEditLines, CDialogEx)
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CHtmlEditLines::CHtmlEditLines(CWnd* pParent /*=NULL*/)
+	: CDialogEx(CHtmlEditLines::IDD, pParent)
 {
+	m_linenumber = 0;
 
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CHtmlLines::~CHtmlLines()
+CHtmlEditLines::~CHtmlEditLines()
 {
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CHtmlLines::DoDataExchange(CDataExchange* pDX)
+void CHtmlEditLines::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_LIST, m_ListCtrl);
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BEGIN_MESSAGE_MAP(CHtmlLines, CDialogEx)
+BEGIN_MESSAGE_MAP(CHtmlEditLines, CDialogEx)
 	ON_WM_SIZE()
 	ON_WM_SIZING()
-	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CHtmlLines::OnDblclkList)
-	ON_COMMAND(ID_LIST_LINES, &CHtmlLines::OnListLines)
-	ON_BN_CLICKED(IDC_MODIFY, &CHtmlLines::OnClickedModify)
-	ON_EN_CHANGE(IDC_EDIT, &CHtmlLines::OnChangeEdit)
+	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CHtmlEditLines::OnDblclkList)
+	ON_COMMAND(ID_LIST_LINES, &CHtmlEditLines::OnListLines)
+	ON_BN_CLICKED(IDC_MODIFY, &CHtmlEditLines::OnClickedModify)
+	ON_EN_CHANGE(IDC_EDIT, &CHtmlEditLines::OnChangeEdit)
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CHtmlLines::OnInitDialog()
+BOOL CHtmlEditLines::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 	EASYSIZE_ADD( IDC_LIST,	ES_BORDER,	ES_BORDER,		ES_BORDER,		ES_KEEPSIZE,	0 );
@@ -63,6 +82,8 @@ BOOL CHtmlLines::OnInitDialog()
 	CString lineGP;
 	CString lineF;
 	CString lineP;
+
+	CString linenumber;
 	std::vector<CString> vLinenumbers;
 
 	m_ListCtrl.KeepSortOrder(TRUE);
@@ -89,12 +110,12 @@ BOOL CHtmlLines::OnInitDialog()
 		return true;
 	}
 
-	CStringArray A;
-	A.Add( L"anyai nagyapa" );
-	A.Add( L"apa" );
-	A.Add( L"ember" );	
-	
-	
+	if( m_linenumber )
+	{
+		displayLine();
+		return true;
+	}
+
 
 	if( !m_rowid.IsEmpty() )
 	{
@@ -123,21 +144,21 @@ BOOL CHtmlLines::OnInitDialog()
 		lineF	= getHtmlLine( linenumberF );
 		lineP	= getHtmlLine( linenumberP );
 
-		nItem = m_ListCtrl.InsertItem( 0, A[0] );
+		nItem = m_ListCtrl.InsertItem( 0, L"anyai nagyapa" );
 		m_ListCtrl.SetItemText( nItem, 1, linenumberGP );
 		m_ListCtrl.SetItemText( nItem, 2, lineGP );
 
-		nItem = m_ListCtrl.InsertItem( 1, A[1] );
+		nItem = m_ListCtrl.InsertItem( 1, L"apa" );
 		m_ListCtrl.SetItemText( nItem, 1, linenumberF );
 		m_ListCtrl.SetItemText( nItem, 2, lineF );
 
-		nItem = m_ListCtrl.InsertItem( 2, A[2] );
+		nItem = m_ListCtrl.InsertItem( 2, L"gyerek" );
 		m_ListCtrl.SetItemText( nItem, 1, linenumberP );
 		m_ListCtrl.SetItemText( nItem, 2, lineP );
 
-		caption = L"Egy ember, annak apja és anyai nagyapja";
+		m_title = L"Egy ember, annak apja és anyai nagyapja";
 	}
-	else
+	else if( !m_linenumber )
 	{
 		m_ListCtrl.InsertColumn( 0,	L"",		LVCFMT_RIGHT,	 120,-1,COL_HIDDEN );
 		m_ListCtrl.InsertColumn( 1,	L"line#",	LVCFMT_RIGHT,	  80,-1,COL_NUM);
@@ -150,34 +171,25 @@ BOOL CHtmlLines::OnInitDialog()
 			line = getHtmlLine( vLines->at(i) );
 			m_ListCtrl.SetItemText( nItem, 2, line );
 		}
-	
-		if( _what == 1 )
-		{
-			if( child.IsEmpty() )
-				caption = L"Kijelölt sorok a htm fájlban";
-			else
-				caption.Format( L"%s kijelölt sora a html fájlban", child ); 
-		}
-		else
-			caption.Format( L"%s és szülei a ga.html fájlban", child );
 	}
-	SetWindowTextW( caption );
+
+	SetWindowTextW( m_title );
 	return TRUE;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CHtmlLines::OnSize(UINT nType, int cx, int cy)
+void CHtmlEditLines::OnSize(UINT nType, int cx, int cy)
 {
 	CDialogEx::OnSize(nType, cx, cy);
 	EASYSIZE_RESIZE()
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CHtmlLines::OnSizing(UINT fwSide, LPRECT pRect)
+void CHtmlEditLines::OnSizing(UINT fwSide, LPRECT pRect)
 {
 	CDialogEx::OnSizing(fwSide, pRect);
 	EASYSIZE_MINSIZE(430,314,fwSide,pRect); 
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CHtmlLines::getHtmlLine( CString lineNumber )
+CString CHtmlEditLines::getHtmlLine( CString lineNumber )
 {
 	if( lineNumber.IsEmpty() ) return L"";
 	theApp.m_inputCode = GetInputCode( theApp.m_htmlFileSpec );
@@ -198,7 +210,7 @@ CString CHtmlLines::getHtmlLine( CString lineNumber )
 	return cLine;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CHtmlLines::cleanHtmlLine( CString cLine )
+CString CHtmlEditLines::cleanHtmlLine( CString cLine )
 {
 	CString htmlLine = cLine;
 	int		pos;
@@ -217,15 +229,15 @@ CString CHtmlLines::cleanHtmlLine( CString cLine )
 	return htmlLine;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CHtmlLines::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
+void CHtmlEditLines::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	m_nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
 	CString line;
 
-	m_linenumber = _wtoi( m_ListCtrl.GetItemText( nItem, 1 ) );
-	line = m_ListCtrl.GetItemText( nItem, 2 );
+	m_linenumber = _wtoi( m_ListCtrl.GetItemText( m_nItem, 1 ) );
+	line = m_ListCtrl.GetItemText( m_nItem, 2 );
 	line = line.Mid( 2 );		// geerációs kód eldobása
 		
 
@@ -233,28 +245,33 @@ void CHtmlLines::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
 	*pResult = 0;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CHtmlLines::OnListLines()
+void CHtmlEditLines::OnListLines()
 {
 	CString	logFile(L"problémás_html_Sorok"); 
 	CString	title = logFile;
 	theApp.exportSelected( logFile, title, &m_ListCtrl );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CHtmlLines::OnClickedModify()
+void CHtmlEditLines::OnClickedModify()
 {
 	GetDlgItem( IDC_EDIT )->GetWindowTextW( m_line );
 //	if( AfxMessageBox( L"Felülírod a ga.html fájl sorát ezzel a módosított sorral?", MB_YESNO ) == IDNO ) return;
 
 	theApp.saveHtmlLine( m_linenumber, m_line );
-	CDialogEx::OnOK();
+
+
+	m_ListCtrl.SetItemText( m_nItem, 2, m_line );
+	GetDlgItem( IDC_MODIFY )->EnableWindow( FALSE );
+	GetDlgItem( IDC_EDIT )->SetWindowTextW( L"" );
+//	CDialogEx::OnOK();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CHtmlLines::OnChangeEdit()
+void CHtmlEditLines::OnChangeEdit()
 {
 	GetDlgItem( IDC_MODIFY )->EnableWindow( TRUE );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CHtmlLines::motherAndSiblings()
+void CHtmlEditLines::motherAndSiblings()
 {
 	if( m_rowid.IsEmpty() ) return;
 
@@ -294,7 +311,7 @@ void CHtmlLines::motherAndSiblings()
 	}
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CHtmlLines::fatherAndSiblings()
+void CHtmlEditLines::fatherAndSiblings()
 {
 	if( m_rowid.IsEmpty() ) return;
 
@@ -334,7 +351,7 @@ void CHtmlLines::fatherAndSiblings()
 	}
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CHtmlLines::fatherMotherHe()
+void CHtmlEditLines::fatherMotherHe()
 {
 	if( m_rowid.IsEmpty() ) return;
 
@@ -346,6 +363,10 @@ void CHtmlLines::fatherMotherHe()
 	CString father_id;
 	CString mother_id;
 	CString linenumberC;
+
+	CProgressWnd wndP(NULL, L"Keresem a szülõket és testvéreket..." ); 
+	wndP.GoModal();
+
 
 	m_ListCtrl.InsertColumn( 0,	L"",		LVCFMT_RIGHT,	 120,-1,COL_TEXT );
 	m_ListCtrl.InsertColumn( 1,	L"line#",	LVCFMT_RIGHT,	  80,-1,COL_NUM);
@@ -365,8 +386,14 @@ void CHtmlLines::fatherMotherHe()
 	m_ListCtrl.SetItemText( nItem, 1, linenumber );
 	m_ListCtrl.SetItemText( nItem, 2, line );
 
-	m_command.Format( L"SELECT linenumber FROM people WHERE father_id ='%s' ORDER BY linenumber", father_id );
+	m_command.Format( L"SELECT linenumber FROM people WHERE father_id ='%s' AND mother_id ='%s' ORDER BY linenumber", father_id, mother_id );
 	if( !theApp.query( m_command ) ) return;
+
+	wndP.SetRange( 0, theApp.m_recordset->RecordsCount() );
+	wndP.SetPos(0 );
+	wndP.SetStep(1 );
+
+
 	for( INT i = 0; i < theApp.m_recordset->RecordsCount(); ++i, theApp.m_recordset->MoveNext() )
 	{
 		linenumber	= theApp.m_recordset->GetFieldString( 0 );
@@ -374,5 +401,26 @@ void CHtmlLines::fatherMotherHe()
 		nItem = m_ListCtrl.InsertItem( 2+i, L"gyerek" );
 		m_ListCtrl.SetItemText( nItem, 1, linenumber );
 		m_ListCtrl.SetItemText( nItem, 2, line );
+
+		wndP.StepIt();
+		wndP.PeekAndPump();
+		if (wndP.Cancelled()) break;
 	}
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CHtmlEditLines::displayLine( )
+{
+	CString linenumber;
+	CString line;
+
+	linenumber.Format( L"%d", m_linenumber ); 
+	m_ListCtrl.InsertColumn( 0,	L"",		LVCFMT_RIGHT,	 120,-1,COL_TEXT );
+	m_ListCtrl.InsertColumn( 1,	L"line#",	LVCFMT_RIGHT,	  80,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( 2,	L"ga.line",	LVCFMT_LEFT,    1500,-1,COL_EDIT);
+	
+	line = getHtmlLine( linenumber );
+
+	m_ListCtrl.InsertItem( 0, L"" );
+	m_ListCtrl.SetItemText( 0, 1, linenumber );
+	m_ListCtrl.SetItemText( 0, 2, line );
 }

@@ -32,9 +32,9 @@ BEGIN_MESSAGE_MAP(CCheckNames, CDialogEx)
 	ON_WM_SIZING()
 
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_HTML_EDIT, &CCheckNames::OnHtmlEdit)
+	ON_COMMAND(ID_HTML_LINE, &CCheckNames::OnHtmlEdit)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CCheckNames::OnHtmlNotepad)
-	ON_COMMAND(ID_ROKONSAG, &CCheckNames::OnRokonsag)
+	ON_COMMAND(ID_DB_EDIT, &CCheckNames::OnRokonsag)
 
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -281,12 +281,12 @@ LRESULT CCheckNames:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 
 		if( m_ListCtrl.GetItemText( nItem, 1 ).IsEmpty() )  // linenumber
 		{
-			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
+			pPopup->EnableMenuItem(ID_HTML_LINE, MF_BYCOMMAND | MF_GRAYED);
 			pPopup->EnableMenuItem(ID_HTML_NOTEPAD, MF_BYCOMMAND | MF_GRAYED);
 		}
 		if( m_ListCtrl.GetItemText( nItem, 2 ).IsEmpty() )  // rowid
 		{
-			pPopup->EnableMenuItem(ID_ROKONSAG, MF_BYCOMMAND | MF_GRAYED);
+			pPopup->EnableMenuItem(ID_DB_EDIT, MF_BYCOMMAND | MF_GRAYED);
 		}
 		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
     }

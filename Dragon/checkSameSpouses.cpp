@@ -5,7 +5,7 @@
 #include "Dragon.h"
 #include "checkSameSpouses.h"
 #include "afxdialogex.h"
-#include "html_Lines.h"
+#include "html_EditLines.h"
 #include "Relations.h"
 #include "CheckParam0.h"
 #include <algorithm>
@@ -61,20 +61,22 @@ enum
 enum
 {
 	L_CNT = 0,
-	L_ROWID, 
 	L_LINENUMBER,
 	L_TABLENUMBER,
 	L_UNITED,
 	L_GENERATION,
 	L_SOURCE,
+	L_ROWID, 
 	L_NAME,
 	L_BIRTH,
 	L_DEATH,
 	L_SOURCEF,
+	L_ROWIDF,
 	L_FATHER,
 	L_BIRTH_F,
 	L_DEATH_F,
 	L_SOURCEM,
+	L_ROWIDM,
 	L_MOTHER,
 	L_BIRTH_M,
 	L_DEATH_M,
@@ -164,9 +166,10 @@ BEGIN_MESSAGE_MAP(CCheckSameSpouses, CDialogEx)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CCheckSameSpouses::OnDblclkList)
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
 	ON_COMMAND(ID_EDIT2LINES, &CCheckSameSpouses::OnEdit2lines)
-	ON_COMMAND(ID_HTML_SHOWS, &CCheckSameSpouses::OnHtmlShows)
+	ON_COMMAND(ID_HTML_EDIT, &CCheckSameSpouses::OnHtmlShows)
 	ON_COMMAND(ID_HTML_PEOPLEFATHER, &CCheckSameSpouses::OnHtmlPeoplefather)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CCheckSameSpouses::OnHtmlNotepad)
+	ON_COMMAND(ID_HTML_FAMILY, &CCheckSameSpouses::OnHtmlFamily)
 
 	ON_COMMAND(ID_HTML, &CCheckSameSpouses::OnHtml)
 	ON_COMMAND(ID_INFO, &CCheckSameSpouses::OnInfo)
@@ -278,20 +281,22 @@ void CCheckSameSpouses::createColumns()
 
 	m_ListCtrl.SetExtendedStyle(m_ListCtrl.GetExtendedStyle()| LVS_EX_GRIDLINES );
 	m_ListCtrl.InsertColumn( L_CNT,			L"cnt",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( L_ROWID,		L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_LINENUMBER,	L"line#",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_TABLENUMBER,	L"table#",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_UNITED,		L"U",			LVCFMT_LEFT,	 25,-1,COL_NUM );
 	m_ListCtrl.InsertColumn( L_GENERATION,	L"G",			LVCFMT_RIGHT,	 25,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_SOURCE,		L"s",			LVCFMT_RIGHT,	 25,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_ROWID,		L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_NAME,		L"név",			LVCFMT_LEFT,	200,-1,COL_TEXT );
 	m_ListCtrl.InsertColumn( L_BIRTH,		L"születés",	LVCFMT_LEFT,	 80,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_DEATH,		L"halál",		LVCFMT_LEFT,	 80,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_SOURCEF,		L"s",			LVCFMT_LEFT,	 20,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_ROWIDF,		L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_FATHER,		L"apa",			LVCFMT_LEFT,	200,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_BIRTH_F,		L"születés",	LVCFMT_LEFT,	 80,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_DEATH_F,		L"halál",		LVCFMT_LEFT,	 80,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_SOURCEM,		L"s",			LVCFMT_LEFT,	 20,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_ROWIDM,		L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_MOTHER,		L"anya",		LVCFMT_LEFT,	200,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_BIRTH_M,		L"születés",	LVCFMT_LEFT,	 80,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_DEATH_M,		L"halál",		LVCFMT_LEFT,	 80,-1,COL_NUM);
@@ -433,6 +438,9 @@ void CCheckSameSpouses::fillSpouses( CString rowid, CString sex_id )
 		vspouse.tableNumber = m_recordset2->GetFieldString( 5 );
 		vspouse.birthDate	= m_recordset2->GetFieldString( 6 );
 		vspouse.deathDate	= m_recordset2->GetFieldString( 7 );
+		
+		vspouse.father_id	= m_recordset2->GetFieldString( 8 );
+		vspouse.mother_id	= m_recordset2->GetFieldString( 9 );
 			
 		fatherId			= m_recordset2->GetFieldString( 8 );
 		motherId			= m_recordset2->GetFieldString( 9 );
@@ -454,7 +462,7 @@ void CCheckSameSpouses::fillSpouses( CString rowid, CString sex_id )
 		vspouse.sourceF.Format( L"%s", m_recordset3->GetFieldString( 3 ) );
 		vspouse.birthDateF	= m_recordset3->GetFieldString( 4 );
 		vspouse.deathDateF	= m_recordset3->GetFieldString( 5 );
-
+	
 /*
 		vspouse.mother.Empty();
 		vspouse.lineNumberM.Empty();
@@ -500,8 +508,10 @@ void CCheckSameSpouses::fillSameSpouses( )
 				vspouse.rowidM		= vSpouses.at(j-1).rowidM; 
 				vspouse.birthDate	= vSpouses.at(j-1).birthDate;
 				vspouse.deathDate	= vSpouses.at(j-1).deathDate;
+				vspouse.father_id		= vSpouses.at(j-1).father_id;
 				vspouse.father		= vSpouses.at(j-1).father;
 				vspouse.lineNumber	= vSpouses.at(j-1).lineNumber;
+				vspouse.mother_id	= vSpouses.at(j-1).mother_id;
 				vspouse.mother 		= vSpouses.at(j-1).mother;
 				vspouse.rowid 		= vSpouses.at(j-1).rowid;
 				vspouse.sex_id		= vSpouses.at(j-1).sex_id;
@@ -525,8 +535,10 @@ void CCheckSameSpouses::fillSameSpouses( )
 			vspouse.rowidM		= vSpouses.at(j).rowidM;
 			vspouse.birthDate	= vSpouses.at(j).birthDate;
 			vspouse.deathDate	= vSpouses.at(j).deathDate;
+			vspouse.father_id		= vSpouses.at(j).father_id;
 			vspouse.father		= vSpouses.at(j).father;
 			vspouse.lineNumber	= vSpouses.at(j).lineNumber;
+			vspouse.mother_id	= vSpouses.at(j).mother_id;
 			vspouse.mother 		= vSpouses.at(j).mother;
 			vspouse.rowid 		= vSpouses.at(j).rowid;
 			vspouse.sex_id		= vSpouses.at(j).sex_id;
@@ -667,21 +679,25 @@ deathDateM\
 	str.Format( L"%d", m_cnt + 1 );
 	nItem = m_ListCtrl.InsertItem( nItem, str );
 		
-	m_ListCtrl.SetItemText( nItem, L_ROWID, rowid );
 	m_ListCtrl.SetItemText( nItem, L_LINENUMBER, lineNumber );
 	m_ListCtrl.SetItemText( nItem, L_TABLENUMBER, tableNumber );
 	m_ListCtrl.SetItemText( nItem, L_GENERATION, generation );
 
 	m_ListCtrl.SetItemText( nItem, L_SOURCE, source );
+	m_ListCtrl.SetItemText( nItem, L_ROWID, rowid );
 	m_ListCtrl.SetItemText( nItem, L_UNITED, united );
 	m_ListCtrl.SetItemText( nItem, L_NAME, name );
 	m_ListCtrl.SetItemText( nItem, L_BIRTH, birth );
 	m_ListCtrl.SetItemText( nItem, L_DEATH, death );
+
 	m_ListCtrl.SetItemText( nItem, L_SOURCEF, sourceF );
+	m_ListCtrl.SetItemText( nItem, L_ROWIDF, father_id );
 	m_ListCtrl.SetItemText( nItem, L_FATHER, father );
 	m_ListCtrl.SetItemText( nItem, L_BIRTH_F, birthDateF );
 	m_ListCtrl.SetItemText( nItem, L_DEATH_F, deathDateF );
+
 	m_ListCtrl.SetItemText( nItem, L_SOURCEM, sourceM );
+	m_ListCtrl.SetItemText( nItem, L_ROWIDM, mother_id );
 	m_ListCtrl.SetItemText( nItem, L_MOTHER, mother );
 	m_ListCtrl.SetItemText( nItem, L_BIRTH_M, birthDateM );
 	m_ListCtrl.SetItemText( nItem, L_DEATH_M, deathDateM );
@@ -717,21 +733,24 @@ vSameSpouses.at(0).deathDateM\
 	
 	// elsõ házastárs
 	rowidBy = vSameSpouses.at(0).rowid;
-	m_ListCtrl.SetItemText( nItem, L_ROWID, rowidBy );
 	m_ListCtrl.SetItemText( nItem, L_LINENUMBER, vSameSpouses.at(0).lineNumber );
 	m_ListCtrl.SetItemText( nItem, L_TABLENUMBER, vSameSpouses.at(0).tableNumber );
 	m_ListCtrl.SetItemText( nItem, L_UNITED, vSameSpouses.at(0).united );
 	m_ListCtrl.SetItemText( nItem, L_GENERATION, vSameSpouses.at(0).generation );
 	m_ListCtrl.SetItemText( nItem, L_SOURCE, vSameSpouses.at(0).source );
+	m_ListCtrl.SetItemText( nItem, L_ROWID, rowidBy );
 	m_ListCtrl.SetItemText( nItem, L_NAME, vSameSpouses.at(0).spouse );
 	m_ListCtrl.SetItemText( nItem, L_BIRTH, vSameSpouses.at(0).birthDate );
 	m_ListCtrl.SetItemText( nItem, L_DEATH, vSameSpouses.at(0).deathDate );
 
 	m_ListCtrl.SetItemText( nItem, L_SOURCEF, vSameSpouses.at(0).sourceF );
+	m_ListCtrl.SetItemText( nItem, L_ROWIDF, vSameSpouses.at(0).father_id );
 	m_ListCtrl.SetItemText( nItem, L_FATHER, vSameSpouses.at(0).father );
 	m_ListCtrl.SetItemText( nItem, L_BIRTH_F, vSameSpouses.at(0).birthDateF );
 	m_ListCtrl.SetItemText( nItem, L_DEATH_F, vSameSpouses.at(0).deathDateF );
+
 	m_ListCtrl.SetItemText( nItem, L_SOURCEM, vSameSpouses.at(0).sourceM );
+	m_ListCtrl.SetItemText( nItem, L_ROWIDM, vSameSpouses.at(0).mother_id );
 	m_ListCtrl.SetItemText( nItem, L_MOTHER, vSameSpouses.at(0).mother );
 	m_ListCtrl.SetItemText( nItem, L_BIRTH_M, vSameSpouses.at(0).birthDateM );
 	m_ListCtrl.SetItemText( nItem, L_DEATH_M, vSameSpouses.at(0).deathDateM );
@@ -913,21 +932,25 @@ vSameSpouses.at(0).deathDateM\
 
 		nItem = m_ListCtrl.InsertItem( nItem, L"" );
 		
-		m_ListCtrl.SetItemText( nItem, L_ROWID, vSameSpouses.at(j).rowid );
 		m_ListCtrl.SetItemText( nItem, L_LINENUMBER, vSameSpouses.at(j).lineNumber );
 		m_ListCtrl.SetItemText( nItem, L_TABLENUMBER, vSameSpouses.at(j).tableNumber );
 		m_ListCtrl.SetItemText( nItem, L_UNITED, vSameSpouses.at(j).united );
 		m_ListCtrl.SetItemText( nItem, L_GENERATION, vSameSpouses.at(j).generation );
+
 		m_ListCtrl.SetItemText( nItem, L_SOURCE, vSameSpouses.at(j).source );
+		m_ListCtrl.SetItemText( nItem, L_ROWID, vSameSpouses.at(j).rowid );
 		m_ListCtrl.SetItemText( nItem, L_NAME, vSameSpouses.at(j).spouse );
 		m_ListCtrl.SetItemText( nItem, L_BIRTH, vSameSpouses.at(j).birthDate );
 		m_ListCtrl.SetItemText( nItem, L_DEATH, vSameSpouses.at(j).deathDate );
 
 		m_ListCtrl.SetItemText( nItem, L_SOURCEF, vSameSpouses.at(j).sourceF );
+		m_ListCtrl.SetItemText( nItem, L_ROWIDF, vSameSpouses.at(j).father_id );
 		m_ListCtrl.SetItemText( nItem, L_FATHER, fatherJ );
 		m_ListCtrl.SetItemText( nItem, L_BIRTH_F, vSameSpouses.at(j).birthDateF );
 		m_ListCtrl.SetItemText( nItem, L_DEATH_F, vSameSpouses.at(j).deathDateF );
+
 		m_ListCtrl.SetItemText( nItem, L_SOURCEM, vSameSpouses.at(j).sourceM );
+		m_ListCtrl.SetItemText( nItem, L_ROWIDM, vSameSpouses.at(j).mother_id );
 		m_ListCtrl.SetItemText( nItem, L_MOTHER, motherJ );
 		m_ListCtrl.SetItemText( nItem, L_BIRTH_M, birthDateMJ );
 		m_ListCtrl.SetItemText( nItem, L_DEATH_M, deathDateMJ );
@@ -1008,9 +1031,9 @@ void CCheckSameSpouses::OnListPeople()
 		if( !lineNumber.IsEmpty() ) vLines.push_back( m_ListCtrl.GetItemText( nItem, L_LINENUMBER ) );
 	}
 
-	CHtmlLines dlg;
+	CHtmlEditLines dlg;
 
-	dlg._what = 1;
+	
 	dlg.vLines = &vLines;
 
 	dlg.DoModal();
@@ -1039,13 +1062,14 @@ LRESULT CCheckSameSpouses:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 	CMenu*	pPopup;
 
 
-	if(Menu.LoadMenu( IDR_DROPDOWN_HTML_P ))
+//	if(Menu.LoadMenu( IDR_DROPDOWN_HTML_P ))
+	if(Menu.LoadMenu( IDR_DROPDOWN_HTML ))
     {
 		pPopup = Menu.GetSubMenu(0);
 		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
 		{
-			pPopup->EnableMenuItem(ID_HTML_SHOWS, MF_BYCOMMAND | MF_GRAYED);
 			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
+			pPopup->EnableMenuItem(ID_HTML_LINE, MF_BYCOMMAND | MF_GRAYED);
 		}
 		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
     }
@@ -1095,14 +1119,15 @@ void CCheckSameSpouses::OnHtmlShows()
 
 	}
 
-	CHtmlLines dlg;
-
-	if( cnt == 1 )
-		dlg.child = name;
+	CHtmlEditLines dlg;
+	if( !name.IsEmpty() )
+	{
+		str.Format( L"%s kijelölt sora a html fájlban", name ); 
+		dlg.m_title = str;
+	}
 	else
-		dlg.child = L"";
+		dlg.m_title = L"Kijelölt sorok a htm fájlban";
 
-	dlg._what = 1;
 	dlg.vLines = &vLines;
 
 	dlg.DoModal();
@@ -1112,32 +1137,9 @@ void CCheckSameSpouses::OnHtmlPeoplefather()
 {
 	int nItem		= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
 	CString rowid	= m_ListCtrl.GetItemText( nItem, L_ROWID );
-	CHtmlLines dlg;
+	CHtmlEditLines dlg;
 	dlg.m_rowid = rowid;
 	dlg.DoModal();
-
-	/*
-	CString lineNumber	= m_ListCtrl.GetItemText( nItem, 	L_LINENUMBER );
-	CString lineNumberF	= m_ListCtrl.GetItemText( nItem, 	L_LINENUMBERF );
-	if( lineNumberF.IsEmpty() )
-	{
-		AfxMessageBox( L"A kijelölt embernek nem ismerjük az apját!" );
-		return;
-	}
-
-
-	std::vector<CString> vLines;
-
-	vLines.push_back( lineNumberF );
-	if( lineNumber != lineNumberF )	vLines.push_back( lineNumber );
-
-	CHtmlLines dlg;
-	dlg._what = 2;
-	dlg.parents.Format( L"%s - %s",  m_ListCtrl.GetItemText( nItem,L_FATHER ), m_ListCtrl.GetItemText( nItem,L_MOTHER ) );
-	dlg.child	= m_ListCtrl.GetItemText( nItem,L_NAME );
-	dlg.vLines	= &vLines;
-	dlg.DoModal();
-	*/
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool sortBySpouses(const MORESPOUSES &v1, const MORESPOUSES &v2) 
@@ -1338,3 +1340,15 @@ BOOL CCheckSameSpouses::PreTranslateMessage(MSG* pMsg)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckSameSpouses::OnHtmlFamily()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
+	CHtmlEditLines dlg;
+	dlg.m_title.Format( L"%s szülei és testvérei", m_ListCtrl.GetItemText( nItem, L_NAME ) );
+	dlg.m_type	= L"FATHERMOTHERHE";
+	dlg.m_rowid = rowid;
+	dlg.DoModal();
+}

@@ -6,7 +6,7 @@
 #include "html_SpouseSpouses.h"
 #include "afxdialogex.h"
 #include "GA_input.h"
-#include "html_Edit.h"
+#include "html_EditLine.h"
 #include "DragonDlg.h"
 #include "ProgressWnd.h"
 #include "utilities.h"
@@ -67,7 +67,7 @@ BEGIN_MESSAGE_MAP(CSpouseSpouses, CDialogEx)
 	ON_COMMAND(ID_NEWTABLE, &CSpouseSpouses::OnNewtable)
 
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_HTML_EDIT, &CSpouseSpouses::OnHtmlEdit)
+	ON_COMMAND(ID_HTML_LINE, &CSpouseSpouses::OnHtmlEdit)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CSpouseSpouses::OnHtmlNotepad)
 
 END_MESSAGE_MAP()

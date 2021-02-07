@@ -6,7 +6,7 @@
 #include "html_Descendants.h"
 #include "afxdialogex.h"
 #include "GA_input.h"
-#include "html_Edit.h"
+#include "html_EditLine.h"
 #include "DragonDlg.h"
 #include "ProgressWnd.h"
 #include "utilities.h"
@@ -69,7 +69,7 @@ BEGIN_MESSAGE_MAP(CDescendant, CDialogEx)
 	ON_COMMAND(ID_D_LIST, &CDescendant::OnDList)
 	
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_HTML_EDIT, &CDescendant::OnHtmlEdit)
+	ON_COMMAND(ID_HTML_LINE, &CDescendant::OnHtmlEdit)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CDescendant::OnHtmlNotepad)
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -236,11 +236,11 @@ void CDescendant::fillTable( )
 			m_ListCtrl.SetItemText( nItem, PS_LAST_NAME, split.d.last_name );
 //			m_ListCtrl.SetItemText( nItem, PS_LAST_NAME, split.m_tableHeader.familyName );
 			m_ListCtrl.SetItemText( nItem, PS_FIRST_NAME, split.d.first_name );
-			str.Format( L"%d", split.d.parent2Index );
+			str.Format( L"%d", split.d.parentIndex );
 			if( !str.Compare( L"0" ) ) str.Empty();
 			m_ListCtrl.SetItemText( nItem, PS_MOTHER_INDEX, str );
 
-				str.Format( L"%d", split.d.parent2IndexCalc );
+				str.Format( L"%d", split.d.parentIndexCalc );
 			if( !str.Compare( L"0" ) ) str.Empty();
 			m_ListCtrl.SetItemText( nItem, PS_MINDEX_CALC, str );
 
@@ -346,7 +346,7 @@ void CDescendant::listHtmlLine()
 	}
 
 	int htmlLineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	PS_LINENUMBER ) );
-	CHtmlEdit dlg;
+	CHtmlEditLine dlg;
 
 	theApp.m_inputCode = GetInputCode( theApp.m_htmlFileSpec );
 	CStdioFile file( theApp.m_htmlFileSpec, CFile::modeRead); 

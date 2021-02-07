@@ -68,10 +68,10 @@ void CGaInput::processDescendantSubstring( CString cLine )
 	d.titolo = m_tableHeader.titolo;
 	d.last_name = m_tableHeader.familyName;
 	
-	// a parent2Index csak ott van megadva, ahol változás történt, az ezt követõ gyerekek értelemszerûen ugyanannak az anyának a gyerekei.
-	// parent2Index-t kell kiírni gyerekhez a leszármazotti listánál ( 0-t nem kell )
-	// parent2IndexCalc-t pedig minden gyereknél meg van adva, az  anya meghatározásához használjuk
-	d.parent2IndexCalc	= getParent2Index( generation, d.parent2Index );		// a felülírt index
+	// a parentIndex csak ott van megadva, ahol változás történt, az ezt követõ gyerekek értelemszerûen ugyanannak az anyának a gyerekei.
+	// parentIndex-t kell kiírni gyerekhez a leszármazotti listánál ( 0-t nem kell )
+	// parentIndexCalc-t pedig minden gyereknél meg van adva, az  anya meghatározásához használjuk
+	d.parentIndexCalc	= getParent2Index( generation, d.parentIndex );		// a felülírt index
 
 
 
@@ -137,13 +137,13 @@ void CGaInput::processNameSubstr( CString nameSubstr, CString birthSubstr, CStri
 	CString comment;
 	CString title;
 	CString posterior;
-	int parent2Index;
+	int parentIndex;
 	int ret;
 	int sex_id;
 	bool volt = false;
 
 	nameSubstr.Trim();
-	// parent2Index leszedése, ha van
+	// parentIndex leszedése, ha van
 	int n = wordList(&A, nameSubstr, ' ', FALSE );
 	for( i = 0; i < n; ++i )
 	{
@@ -153,8 +153,8 @@ void CGaInput::processNameSubstr( CString nameSubstr, CString birthSubstr, CStri
 			str = word.Left( pos );
 			if( ( ret = isFirstName( str ) ) != -1 )
 			{
-				parent2Index = _wtoi(word.Mid(pos+1));
-				any->parent2Index = parent2Index;
+				parentIndex = _wtoi(word.Mid(pos+1));
+				any->parentIndex = parentIndex;
 				A[i] = str;
 				break;
 			}
@@ -401,20 +401,20 @@ void CGaInput::processPlaceDateComment( CString placeDateComment, PLACE_DATE_BLO
 		ns->place = placeDateComment;   // nem talált vesszõt, az egész sor place
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// A generation-parent2Index-bõl meghatározza az parent2IndexCalc-t, ami az anya indexe a v_generation.spouse_id[parent2IndexCalc]-ben 
-// Mert a leszármazoitti listán csak az elsõ gyereknél van a parent2Index, az utána következõknél nem!
-// Ezért határozza meg a generáció utolsó parent2Index-ét, amit visszaad 
+// A generation-parentIndex-bõl meghatározza az parentIndexCalc-t, ami az anya indexe a v_generation.spouse_id[parentIndexCalc]-ben 
+// Mert a leszármazoitti listán csak az elsõ gyereknél van a parentIndex, az utána következõknél nem!
+// Ezért határozza meg a generáció utolsó parentIndex-ét, amit visszaad 
 //
 // Visszamegy az vParent2Index vektorban a megadott generációhoz, ha volt ilyen. és annak mother-indexét visszadja
-// és a ezzel a parent2Index-el és az aktuális generációval beteszi a vParent2Index vektorba.
+// és a ezzel a parentIndex-el és az aktuális generációval beteszi a vParent2Index vektorba.
 // Ha nem talál azono sgenerációt, akkor mother_indexbe 1-et tesz.
-// A vParent2Index vektorban gyûjti a táblában lévõ generációk utolsó parent2Index-ét, ami a leszármazott keresztneve után van megadva. (/n)
+// A vParent2Index vektorban gyûjti a táblában lévõ generációk utolsó parentIndex-ét, ami a leszármazott keresztneve után van megadva. (/n)
 // Ha nincs megadva a leszármazott neve után index, akkor 1-et tesz bele
 int CGaInput::getParent2Index( TCHAR generation, int n_mother_index )
 {
 	PARENT2INDEX mx;
 	
-	int parent2Index = n_mother_index;
+	int parentIndex = n_mother_index;
 
 	if( n_mother_index == 0 )   // ha a /n nincs megadva, akkor megnézi hogy volt-e már korábban ez a generáció?
 	{
@@ -423,18 +423,18 @@ int CGaInput::getParent2Index( TCHAR generation, int n_mother_index )
 		{
 			if( vParent2Index.at(i).generation == generation )
 			{
-				parent2Index = vParent2Index.at(i).parent2Index;  // ha talált, akkor azt használja
+				parentIndex = vParent2Index.at(i).parentIndex;  // ha talált, akkor azt használja
 				break;
 			}
 		}
 		if( i == -1 )														// ha nem talált, akkor 1
 		{
-			parent2Index = 1;
+			parentIndex = 1;
 		}
 	}
 
 	mx.generation	= generation;									// az adott generáció utolsó indexe
-	mx.parent2Index = parent2Index;									// elteszi az aktuális beállítást
+	mx.parentIndex = parentIndex;									// elteszi az aktuális beállítást
 	vParent2Index.push_back( mx );
-	return parent2Index;
+	return parentIndex;
 }

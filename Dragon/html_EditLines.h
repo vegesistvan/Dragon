@@ -2,34 +2,41 @@
 #include "listctrlex.h"
 
 
-// CHtmlLines dialog
+// CHtmlEditLines dialog
 
-class CHtmlLines : public CDialogEx
+class CHtmlEditLines : public CDialogEx
 {
-	DECLARE_DYNAMIC(CHtmlLines)
+	DECLARE_DYNAMIC(CHtmlEditLines)
 	DECLARE_EASYSIZE
 
 public:
-	CHtmlLines(CWnd* pParent = NULL);   // standard constructor
-	virtual ~CHtmlLines();
+	CHtmlEditLines(CWnd* pParent = NULL);   // standard constructor
+	virtual ~CHtmlEditLines();
 
 // Dialog Data
-	enum { IDD = IDD_HTML_LINES };
+	enum { IDD = IDD_HTML_EDITLINES };
 
-	int _what;
-	CString parents;
-	CString child;
-	CString m_line;
-	int	 m_linenumber;
+//	int _what;
+//	CString parents;
+//	CString child;
+//	CString m_line;
+//	int	 m_linenumber;
+
 	std::vector<CString>* vLines;
+	int		m_linenumber;
 	CString m_rowid;
 	CString m_type;
 	CString m_title;
+	
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	CListCtrlEx m_ListCtrl;
 	CString m_command;
+	int		m_nItem;
 
+	CString m_line;
+
+	void displayLine( );
 	void motherAndSiblings();
 	void fatherAndSiblings();
 	void fatherMotherHe();

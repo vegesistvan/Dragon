@@ -90,3 +90,4 @@ int			same( CString ref, CString par1, CString par2 );
 int			getYearFromDate( CString date );
 CString		getTimeTag();
 bool		openFileSpec( FILE** ff, CString fileSpec, CString mode );
+CString		roundDate( CString date );

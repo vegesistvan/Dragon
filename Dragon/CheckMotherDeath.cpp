@@ -6,7 +6,7 @@
 #include "CheckMotherDeath.h"
 #include "afxdialogex.h"
 #include "Relations.h"
-#include "html_Lines.h"
+#include "html_EditLines.h"
 #include "ProgressWnd.h"
 #include "utilities.h"
 // txt fájl oszlopok
@@ -102,8 +102,8 @@ BEGIN_MESSAGE_MAP(CCheckMotherDeath, CDialogEx)
 	ON_WM_SIZING()
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST, &CCheckMotherDeath::OnCustomdrawList)
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_HTML_EDIT, &CCheckMotherDeath::OnHtmlEdit)
-	ON_COMMAND(ID_HTML_SHOWS, &CCheckMotherDeath::OnHtmlShows)
+	ON_COMMAND(ID_HTML_LINE, &CCheckMotherDeath::OnHtmlEdit)
+	ON_COMMAND(ID_HTML_EDIT, &CCheckMotherDeath::OnHtmlShows)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CCheckMotherDeath::OnHtmlNotepad)
 	ON_COMMAND(ID_LIST, &CCheckMotherDeath::OnList)
 END_MESSAGE_MAP()
@@ -322,9 +322,9 @@ LRESULT CCheckMotherDeath:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 		pPopup = Menu.GetSubMenu(0);
 		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
 		{
-			pPopup->EnableMenuItem(ID_HTML_SHOWS, MF_BYCOMMAND | MF_GRAYED);
-			pPopup->EnableMenuItem(ID_HTML_NOTEPAD, MF_BYCOMMAND | MF_GRAYED);
 			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
+			pPopup->EnableMenuItem(ID_HTML_NOTEPAD, MF_BYCOMMAND | MF_GRAYED);
+			pPopup->EnableMenuItem(ID_HTML_LINE, MF_BYCOMMAND | MF_GRAYED);
 		}
 		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
     }
@@ -368,14 +368,15 @@ void CCheckMotherDeath::OnHtmlShows()
 
 	}
 
-	CHtmlLines dlg;
+	CHtmlEditLines dlg;
 
-	if( cnt == 1 )
-		dlg.child = name;
+	if( !name.IsEmpty() )
+	{
+		str.Format( L"%s kijelölt sora a html fájlban", name ); 
+		dlg.m_title = str;
+	}
 	else
-		dlg.child = L"";
-
-	dlg._what = 1;
+		dlg.m_title = L"Kijelölt sorok a htm fájlban";
 	dlg.vLines = &vLines;
 
 	dlg.DoModal();
@@ -433,7 +434,7 @@ void CCheckMotherDeath::motherDeathChildBirth()
 
 
 	// gyerekek lekérdezése
-	m_command = L"SELECT rowid, lineNumber, tableNumber, source, united, parent2Index, last_name, first_name, birth_date, death_date, father_id, mother_id FROM people ORDER BY last_name, first_name";
+	m_command = L"SELECT rowid, lineNumber, tableNumber, source, united, parentIndex, last_name, first_name, birth_date, death_date, father_id, mother_id FROM people ORDER BY last_name, first_name";
 	if( !query( m_command ) ) return;
 
 	wndP.SetRange(0, m_recordset->RecordsCount() );
@@ -512,7 +513,7 @@ void CCheckMotherDeath::motherDeathChildBirth()
 
 							// apa-anya gyermeke adatai
 
-							m_command.Format( L"SELECT rowid, lineNumber, tableNumber, source, united, parent2IndexCalc, last_name, first_name, birth_date, death_date FROM people WHERE father_id='%s' AND mother_id='%s'", rowidF, rowidM );
+							m_command.Format( L"SELECT rowid, lineNumber, tableNumber, source, united, parentIndexCalc, last_name, first_name, birth_date, death_date FROM people WHERE father_id='%s' AND mother_id='%s'", rowidF, rowidM );
 							if( !query3( m_command ) ) return;
 
 							for( UINT k = 0; k < m_recordset3->RecordsCount(); ++k, m_recordset3->MoveNext() )

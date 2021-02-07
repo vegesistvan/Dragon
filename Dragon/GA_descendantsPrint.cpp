@@ -130,16 +130,16 @@ void CGaDescendants::printDescendant( int ix )
 	{
 		if( m_numbering == SZLUHA || m_numbering == TUP )
 		{
-			if( p.parent2Index != 0 )
+			if( p.parentIndex != 0 )
 			{
-				str.Format( L"/%d", p.parent2Index ); 
+				str.Format( L"/%d", p.parentIndex ); 
 				cLine += str;
 			}
 		}
 		else if( m_numbering == VIL )  // felség sorszámának kiírása a név elõtt
 		{
-			if( p.parent2IndexCalc != 0 )
-				fwprintf( fl, L"%d. ", p.parent2IndexCalc );
+			if( p.parentIndexCalc != 0 )
+				fwprintf( fl, L"%d. ", p.parentIndexCalc );
 		}
 	}
 	if( !p.posterior.IsEmpty() )
@@ -494,8 +494,8 @@ void CGaDescendants::queryPeople( CString rowid, PPEOPLE* p )
 	p->last_name		= m_recordset.GetFieldString( PEOPLE_LAST_NAME );
 	p->lineNumber		= m_recordset.GetFieldString( PEOPLE_LINENUMBER );
 	p->mother_id		= m_recordset.GetFieldString( PEOPLE_MOTHER_ID );
-	p->parent2Index		= _wtoi( m_recordset.GetFieldString( PEOPLE_MOTHER_INDEX ));
-	p->parent2IndexCalc	= _wtoi( m_recordset.GetFieldString( PEOPLE_MOTHER_INDEX2 ));
+	p->parentIndex		= _wtoi( m_recordset.GetFieldString( PEOPLE_MOTHER_INDEX ));
+	p->parentIndexCalc	= _wtoi( m_recordset.GetFieldString( PEOPLE_MOTHER_INDEX2 ));
 	p->tableAncestry	= m_recordset.GetFieldString( PEOPLE_TABLEANCESTRY );
 	p->occupation		= m_recordset.GetFieldString( PEOPLE_OCCUPATION );
 	p->orderFather		= m_recordset.GetFieldString( PEOPLE_ORDERFATHER);

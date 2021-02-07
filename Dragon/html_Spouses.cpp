@@ -6,7 +6,7 @@
 #include "html_Marriages.h"
 #include "afxdialogex.h"
 #include "GA_input.h"
-#include "html_Edit.h"
+#include "html_EditLine.h"
 #include "DragonDlg.h"
 #include "ProgressWnd.h"
 #include "utilities.h"

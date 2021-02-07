@@ -71,5 +71,4 @@ public:
 	afx_msg void OnHtml1U();
 	afx_msg void OnHtml2D();
 	afx_msg void OnHtml2U();
-//	afx_msg void OnClickList(NMHDR *pNMHDR, LRESULT *pResult);
 };
