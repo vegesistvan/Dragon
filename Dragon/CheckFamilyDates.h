@@ -65,6 +65,8 @@ protected:
 
 	_int64 oneyear;
 
+	int m_type;
+
 	CString m_command;
 	CString str;
 	CString m_filespec;
@@ -89,8 +91,15 @@ protected:
 	CHILDREN c;
 
 
-	int	m_diffMotherChild;		// anya és gyermeke max korkülönbsége
+	
+	int	m_maxLifeSpan;			// maximális életkor
+	int	m_minAgeWedding; 
 
+
+	int	m_maxDiffCM;		// gyerek és anya max korkülönbsége
+	int	m_minDiffCM;		// gyerek és anya min korkülönbsége
+	int m_minDiffCF;		// gyerek és apa mainimális korkülönbsége
+	int	m_maxDiffCF;		// gyerek és apa maximális korkülönbsége
 
 
 	int m_cnt;
@@ -108,6 +117,7 @@ protected:
 	void CCheckFamilyDates::OnHtmlNotepad();
 	void CCheckFamilyDates::OnHtmlFamily();
 	void CCheckFamilyDates::OnDbEdit();
+	void OnHtmlFatherAndSiblings();
 
 public:
 	virtual BOOL OnInitDialog();

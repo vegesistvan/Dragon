@@ -63,12 +63,19 @@ protected:
 	BOOL CcheckSameNameAnd::sameSpouses();
 
 
+	void OnHtmlEditLines();
+	void OnHtmlNotepad();
+	void OnHtmlFamily();
+	void OnDbEdit();
+	void OnHtmlFatherAndSiblings();
+
+/*
 	void CcheckSameNameAnd::OnHtmlPeoplefather();
 	void CcheckSameNameAnd::OnHtmlEditLines();
 	void CcheckSameNameAnd::OnHtmlNotepad();
 	void OnEditNotpadParents();
 	void OnEdit2lines();
-
+*/
 	void CcheckSameNameAnd::init( CString title );
 	void CcheckSameNameAnd::listSameVector();
 	
@@ -92,6 +99,5 @@ public:
 	
 	afx_msg void OnHtml();
 	afx_msg void OnEditNotepadParents();
-	afx_msg void OnMotherandsibling();
 	afx_msg void OnFatherandsiblings();
 };

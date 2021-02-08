@@ -118,6 +118,8 @@ public:
 	afx_msg void OnEditNotpadParents();
 	afx_msg void OnListPeople();
 	afx_msg void OnHtmlFamily();
+	afx_msg void OnFatherAndSiblings();
+	afx_msg void OnHtmlFatherAndSiblings();
 	afx_msg void OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
 

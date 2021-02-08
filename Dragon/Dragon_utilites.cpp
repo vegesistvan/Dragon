@@ -14,6 +14,7 @@
 #include "ProgressWnd.h"
 #include "html_Edit2Lines.h"
 #include "html_EditLines.h"
+#include <math.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -182,7 +183,11 @@ _int64 CDragonApp::dateDiff( CString date1, CString date2 )
 {
 	_int64 d1;
 	_int64 d2;
+	double	diffD;
+	int		diffI;
 	
+	if( date1 == L"1802-07-05" || date2 == L"1802-07-05" )
+		diffI = 0;
 	date1.Replace( '.', '-' );
 	date2.Replace( '.', '-' );
 	m_command.Format( L"SELECT julianday( '%s')", date1 );
@@ -193,7 +198,11 @@ _int64 CDragonApp::dateDiff( CString date1, CString date2 )
 	if( !query4( m_command ) ) return 0;
 	d2 = _wtoi64( m_recordset4->GetFieldString( 0 ) );
 
-	return ( (d1-d2) / 365 );
+	diffD = (double)(d1 - d2)/365 + 0,5;
+
+	diffI = (int)diffD;
+
+	return ( diffI );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 _int64 CDragonApp::getPresentTime()

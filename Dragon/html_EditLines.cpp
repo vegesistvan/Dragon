@@ -18,11 +18,8 @@
 // Public vátozók:
 //
 // CString m_type			implicit megadott sorok listázása
-//							SIBLINGS		- az m_rowid-val megadott emer anyját és testéreit listázza
 //							F_SIBLINGS		- az m_rowid-val megadott ember apját és testvéreit listázza
 //							FATHERMOTHERHE	- az m_rowid-val megadott emeber szüleit és testvéreit listázza
-//
-// CString m_rowid			a megadott ember anyai nagyapját, apját és õ magát listázza, ha nincs m_type megadva
 //
 // vector<int>*vLines		a listázandó sorok sorszámát tartalmazó vektor, ha nincs m_type megadva
 //
@@ -65,7 +62,7 @@ BOOL CHtmlEditLines::OnInitDialog()
 	EASYSIZE_ADD( IDCANCEL,	ES_KEEPSIZE,ES_KEEPSIZE,	ES_BORDER,		ES_BORDER,		0);
 	EASYSIZE_INIT()
 
-	
+/*	
 	int		nItem = 0;
 	CString parentsL;
 	CString line;
@@ -85,45 +82,31 @@ BOOL CHtmlEditLines::OnInitDialog()
 
 	CString linenumber;
 	std::vector<CString> vLinenumbers;
-
+*/
 	m_ListCtrl.KeepSortOrder(TRUE);
 	m_ListCtrl.SetExtendedStyle(m_ListCtrl.GetExtendedStyle()| LVS_EX_GRIDLINES );
 	
 
 	GetDlgItem( IDC_MODIFY )->EnableWindow( FALSE );
 
-
-	if( m_type == L"SIBLINGS" )
-	{
-		motherAndSiblings();
-		return true;
-	}
 	if( m_type == L"F_SIBLINGS" )
 	{
 		fatherAndSiblings();
 		return true;
 	}
-
-	if( m_type == L"FATHERMOTHERHE" )
-	{
-		fatherMotherHe();
-		return true;
-	}
-
-	if( m_type == L"PARENTS" )
-	{
-		parents();
-		return true;
-	}
-
-
 	if( m_linenumber )
 	{
 		displayLine();
 		return true;
 	}
 
+	if( vLines->size() )
+	{
+		displayLines();
+		return true;
+	}
 
+/*
 	if( !m_rowid.IsEmpty() )
 	{
 		m_ListCtrl.InsertColumn( 0,	L"",		LVCFMT_RIGHT,	 120,-1,COL_TEXT );
@@ -165,22 +148,7 @@ BOOL CHtmlEditLines::OnInitDialog()
 
 		m_title = L"Egy ember, annak apja és anyai nagyapja";
 	}
-	else if( !m_linenumber )
-	{
-		m_ListCtrl.InsertColumn( 0,	L"",		LVCFMT_RIGHT,	 120,-1,COL_HIDDEN );
-		m_ListCtrl.InsertColumn( 1,	L"line#",	LVCFMT_RIGHT,	  80,-1,COL_NUM);
-		m_ListCtrl.InsertColumn( 2,	L"ga.line",	LVCFMT_LEFT,    1500,-1,COL_EDIT);
-	
-		for( UINT i = 0; i < vLines->size(); ++ i )
-		{
-			nItem = m_ListCtrl.InsertItem( i, L"" );
-			m_ListCtrl.SetItemText( nItem, 1, vLines->at(i) );
-			line = getHtmlLine( vLines->at(i) );
-			m_ListCtrl.SetItemText( nItem, 2, line );
-		}
-	}
-
-	SetWindowTextW( m_title );
+*/
 	return TRUE;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -278,6 +246,7 @@ void CHtmlEditLines::OnChangeEdit()
 	GetDlgItem( IDC_MODIFY )->EnableWindow( TRUE );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 void CHtmlEditLines::motherAndSiblings()
 {
 	if( m_rowid.IsEmpty() ) return;
@@ -317,46 +286,8 @@ void CHtmlEditLines::motherAndSiblings()
 		m_ListCtrl.SetItemText( nItem, 2, line );
 	}
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CHtmlEditLines::fatherAndSiblings()
-{
-	if( m_rowid.IsEmpty() ) return;
-
-	SetWindowTextW( m_title );
-
-	int nItem;
-	CString line;
-	CString linenumber;
-	CString father_id;
-
-	m_ListCtrl.InsertColumn( 0,	L"",		LVCFMT_RIGHT,	 120,-1,COL_TEXT );
-	m_ListCtrl.InsertColumn( 1,	L"line#",	LVCFMT_RIGHT,	  80,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( 2,	L"ga.line",	LVCFMT_LEFT,    1500,-1,COL_EDIT);
-
-	m_command.Format( L"SELECT father_id FROM people WHERE rowid ='%s'", m_rowid );
-	if( !theApp.query( m_command ) ) return;
-	father_id	= theApp.m_recordset->GetFieldString( 0 );
-
-	m_command.Format( L"SELECT linenumber FROM people WHERE rowid ='%s'", father_id );
-	if( !theApp.query( m_command ) ) return;
-	linenumber	= theApp.m_recordset->GetFieldString( 0 );
-	line		= getHtmlLine( linenumber );
-	nItem = m_ListCtrl.InsertItem( 0, L"apa" );
-	m_ListCtrl.SetItemText( nItem, 1, linenumber );
-	m_ListCtrl.SetItemText( nItem, 2, line );
-
-
-	m_command.Format( L"SELECT linenumber FROM people WHERE father_id ='%s' ORDER BY linenumber", father_id );
-	if( !theApp.query( m_command ) ) return;
-	for( INT i = 0; i < theApp.m_recordset->RecordsCount(); ++i, theApp.m_recordset->MoveNext() )
-	{
-		linenumber	= theApp.m_recordset->GetFieldString( 0 );
-		line		= getHtmlLine( linenumber );
-		nItem = m_ListCtrl.InsertItem( i+1, L"gyerek" );
-		m_ListCtrl.SetItemText( nItem, 1, linenumber );
-		m_ListCtrl.SetItemText( nItem, 2, line );
-	}
-}
+*/
+/*
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CHtmlEditLines::fatherMotherHe()
 {
@@ -414,7 +345,67 @@ void CHtmlEditLines::fatherMotherHe()
 		if (wndP.Cancelled()) break;
 	}
 }
+*/
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CHtmlEditLines::fatherAndSiblings()
+{
+	if( m_rowid.IsEmpty() ) return;
+
+	SetWindowTextW( m_title );
+
+	int nItem;
+	CString line;
+	CString linenumber;
+	CString father_id;
+	CString mother_id;
+	CString linenumberC;
+
+	CProgressWnd wndP(NULL, L"Keresem a szülõket és testvéreket..." ); 
+	wndP.GoModal();
+
+
+	m_ListCtrl.InsertColumn( 0,	L"",		LVCFMT_RIGHT,	 120,-1,COL_TEXT );
+	m_ListCtrl.InsertColumn( 1,	L"line#",	LVCFMT_RIGHT,	  80,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( 2,	L"ga.line",	LVCFMT_LEFT,    1500,-1,COL_EDIT);
+
+	m_command.Format( L"SELECT father_id, mother_id, linenumber FROM people WHERE rowid ='%s'", m_rowid );
+	if( !theApp.query( m_command ) ) return;
+	father_id	= theApp.m_recordset->GetFieldString( 0 );
+	mother_id	= theApp.m_recordset->GetFieldString( 1 );
+	linenumberC	= theApp.m_recordset->GetFieldString( 2 );
+
+	m_command.Format( L"SELECT linenumber FROM people WHERE rowid ='%s'", father_id );
+	if( !theApp.query( m_command ) ) return;
+	linenumber	= theApp.m_recordset->GetFieldString( 0 );
+	line		= getHtmlLine( linenumber );
+	nItem = m_ListCtrl.InsertItem( 0, L"szülõk" );
+	m_ListCtrl.SetItemText( nItem, 1, linenumber );
+	m_ListCtrl.SetItemText( nItem, 2, line );
+
+	m_command.Format( L"SELECT linenumber FROM people WHERE father_id ='%s' AND mother_id ='%s' ORDER BY linenumber", father_id, mother_id );
+	m_command.Format( L"SELECT linenumber FROM people WHERE father_id ='%s' ORDER BY linenumber", father_id );
+	if( !theApp.query( m_command ) ) return;
+
+	wndP.SetRange( 0, theApp.m_recordset->RecordsCount() );
+	wndP.SetPos(0 );
+	wndP.SetStep(1 );
+
+
+	for( INT i = 0; i < theApp.m_recordset->RecordsCount(); ++i, theApp.m_recordset->MoveNext() )
+	{
+		linenumber	= theApp.m_recordset->GetFieldString( 0 );
+		line		= getHtmlLine( linenumber );
+		nItem = m_ListCtrl.InsertItem( 2+i, L"gyerek" );
+		m_ListCtrl.SetItemText( nItem, 1, linenumber );
+		m_ListCtrl.SetItemText( nItem, 2, line );
+
+		wndP.StepIt();
+		wndP.PeekAndPump();
+		if (wndP.Cancelled()) break;
+	}
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 void CHtmlEditLines::parents()
 {
 	if( m_rowid.IsEmpty() ) return;
@@ -452,12 +443,13 @@ void CHtmlEditLines::parents()
 	m_ListCtrl.SetItemText( nItem, 2, line );
 
 	line		= getHtmlLine( linenumberC );
-	nItem = m_ListCtrl.InsertItem( 0, L"gyerek" );
+	nItem = m_ListCtrl.InsertItem( 1, L"gyerek" );
 	m_ListCtrl.SetItemText( nItem, 1, linenumberC );
 	m_ListCtrl.SetItemText( nItem, 2, line );
 
 	wndP.DestroyWindow();
 }
+*/
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CHtmlEditLines::displayLine( )
 {
@@ -474,4 +466,34 @@ void CHtmlEditLines::displayLine( )
 	m_ListCtrl.InsertItem( 0, L"" );
 	m_ListCtrl.SetItemText( 0, 1, linenumber );
 	m_ListCtrl.SetItemText( 0, 2, line );
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CHtmlEditLines::displayLines( )
+{
+	int nItem;
+	CString line;
+
+	CProgressWnd wndP(NULL, L"Keresem a kijelölt sorokat..." ); 
+	wndP.GoModal();
+	wndP.SetRange( 0, vLines->size() );
+	wndP.SetPos(0 );
+	wndP.SetStep(1 );
+
+	m_ListCtrl.InsertColumn( 0,	L"",		LVCFMT_RIGHT,	 120,-1,COL_HIDDEN );
+	m_ListCtrl.InsertColumn( 1,	L"line#",	LVCFMT_RIGHT,	  80,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( 2,	L"ga.line",	LVCFMT_LEFT,    1500,-1,COL_EDIT);
+
+	for( UINT i = 0; i < vLines->size(); ++ i )
+	{
+		nItem = m_ListCtrl.InsertItem( i, L"" );
+		m_ListCtrl.SetItemText( nItem, 1, vLines->at(i) );
+		line = getHtmlLine( vLines->at(i) );
+		m_ListCtrl.SetItemText( nItem, 2, line );
+
+		wndP.StepIt();
+		wndP.PeekAndPump();
+		if (wndP.Cancelled()) break;
+	}
+	wndP.DestroyWindow();
+	SetWindowTextW( m_title );
 }

@@ -91,7 +91,6 @@ BEGIN_MESSAGE_MAP(CCheckParentChild, CDialogEx)
 	ON_COMMAND(ID_GAHTML_LINE, &CCheckParentChild::OnGahtmlLine)
 
 	ON_COMMAND(ID_LIST, &CCheckParentChild::OnList)
-	ON_COMMAND(ID_HTML_FAMILY, &CCheckParentChild::OnHtmlFamily)
 	ON_STN_CLICKED(IDC_KERES, &CCheckParentChild::OnClickedKeres)
 	ON_STN_CLICKED(IDC_NEXT, &CCheckParentChild::OnClickedNext)
 END_MESSAGE_MAP()
@@ -486,7 +485,7 @@ void CCheckParentChild::OnHtmlFamily()
 	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
 	CHtmlEditLines dlg;
 	dlg.m_title.Format( L"%s szülei és testvérei", m_ListCtrl.GetItemText( nItem, L_NAME ) );
-	dlg.m_type	= L"FATHERMOTHERHE";
+	dlg.m_type	= L"F_SIBLINGS";
 	dlg.m_rowid = rowid;
 	dlg.DoModal();
 }

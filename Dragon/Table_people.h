@@ -132,7 +132,7 @@ public:
 	afx_msg void OnFilterSmother();
 
 	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
-	afx_msg void OnHtmlParents();
+	afx_msg void OnHtmlFatherAndSiblings();
 	afx_msg void OnHtmlFamily();
 	afx_msg void OnHtmlEditLines();
 	afx_msg void OnHtmlNotepadParents();

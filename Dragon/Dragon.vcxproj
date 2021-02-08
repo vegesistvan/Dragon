@@ -196,6 +196,7 @@
     <ClInclude Include="EditComment.h" />
     <ClInclude Include="EditMarriage.h" />
     <ClInclude Include="EditPeople.h" />
+    <ClInclude Include="FamilyDatesStart.h" />
     <ClInclude Include="html_Edit2Lines.h" />
     <ClInclude Include="FatherMother.h" />
     <ClInclude Include="GedcomOut.h" />
@@ -316,6 +317,7 @@
     <ClCompile Include="EditComment.cpp" />
     <ClCompile Include="EditMarriage.cpp" />
     <ClCompile Include="EditPeople.cpp" />
+    <ClCompile Include="FamilyDatesStart.cpp" />
     <ClCompile Include="html_Edit2Lines.cpp" />
     <ClCompile Include="FatherMother.cpp" />
     <ClCompile Include="GA_input_processDescendantSubstr.cpp" />

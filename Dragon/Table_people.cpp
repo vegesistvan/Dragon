@@ -169,9 +169,8 @@ BEGIN_MESSAGE_MAP(CTablePeople, CDialogEx)
 // DROPDOWN menü funkciók
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
 	ON_COMMAND(ID_DB_EDIT, &CTablePeople::OnDbEdit)
-	ON_COMMAND(ID_HTML_FAMILY, &CTablePeople::OnHtmlFamily )
 	ON_COMMAND(ID_HTML_NOTEPAD_PARENTS, &CTablePeople::OnHtmlNotepadParents )
-	ON_COMMAND(ID_HTML_PARENTS, &CTablePeople::OnHtmlParents)
+	ON_COMMAND(ID_HTML_FATHERANDSIBLINGS, &CTablePeople::OnHtmlFatherAndSiblings)
 	ON_COMMAND(ID_HTML_EDIT, &CTablePeople::OnHtmlEditLines)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CTablePeople::OnEditNotepad)	
 	
@@ -1693,60 +1692,17 @@ void CTablePeople::PostNcDestroy()
 	}
 	delete this;
 }
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTablePeople::OnHtmlParents()
+void CTablePeople::OnHtmlFatherAndSiblings()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
 
 	CString rowid = m_ListCtrl.GetItemText( nItem, 	H_ROWID );
 	CHtmlEditLines dlg;
 	dlg.m_title.Format( L"%s %s és szülei", m_ListCtrl.GetItemText( nItem, H_LAST_NAME ), m_ListCtrl.GetItemText( nItem, H_FIRST_NAME ) );
-	dlg.m_type	= L"PARENTS";
+	dlg.m_type	= L"F_SIBLINGS";
 	dlg.m_rowid = rowid;
 	dlg.DoModal();
-
-/*
-//	CProgressWnd wndProgress(NULL, L"Gyerek és szülõk html sorainak keresése..." ); 
-//	wndProgress.GoModal();
-
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	CString lineNumberF;
-	CString lineNumber	= m_ListCtrl.GetItemText( nItem, 	H_LINENUMBER );
-	CString father_id	= m_ListCtrl.GetItemText( nItem, 	H_ROWID_FATHER );
-	CString parents;
-
-
-	parents.Format( L"%s - %s", m_ListCtrl.GetItemText( nItem, 	H_FATHER ), m_ListCtrl.GetItemText( nItem, 	H_MOTHER ) );
-
-	m_command.Format( L"SELECT lineNumber FROM people WHERE rowid = '%s'", father_id );
-	if( !query( m_command ) ) return;
-	lineNumberF = m_recordset->GetFieldString( 0 );
-	if( lineNumberF.IsEmpty() )
-	{
-		AfxMessageBox( L"A kijelölt embernek nem ismerjük az apját!" );
-		return;
-	}
-
-	std::vector<CString> vLines;
-
-	vLines.push_back( lineNumberF );
-	vLines.push_back( lineNumber );
-
-	ShowWindow( SW_HIDE );
-	CHtmlEditLines dlg;
-
-	str.Format( L"%s %s", m_ListCtrl.GetItemText( nItem,H_LAST_NAME ), m_ListCtrl.GetItemText( nItem,H_FIRST_NAME ) ); 
-	dlg.m_title = str;
-	dlg.vLines	= &vLines;
-
-//	wndProgress.DestroyWindow();
-
-	dlg.DoModal();
-
-
-	ShowWindow( SW_RESTORE );
-*/
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTablePeople::OnHtmlEditLines()
@@ -1778,7 +1734,7 @@ void CTablePeople::OnHtmlFamily()
 	CString rowid = m_ListCtrl.GetItemText( nItem, 	H_ROWID );
 	CHtmlEditLines dlg;
 	dlg.m_title.Format( L"%s szülei és testvérei", m_ListCtrl.GetItemText( nItem, H_LAST_NAME ) );
-	dlg.m_type	= L"FATHERMOTHERHE";
+	dlg.m_type	= L"F_SIBLINGS";
 	dlg.m_rowid = rowid;
 	dlg.DoModal();
 }

@@ -170,8 +170,8 @@ END_MESSAGE_MAP()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CContractPeople::contractPeople()
 {
-	CContractPeopleDlg dlg;
-	if( dlg.DoModal() == IDCANCEL ) return false;
+//	CContractPeopleDlg dlg;
+//	if( dlg.DoModal() == IDCANCEL ) return false;
 
 
 

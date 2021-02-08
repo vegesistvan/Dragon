@@ -102,19 +102,17 @@ void CcheckSameNameAnd::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CcheckSameNameAnd, CDialogEx)
 	ON_WM_SIZE()
 	ON_WM_SIZING()
+	ON_WM_CLOSE()
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST, &CcheckSameNameAnd::OnCustomdrawList)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CcheckSameNameAnd::OnDblclkList)
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_EDIT2LINES, &CcheckSameNameAnd::OnEdit2lines)
-	ON_COMMAND(ID_HTML_EDIT, &CcheckSameNameAnd::OnHtmlEditLines)
-	ON_COMMAND(ID_HTML_PEOPLEFATHER, &CcheckSameNameAnd::OnHtmlPeoplefather)
-	ON_COMMAND(ID_HTML_NOTEPAD, &CcheckSameNameAnd::OnHtmlNotepad)
+	
 
-	ON_COMMAND(ID_HTML, &CcheckSameNameAnd::OnHtml)
-	ON_COMMAND(ID_EDIT_NOTEPAD_PARENTS, &CcheckSameNameAnd::OnEditNotepadParents)
-	ON_WM_CLOSE()
-	ON_COMMAND(ID_MOTHERANDSIBLING, &CcheckSameNameAnd::OnMotherandsibling)
-	ON_COMMAND(ID_FATHERANDSIBLINGS, &CcheckSameNameAnd::OnFatherandsiblings)
+	ON_COMMAND(ID_HTML_EDIT, &CcheckSameNameAnd::OnHtmlEditLines)
+	ON_COMMAND(ID_HTML_NOTEPAD, &CcheckSameNameAnd::OnHtmlNotepad)
+	ON_COMMAND(ID_HTML_FATHERANDSIBLINGS, &CcheckSameNameAnd::OnHtmlFatherAndSiblings)
+	ON_COMMAND(ID_DB_EDIT, &CcheckSameNameAnd::OnDbEdit)
+
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CcheckSameNameAnd::OnInitDialog()
@@ -699,7 +697,7 @@ LRESULT CcheckSameNameAnd:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 	CMenu*	pPopup;
 
 
-	if(Menu.LoadMenu( IDR_DROPDOWN_HTML_P ))
+	if(Menu.LoadMenu( IDR_DROPDOWN_HTML ))
     {
 		pPopup = Menu.GetSubMenu(0);
 		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
@@ -711,6 +709,7 @@ LRESULT CcheckSameNameAnd:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
     }
 	return TRUE;
 }
+/*
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CcheckSameNameAnd::OnEdit2lines()
 {
@@ -775,7 +774,7 @@ void CcheckSameNameAnd::OnHtmlEditLines()
 	dlg.vLines = &vLines;
 
 	dlg.DoModal();
-*/
+
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CcheckSameNameAnd::OnHtmlPeoplefather()
@@ -786,6 +785,7 @@ void CcheckSameNameAnd::OnHtmlPeoplefather()
 	dlg.DoModal();
 
 }
+*/
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1208,16 +1208,7 @@ void CcheckSameNameAnd::OnHtml()
 	theApp.showHtmlFile( fileSpec );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CcheckSameNameAnd::OnMotherandsibling()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	CHtmlEditLines dlg;
-	dlg.m_type = L"SIBLINGS";
-
-	dlg.m_rowid = m_ListCtrl.GetItemText( nItem, L_ROWID );
-	dlg.DoModal();
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 void CcheckSameNameAnd::OnFatherandsiblings()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
@@ -1230,4 +1221,59 @@ void CcheckSameNameAnd::OnFatherandsiblings()
 	dlg.m_rowid = m_ListCtrl.GetItemText( nItem, L_ROWID );
 	dlg.DoModal();
 
+}
+*/
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CcheckSameNameAnd::OnHtmlEditLines()
+{
+	CString title;
+	int selectedCount	= m_ListCtrl.GetSelectedCount();
+	int nItem			= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	if( selectedCount == 1 )
+		title.Format( L"%s a ga.html fájlban (%s. sor)", m_ListCtrl.GetItemText( nItem, L_NAME ), m_ListCtrl.GetItemText( nItem, L_LINENUMBER )  );
+	else
+		title.Format( L"%d kijelölt ember a ga.html fájlban", selectedCount );
+
+	theApp.htmlEditLines( &m_ListCtrl, L_LINENUMBER, title );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CcheckSameNameAnd::OnHtmlNotepad()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	CString lineNumber = m_ListCtrl.GetItemText( nItem,	L_LINENUMBER );
+	if( !lineNumber.IsEmpty() ) 
+		theApp.editNotepad( lineNumber );
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CcheckSameNameAnd::OnHtmlFamily()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
+	CHtmlEditLines dlg;
+	dlg.m_title.Format( L"%s szülei és testvérei", m_ListCtrl.GetItemText( nItem, L_NAME ) );
+	dlg.m_type	= L"F_SIBLINGS";
+	dlg.m_rowid = rowid;
+	dlg.DoModal();
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CcheckSameNameAnd::OnDbEdit()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
+	CRelations dlg;
+	dlg.m_rowid = rowid;
+	dlg.DoModal();
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CcheckSameNameAnd::OnHtmlFatherAndSiblings()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
+	CHtmlEditLines dlg;
+	dlg.m_title.Format( L"%s szülei és testvérei", m_ListCtrl.GetItemText( nItem, L_NAME ) );
+	dlg.m_type	= L"F_SIBLINGS";
+	dlg.m_rowid = rowid;
+	dlg.DoModal();
 }
