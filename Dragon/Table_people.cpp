@@ -63,44 +63,44 @@ enum
 // GAHTML
 enum
 {
-	H_ROWID = 0,
-	H_ROWID_FILE,
-	H_FAMILYNUMBER,
-	H_TABLENUMBER,
-	H_LINENUMBER,
-	H_SOURCE,
-	H_SPOUSE,
-	H_SPOUSEPARENT,
-	H_SPOUSESPOUSE,
-	H_UNITED,
-	H_TABLENUMBERROMAN,
-	H_GENERATION,
-	H_SEX,
-	H_TITLE,
-	H_TITOLO,
-	H_LAST_NAME,
-	H_KNOWN_AS,
-	H_FIRST_NAME,
-	H_POSTERIOR,
-	H_BIRTH_PLACE,
-	H_BIRTH_DATE,
-	H_DEATH_PLACE,
-	H_DEATH_DATE,
-	H_AGE,
-	H_ORDERFATHER,
-	H_ORDERMOTHER,
-	H_COMMENT,
-	H_OCCUPATION,
-	H_ROWID_FATHER,
-//	H_TABLE_ID_FATHER,
-	H_FATHER,
-	H_BIRTH_DATE_FATHER,
-	H_ROWID_MOTHER,
-//	H_TABLE_ID_MOTHER,
-	H_MOTHER,
-	H_BIRTH_DATE_MOTHER,
-	H_FOLYT,
-	H_ROW,
+	L_ROWID = 0,
+	L_ROWID_FILE,
+	L_FAMILYNUMBER,
+	L_TABLENUMBER,
+	L_LINENUMBER,
+	L_SOURCE,
+
+	L_SPOUSE,
+	L_SPOUSEPARENT,
+	L_SPOUSESPOUSE,
+	L_UNITED,
+	L_TABLENUMBERROMAN,
+	L_GENERATION,
+
+	L_SEX,
+	L_TITLE,
+	L_TITOLO,
+	L_LAST_NAME,
+	L_KNOWN_AS,
+	L_FIRST_NAME,
+	L_POSTERIOR,
+	L_BIRTH_PLACE,
+	L_BIRTH_DATE,
+	L_DEATH_PLACE,
+	L_DEATH_DATE,
+	L_AGE,
+	L_ORDERFATHER,
+	L_ORDERMOTHER,
+	L_COMMENT,
+	L_OCCUPATION,
+	L_ROWID_FATHER,
+	L_FATHER,
+	L_BIRTH_DATE_FATHER,
+	L_ROWID_MOTHER,
+	L_MOTHER,
+	L_BIRTH_DATE_MOTHER,
+	L_FOLYT,
+	L_ROW,
 };
 // MANUAL
 
@@ -172,7 +172,7 @@ BEGIN_MESSAGE_MAP(CTablePeople, CDialogEx)
 	ON_COMMAND(ID_HTML_NOTEPAD_PARENTS, &CTablePeople::OnHtmlNotepadParents )
 	ON_COMMAND(ID_HTML_FATHERANDSIBLINGS, &CTablePeople::OnHtmlFatherAndSiblings)
 	ON_COMMAND(ID_HTML_EDIT, &CTablePeople::OnHtmlEditLines)
-	ON_COMMAND(ID_HTML_NOTEPAD, &CTablePeople::OnEditNotepad)	
+	ON_COMMAND(ID_HTML_NOTEPAD, &CTablePeople::OnHtmlNotepad)	
 	
 	ON_COMMAND(ID_FILTER_FILE, &CTablePeople::OnFilterFile)
 	ON_COMMAND(ID_FILTER_MEN, &CTablePeople::OnFilterMen)
@@ -538,14 +538,14 @@ void CTablePeople::OnGroupbyTitolo()
 {
 	m_filterNew.Format(L"GROUP BY titolo");
 	m_filterTextNew.Format(L"Különbözõ elõnevek" );
-	m_orderix = H_TITOLO;
+	m_orderix = L_TITOLO;
 	fillTable(0);
 }
 void CTablePeople::OnGroupbyBirthplace()
 {
 	m_filterNew.Format(L"GROUP BY birth_place");
 	m_filterTextNew.Format(L"Különbözõ születési helyek" );
-	m_orderix = H_BIRTH_PLACE;
+	m_orderix = L_BIRTH_PLACE;
 	fillTable(0);
 
 }
@@ -553,21 +553,21 @@ void CTablePeople::OnGroupbyDeathplace()
 {
 	m_filterNew.Format(L"GROUP BY death_place");
 	m_filterTextNew.Format(L"Különbözõ halálozási helyek" );
-	m_orderix = H_DEATH_PLACE;
+	m_orderix = L_DEATH_PLACE;
 	fillTable(0);
 }
 void CTablePeople::OnGroupbyFirstname()
 {
 	m_filterNew.Format(L"GROUP BY first_name");
 	m_filterTextNew.Format(L"Különbözõ keresztnevek" );
-	m_orderix = H_FIRST_NAME;
+	m_orderix = L_FIRST_NAME;
 	fillTable(0);
 }
 void CTablePeople::OnGroupbyLastname()
 {
 	m_filterNew.Format(L"GROUP BY last_name");
 	m_filterTextNew.Format(L"Különbözõ családnevek" );
-	m_orderix = H_LAST_NAME;
+	m_orderix = L_LAST_NAME;
 	fillTable(0);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -575,7 +575,7 @@ void CTablePeople::OnGroupbyBirthDate()
 {
 	m_filterNew.Format(L"GROUP BY birth_date");
 	m_filterTextNew.Format(L"Különbözõ születési idõk" );
-	m_orderix = H_BIRTH_DATE;
+	m_orderix = L_BIRTH_DATE;
 	fillTable(0);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -583,7 +583,7 @@ void CTablePeople::OnGroupbyDeathdate()
 {
 	m_filterNew.Format(L"GROUP BY death_date");
 	m_filterTextNew.Format(L"Különbözõ halálozási idõk" );
-	m_orderix = H_DEATH_DATE;
+	m_orderix = L_DEATH_DATE;
 	fillTable(0);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -591,7 +591,7 @@ void CTablePeople::OnGroupbyComment()
 {
 	m_filterNew.Format(L"GROUP BY comment");
 	m_filterTextNew.Format(L"Különbözõ megjegyzések" );
-	m_orderix = H_COMMENT;
+	m_orderix = L_COMMENT;
 	fillTable(0);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -643,43 +643,43 @@ void CTablePeople::createListColumns( )
 	else if( theApp.m_inputMode == GAHTML )
 	{
 
-		m_ListCtrl.InsertColumn( H_ROWID,				L"rowid",			LVCFMT_RIGHT,	 40,-1,COL_NUM);
-		m_ListCtrl.InsertColumn( H_ROWID_FILE,			L"fájl#",			LVCFMT_RIGHT,	 40,-1,COL_NUM);
-		m_ListCtrl.InsertColumn( H_FAMILYNUMBER,		L"család#",			LVCFMT_RIGHT,	 40,-1,COL_NUM);
-		m_ListCtrl.InsertColumn( H_TABLENUMBER,			L"tábla#",			LVCFMT_RIGHT,	 40,-1,COL_NUM);
-		m_ListCtrl.InsertColumn( H_LINENUMBER,			L"line#",			LVCFMT_RIGHT,	 40,-1,COL_NUM);
-		m_ListCtrl.InsertColumn( H_SOURCE,				L"src",				LVCFMT_RIGHT,	 40,-1,COL_NUM);
-		m_ListCtrl.InsertColumn( H_SPOUSE,				L"sp",				LVCFMT_RIGHT,	 40,-1,COL_NUM);
-		m_ListCtrl.InsertColumn( H_SPOUSEPARENT,		L"spp",				LVCFMT_RIGHT,	 40,-1,COL_NUM);
-		m_ListCtrl.InsertColumn( H_SPOUSESPOUSE,		L"ssp",				LVCFMT_RIGHT,	 40,-1,COL_NUM);
-		m_ListCtrl.InsertColumn( H_UNITED,				L"egyesített",		LVCFMT_RIGHT,	 40,-1,COL_NUM);
+		m_ListCtrl.InsertColumn( L_ROWID,				L"rowid",			LVCFMT_RIGHT,	 40,-1,COL_NUM);
+		m_ListCtrl.InsertColumn( L_ROWID_FILE,			L"fájl#",			LVCFMT_RIGHT,	 40,-1,COL_NUM);
+		m_ListCtrl.InsertColumn( L_FAMILYNUMBER,		L"család#",			LVCFMT_RIGHT,	 40,-1,COL_NUM);
+		m_ListCtrl.InsertColumn( L_TABLENUMBER,			L"tábla#",			LVCFMT_RIGHT,	 40,-1,COL_NUM);
+		m_ListCtrl.InsertColumn( L_LINENUMBER,			L"line#",			LVCFMT_RIGHT,	 40,-1,COL_NUM);
+		m_ListCtrl.InsertColumn( L_SOURCE,				L"src",				LVCFMT_RIGHT,	 40,-1,COL_NUM);
+		m_ListCtrl.InsertColumn( L_SPOUSE,				L"sp",				LVCFMT_RIGHT,	 40,-1,COL_NUM);
+		m_ListCtrl.InsertColumn( L_SPOUSEPARENT,		L"spp",				LVCFMT_RIGHT,	 40,-1,COL_NUM);
+		m_ListCtrl.InsertColumn( L_SPOUSESPOUSE,		L"ssp",				LVCFMT_RIGHT,	 40,-1,COL_NUM);
+		m_ListCtrl.InsertColumn( L_UNITED,				L"egyesített",		LVCFMT_RIGHT,	 40,-1,COL_NUM);
 
-		m_ListCtrl.InsertColumn( H_TABLENUMBERROMAN,	L"tábla",			LVCFMT_RIGHT,	 40,-1,COL_TEXT);
-		m_ListCtrl.InsertColumn( H_GENERATION,			L"G",				LVCFMT_LEFT,	 25,-1,COL_TEXT);
-		m_ListCtrl.InsertColumn( H_SEX,					L"nem",				LVCFMT_LEFT,	 40,-1,COL_NUM);
-		m_ListCtrl.InsertColumn( H_TITLE,				L"tit",				LVCFMT_LEFT,	 30,-1,COL_TEXT);
-		m_ListCtrl.InsertColumn( H_TITOLO,				L"elõnév",			LVCFMT_LEFT,	100,-1,COL_TEXT);
-		m_ListCtrl.InsertColumn( H_LAST_NAME,			L"családnév",		LVCFMT_LEFT,	110,-1,COL_TEXT);
-		m_ListCtrl.InsertColumn( H_KNOWN_AS,			L"más",				LVCFMT_LEFT,	 30,-1,COL_TEXT);
-		m_ListCtrl.InsertColumn( H_FIRST_NAME,			L"utónév",			LVCFMT_LEFT,	110,-1,COL_TEXT);
-		m_ListCtrl.InsertColumn( H_POSTERIOR,			L"utótag",			LVCFMT_LEFT,	 60,-1,COL_TEXT);
-		m_ListCtrl.InsertColumn( H_BIRTH_PLACE,			L"születés",		LVCFMT_LEFT,	120,-1,COL_TEXT);
-		m_ListCtrl.InsertColumn( H_BIRTH_DATE,			L"ideje",			LVCFMT_LEFT,	 70,-1,COL_TEXT);
-		m_ListCtrl.InsertColumn( H_DEATH_PLACE,			L"elhalálozás",		LVCFMT_LEFT,	120,-1,COL_TEXT);
-		m_ListCtrl.InsertColumn( H_DEATH_DATE,			L"ideje",			LVCFMT_LEFT,	 70,-1,COL_TEXT);
-		m_ListCtrl.InsertColumn( H_AGE,					L"kor",				LVCFMT_LEFT,	 30,-1,COL_NUM);
-		m_ListCtrl.InsertColumn( H_ORDERFATHER,		L"apjacnt",			LVCFMT_LEFT,	30,-1,COL_NUM);
-		m_ListCtrl.InsertColumn( H_ORDERMOTHER,		L"anyjacnt",		LVCFMT_LEFT,	30,-1,COL_NUM);
-		m_ListCtrl.InsertColumn( H_COMMENT,				L"leírás",		LVCFMT_LEFT,	100,-1,COL_TEXT);
-		m_ListCtrl.InsertColumn( H_OCCUPATION,			L"foglalkozás",		LVCFMT_LEFT,	100,-1,COL_TEXT);
-		m_ListCtrl.InsertColumn( H_ROWID_FATHER,		L"apa_rowid",		LVCFMT_RIGHT,	50,-1,COL_NUM);
-		m_ListCtrl.InsertColumn( H_FATHER,				L"apja",			LVCFMT_LEFT,	200,-1,COL_TEXT);
-		m_ListCtrl.InsertColumn( H_BIRTH_DATE_FATHER,	L"birth",			LVCFMT_LEFT,	80,-1,COL_TEXT);
-		m_ListCtrl.InsertColumn( H_ROWID_MOTHER,		L"anya_rowid",		LVCFMT_LEFT,	 50,-1,COL_TEXT);
-		m_ListCtrl.InsertColumn( H_MOTHER,				L"anyja",			LVCFMT_LEFT,	200,-1,COL_TEXT);
-		m_ListCtrl.InsertColumn( H_BIRTH_DATE_MOTHER,	L"birth",			LVCFMT_LEFT,	80,-1,COL_TEXT);
-		m_ListCtrl.InsertColumn( H_FOLYT,				L"elágazás",		LVCFMT_LEFT,	50,-1,COL_TEXT);
-		m_ListCtrl.InsertColumn( H_ROW,					L"record",			LVCFMT_RIGHT,	50,-1,COL_NUM);
+		m_ListCtrl.InsertColumn( L_TABLENUMBERROMAN,	L"tábla",			LVCFMT_RIGHT,	 40,-1,COL_TEXT);
+		m_ListCtrl.InsertColumn( L_GENERATION,			L"G",				LVCFMT_LEFT,	 25,-1,COL_TEXT);
+		m_ListCtrl.InsertColumn( L_SEX,					L"nem",				LVCFMT_LEFT,	 40,-1,COL_NUM);
+		m_ListCtrl.InsertColumn( L_TITLE,				L"tit",				LVCFMT_LEFT,	 30,-1,COL_TEXT);
+		m_ListCtrl.InsertColumn( L_TITOLO,				L"elõnév",			LVCFMT_LEFT,	100,-1,COL_TEXT);
+		m_ListCtrl.InsertColumn( L_LAST_NAME,			L"családnév",		LVCFMT_LEFT,	110,-1,COL_TEXT);
+		m_ListCtrl.InsertColumn( L_KNOWN_AS,			L"más",				LVCFMT_LEFT,	 30,-1,COL_TEXT);
+		m_ListCtrl.InsertColumn( L_FIRST_NAME,			L"utónév",			LVCFMT_LEFT,	110,-1,COL_TEXT);
+		m_ListCtrl.InsertColumn( L_POSTERIOR,			L"utótag",			LVCFMT_LEFT,	 60,-1,COL_TEXT);
+		m_ListCtrl.InsertColumn( L_BIRTH_PLACE,			L"születés",		LVCFMT_LEFT,	120,-1,COL_TEXT);
+		m_ListCtrl.InsertColumn( L_BIRTH_DATE,			L"ideje",			LVCFMT_LEFT,	 70,-1,COL_TEXT);
+		m_ListCtrl.InsertColumn( L_DEATH_PLACE,			L"elhalálozás",		LVCFMT_LEFT,	120,-1,COL_TEXT);
+		m_ListCtrl.InsertColumn( L_DEATH_DATE,			L"ideje",			LVCFMT_LEFT,	 70,-1,COL_TEXT);
+		m_ListCtrl.InsertColumn( L_AGE,					L"kor",				LVCFMT_LEFT,	 30,-1,COL_NUM);
+		m_ListCtrl.InsertColumn( L_ORDERFATHER,		L"apjacnt",			LVCFMT_LEFT,	30,-1,COL_NUM);
+		m_ListCtrl.InsertColumn( L_ORDERMOTHER,		L"anyjacnt",		LVCFMT_LEFT,	30,-1,COL_NUM);
+		m_ListCtrl.InsertColumn( L_COMMENT,				L"leírás",		LVCFMT_LEFT,	100,-1,COL_TEXT);
+		m_ListCtrl.InsertColumn( L_OCCUPATION,			L"foglalkozás",		LVCFMT_LEFT,	100,-1,COL_TEXT);
+		m_ListCtrl.InsertColumn( L_ROWID_FATHER,		L"apa_rowid",		LVCFMT_RIGHT,	50,-1,COL_NUM);
+		m_ListCtrl.InsertColumn( L_FATHER,				L"apja",			LVCFMT_LEFT,	200,-1,COL_TEXT);
+		m_ListCtrl.InsertColumn( L_BIRTH_DATE_FATHER,	L"birth",			LVCFMT_LEFT,	80,-1,COL_TEXT);
+		m_ListCtrl.InsertColumn( L_ROWID_MOTHER,		L"anya_rowid",		LVCFMT_LEFT,	 50,-1,COL_TEXT);
+		m_ListCtrl.InsertColumn( L_MOTHER,				L"anyja",			LVCFMT_LEFT,	200,-1,COL_TEXT);
+		m_ListCtrl.InsertColumn( L_BIRTH_DATE_MOTHER,	L"birth",			LVCFMT_LEFT,	80,-1,COL_TEXT);
+		m_ListCtrl.InsertColumn( L_FOLYT,				L"elágazás",		LVCFMT_LEFT,	50,-1,COL_TEXT);
+		m_ListCtrl.InsertColumn( L_ROW,					L"record",			LVCFMT_RIGHT,	50,-1,COL_NUM);
 	}
 	else if( theApp.m_inputMode == MANUAL )
 	{
@@ -1070,33 +1070,6 @@ BOOL CTablePeople::query4( CString command )
 	}
 	return TRUE;
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-LRESULT CTablePeople::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
-{
-	CPoint* point=(CPoint*) lParam;
-    CMenu	Menu;
-	CMenu*	pPopup;
-	int		MENU_IDR;
-
-	if( theApp.m_inputMode == GEDCOM )
-		MENU_IDR = IDR_DROPDOWN_DELETE;
-	else if( theApp.m_inputMode == GAHTML )
-		MENU_IDR = IDR_DROPDOWN_HTML;
-	else if( theApp.m_inputMode == MANUAL )
-		MENU_IDR = IDR_DROPDOWN_DELETE;
-
-	if(Menu.LoadMenu( MENU_IDR ))
-    {
-		pPopup = Menu.GetSubMenu(0);
-		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
-		{
-//			pPopup->EnableMenuItem(ID_DB_EDIT,MF_BYCOMMAND | MF_GRAYED);
-//			pPopup->EnableMenuItem(ID_EDIT_DELETE,MF_BYCOMMAND | MF_GRAYED);
-		}
-		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
-    }
-	return TRUE;
-}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTablePeople::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
@@ -1224,8 +1197,8 @@ void CTablePeople::OnEditDelete()
 	}
 	else if( theApp.m_inputMode == GAHTML )
 	{
-		name.Format( L"%s %s", m_ListCtrl.GetItemText( nItem, H_LAST_NAME ), m_ListCtrl.GetItemText( nItem, H_FIRST_NAME ) ); 
-		sex_id = _wtoi( m_ListCtrl.GetItemText( nItem, H_SEX ) );
+		name.Format( L"%s %s", m_ListCtrl.GetItemText( nItem, L_LAST_NAME ), m_ListCtrl.GetItemText( nItem, L_FIRST_NAME ) ); 
+		sex_id = _wtoi( m_ListCtrl.GetItemText( nItem, L_SEX ) );
 	}
 	else
 	{
@@ -1257,25 +1230,7 @@ void CTablePeople::OnEditDelete()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTablePeople::OnDbEdit()
-{
 
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-
-	m_rowid = m_ListCtrl.GetItemText( nItem, G_ROWID );
-	m_insert = 0;
-	ShowWindow( SW_HIDE );
-	CRelations dlg;
-	dlg.nItem = nItem;
-	dlg.m_rowid = m_rowid;
-	if( dlg.DoModal() != IDCANCEL )
-	{
-		fillTable( nItem );
-		updateRow( nItem );
-	}
-	ShowWindow( SW_RESTORE );
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int CTablePeople::find_nItem( int rowid )
 {
 	for( int i = 0; i < m_ListCtrl.GetItemCount(); ++i )
@@ -1378,26 +1333,26 @@ void CTablePeople::updateRow( int nItem )
 	}
 	else if( theApp.m_inputMode == GAHTML )
 	{
-		updateField( nItem, H_SEX, m_recordset->GetFieldString( PEOPLE_SEX_ID ) );
-		updateField( nItem, H_TITLE, m_recordset->GetFieldString( PEOPLE_TITLE ) );
-		updateField( nItem, H_TITOLO, m_recordset->GetFieldString( PEOPLE_TITOLO ) );
-		updateField( nItem, H_LAST_NAME, m_recordset->GetFieldString( PEOPLE_LAST_NAME ) );
-		updateField( nItem, H_FIRST_NAME, m_recordset->GetFieldString( PEOPLE_FIRST_NAME ) );
-		updateField( nItem, H_BIRTH_PLACE, m_recordset->GetFieldString( PEOPLE_BIRTH_PLACE ) );
-		updateField( nItem, H_BIRTH_DATE, m_recordset->GetFieldString( PEOPLE_BIRTH_DATE ) );
-		updateField( nItem, H_DEATH_PLACE, m_recordset->GetFieldString( PEOPLE_DEATH_PLACE ) );
-		updateField( nItem, H_DEATH_DATE, m_recordset->GetFieldString( PEOPLE_DEATH_DATE ) );
-		updateField( nItem, H_AGE, kor );
-		updateField( nItem, H_ORDERFATHER, m_recordset->GetFieldString( PEOPLE_ORDERFATHER ) );
-		updateField( nItem, H_ORDERMOTHER, m_recordset->GetFieldString( PEOPLE_ORDERMOTHER ) );
-		updateField( nItem, H_COMMENT, m_recordset->GetFieldString( PEOPLE_COMMENT ) );
-		updateField( nItem, H_OCCUPATION, m_recordset->GetFieldString( PEOPLE_OCCUPATION ) );
-		updateField( nItem, H_ROWID_FATHER, rowid_father );
-		updateField( nItem, H_FATHER, father );
-		updateField( nItem, H_BIRTH_DATE_FATHER, m_recordset2->GetFieldString( 3) );
-		updateField( nItem, H_ROWID_MOTHER, rowid_mother );
-		updateField( nItem, H_MOTHER, mother );
-		updateField( nItem, H_BIRTH_DATE_MOTHER, m_recordset2->GetFieldString( 3) );
+		updateField( nItem, L_SEX, m_recordset->GetFieldString( PEOPLE_SEX_ID ) );
+		updateField( nItem, L_TITLE, m_recordset->GetFieldString( PEOPLE_TITLE ) );
+		updateField( nItem, L_TITOLO, m_recordset->GetFieldString( PEOPLE_TITOLO ) );
+		updateField( nItem, L_LAST_NAME, m_recordset->GetFieldString( PEOPLE_LAST_NAME ) );
+		updateField( nItem, L_FIRST_NAME, m_recordset->GetFieldString( PEOPLE_FIRST_NAME ) );
+		updateField( nItem, L_BIRTH_PLACE, m_recordset->GetFieldString( PEOPLE_BIRTH_PLACE ) );
+		updateField( nItem, L_BIRTH_DATE, m_recordset->GetFieldString( PEOPLE_BIRTH_DATE ) );
+		updateField( nItem, L_DEATH_PLACE, m_recordset->GetFieldString( PEOPLE_DEATH_PLACE ) );
+		updateField( nItem, L_DEATH_DATE, m_recordset->GetFieldString( PEOPLE_DEATH_DATE ) );
+		updateField( nItem, L_AGE, kor );
+		updateField( nItem, L_ORDERFATHER, m_recordset->GetFieldString( PEOPLE_ORDERFATHER ) );
+		updateField( nItem, L_ORDERMOTHER, m_recordset->GetFieldString( PEOPLE_ORDERMOTHER ) );
+		updateField( nItem, L_COMMENT, m_recordset->GetFieldString( PEOPLE_COMMENT ) );
+		updateField( nItem, L_OCCUPATION, m_recordset->GetFieldString( PEOPLE_OCCUPATION ) );
+		updateField( nItem, L_ROWID_FATHER, rowid_father );
+		updateField( nItem, L_FATHER, father );
+		updateField( nItem, L_BIRTH_DATE_FATHER, m_recordset2->GetFieldString( 3) );
+		updateField( nItem, L_ROWID_MOTHER, rowid_mother );
+		updateField( nItem, L_MOTHER, mother );
+		updateField( nItem, L_BIRTH_DATE_MOTHER, m_recordset2->GetFieldString( 3) );
 	}
 	else if( theApp.m_inputMode == MANUAL )
 	{
@@ -1508,9 +1463,9 @@ void CTablePeople::OnIndividualDescendants()
 	}
 	else if( theApp.m_inputMode == GAHTML )
 	{
-		dlg.m_name.Format( L"%s %s", m_ListCtrl.GetItemText( nItem, H_LAST_NAME ), m_ListCtrl.GetItemText( nItem, H_FIRST_NAME ) );
-		dlg.m_tableNumber = m_ListCtrl.GetItemText( nItem, H_TABLENUMBER );
-		dlg.m_source	= _wtoi( m_ListCtrl.GetItemText( nItem, H_SOURCE ) );
+		dlg.m_name.Format( L"%s %s", m_ListCtrl.GetItemText( nItem, L_LAST_NAME ), m_ListCtrl.GetItemText( nItem, L_FIRST_NAME ) );
+		dlg.m_tableNumber = m_ListCtrl.GetItemText( nItem, L_TABLENUMBER );
+		dlg.m_source	= _wtoi( m_ListCtrl.GetItemText( nItem, L_SOURCE ) );
 	}
 	else
 	{
@@ -1544,9 +1499,9 @@ void CTablePeople::OnPrivateDescendants()
 	}
 	else if( theApp.m_inputMode == GAHTML )
 	{
-		dlg.m_name.Format( L"%s %s", m_ListCtrl.GetItemText( nItem, H_LAST_NAME ), m_ListCtrl.GetItemText( nItem, H_FIRST_NAME ) );
-		dlg.m_tableNumber = m_ListCtrl.GetItemText( nItem, H_TABLENUMBER );
-		dlg.m_source	= _wtoi( m_ListCtrl.GetItemText( nItem, H_SOURCE ) );
+		dlg.m_name.Format( L"%s %s", m_ListCtrl.GetItemText( nItem, L_LAST_NAME ), m_ListCtrl.GetItemText( nItem, L_FIRST_NAME ) );
+		dlg.m_tableNumber = m_ListCtrl.GetItemText( nItem, L_TABLENUMBER );
+		dlg.m_source	= _wtoi( m_ListCtrl.GetItemText( nItem, L_SOURCE ) );
 	}
 	else
 	{
@@ -1561,7 +1516,7 @@ void CTablePeople::OnPrivateDescendants()
 void CTablePeople::OnGaLine()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	H_LINENUMBER ) );
+	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	L_LINENUMBER ) );
 
 	ShowWindow( SW_HIDE );
 	theApp.listHtmlLine( lineNumber );
@@ -1617,8 +1572,8 @@ void CTablePeople::OnAzonosember()
 	CString firstName;
 	CString lastName;
 
-	firstName	= m_ListCtrl.GetItemText( nItem, H_FIRST_NAME );
-	lastName	= m_ListCtrl.GetItemText( nItem, H_LAST_NAME );
+	firstName	= m_ListCtrl.GetItemText( nItem, L_FIRST_NAME );
+	lastName	= m_ListCtrl.GetItemText( nItem, L_LAST_NAME );
 	CSameP same;
 //	CIdenticalPeople identical;
 	same.findSamePeople( firstName, lastName, FALSE );
@@ -1642,8 +1597,8 @@ void CTablePeople::OnAzonosemberConc()
 	CString firstName;
 	CString lastName;
 
-	firstName	= m_ListCtrl.GetItemText( nItem, H_FIRST_NAME );
-	lastName	= m_ListCtrl.GetItemText( nItem, H_LAST_NAME );
+	firstName	= m_ListCtrl.GetItemText( nItem, L_FIRST_NAME );
+	lastName	= m_ListCtrl.GetItemText( nItem, L_LAST_NAME );
 
 //	CIdenticalPeople identical;
 	CSameP identical;
@@ -1664,8 +1619,8 @@ void CTablePeople::OnAzonosemberIdent()
 
 	CSameParams dlg;
 	
-	dlg.m_firstName	= m_ListCtrl.GetItemText( nItem, H_FIRST_NAME );
-	dlg.m_lastName	= m_ListCtrl.GetItemText( nItem, H_LAST_NAME );
+	dlg.m_firstName	= m_ListCtrl.GetItemText( nItem, L_FIRST_NAME );
+	dlg.m_lastName	= m_ListCtrl.GetItemText( nItem, L_LAST_NAME );
 
 	dlg.DoModal();
 
@@ -1691,60 +1646,6 @@ void CTablePeople::PostNcDestroy()
 		((CDragonDlg*)m_dlg )->m_pIndividuals = NULL;
 	}
 	delete this;
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTablePeople::OnHtmlFatherAndSiblings()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
-
-	CString rowid = m_ListCtrl.GetItemText( nItem, 	H_ROWID );
-	CHtmlEditLines dlg;
-	dlg.m_title.Format( L"%s %s és szülei", m_ListCtrl.GetItemText( nItem, H_LAST_NAME ), m_ListCtrl.GetItemText( nItem, H_FIRST_NAME ) );
-	dlg.m_type	= L"F_SIBLINGS";
-	dlg.m_rowid = rowid;
-	dlg.DoModal();
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTablePeople::OnHtmlEditLines()
-{
-	CString title;
-	int selectedCount	= m_ListCtrl.GetSelectedCount();
-	int nItem			= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	if( selectedCount == 1 )
-		title.Format( L"%s a ga.html fájlban (%s. sor)", m_ListCtrl.GetItemText( nItem, H_LAST_NAME ), m_ListCtrl.GetItemText( nItem, H_LINENUMBER )  );
-	else
-		title.Format( L"%d kijelölt ember a ga.html fájlban", selectedCount );
-
-	theApp.htmlEditLines( &m_ListCtrl, H_LINENUMBER, title );
-	ShowWindow( SW_RESTORE );
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTablePeople::OnEditNotepad()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	CString lineNumber	= m_ListCtrl.GetItemText( nItem, 	H_LINENUMBER );
-
-	theApp.editNotepad( lineNumber );
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTablePeople::OnHtmlFamily()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
-
-	CString rowid = m_ListCtrl.GetItemText( nItem, 	H_ROWID );
-	CHtmlEditLines dlg;
-	dlg.m_title.Format( L"%s szülei és testvérei", m_ListCtrl.GetItemText( nItem, H_LAST_NAME ) );
-	dlg.m_type	= L"F_SIBLINGS";
-	dlg.m_rowid = rowid;
-	dlg.DoModal();
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTablePeople::OnHtmlNotepadParents()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
-	CString rowid = m_ListCtrl.GetItemText( nItem, H_ROWID );
-
-	theApp.HtmlNotepadParents( rowid );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTablePeople::OnNcDestroy()
@@ -1796,8 +1697,8 @@ void CTablePeople::OnAscendants()
 	int sex_id;
 	if( theApp.m_inputMode == GAHTML )
 	{
-		name.Format( L"%s %s", m_ListCtrl.GetItemText( nItem, H_LAST_NAME ), m_ListCtrl.GetItemText( nItem, H_FIRST_NAME ) );
-		sex_id = _wtoi( m_ListCtrl.GetItemText( nItem, H_SEX ) );
+		name.Format( L"%s %s", m_ListCtrl.GetItemText( nItem, L_LAST_NAME ), m_ListCtrl.GetItemText( nItem, L_FIRST_NAME ) );
+		sex_id = _wtoi( m_ListCtrl.GetItemText( nItem, L_SEX ) );
 	}
 	else if( theApp.m_inputMode == GEDCOM )
 	{
@@ -1837,8 +1738,8 @@ void CTablePeople::OnAscendantsChain()
 	int sex_id;
 	if( theApp.m_inputMode == GAHTML )
 	{
-		name.Format( L"%s %s", m_ListCtrl.GetItemText( nItem, H_LAST_NAME ), m_ListCtrl.GetItemText( nItem, H_FIRST_NAME ) );
-		sex_id = _wtoi( m_ListCtrl.GetItemText( nItem, H_SEX ) );
+		name.Format( L"%s %s", m_ListCtrl.GetItemText( nItem, L_LAST_NAME ), m_ListCtrl.GetItemText( nItem, L_FIRST_NAME ) );
+		sex_id = _wtoi( m_ListCtrl.GetItemText( nItem, L_SEX ) );
 	}
 	else if( theApp.m_inputMode == GEDCOM )
 	{
@@ -1866,7 +1767,7 @@ void CTablePeople::OnGedcomOutput()
 	if( theApp.m_inputMode == GEDCOM )
 		m_ListCtrl.SetSortOrder( 2, G_LAST_NAME+1, G_FIRST_NAME+1 );
 	if( theApp.m_inputMode == GAHTML )
-		m_ListCtrl.SetSortOrder( 2, H_LAST_NAME+1, H_FIRST_NAME+1 );
+		m_ListCtrl.SetSortOrder( 2, L_LAST_NAME+1, L_FIRST_NAME+1 );
 
 	CGedcomOut dlg;
 	dlg.m_filter = m_filterText;
@@ -1933,4 +1834,83 @@ BOOL CTablePeople::PreTranslateMessage(MSG* pMsg)
 		}
 	}
     return CWnd::PreTranslateMessage(pMsg);
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+LRESULT CTablePeople::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
+{
+	CPoint* point=(CPoint*) lParam;
+    CMenu	Menu;
+	CMenu*	pPopup;
+	int		MENU_IDR;
+
+	if( theApp.m_inputMode == GEDCOM )
+		MENU_IDR = IDR_DROPDOWN_EDIT;
+	else if( theApp.m_inputMode == GAHTML )
+		MENU_IDR = IDR_DROPDOWN_HTML;
+	else if( theApp.m_inputMode == MANUAL )
+		MENU_IDR = IDR_DROPDOWN_EDIT;
+
+	if(Menu.LoadMenu( MENU_IDR ))
+    {
+		pPopup = Menu.GetSubMenu(0);
+		pPopup->EnableMenuItem(ID_EDIT_INSERT,MF_BYCOMMAND | MF_GRAYED);
+		pPopup->EnableMenuItem(ID_EDIT_UPDATE,MF_BYCOMMAND | MF_GRAYED);
+		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
+		{
+//			pPopup->EnableMenuItem(ID_DB_EDIT,MF_BYCOMMAND | MF_GRAYED);
+//			pPopup->EnableMenuItem(ID_EDIT_DELETE,MF_BYCOMMAND | MF_GRAYED);
+		}
+		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
+    }
+	return TRUE;
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTablePeople::OnHtmlEditLines()
+{
+	CString title;
+	int selectedCount	= m_ListCtrl.GetSelectedCount();
+	int nItem			= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	if( selectedCount == 1 )
+		title.Format( L"%s a ga.html fájlban (%s. sor)", m_ListCtrl.GetItemText( nItem, L_LAST_NAME ), m_ListCtrl.GetItemText( nItem, L_LINENUMBER )  );
+	else
+		title.Format( L"%d kijelölt ember a ga.html fájlban", selectedCount );
+
+	theApp.htmlEditLines( &m_ListCtrl, L_LINENUMBER, title );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTablePeople::OnHtmlNotepad()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	CString lineNumber = m_ListCtrl.GetItemText( nItem,	L_LINENUMBER );
+	if( !lineNumber.IsEmpty() ) 
+		theApp.editNotepad( lineNumber );
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTablePeople::OnHtmlNotepadParents()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+	CString rowid = m_ListCtrl.GetItemText( nItem, L_ROWID );
+
+	theApp.HtmlNotepadParents( rowid );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTablePeople::OnHtmlFatherAndSiblings()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
+	CHtmlEditLines dlg;
+	dlg.m_title.Format( L"%s szülei és testvérei", m_ListCtrl.GetItemText( nItem, L_LAST_NAME ) );
+	dlg.m_type	= L"F_SIBLINGS";
+	dlg.m_rowid = rowid;
+	dlg.DoModal();
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTablePeople::OnDbEdit()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
+	CRelations dlg;
+	dlg.m_rowid = rowid;
+	dlg.DoModal();
 }

@@ -87,9 +87,6 @@ protected:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	virtual void PostNcDestroy();
 
-//	void OnHtmlEdit();
-	void OnHtmlNotepad();
-	void OnHtmlEditLines();
 
 	std::vector<SPOUSE11>	vSpouse1;
 	std::vector<SPOUSE21>	vSpouse2;
@@ -151,7 +148,7 @@ public:
 	afx_msg void OnAzonosMarriagelist();
 	afx_msg void OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnClickedKeres();
-
+	afx_msg void OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnUnfilter();
 	afx_msg void OnFilterHlastname();
 	afx_msg void OnFilterWlastname();
@@ -162,13 +159,20 @@ public:
 	afx_msg void OnMarriagesParents();
 	afx_msg void OnRowidMarriages();
 	afx_msg void OnNameMarriages();
-	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
-	afx_msg void OnGahtmlLine();
-	afx_msg void OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnEditUpdate();
-	afx_msg void OnEditDelete();
-	afx_msg void OnEditGahtml();
 	afx_msg void OnMoreMarriages();
 	afx_msg void OnClickedNext();
 	afx_msg void OnManMorespouses();
+
+
+
+	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
+	afx_msg void OnEditUpdate();
+	afx_msg void OnEditDelete();
+
+	afx_msg	void OnHtmlEditLines();
+	afx_msg void OnHtmlNotepad();
+	afx_msg void OnHtmlNotepadParents();
+	afx_msg void OnHtmlFatherAndSiblings();
+	afx_msg void OnDbEdit();
+
 };

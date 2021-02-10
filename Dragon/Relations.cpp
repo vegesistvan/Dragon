@@ -1141,9 +1141,10 @@ LRESULT CRelations::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 	}
 	if( listCtrlFlag != -1 )
 	{
-		if(Menu.LoadMenu( IDR_DROPDOWN_DELETE_UPDATE ))
+		if(Menu.LoadMenu( IDR_DROPDOWN_EDIT ))
 		{
 			pPopup = Menu.GetSubMenu(0);
+			pPopup->EnableMenuItem(ID_EDIT_INSERT,MF_BYCOMMAND | MF_GRAYED);
 			pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
 		}
 	}

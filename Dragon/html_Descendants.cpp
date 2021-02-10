@@ -448,11 +448,17 @@ LRESULT CDescendant::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 	if(Menu.LoadMenu( MENU_IDR ))
     {
 		pPopup = Menu.GetSubMenu(0);
+
+		pPopup->EnableMenuItem(ID_DB_EDIT,MF_BYCOMMAND | MF_GRAYED);
+		pPopup->EnableMenuItem(ID_HTML_NOTEPAD_PARENTS,MF_BYCOMMAND | MF_GRAYED);
+		pPopup->EnableMenuItem(ID_HTML_FATHERANDSIBLINGS,MF_BYCOMMAND | MF_GRAYED);
+/*
 		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
 		{
 //			pPopup->EnableMenuItem(ID_DB_EDIT,MF_BYCOMMAND | MF_GRAYED);
 //			pPopup->EnableMenuItem(ID_EDIT_DELETE,MF_BYCOMMAND | MF_GRAYED);
 		}
+*/
 		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
     }
 	return TRUE;

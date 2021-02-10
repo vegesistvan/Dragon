@@ -162,21 +162,22 @@ BEGIN_MESSAGE_MAP(CCheckSameSpouses, CDialogEx)
 	ON_WM_SIZE()
 	ON_WM_SIZING()
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST, &CCheckSameSpouses::OnCustomdrawList)
-	ON_COMMAND(ID_LIST_PEOPLE, &CCheckSameSpouses::OnListPeople)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CCheckSameSpouses::OnDblclkList)
-	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_EDIT2LINES, &CCheckSameSpouses::OnEdit2lines)
-	ON_COMMAND(ID_HTML_EDIT, &CCheckSameSpouses::OnHtmlEditLines)
-	ON_COMMAND(ID_HTML_PEOPLEFATHER, &CCheckSameSpouses::OnHtmlPeoplefather)
-	ON_COMMAND(ID_HTML_NOTEPAD, &CCheckSameSpouses::OnHtmlNotepad)
-	ON_COMMAND(ID_HTML_FATHERANDSIBLINGS, &CCheckSameSpouses::OnFatherAndSiblings)
 	ON_COMMAND(ID_HTML, &CCheckSameSpouses::OnHtml)
 	ON_COMMAND(ID_INFO, &CCheckSameSpouses::OnInfo)
 	ON_COMMAND(ID_SPOUSES_DIFF, &CCheckSameSpouses::OnSpousesDiff)
 	ON_STN_CLICKED(IDC_KERESS, &CCheckSameSpouses::OnClickedKeress)
 	ON_STN_CLICKED(IDC_NEXT, &CCheckSameSpouses::OnClickedNext)
+	
 
-	ON_COMMAND(ID_EDIT_NOTEPAD_PARENTS, &CCheckSameSpouses::OnEditNotepadParents)
+	// IDR_DROPDOWN_HTML funkciók	
+	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
+	ON_COMMAND(ID_HTML_EDIT, &CCheckSameSpouses::OnHtmlEditLines)
+	ON_COMMAND(ID_HTML_NOTEPAD, &CCheckSameSpouses::OnHtmlNotepad)
+	ON_COMMAND(ID_HTML_NOTEPAD_PARENTS, &CCheckSameSpouses::OnHtmlNotepadParents)
+	ON_COMMAND(ID_HTML_FATHERANDSIBLINGS, &CCheckSameSpouses::OnHtmlFatherAndSiblings)
+	ON_COMMAND(ID_DB_EDIT, &CCheckSameSpouses::OnDbEdit)
+
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckSameSpouses::OnSize(UINT nType, int cx, int cy)
@@ -1001,160 +1002,6 @@ void CCheckSameSpouses::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
 		break;
 	}
 }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSameSpouses::OnEditnotepad()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	CString lineNumber	= m_ListCtrl.GetItemText( nItem, 	L_LINENUMBER );
-	if( !lineNumber.IsEmpty() ) theApp.editNotepad( lineNumber );
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSameSpouses::OnEditNotpadParents()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	CString lineNumber	= m_ListCtrl.GetItemText( nItem, 	L_LINENUMBERF );
-	if( !lineNumber.IsEmpty() ) theApp.editNotepad( lineNumber );
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSameSpouses::OnListPeople()
-{
-	POSITION	pos = m_ListCtrl.GetFirstSelectedItemPosition();
-	int			nItem;
-	CString		lineNumber;
-	std::vector<CString> vLines;
-
-	while( pos )
-	{
-		nItem = m_ListCtrl.GetNextSelectedItem( pos );
-		lineNumber	= m_ListCtrl.GetItemText( nItem, 	L_LINENUMBER );
-		if( !lineNumber.IsEmpty() ) vLines.push_back( m_ListCtrl.GetItemText( nItem, L_LINENUMBER ) );
-	}
-
-	CHtmlEditLines dlg;
-
-	
-	dlg.vLines = &vLines;
-
-	dlg.DoModal();
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSameSpouses::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-
-	CRelations dlg;
-	int nItem = pNMItemActivate->iItem;
-//	int nItem		= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	CString rowid	= m_ListCtrl.GetItemText( nItem, L_ROWID );
-
-	dlg.nItem		= nItem;
-	dlg.m_rowid		= rowid;
-	if( dlg.DoModal() == IDCANCEL ) return;
-
-	*pResult = 0;
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-LRESULT CCheckSameSpouses:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
-{
-	CPoint* point=(CPoint*) lParam;
-    CMenu	Menu;
-	CMenu*	pPopup;
-
-
-	if(Menu.LoadMenu( IDR_DROPDOWN_HTML ))
-    {
-		pPopup = Menu.GetSubMenu(0);
-		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
-		{
-			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
-			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
-		}
-		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
-    }
-	return TRUE;
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSameSpouses::OnEdit2lines()
-{
-	theApp.editHtmlLines( &m_ListCtrl, L_LINENUMBER );
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSameSpouses::OnHtmlNotepad()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	CString lineNumber = m_ListCtrl.GetItemText( nItem,	L_LINENUMBER );
-	if( !lineNumber.IsEmpty() ) 
-		theApp.editNotepad( lineNumber );
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSameSpouses::OnEditNotepadParents()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	CString lineNumber = m_ListCtrl.GetItemText( nItem,	L_LINENUMBERF );
-	if( !lineNumber.IsEmpty() ) 
-		theApp.editNotepad( lineNumber );
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSameSpouses::OnHtmlEditLines()
-{
-	CString title;
-	int selectedCount	= m_ListCtrl.GetSelectedCount();
-	int nItem			= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	if( selectedCount == 1 )
-		title.Format( L"%s a ga.html fájlban (%s. sor)", m_ListCtrl.GetItemText( nItem, L_NAME ), m_ListCtrl.GetItemText( nItem, L_LINENUMBER )  );
-	else
-		title.Format( L"%d kijelölt ember a ga.html fájlban", selectedCount );
-
-	theApp.htmlEditLines( &m_ListCtrl, L_LINENUMBER, title );
-
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSameSpouses::OnHtmlFamily()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
-
-	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
-	CHtmlEditLines dlg;
-	dlg.m_title.Format( L"%s apja és testvérei", m_ListCtrl.GetItemText( nItem, L_NAME ) );
-	dlg.m_type	= L"FATHERSIBLINGS";
-	dlg.m_rowid = rowid;
-	dlg.DoModal();
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSameSpouses::OnHtmlFatherAndSiblings()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
-
-	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
-	CHtmlEditLines dlg;
-	dlg.m_title.Format( L"Szülõk és gyerekek (%s)", m_ListCtrl.GetItemText( nItem, L_NAME ) );
-	dlg.m_type	= L"F_SIBLINGS";
-	dlg.m_rowid = rowid;
-	dlg.DoModal();
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSameSpouses::OnFatherAndSiblings()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	CHtmlEditLines dlg;
-
-	str.Format( L"%s és gyermekei a GA.html listában", m_ListCtrl.GetItemText( nItem, L_FATHER ) );
-	dlg.m_title = str;
-	dlg.m_type = L"F_SIBLINGS";
-
-	dlg.m_rowid = m_ListCtrl.GetItemText( nItem, L_ROWID );
-	dlg.DoModal();
-
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSameSpouses::OnHtmlPeoplefather()
-{
-	int nItem		= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	CString rowid	= m_ListCtrl.GetItemText( nItem, L_ROWID );
-	CHtmlEditLines dlg;
-	dlg.m_rowid = rowid;
-	dlg.DoModal();
-}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool sortBySpouses(const MORESPOUSES &v1, const MORESPOUSES &v2) 
 { 
@@ -1353,4 +1200,94 @@ BOOL CCheckSameSpouses::PreTranslateMessage(MSG* pMsg)
 	return CWnd::PreTranslateMessage(pMsg);
 }
 
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckSameSpouses::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+
+	CRelations dlg;
+	int nItem = pNMItemActivate->iItem;
+//	int nItem		= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	CString rowid	= m_ListCtrl.GetItemText( nItem, L_ROWID );
+
+	dlg.nItem		= nItem;
+	dlg.m_rowid		= rowid;
+	if( dlg.DoModal() == IDCANCEL ) return;
+
+	*pResult = 0;
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+LRESULT CCheckSameSpouses:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
+{
+	CPoint* point=(CPoint*) lParam;
+    CMenu	Menu;
+	CMenu*	pPopup;
+
+
+	if(Menu.LoadMenu( IDR_DROPDOWN_HTML ))
+    {
+		pPopup = Menu.GetSubMenu(0);
+		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
+		{
+			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
+			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
+		}
+		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
+    }
+	return TRUE;
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckSameSpouses::OnHtmlEditLines()
+{
+	CString title;
+	int selectedCount	= m_ListCtrl.GetSelectedCount();
+	int nItem			= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	if( selectedCount == 1 )
+		title.Format( L"%s a ga.html fájlban (%s. sor)", m_ListCtrl.GetItemText( nItem, L_NAME ), m_ListCtrl.GetItemText( nItem, L_LINENUMBER )  );
+	else
+		title.Format( L"%d kijelölt ember a ga.html fájlban", selectedCount );
+
+	theApp.htmlEditLines( &m_ListCtrl, L_LINENUMBER, title );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckSameSpouses::OnHtmlNotepad()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	CString lineNumber = m_ListCtrl.GetItemText( nItem,	L_LINENUMBER );
+	if( !lineNumber.IsEmpty() ) 
+		theApp.editNotepad( lineNumber );
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckSameSpouses::OnHtmlNotepadParents()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+	CString rowid = m_ListCtrl.GetItemText( nItem, L_ROWID );
+
+	theApp.HtmlNotepadParents( rowid );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckSameSpouses::OnHtmlFatherAndSiblings()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
+	CHtmlEditLines dlg;
+	dlg.m_title.Format( L"%s szülei és testvérei", m_ListCtrl.GetItemText( nItem, L_NAME ) );
+	dlg.m_type	= L"F_SIBLINGS";
+	dlg.m_rowid = rowid;
+	dlg.DoModal();
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckSameSpouses::OnDbEdit()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
+	CRelations dlg;
+	dlg.m_rowid = rowid;
+	dlg.DoModal();
+}

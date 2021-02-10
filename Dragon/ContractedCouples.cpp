@@ -10,8 +10,9 @@
 #include "ContractCouples.h"
 #include "ContractInfo.h"
 #include "html_EditLines.h"
-#include "html_Edit2Lines.h"
-#include "html_EditLine.h"
+//#include "html_Edit2Lines.h"
+//#include "html_EditLine.h"
+#include "Relations.h"
 
 enum
 {
@@ -80,17 +81,21 @@ BEGIN_MESSAGE_MAP(CContractedCouples, CDialogEx)
 	ON_COMMAND(ID_FILTER_1, &CContractedCouples::OnFilter1)
 	ON_COMMAND(ID_FILTER_2, &CContractedCouples::OnFilter2)
 
-	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_EDIT2LINES, &CContractedCouples::OnEdit2lines)
-	ON_COMMAND(ID_HTML_EDIT, &CContractedCouples::OnHtmlEditLines)
-	ON_COMMAND(ID_HTML_PEOPLEFATHER, &CContractedCouples::OnHtmlPeoplefather)
-	ON_COMMAND(ID_HTML_NOTEPAD, &CContractedCouples::OnHtmlNotepad)
-
 	ON_COMMAND(ID_INFO, &CContractedCouples::OnInfo)
 	ON_COMMAND(ID_HTML_1_D, &CContractedCouples::OnHtml1D)
 	ON_COMMAND(ID_HTML_1_U, &CContractedCouples::OnHtml1U)
 	ON_COMMAND(ID_HTML_2_D, &CContractedCouples::OnHtml2D)
 	ON_COMMAND(ID_HTML_2_U, &CContractedCouples::OnHtml2U)
+
+	// IDR_DROPDOWN_HTML funkciók	
+	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
+	ON_COMMAND(ID_HTML_EDIT, &CContractedCouples::OnHtmlEditLines)
+	ON_COMMAND(ID_HTML_NOTEPAD, &CContractedCouples::OnHtmlNotepad)
+	ON_COMMAND(ID_HTML_NOTEPAD_PARENTS, &CContractedCouples::OnHtmlNotepadParents)
+	ON_COMMAND(ID_HTML_FATHERANDSIBLINGS, &CContractedCouples::OnHtmlFatherAndSiblings)
+	ON_COMMAND(ID_DB_EDIT, &CContractedCouples::OnDbEdit)
+
+
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CContractedCouples::OnInitDialog()
@@ -476,69 +481,6 @@ BOOL CContractedCouples::PreTranslateMessage(MSG* pMsg)
 	}
 	return CWnd::PreTranslateMessage(pMsg);
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-LRESULT CContractedCouples:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
-{
-	CPoint* point=(CPoint*) lParam;
-    CMenu	Menu;
-	CMenu*	pPopup;
-
-
-	if(Menu.LoadMenu( IDR_DROPDOWN_HTML_P ))
-    {
-		pPopup = Menu.GetSubMenu(0);
-		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
-		{
-			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
-			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
-		}
-		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
-    }
-	return TRUE;
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CContractedCouples::OnEdit2lines()
-{
-	theApp.editHtmlLines( &m_ListCtrl, L_LINENUMBERH );
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CContractedCouples::OnHtmlNotepad()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	CString lineNumber = m_ListCtrl.GetItemText( nItem,	L_LINENUMBERH );
-	if( !lineNumber.IsEmpty() ) 
-		theApp.editNotepad( lineNumber );
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CContractedCouples::OnEditNotepadParents()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	CString lineNumber = m_ListCtrl.GetItemText( nItem,	L_LINENUMBERH );
-	if( !lineNumber.IsEmpty() ) 
-		theApp.editNotepad( lineNumber );
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CContractedCouples::OnHtmlEditLines()
-{
-	CString title;
-	int selectedCount	= m_ListCtrl.GetSelectedCount();
-	int nItem			= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	if( selectedCount == 1 )
-		title.Format( L"%s a ga.html fájlban  (%s. sor)", m_ListCtrl.GetItemText( nItem, L_HUSBAND ), m_ListCtrl.GetItemText( nItem, L_LINENUMBERH ) );
-	else
-		title.Format( L"%d kijelölt ember a ga.html fájlban", selectedCount );
-
-	theApp.htmlEditLines( &m_ListCtrl, L_LINENUMBERH, title );
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CContractedCouples::OnHtmlPeoplefather()
-{
-	int nItem		= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	CString rowid	= m_ListCtrl.GetItemText( nItem, L_ROWIDH );
-	CHtmlEditLines dlg;
-	dlg.m_rowid = rowid;
-	dlg.DoModal();
-}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedCouples::OnInfo()
 {
@@ -603,4 +545,78 @@ void CContractedCouples::getFileSpec( int type, int subType )
 		AfxMessageBox( str );
 	}
 	theApp.showHtmlFile( filespec );
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+LRESULT CContractedCouples:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
+{
+	CPoint* point=(CPoint*) lParam;
+    CMenu	Menu;
+	CMenu*	pPopup;
+
+
+	if(Menu.LoadMenu( IDR_DROPDOWN_HTML ))
+    {
+		pPopup = Menu.GetSubMenu(0);
+		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
+		{
+			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
+			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
+		}
+		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
+    }
+	return TRUE;
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedCouples::OnHtmlEditLines()
+{
+	CString title;
+	int selectedCount	= m_ListCtrl.GetSelectedCount();
+	int nItem			= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	if( selectedCount == 1 )
+		title.Format( L"%s a ga.html fájlban (%s. sor)", m_ListCtrl.GetItemText( nItem, L_HUSBAND ), m_ListCtrl.GetItemText( nItem, L_LINENUMBERH )  );
+	else
+		title.Format( L"%d kijelölt ember a ga.html fájlban", selectedCount );
+
+	theApp.htmlEditLines( &m_ListCtrl, L_LINENUMBERH, title );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedCouples::OnHtmlNotepad()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	CString lineNumber = m_ListCtrl.GetItemText( nItem,	L_LINENUMBERH );
+	if( !lineNumber.IsEmpty() ) 
+		theApp.editNotepad( lineNumber );
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedCouples::OnHtmlNotepadParents()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+	CString rowid = m_ListCtrl.GetItemText( nItem, L_ROWIDH );
+
+	theApp.HtmlNotepadParents( rowid );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedCouples::OnHtmlFatherAndSiblings()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWIDH );
+	CHtmlEditLines dlg;
+	dlg.m_title.Format( L"%s szülei és testvérei", m_ListCtrl.GetItemText( nItem, L_HUSBAND ) );
+	dlg.m_type	= L"F_SIBLINGS";
+	dlg.m_rowid = rowid;
+	dlg.DoModal();
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedCouples::OnDbEdit()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWIDH );
+	CRelations dlg;
+	dlg.m_rowid = rowid;
+	dlg.DoModal();
 }

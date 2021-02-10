@@ -88,9 +88,10 @@ LRESULT CTitles::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
     CMenu	Menu;
 	CMenu*	pPopup;
 
-	if(Menu.LoadMenu( IDR_DROPDOWN_DELETE_UPDATE ))
+	if(Menu.LoadMenu( IDR_DROPDOWN_EDIT ))
     {
 		pPopup = Menu.GetSubMenu(0);
+		pPopup->EnableMenuItem(ID_EDIT_INSERT,MF_BYCOMMAND | MF_GRAYED);
 		if( m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
 		{
 			pPopup->EnableMenuItem(ID_EDIT_UPDATE,MF_BYCOMMAND | MF_GRAYED);

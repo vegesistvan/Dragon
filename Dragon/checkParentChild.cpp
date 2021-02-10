@@ -83,12 +83,13 @@ void CCheckParentChild::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CCheckParentChild, CDialogEx)
 	ON_WM_SIZE()
 	ON_WM_SIZING()
+
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-//	ON_COMMAND(ID_HTML_EDIT, &CCheckParentChild::OnHtmlEdit)
 	ON_COMMAND(ID_HTML_EDIT, &CCheckParentChild::OnHtmlEditLines)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CCheckParentChild::OnHtmlNotepad)
+	ON_COMMAND(ID_HTML_NOTEPAD_PARENTS, &CCheckParentChild::OnHtmlNotepadParents)
+	ON_COMMAND(ID_HTML_FATHERANDSIBLINGS, &CCheckParentChild::OnHtmlFatherAndSiblings)
 	ON_COMMAND(ID_DB_EDIT, &CCheckParentChild::OnDbEdit)
-	ON_COMMAND(ID_GAHTML_LINE, &CCheckParentChild::OnGahtmlLine)
 
 	ON_COMMAND(ID_LIST, &CCheckParentChild::OnList)
 	ON_STN_CLICKED(IDC_KERES, &CCheckParentChild::OnClickedKeres)
@@ -356,92 +357,7 @@ void CCheckParentChild::fillColumns()
 		CDialogEx::OnOK();
 	}
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-LRESULT CCheckParentChild:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
-{
-	CPoint* point=(CPoint*) lParam;
-    CMenu	Menu;
-	CMenu*	pPopup;
 
-
-	if(Menu.LoadMenu( IDR_DROPDOWN_HTML ))
-    {
-		pPopup = Menu.GetSubMenu(0);
-		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
-		{
-			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
-			pPopup->EnableMenuItem(ID_HTML_NOTEPAD, MF_BYCOMMAND | MF_GRAYED);
-			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
-		}
-		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
-    }
-	return TRUE;
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-void CCheckParentChild::OnHtmlEdit()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	L_LINENUMBER ) );
-	theApp.listHtmlLine( lineNumber );
-}
-*/
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckParentChild::OnHtmlNotepad()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	CString lineNumber = m_ListCtrl.GetItemText( nItem, 	L_LINENUMBER );
-	if( !lineNumber.IsEmpty() ) 
-		theApp.editNotepad( lineNumber );
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckParentChild::OnHtmlEditLines()
-{
-	CString title;
-	int selectedCount	= m_ListCtrl.GetSelectedCount();
-	int nItem			= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	if( selectedCount == 1 )
-		title.Format( L"%s a ga.html fájlban (%s. sor)", m_ListCtrl.GetItemText( nItem, L_NAME ), m_ListCtrl.GetItemText( nItem, L_LINENUMBER )  );
-	else
-		title.Format( L"%d kijelölt ember a ga.html fájlban", selectedCount );
-
-	theApp.htmlEditLines( &m_ListCtrl, L_LINENUMBER, title );
-
-/*
-	POSITION	pos = m_ListCtrl.GetFirstSelectedItemPosition();
-	int			nItem;
-	std::vector<CString> vLines;
-
-	int cnt = 0;
-	CString name(L"");
-
-	while( pos )
-	{
-		nItem = m_ListCtrl.GetNextSelectedItem( pos );
-		vLines.push_back( m_ListCtrl.GetItemText( nItem, L_LINENUMBER ) );
-		if( name.Compare( m_ListCtrl.GetItemText( nItem, L_NAME ) ) )
-		{
-			name = m_ListCtrl.GetItemText( nItem, L_NAME );
-			++cnt;
-		}
-	
-
-	}
-
-	CHtmlEditLines dlg;
-
-	if( !name.IsEmpty() )
-	{
-		str.Format( L"%s kijelölt sora a html fájlban", name ); 
-		dlg.m_title = str;
-	}
-	else
-		dlg.m_title = L"Kijelölt sorok a htm fájlban";
-	dlg.vLines = &vLines;
-
-	dlg.DoModal();
-*/
-}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckParentChild::OnList()
 {
@@ -450,46 +366,6 @@ void CCheckParentChild::OnList()
 	theApp.exportAll( logFile, m_title, &m_ListCtrl );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckParentChild::OnGahtmlLine()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
-
-	if( nItem == - 1 )
-	{
-		theApp.message( L"Házastársak korkülönbsége", L"Nincs kijelölve ember!" );
-		return;
-	}
-	
-
-	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	L_LINENUMBER ) );
-
-	theApp.listHtmlLine( lineNumber );
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckParentChild::OnDbEdit()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
-
-	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
-	CRelations dlg;
-
-	dlg.m_rowid = rowid;
-	dlg.DoModal();
-
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckParentChild::OnHtmlFamily()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
-
-	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
-	CHtmlEditLines dlg;
-	dlg.m_title.Format( L"%s szülei és testvérei", m_ListCtrl.GetItemText( nItem, L_NAME ) );
-	dlg.m_type	= L"F_SIBLINGS";
-	dlg.m_rowid = rowid;
-	dlg.DoModal();
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckParentChild::OnClickedKeres()
 {
 	keress( 0 );
@@ -586,4 +462,80 @@ BOOL CCheckParentChild::PreTranslateMessage(MSG* pMsg)
 		}
 	}
     return CWnd::PreTranslateMessage(pMsg);
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+LRESULT CCheckParentChild:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
+{
+	CPoint* point=(CPoint*) lParam;
+    CMenu	Menu;
+	CMenu*	pPopup;
+
+
+	if(Menu.LoadMenu( IDR_DROPDOWN_HTML ))
+    {
+		pPopup = Menu.GetSubMenu(0);
+		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
+		{
+			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
+			pPopup->EnableMenuItem(ID_HTML_NOTEPAD, MF_BYCOMMAND | MF_GRAYED);
+			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
+		}
+		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
+    }
+	return TRUE;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckParentChild::OnHtmlNotepad()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	CString lineNumber = m_ListCtrl.GetItemText( nItem, 	L_LINENUMBER );
+	if( !lineNumber.IsEmpty() ) 
+		theApp.editNotepad( lineNumber );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckParentChild::OnHtmlEditLines()
+{
+	CString title;
+	int selectedCount	= m_ListCtrl.GetSelectedCount();
+	int nItem			= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	if( selectedCount == 1 )
+		title.Format( L"%s a ga.html fájlban (%s. sor)", m_ListCtrl.GetItemText( nItem, L_NAME ), m_ListCtrl.GetItemText( nItem, L_LINENUMBER )  );
+	else
+		title.Format( L"%d kijelölt ember a ga.html fájlban", selectedCount );
+
+	theApp.htmlEditLines( &m_ListCtrl, L_LINENUMBER, title );
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckParentChild::OnHtmlNotepadParents()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+	CString rowid = m_ListCtrl.GetItemText( nItem, L_ROWID );
+
+	theApp.HtmlNotepadParents( rowid );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckParentChild::OnHtmlFatherAndSiblings()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
+	CHtmlEditLines dlg;
+	dlg.m_title.Format( L"%s szülei és testvérei", m_ListCtrl.GetItemText( nItem, L_NAME ) );
+	dlg.m_type	= L"F_SIBLINGS";
+	dlg.m_rowid = rowid;
+	dlg.DoModal();
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckParentChild::OnDbEdit()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
+	CRelations dlg;
+	dlg.m_rowid = rowid;
+	dlg.DoModal();
 }

@@ -10,6 +10,15 @@
 #include "Relations.h"
 #include "html_EditLines.h"
 
+enum
+{
+	L_CNT = 0,
+	L_LINENUMBER,
+	L_ROWID,
+	L_NAME,
+	L_PEOPLE,
+};
+
 IMPLEMENT_DYNAMIC(CCheckNames, CDialogEx)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CCheckNames::CCheckNames(CWnd* pParent /*=NULL*/)
@@ -35,7 +44,10 @@ BEGIN_MESSAGE_MAP(CCheckNames, CDialogEx)
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
 	ON_COMMAND(ID_HTML_EDIT, &CCheckNames::OnHtmlEditLines)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CCheckNames::OnHtmlNotepad)
+	ON_COMMAND(ID_HTML_NOTEPAD_PARENTS, &CCheckNames::OnHtmlNotepadParents)
+	ON_COMMAND(ID_HTML_FATHERANDSIBLINGS, &CCheckNames::OnHtmlFatherAndSiblings)
 	ON_COMMAND(ID_DB_EDIT, &CCheckNames::OnDbEdit)
+
 
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -45,16 +57,7 @@ BOOL CCheckNames::OnInitDialog()
 	EASYSIZE_ADD( IDC_EDIT,	ES_BORDER,	ES_BORDER,		ES_BORDER,		ES_KEEPSIZE,	0 );
 	EASYSIZE_ADD( IDC_LIST,	ES_BORDER,	ES_BORDER,		ES_BORDER,		ES_BORDER,	0 );
 	EASYSIZE_INIT()
-/*
-	CString title = L"A ga.html fájl beolvasásakor elõfordulhatnak olyan emberek, akiknek a vezeték vagy keresztnevét nem tudja a \
-program megállapítani, ezért vezeték vagy keresztneve üres marad. Ezeket az eseteket vizsgálhatjuk meg ezzel a funkcióval.\
-";
-	if( AfxMessageBox( title, MB_ICONINFORMATION || MB_OKCANCEL ) == IDCANCEL ) 
-	{
-		OnCancel();
-		return false;
-	}
-*/
+
 	CString caption;
 	caption.Format( L"Név problémák az adatbázisban amely %s GA.htm fájlból lett feltöltve", theApp.m_htmlFileName );
 	SetWindowTextW( caption );
@@ -75,11 +78,11 @@ ill. 'A sor a Notepad-ben' funkciókat. Bármelyikban javíthatjuk a ga.html fájl m
 	m_ListCtrl.KeepSortOrder(TRUE);
 	m_ListCtrl.SetExtendedStyle(m_ListCtrl.GetExtendedStyle()| LVS_EX_GRIDLINES );
 	
-	m_ListCtrl.InsertColumn( 0,	L"#",		LVCFMT_RIGHT,	 60,-1,COL_NUM );
-	m_ListCtrl.InsertColumn( 1,	L"line#",	LVCFMT_RIGHT,	 60,-1,COL_NUM );
-	m_ListCtrl.InsertColumn( 2,	L"rowid",	LVCFMT_RIGHT,	 60,-1,COL_NUM );
-	m_ListCtrl.InsertColumn( 3,	L"név",		LVCFMT_LEFT,	200,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( 4,	L"",		LVCFMT_LEFT,   2000,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_CNT,			L"#",		LVCFMT_RIGHT,	 60,-1,COL_NUM );
+	m_ListCtrl.InsertColumn( L_LINENUMBER,	L"line#",	LVCFMT_RIGHT,	 60,-1,COL_NUM );
+	m_ListCtrl.InsertColumn( L_ROWID,		L"rowid",	LVCFMT_RIGHT,	 60,-1,COL_NUM );
+	m_ListCtrl.InsertColumn( L_NAME,		L"név",		LVCFMT_LEFT,	200,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_PEOPLE,		L"",		LVCFMT_LEFT,   2000,-1,COL_TEXT);
 
 	
 
@@ -121,14 +124,14 @@ ill. 'A sor a Notepad-ben' funkciókat. Bármelyikban javíthatjuk a ga.html fájl m
 		people	= getPeople();
 
 		nItem = m_ListCtrl.InsertItem( nItem, cntS );
-		m_ListCtrl.SetItemText( nItem, 2, rowid );
-		m_ListCtrl.SetItemText( nItem, 3, name );
-		m_ListCtrl.SetItemText( nItem, 4, people );
+		m_ListCtrl.SetItemText( nItem, L_ROWID, rowid );
+		m_ListCtrl.SetItemText( nItem, L_NAME, name );
+		m_ListCtrl.SetItemText( nItem, L_PEOPLE, people );
 		++nItem;
 
 		nItem = m_ListCtrl.InsertItem( nItem, L"" );
-		m_ListCtrl.SetItemText( nItem, 1, lineNumber );
-		m_ListCtrl.SetItemText( nItem, 4, gaLine );
+		m_ListCtrl.SetItemText( nItem, L_LINENUMBER, lineNumber );
+		m_ListCtrl.SetItemText( nItem, L_PEOPLE, gaLine );
 		++nItem;
 
 		nItem = m_ListCtrl.InsertItem( nItem, L"" );
@@ -276,50 +279,69 @@ LRESULT CCheckNames:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 	CMenu*	pPopup;
 	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
 
+	if( m_ListCtrl.GetItemText( nItem, L_LINENUMBER ).IsEmpty() ) return FALSE;
+
+
 	if(Menu.LoadMenu( IDR_DROPDOWN_HTML ))
     {
 		pPopup = Menu.GetSubMenu(0);
 
-		if( m_ListCtrl.GetItemText( nItem, 1 ).IsEmpty() )  // linenumber
-		{
-			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
-			pPopup->EnableMenuItem(ID_HTML_NOTEPAD, MF_BYCOMMAND | MF_GRAYED);
-		}
-		if( m_ListCtrl.GetItemText( nItem, 2 ).IsEmpty() )  // rowid
-		{
-			pPopup->EnableMenuItem(ID_DB_EDIT, MF_BYCOMMAND | MF_GRAYED);
-		}
+		pPopup->EnableMenuItem(ID_HTML_NOTEPAD_PARENTS, MF_BYCOMMAND | MF_GRAYED);
+		pPopup->EnableMenuItem(ID_HTML_FATHERANDSIBLINGS, MF_BYCOMMAND | MF_GRAYED);
+		pPopup->EnableMenuItem(ID_DB_EDIT, MF_BYCOMMAND | MF_GRAYED);
+
 		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
     }
 	return TRUE;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckNames::OnHtmlEditLines()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	1 ) );
-	CHtmlEditLines dlg;
-	dlg.m_linenumber = lineNumber;
-	dlg.DoModal();
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckNames::OnHtmlNotepad()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	CString lineNumber = m_ListCtrl.GetItemText( nItem, 	1 );
+	CString lineNumber = m_ListCtrl.GetItemText( nItem, L_LINENUMBER );
 	if( !lineNumber.IsEmpty() ) 
 		theApp.editNotepad( lineNumber );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckNames::OnDbEdit()
+void CCheckNames::OnHtmlEditLines()
+{
+	CString title;
+	int selectedCount	= m_ListCtrl.GetSelectedCount();
+	int nItem			= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	if( selectedCount == 1 )
+		title.Format( L"%s a ga.html fájlban (%s. sor)", m_ListCtrl.GetItemText( nItem, L_NAME ), m_ListCtrl.GetItemText( nItem, L_LINENUMBER )  );
+	else
+		title.Format( L"%d kijelölt ember a ga.html fájlban", selectedCount );
+
+	theApp.htmlEditLines( &m_ListCtrl, L_LINENUMBER, title );
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckNames::OnHtmlNotepadParents()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+	CString rowid = m_ListCtrl.GetItemText( nItem, L_ROWID );
+
+	theApp.HtmlNotepadParents( rowid );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckNames::OnHtmlFatherAndSiblings()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
 
-	CString rowid = m_ListCtrl.GetItemText( nItem, 2 );
-	CRelations dlg;
-
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
+	CHtmlEditLines dlg;
+	dlg.m_title.Format( L"%s szülei és testvérei", m_ListCtrl.GetItemText( nItem, L_NAME ) );
+	dlg.m_type	= L"F_SIBLINGS";
 	dlg.m_rowid = rowid;
 	dlg.DoModal();
-
 }
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckNames::OnDbEdit()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
+	CRelations dlg;
+	dlg.m_rowid = rowid;
+	dlg.DoModal();
+}

@@ -296,20 +296,6 @@ enum
 	LANG_LANGUAGE
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const COLUMN places[] =
-{
-	{ L"xid",		L"INTEGER PRIMARY KEY ASC" },
-	{ L"place",		L"TEXT" }, 
-	{ L"occurance",	L"NUM" }
-};
-enum
-{
-	PLACES_ROWID = 0,
-	PLACES_XID,
-	PLACES_PLACE,
-	PLACES_OCCURANCE
-};
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const COLUMN united[] =
 {
 	{ L"xid",		L"INTEGER PRIMARY KEY ASC" },
@@ -371,7 +357,6 @@ const DB databaseTables[] =
 	{ L"inputFiles", (COLUMN*)&inputFiles, sizeof( inputFiles )/sizeof(COLUMN) },
 	{ L"marriages", (COLUMN*)&marriages, sizeof( marriages )/sizeof(COLUMN) },
 	{ L"people", (COLUMN*)&people, sizeof( people )/sizeof(COLUMN) },
-	{ L"places", (COLUMN*)&places, sizeof( places )/sizeof(COLUMN) },
 	{ L"tables", (COLUMN*)&tables, sizeof( tables )/sizeof(COLUMN) },
 	{ L"united", (COLUMN*)&united, sizeof( united )/sizeof(COLUMN) },
 };

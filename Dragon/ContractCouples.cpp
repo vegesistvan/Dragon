@@ -594,6 +594,9 @@ void CContractCouples::processSame()
 		{
 			for( UINT i2 = 0; i2 < vSame.size(); ++i2 )
 			{
+				if( vSame.at(i1).sourceS1 == L"1" && vSame.at(i2).sourceS1 == L"1" ) continue;
+				if( vSame.at(i1).sourceS2 == L"1" && vSame.at(i2).sourceS2 == L"1" ) continue;
+
 				rowid2 = vSame.at(i2).rowidS1;
 				if( i1 != i2 && vSame.at(i2).subGroup == 0 )	// természetesen csak különbözõ házaspárokat vizsgál, amelyeket még nem redneltek hozzá egyik csooprthoz sem
 				{

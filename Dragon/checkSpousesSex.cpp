@@ -56,14 +56,13 @@ BEGIN_MESSAGE_MAP(CCheckSpousesSex, CDialogEx)
 //	ON_WM_SIZE()
 //	ON_WM_SIZING()
 
+
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_HTML_EDIT, &CCheckSpousesSex::OnHtmlEdit)
 	ON_COMMAND(ID_HTML_EDIT, &CCheckSpousesSex::OnHtmlEditLines)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CCheckSpousesSex::OnHtmlNotepad)
-	ON_COMMAND(ID_DB_EDIT, &CCheckSpousesSex::OnDbEdit)
-	ON_COMMAND(ID_GAHTML_LINE, &CCheckSpousesSex::OnGahtmlLine)
+
 	ON_COMMAND(ID_LIST, &CCheckSpousesSex::OnList)
-	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LIST, &CCheckSpousesSex::OnLvnItemchangedList)
+
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CCheckSpousesSex::OnInitDialog()
@@ -75,20 +74,13 @@ BOOL CCheckSpousesSex::OnInitDialog()
 
 	CString info = L"\
 Alább azokat a házaspárokat listázzuk párba szedve, amelykban a házastársak neme azonos.\r\n\r\n\
-Ennek lehet az az oka, hogy a programban nyilvántartott nevekhez rendelt nem helytelen, és lehet hogy \
+Ennek lehet az az oka, hogy a programban nyilvántartott nevekhez rendelt nem helytelen, de lehet hogy \
 hiba van a GA.html fájlban.\r\n\
 A jobb egérgombbal egy sorra klikkelve egy legördülõ menübõl választhatunk kölönbözõ funkciókat a \
 GA-html fájl vizsgálatára, javítására.\r\n\
 Fontos, hogy a hibákat kijavítsuk, mert az azonos emeberhez tartzozó bejegyzések összevonásának \r\n\
 sikere nagymértékben függ az emeberek nevének és nemének helyességétõl.\
 ";
-/*
-	if( AfxMessageBox( info, MB_OKCANCEL|MB_ICONINFORMATION ) == IDCANCEL )
-	{
-		OnCancel();
-		return TRUE;
-	}
-*/
 	GetDlgItem( IDC_EDIT )->SetWindowTextW( info );
 
 	createColumns();
@@ -240,6 +232,16 @@ void CCheckSpousesSex::fillColumns()
 		CDialogEx::OnOK();
 	}
 }
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckSpousesSex::OnList()
+{
+	CString	logFile(L"spousessex"); 
+	
+	theApp.exportAll( logFile, L"Azomos nemû házastársak", &m_ListCtrl );
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 LRESULT CCheckSpousesSex:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 {
@@ -251,22 +253,15 @@ LRESULT CCheckSpousesSex:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 	if(Menu.LoadMenu( IDR_DROPDOWN_HTML ))
     {
 		pPopup = Menu.GetSubMenu(0);
-		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
-		{
-			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
-			pPopup->EnableMenuItem(ID_HTML_NOTEPAD, MF_BYCOMMAND | MF_GRAYED);
-			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
-		}
+		
+		pPopup->EnableMenuItem(ID_HTML_NOTEPAD_PARENTS, MF_BYCOMMAND | MF_GRAYED);
+		pPopup->EnableMenuItem(ID_HTML_FATHERANDSIBLINGS, MF_BYCOMMAND | MF_GRAYED);
+		pPopup->EnableMenuItem(ID_DB_EDIT, MF_BYCOMMAND | MF_GRAYED);
+
+
 		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
     }
 	return TRUE;
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSpousesSex::OnHtmlEdit()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	L_LINENUMBER ) );
-	theApp.listHtmlLine( lineNumber );
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckSpousesSex::OnHtmlNotepad()
@@ -288,85 +283,4 @@ void CCheckSpousesSex::OnHtmlEditLines()
 		title.Format( L"%d kijelölt ember a ga.html fájlban", selectedCount );
 
 	theApp.htmlEditLines( &m_ListCtrl, L_LINENUMBER, title );
-
-	/*
-	POSITION	pos = m_ListCtrl.GetFirstSelectedItemPosition();
-	int			nItem;
-	std::vector<CString> vLines;
-
-	int cnt = 0;
-	CString name(L"");
-
-	while( pos )
-	{
-		nItem = m_ListCtrl.GetNextSelectedItem( pos );
-		vLines.push_back( m_ListCtrl.GetItemText( nItem, L_LINENUMBER ) );
-		if( name.Compare( m_ListCtrl.GetItemText( nItem, L_NAME ) ) )
-		{
-			name = m_ListCtrl.GetItemText( nItem, L_NAME );
-			++cnt;
-		}
-	
-
-	}
-
-	CHtmlEditLines dlg;
-	if( !name.IsEmpty() )
-	{
-		str.Format( L"%s kijelölt sora a html fájlban", name ); 
-		dlg.m_title = str;
-	}
-	else
-		dlg.m_title = L"Kijelölt sorok a htm fájlban";
-
-	dlg.vLines = &vLines;
-
-	dlg.DoModal();
-	*/
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSpousesSex::OnList()
-{
-	CString	logFile(L"spousessex"); 
-	
-	theApp.exportAll( logFile, L"Azomos nemû házastársak", &m_ListCtrl );
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSpousesSex::OnGahtmlLine()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
-
-	if( nItem == - 1 )
-	{
-		theApp.message( L"Azonos nemû házastársak", L"Nincs kijelölve ember!" );
-		return;
-	}
-	
-
-	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	L_LINENUMBER ) );
-
-	theApp.listHtmlLine( lineNumber );
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSpousesSex::OnDbEdit()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
-
-	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
-	CRelations dlg;
-
-	dlg.m_rowid = rowid;
-	dlg.DoModal();
-
-}
-
-	
-
-
-
-void CCheckSpousesSex::OnLvnItemchangedList(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
-	// TODO: Add your control notification handler code here
-	*pResult = 0;
 }

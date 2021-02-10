@@ -26,10 +26,9 @@ protected:
 	void createColumns();
 	void fillColumns();
 
-	void OnHtmlEdit();
 	void OnHtmlNotepad();
 	void OnHtmlEditLines();
-	void OnDbEdit();
+
 
 	DECLARE_MESSAGE_MAP()
 public:
@@ -38,5 +37,4 @@ public:
 	afx_msg void OnGahtmlLine();
 	afx_msg void OnList();
 
-	afx_msg void OnLvnItemchangedList(NMHDR *pNMHDR, LRESULT *pResult);
 };

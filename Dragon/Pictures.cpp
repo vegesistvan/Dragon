@@ -49,11 +49,11 @@ BEGIN_MESSAGE_MAP(CPictures, CDialogEx)
 	ON_EN_CHANGE(IDC_TITLE, &CPictures::OnChangeTitle)
 	ON_BN_CLICKED(IDC_VIEW, &CPictures::OnClickedView)
 	ON_BN_CLICKED(IDC_PRIMARY, &CPictures::OnClickedPrimary)
-//	ON_BN_CLICKED(IDC_DELETE, &CPictures::OnClickedDelete)
+
 	ON_WM_SYSCOMMAND()
 	ON_BN_CLICKED(IDOK, &CPictures::OnBnClickedOk)
-ON_NOTIFY(NM_RDBLCLK, IDC_LIST, &CPictures::OnRdblclkList)
-ON_NOTIFY(NM_CLICK, IDC_LIST, &CPictures::OnClickList)
+	ON_NOTIFY(NM_RDBLCLK, IDC_LIST, &CPictures::OnRdblclkList)
+	ON_NOTIFY(NM_CLICK, IDC_LIST, &CPictures::OnClickList)
 
 	ON_BN_CLICKED(ID_EDIT_UPDATE, &CPictures::OnEditUpdate )
 	ON_BN_CLICKED(ID_EDIT_DELETE, &CPictures::OnEditDelete )
@@ -474,6 +474,29 @@ void CPictures::OnClickList(NMHDR *pNMHDR, LRESULT *pResult)
 	paintBlob( nItem );
 	*pResult = 0;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CPictures::displayPicture()
+{
+
+	m_command.Format( L"SELECT rowid FROM pictures WHERE id='%s' AND table_id=%d AND primaryPic=1", m_rowidP, PEOPLE );
+	if( !theApp.queryBlob( m_command ) ) return;
+
+	InvalidateRect( NULL, true );
+	m_paint = false;
+	CString rowid = theApp.m_recordsetBlob->GetFieldString( 0 );
+	if( !rowid.IsEmpty() )
+	{
+		_int64 blob_size;
+		void* block = theApp.blobDB->blobRead( "pictures", "picture", rowid, &blob_size );
+		if( block == NULL ) return;
+		if( !writeBlockToFile( block, blob_size ) ) return;
+		m_paint = true;
+	}
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 LRESULT CPictures::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
@@ -482,12 +505,12 @@ LRESULT CPictures::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
     CMenu	Menu;
 	CMenu*	pPopup;
 
-	if(Menu.LoadMenu( IDR_DROPDOWN_DELETE_INSERT ))
+	if(Menu.LoadMenu( IDR_DROPDOWN_EDIT ))
 	{
 		pPopup = Menu.GetSubMenu(0);
+		pPopup->EnableMenuItem(ID_EDIT_UPDATE, MF_BYCOMMAND | MF_GRAYED);
 		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
 		{
-//			pPopup->EnableMenuItem(ID_EDIT_UPDATE,MF_BYCOMMAND | MF_GRAYED);
 			pPopup->EnableMenuItem(ID_EDIT_DELETE,MF_BYCOMMAND | MF_GRAYED);
 		}
 	pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
@@ -608,27 +631,4 @@ void CPictures::OnEditInsert()
 	m_cnt = 1;
 	caption( m_cnt );
 	paintBlob( 0 );
-	
-//	m_ListCtrl.EnsureVisible( nItem, FALSE );
-
-//	if( m_ListCtrl.GetItemCount() ) GetDlgItem( IDC_PHOTOS )->EnableWindow( true );
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CPictures::displayPicture()
-{
-
-	m_command.Format( L"SELECT rowid FROM pictures WHERE id='%s' AND table_id=%d AND primaryPic=1", m_rowidP, PEOPLE );
-	if( !theApp.queryBlob( m_command ) ) return;
-
-	InvalidateRect( NULL, true );
-	m_paint = false;
-	CString rowid = theApp.m_recordsetBlob->GetFieldString( 0 );
-	if( !rowid.IsEmpty() )
-	{
-		_int64 blob_size;
-		void* block = theApp.blobDB->blobRead( "pictures", "picture", rowid, &blob_size );
-		if( block == NULL ) return;
-		if( !writeBlockToFile( block, blob_size ) ) return;
-		m_paint = true;
-	}
-	}

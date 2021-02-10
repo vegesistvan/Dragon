@@ -38,11 +38,11 @@ protected:
 	void createColumns();
 	void fillColumns();
 
-	void OnHtmlEdit();
-	void OnHtmlNotepad();
 	void OnHtmlEditLines();
+	void OnHtmlNotepad();
+	void OnHtmlNotepadParents();
+	void OnHtmlFatherAndSiblings();
 	void OnDbEdit();
-
 
 	DECLARE_MESSAGE_MAP()
 public:

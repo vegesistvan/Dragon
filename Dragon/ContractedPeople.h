@@ -38,8 +38,7 @@ protected:
 	std::vector<TCHAR*> vPeople; 
 	std::vector<TCHAR*> vFiltered; 
 
-//	SAMENAMES r;				// referencia adatok az összehasonlításnál
-	
+
 	void inputFile( int subType );
 	void getFileSpec( int type, int subtype );
 
@@ -57,18 +56,18 @@ public:
 	afx_msg void OnFilterAll();
 	afx_msg void OnFilter1();
 	afx_msg void OnFilter2();
-
-	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
-	afx_msg void OnHtmlEditLines();
-	afx_msg void OnHtmlPeoplefather();
-	afx_msg void OnHtmlNotepad();
-	afx_msg void OnEditNotepadParents();
 	afx_msg void OnInputDifferent();
 	afx_msg void OnInputUnited();
-
 	afx_msg void OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnHtml1D();
 	afx_msg void OnHtml1U();
 	afx_msg void OnHtml2D();
 	afx_msg void OnHtml2U();
+
+	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
+	afx_msg	void OnHtmlEditLines();
+	afx_msg void OnHtmlNotepad();
+	afx_msg void OnHtmlNotepadParents();
+	afx_msg void OnHtmlFatherAndSiblings();
+	afx_msg void OnDbEdit();
 };

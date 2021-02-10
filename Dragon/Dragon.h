@@ -285,7 +285,6 @@ public:
 	void CDragonApp::change( CString linenumber, CString line );
 	void CDragonApp::edit1line( int lineNumber );
 	void CDragonApp::edit2lines( std::vector<CString>* vLines );
-	void CDragonApp::editHtmlLines( CListCtrlEx * p_ListCtrl, int col_linennumber );
 	void CDragonApp::htmlEditLines( CListCtrlEx* p_ListCtrl, int col_linenumber, CString title );
 	void CDragonApp::HtmlNotepadParents( CString rowid );
 

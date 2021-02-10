@@ -130,15 +130,7 @@ public:
 	afx_msg void OnFilterSspouses();
 	afx_msg void OnFilterSfather();
 	afx_msg void OnFilterSmother();
-
-	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
-	afx_msg void OnHtmlFatherAndSiblings();
-	afx_msg void OnHtmlFamily();
-	afx_msg void OnHtmlEditLines();
-	afx_msg void OnHtmlNotepadParents();
-	afx_msg void OnEditNotepad();
-	afx_msg void OnDbEdit();
-
+	
 	afx_msg void OnGivenname();
 	afx_msg void OnAscendants();
 	afx_msg void OnAscendantsChain();
@@ -151,4 +143,12 @@ public:
 	afx_msg void OnFilterBisex();
 	afx_msg void OnClickedKeres();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
+
+	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
+	afx_msg	void OnHtmlEditLines();
+	afx_msg void OnHtmlNotepad();
+	afx_msg void OnHtmlNotepadParents();
+	afx_msg void OnHtmlFatherAndSiblings();
+	afx_msg void OnDbEdit();
+
 };

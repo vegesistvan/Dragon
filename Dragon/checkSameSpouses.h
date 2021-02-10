@@ -93,16 +93,16 @@ protected:
 	BOOL query3( CString command );
 	BOOL query4( CString command );
 
+	CColorStatic colorNext;
+	CString m_search;
+	CColorStatic colorKeress;
 
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
 	void createColumns();
 	void OnHtmlEdit();
 	
-	void OnHtmlEditLines();
-	void OnHtmlPeoplefather();
 	
-
 	void sameSpouses();
 	void sameSpouses2();
 	void same();
@@ -114,24 +114,19 @@ public:
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
 	afx_msg void OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnEditnotepad();
-	afx_msg void OnEditNotpadParents();
-	afx_msg void OnListPeople();
-	afx_msg void OnHtmlFamily();
-	afx_msg void OnFatherAndSiblings();
-	afx_msg void OnHtmlFatherAndSiblings();
 	afx_msg void OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
-
-	void CCheckSameSpouses::OnHtmlNotepad();
 	afx_msg void OnHtml();
 	afx_msg void OnInfo();
 	afx_msg void OnSpousesDiff();
-	CString m_search;
-	CColorStatic colorKeress;
 	afx_msg void OnClickedKeress();
 	afx_msg void OnClickedNext();
-	CColorStatic colorNext;
-	afx_msg void OnEdit2lines();
-	afx_msg void OnEditNotepadParents();
+
+	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
+	afx_msg	void OnHtmlEditLines();
+	afx_msg void OnHtmlNotepad();
+	afx_msg void OnHtmlNotepadParents();
+	afx_msg void OnHtmlFatherAndSiblings();
+	afx_msg void OnDbEdit();
+
+
 };

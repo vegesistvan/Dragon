@@ -49,8 +49,9 @@ protected:
 	void fillTable();
 
 	void OnHtmlEditLines();
-	void OnHtmlEdit();
 	void OnHtmlNotepad();
+	void OnHtmlNotepadParents();
+	void OnHtmlFatherAndSiblings();
 	void OnDbEdit();
 
 	DECLARE_MESSAGE_MAP()

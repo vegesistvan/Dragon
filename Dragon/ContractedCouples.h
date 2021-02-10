@@ -27,6 +27,9 @@ protected:
 	CListCtrlEx m_ListCtrl;
 	bool UNITED;
 	CMenu menu;
+	CColorStatic colorKeress;
+	CColorStatic colorNext;
+
 	std::vector<TCHAR*> vCouples; 
 	std::vector<TCHAR*> vFiltered; 
 
@@ -35,12 +38,6 @@ protected:
 	void push( CString item );
 	void keress( int start );
 
-	void OnHtmlEdit();
-	void OnHtmlEditLines();
-	void OnEdit2lines();
-	void OnHtmlNotepad();
-	void OnHtmlPeoplefather();
-	void OnEditNotepadParents();
 	void getFileSpec( int type, int subType );
 
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
@@ -52,9 +49,7 @@ public:
 	afx_msg void OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnClickedKeress();
 	afx_msg void OnClickedNext();
-	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
-	CColorStatic colorKeress;
-	CColorStatic colorNext;
+
 	afx_msg void OnInputDifferent();
 	afx_msg void OnInputUnited();
 	afx_msg void OnFilterAll();
@@ -65,4 +60,12 @@ public:
 	afx_msg void OnHtml1U();
 	afx_msg void OnHtml2D();
 	afx_msg void OnHtml2U();
+
+	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
+	afx_msg	void OnHtmlEditLines();
+	afx_msg void OnHtmlNotepad();
+	afx_msg void OnHtmlNotepadParents();
+	afx_msg void OnHtmlFatherAndSiblings();
+	afx_msg void OnDbEdit();
+
 };

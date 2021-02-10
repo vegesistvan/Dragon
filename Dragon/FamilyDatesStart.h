@@ -1,5 +1,6 @@
 #pragma once
 #include "afxwin.h"
+#include "colorstatic.h"
 
 
 // CFamilyDatesStart dialog
@@ -11,21 +12,33 @@ class CFamilyDatesStart : public CDialogEx
 public:
 	CFamilyDatesStart(CWnd* pParent = NULL);   // standard constructor
 	virtual ~CFamilyDatesStart();
-
-// Dialog Data
 	enum { IDD = IDD_FAMILYDATES_START };
 
-//	int m_type;
+	// átadott adatok
+	int	m_type;
+    int	m_maxLifespan;
+	int	m_maxDiffBetweenHW;
+	int	m_maxAgeHAtWedd;
+	int	m_minAgeHAtWedd;
+	int	m_maxAgeWAtWedd;
+	int	m_minAgeWAtWedd;
+	int	m_maxDiffFC;
+	int	m_minDiffFC;
+	int	m_minDiffMC;
+	int	m_maxDiffMC;
+
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	CColorStatic colorTitle;
 
-//	CButton m_RadioFamily;
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void OnClickedRadioNochildren();
-	afx_msg void OnRadioMorewifes();
-	afx_msg void OnRadioOnewife();
 	afx_msg void OnBnClickedOk();
 	virtual BOOL OnInitDialog();
-	int m_type;
+
+
+
+	
+	// 0 < megngedett érték < 120	int m_maxLifeSpan;
+
 };

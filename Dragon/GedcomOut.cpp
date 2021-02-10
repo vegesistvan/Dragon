@@ -39,7 +39,7 @@ enum
 // GAHTML
 enum
 {
-	H_ROWID = 0,
+	L_ROWID = 0,
 	H_ROWID_FILE,
 	H_FAMILYNUMBER,
 	H_TABLENUMBER,
@@ -281,7 +281,7 @@ void CGedcomOut::fillINDI( CListCtrlEx* p_ListCtrl )
 
 		if( theApp.m_inputMode == GAHTML ) 
 		{
-			rowidP = p_ListCtrl->GetItemText( i, H_ROWID );
+			rowidP = p_ListCtrl->GetItemText( i, L_ROWID );
 
 			vIndi.title			= p_ListCtrl->GetItemText( i, H_TITLE );
 			vIndi.titolo		= p_ListCtrl->GetItemText( i, H_TITOLO );

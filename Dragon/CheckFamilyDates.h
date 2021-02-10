@@ -10,6 +10,7 @@ typedef struct
 	CString name;
 	CString birth;
 	CString death;
+	CString age;
 	int		numOfSpouses;
 	CString message;
 }HUSBAND;
@@ -23,6 +24,7 @@ typedef struct
 	CString name;
 	CString birth;
 	CString death;
+	CString	age;
 	CString marriage;
 	int		motherOrder;
 	CString message;
@@ -36,6 +38,7 @@ typedef struct
 	CString name;
 	CString birth;
 	CString death;
+	CString	age;
 	CString father_id;
 	CString mother_id;
 	int		mother_index;
@@ -65,8 +68,6 @@ protected:
 
 	_int64 oneyear;
 
-	int m_type;
-
 	CString m_command;
 	CString str;
 	CString m_filespec;
@@ -78,29 +79,36 @@ protected:
 	CColorStatic colorKeres;
 	CColorStatic colorNext;
 
-//	std::vector<HUSBAND> vHusband;
 	std::vector<WIFES> vWifes;
 	std::vector<CHILDREN> vChildren;
 	std::vector<TCHAR*> vList;
 
-	CStringArray m_colors;
 	UINT	m_rgb[10];
 
 	HUSBAND h;
 	WIFES w;
 	CHILDREN c;
 
+	// átvett adatok
+	int	m_type;
+    int	m_maxLifespan;
+	int	m_maxDiffBetweenHW;
+	int	m_maxAgeHAtWedd;
+	int	m_minAgeHAtWedd;
+	int	m_maxAgeWAtWedd;
+	int	m_minAgeWAtWedd;
+	int	m_maxDiffFC;
+	int	m_minDiffFC;
+	int	m_minDiffMC;
+	int	m_maxDiffMC;
 
-	
-	int	m_maxLifeSpan;			// maximális életkor
-	int	m_minAgeWedding; 
 
-
+/*
 	int	m_maxDiffCM;		// gyerek és anya max korkülönbsége
 	int	m_minDiffCM;		// gyerek és anya min korkülönbsége
 	int m_minDiffCF;		// gyerek és apa mainimális korkülönbsége
 	int	m_maxDiffCF;		// gyerek és apa maximális korkülönbsége
-
+*/
 
 	int m_cnt;
 
@@ -112,12 +120,11 @@ protected:
 	void emptyLine();
 	void keress( int start );
 
-
-	void CCheckFamilyDates::OnHtmlEditLines();
-	void CCheckFamilyDates::OnHtmlNotepad();
-	void CCheckFamilyDates::OnHtmlFamily();
-	void CCheckFamilyDates::OnDbEdit();
+	void OnHtmlEditLines();
+	void OnHtmlNotepad();
+	void OnHtmlNotepadParents();
 	void OnHtmlFatherAndSiblings();
+	void OnDbEdit();
 
 public:
 	virtual BOOL OnInitDialog();

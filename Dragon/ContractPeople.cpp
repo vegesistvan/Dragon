@@ -174,7 +174,7 @@ bool CContractPeople::contractPeople()
 //	if( dlg.DoModal() == IDCANCEL ) return false;
 
 
-
+/*
 	CString fileName;
 	
 	fileName = L"peopleUnited";
@@ -182,6 +182,14 @@ bool CContractPeople::contractPeople()
 
 	fileName = L"peopleDifferent";
 	m_fileSpecTextD = theApp.openTextFile( &textD, fileName, L"w+" );
+*/
+
+	m_fileSpecTextU.Format( L"%s\\%s_UNITED.txt", theApp.m_databasePath, theApp.m_baseName );
+	if( !openFileSpec( &textU, m_fileSpecTextU, L"w+" ) ) return NULL;
+	
+	m_fileSpecTextD.Format( L"%s\\%s_DIFFERENT.txt", theApp.m_databasePath, theApp.m_baseName );
+	if( !openFileSpec( &textD, m_fileSpecTextD, L"w+" ) ) return NULL;
+	
 
 	CString drive;
 	CString path;

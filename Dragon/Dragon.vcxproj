@@ -252,7 +252,6 @@
     <ClInclude Include="TableCouples.h" />
     <ClInclude Include="Table_blobs.h" />
     <ClInclude Include="Table_people.h" />
-    <ClInclude Include="Table_places.h" />
     <ClInclude Include="SelectMother.h" />
     <ClInclude Include="Setup.h" />
     <ClInclude Include="html_Descendants.h" />
@@ -378,7 +377,6 @@
     <ClCompile Include="TableCouples.cpp" />
     <ClCompile Include="Table_blobs.cpp" />
     <ClCompile Include="Table_people.cpp" />
-    <ClCompile Include="Table_places.cpp" />
     <ClCompile Include="SelectMother.cpp" />
     <ClCompile Include="Setup.cpp" />
     <ClCompile Include="html_Descendants.cpp" />

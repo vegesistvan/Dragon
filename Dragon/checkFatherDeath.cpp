@@ -99,10 +99,12 @@ BEGIN_MESSAGE_MAP(CCheckFatherDeath9, CDialogEx)
 	ON_WM_SIZE()
 	ON_WM_SIZING()
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST, &CCheckFatherDeath9::OnCustomdrawList)
-	
+
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
 	ON_COMMAND(ID_HTML_EDIT, &CCheckFatherDeath9::OnHtmlEditLines)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CCheckFatherDeath9::OnHtmlNotepad)
+	ON_COMMAND(ID_HTML_NOTEPAD_PARENTS, &CCheckFatherDeath9::OnHtmlNotepadParents)
+	ON_COMMAND(ID_HTML_FATHERANDSIBLINGS, &CCheckFatherDeath9::OnHtmlFatherAndSiblings)
 	ON_COMMAND(ID_DB_EDIT, &CCheckFatherDeath9::OnDbEdit)
 
 	ON_COMMAND(ID_LIST, &CCheckFatherDeath9::OnList)
@@ -588,6 +590,27 @@ void CCheckFatherDeath9::OnHtmlEditLines()
 
 	theApp.htmlEditLines( &m_ListCtrl, L_LINENUMBER, title );
 }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckFatherDeath9::OnHtmlNotepadParents()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+	CString rowid = m_ListCtrl.GetItemText( nItem, L_ROWID );
+
+	theApp.HtmlNotepadParents( rowid );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckFatherDeath9::OnHtmlFatherAndSiblings()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
+	CHtmlEditLines dlg;
+	dlg.m_title.Format( L"%s szülei és testvérei", m_ListCtrl.GetItemText( nItem, L_NAME ) );
+	dlg.m_type	= L"F_SIBLINGS";
+	dlg.m_rowid = rowid;
+	dlg.DoModal();
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckFatherDeath9::OnDbEdit()
 {

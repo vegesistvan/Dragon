@@ -17,33 +17,33 @@
 // CListCtrl táblázat oszlopai
 enum
 {
-	S_CNT = 0,
-	S_LOOP, 
-	S_GROUP,
-	S_MATCH,
-	S_GROUP2,
-	S_STATUS,
-	S_RGBCOLOR,
-	S_LINE,
-	S_UNITED,
-	S_GENERATION,
-	S_SOURCE,
-	S_ROWID,
-	S_NAME,
-	S_BIRTH,
-	S_DEATH,
-	S_ROWIDF,
-	S_FATHER,
-	S_BIRTHF,
-	S_DEATHF,
-	S_ROWIDM,
-	S_MOTHER,
-	S_BIRTHM,
-	S_DEATHM,
-	S_ROWIDS,
-	S_SPOUSES,
-	S_LINEF,
-	S_COLUMNSCOUNT,
+	L_CNT = 0,
+	L_LOOP, 
+	L_GROUP,
+	L_MATCH,
+	L_GROUP2,
+	L_STATUS,
+	L_RGBCOLOR,
+	L_LINENUMBER,
+	L_UNITED,
+	L_GENERATION,
+	L_SOURCE,
+	L_ROWID,
+	L_NAME,
+	L_BIRTH,
+	L_DEATH,
+	L_ROWIDF,
+	L_FATHER,
+	L_BIRTHF,
+	L_DEATHF,
+	L_ROWIDM,
+	L_MOTHER,
+	L_BIRTHM,
+	L_DEATHM,
+	L_ROWIDS,
+	L_SPOUSES,
+	L_LINEF,
+	L_COLUMNSCOUNT,
 };
 IMPLEMENT_DYNAMIC(CContractedPeople, CDialogEx)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -77,20 +77,25 @@ BEGIN_MESSAGE_MAP(CContractedPeople, CDialogEx)
 	ON_COMMAND(ID_FILTER_1, &CContractedPeople::OnFilter1)
 	ON_COMMAND(ID_FILTER_2, &CContractedPeople::OnFilter2)
 
-	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_EDIT2LINES, &CContractedPeople::OnEdit2lines)
-	ON_COMMAND(ID_HTML_EDIT, &CContractedPeople::OnHtmlEditLines)
-	ON_COMMAND(ID_HTML_PEOPLEFATHER, &CContractedPeople::OnHtmlPeoplefather)
-	ON_COMMAND(ID_EDIT_NOTEPAD_PARENTS, &CContractedPeople::OnEditNotepadParents)
-	ON_COMMAND(ID_HTML_NOTEPAD, &CContractedPeople::OnHtmlNotepad)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CContractedPeople::OnDblclkList)
 	ON_COMMAND(ID_INPUT_UNITED, &CContractedPeople::OnInputUnited)
 	ON_COMMAND(ID_INPUT_DIFFERENT, &CContractedPeople::OnInputDifferent)
-ON_COMMAND(ID_HTML_1_D, &CContractedPeople::OnHtml1D)
-ON_COMMAND(ID_HTML_1_U, &CContractedPeople::OnHtml1U)
-ON_COMMAND(ID_HTML_2_D, &CContractedPeople::OnHtml2D)
-ON_COMMAND(ID_HTML_2_U, &CContractedPeople::OnHtml2U)
-//ON_NOTIFY(NM_CLICK, IDC_LIST, &CContractedPeople::OnClickList)
+
+	ON_COMMAND(ID_HTML_1_D, &CContractedPeople::OnHtml1D)
+	ON_COMMAND(ID_HTML_1_U, &CContractedPeople::OnHtml1U)
+	ON_COMMAND(ID_HTML_2_D, &CContractedPeople::OnHtml2D)
+	ON_COMMAND(ID_HTML_2_U, &CContractedPeople::OnHtml2U)
+
+	// IDR_DROPDOWN_HTML funkciók	
+	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
+	ON_COMMAND(ID_HTML_EDIT, &CContractedPeople::OnHtmlEditLines)
+	ON_COMMAND(ID_HTML_NOTEPAD, &CContractedPeople::OnHtmlNotepad)
+	ON_COMMAND(ID_HTML_NOTEPAD_PARENTS, &CContractedPeople::OnHtmlNotepadParents)
+	ON_COMMAND(ID_HTML_FATHERANDSIBLINGS, &CContractedPeople::OnHtmlFatherAndSiblings)
+	ON_COMMAND(ID_DB_EDIT, &CContractedPeople::OnDbEdit)
+
+
+
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CContractedPeople::OnInitDialog()
@@ -180,9 +185,9 @@ void CContractedPeople::inputFile( int subType )
 	{
 		++cnt;
 		n = wordList( &A, cLine, '\t', true );
-		if( n != S_COLUMNSCOUNT )
+		if( n != L_COLUMNSCOUNT )
 		{
-			str.Format( L"Az %d. sorban az elemek száma %d.\n%d kellen lenni.", cnt, n, S_COLUMNSCOUNT );
+			str.Format( L"Az %d. sorban az elemek száma %d.\n%d kellen lenni.", cnt, n, L_COLUMNSCOUNT );
 			AfxMessageBox( str );
 			CDialog::OnCancel();
 		}
@@ -295,7 +300,7 @@ void CContractedPeople::keress( int start )
 
 	for( nItem = start; nItem < itemCnt-1; ++nItem )
 	{
-		str = m_ListCtrl.GetItemText( nItem, S_NAME );
+		str = m_ListCtrl.GetItemText( nItem, L_NAME );
 		str = str.Left(length);						// az aktuális search string hosszával azonos hosszúság leválasztása
 		if( str == search )	break;
 		wndProgress.StepIt();
@@ -333,36 +338,36 @@ void CContractedPeople::createColumns()
 	m_ListCtrl.KeepSortOrder(TRUE);
 	m_ListCtrl.SetExtendedStyle(m_ListCtrl.GetExtendedStyle()| LVS_EX_GRIDLINES );
 	
-	m_ListCtrl.InsertColumn( S_CNT,				L"xyz",			LVCFMT_RIGHT,	 30,-1,COL_HIDDEN);
-	m_ListCtrl.InsertColumn( S_LOOP,			L"loop",		LVCFMT_RIGHT,	 30,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_GROUP,			L"gr",			LVCFMT_RIGHT,	 30,-1,COL_HIDDEN);
-	m_ListCtrl.InsertColumn( S_MATCH,			L"m#",			LVCFMT_RIGHT,	 30,-1,COL_HIDDEN);
-	m_ListCtrl.InsertColumn( S_GROUP2,			L"gr2",			LVCFMT_RIGHT,	 30,-1,COL_HIDDEN);
-	m_ListCtrl.InsertColumn( S_STATUS,			L"st",			LVCFMT_RIGHT,	 30,-1,COL_HIDDEN);
-	m_ListCtrl.InsertColumn( S_RGBCOLOR,		L"color",		LVCFMT_RIGHT,	 30,-1,COL_HIDDEN);
-	m_ListCtrl.InsertColumn( S_LINE,			L"line#",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_UNITED,			L"U",			LVCFMT_LEFT,	 20,-1,COL_NUM );
-	m_ListCtrl.InsertColumn( S_SOURCE,			L"S",			LVCFMT_RIGHT,	 20,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_GENERATION,		L"G",			LVCFMT_RIGHT,	 20,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_CNT,				L"xyz",			LVCFMT_RIGHT,	 30,-1,COL_HIDDEN);
+	m_ListCtrl.InsertColumn( L_LOOP,			L"loop",		LVCFMT_RIGHT,	 30,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_GROUP,			L"gr",			LVCFMT_RIGHT,	 30,-1,COL_HIDDEN);
+	m_ListCtrl.InsertColumn( L_MATCH,			L"m#",			LVCFMT_RIGHT,	 30,-1,COL_HIDDEN);
+	m_ListCtrl.InsertColumn( L_GROUP2,			L"gr2",			LVCFMT_RIGHT,	 30,-1,COL_HIDDEN);
+	m_ListCtrl.InsertColumn( L_STATUS,			L"st",			LVCFMT_RIGHT,	 30,-1,COL_HIDDEN);
+	m_ListCtrl.InsertColumn( L_RGBCOLOR,		L"color",		LVCFMT_RIGHT,	 30,-1,COL_HIDDEN);
+	m_ListCtrl.InsertColumn( L_LINENUMBER,			L"line#",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_UNITED,			L"U",			LVCFMT_LEFT,	 20,-1,COL_NUM );
+	m_ListCtrl.InsertColumn( L_SOURCE,			L"S",			LVCFMT_RIGHT,	 20,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_GENERATION,		L"G",			LVCFMT_RIGHT,	 20,-1,COL_NUM);
 	
-	m_ListCtrl.InsertColumn( S_ROWID,			L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_NAME,			L"név",			LVCFMT_LEFT,	200,-1,COL_TEXT );
-	m_ListCtrl.InsertColumn( S_BIRTH,			L"születés",	LVCFMT_LEFT,	 70,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_DEATH,			L"halálozás",	LVCFMT_LEFT,	 70,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_ROWID,			L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_NAME,			L"név",			LVCFMT_LEFT,	200,-1,COL_TEXT );
+	m_ListCtrl.InsertColumn( L_BIRTH,			L"születés",	LVCFMT_LEFT,	 70,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_DEATH,			L"halálozás",	LVCFMT_LEFT,	 70,-1,COL_NUM);
 	
-	m_ListCtrl.InsertColumn( S_ROWIDF,			L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_FATHER,			L"apa",			LVCFMT_LEFT,	200,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( S_BIRTHF,			L"születés",	LVCFMT_LEFT,	 70,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_DEATHF,			L"halál",		LVCFMT_LEFT,	 70,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_ROWIDM,			L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_ROWIDF,			L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_FATHER,			L"apa",			LVCFMT_LEFT,	200,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_BIRTHF,			L"születés",	LVCFMT_LEFT,	 70,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_DEATHF,			L"halál",		LVCFMT_LEFT,	 70,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_ROWIDM,			L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	
-	m_ListCtrl.InsertColumn( S_MOTHER,			L"anya",		LVCFMT_LEFT,	200,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( S_BIRTHM,			L"születés",	LVCFMT_LEFT,	 70,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_DEATHM,			L"halál",		LVCFMT_LEFT,	 70,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( S_ROWIDS,			L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_MOTHER,			L"anya",		LVCFMT_LEFT,	200,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_BIRTHM,			L"születés",	LVCFMT_LEFT,	 70,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_DEATHM,			L"halál",		LVCFMT_LEFT,	 70,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_ROWIDS,			L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	
-	m_ListCtrl.InsertColumn( S_SPOUSES,			L"házastársak",	LVCFMT_LEFT,	500,-1,COL_TEXT );
-	m_ListCtrl.InsertColumn( S_LINEF,			L"line#F",		LVCFMT_LEFT,	 60,-1,COL_HIDDEN );
+	m_ListCtrl.InsertColumn( L_SPOUSES,			L"házastársak",	LVCFMT_LEFT,	500,-1,COL_TEXT );
+	m_ListCtrl.InsertColumn( L_LINEF,			L"line#F",		LVCFMT_LEFT,	 60,-1,COL_HIDDEN );
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -390,9 +395,9 @@ void CContractedPeople::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
 		if( UNITED )
 		{
 			if( vFiltered.size() )
-				pLVCD->clrTextBk = _wtoi( vFiltered.at( nItem*S_COLUMNSCOUNT + S_RGBCOLOR ) );
+				pLVCD->clrTextBk = _wtoi( vFiltered.at( nItem*L_COLUMNSCOUNT + L_RGBCOLOR ) );
 			else
-				pLVCD->clrTextBk = _wtoi( vPeople.at( nItem*S_COLUMNSCOUNT + S_RGBCOLOR ) );
+				pLVCD->clrTextBk = _wtoi( vPeople.at( nItem*L_COLUMNSCOUNT + L_RGBCOLOR ) );
 		}
 		*pResult = CDRF_DODEFAULT;
 		break;
@@ -421,12 +426,12 @@ void CContractedPeople::OnFilter1()
 {
 	int loop;
 	vFiltered.clear();
-	for( UINT i = 0; i < vPeople.size()- S_COLUMNSCOUNT+1; i += S_COLUMNSCOUNT)
+	for( UINT i = 0; i < vPeople.size()- L_COLUMNSCOUNT+1; i += L_COLUMNSCOUNT)
 	{
 		loop = _wtoi( vPeople.at(i+1) );
 		if( loop == 1 )
 		{
-			for( UINT j = 0; j < S_COLUMNSCOUNT; ++j ) // ix-1 a cnt-re mutat
+			for( UINT j = 0; j < L_COLUMNSCOUNT; ++j ) // ix-1 a cnt-re mutat
 			{
 				vFiltered.push_back( vPeople.at( i + j  ) );
 			}
@@ -446,12 +451,12 @@ void CContractedPeople::OnFilter2()
 {
 	int loop;
 	vFiltered.clear();
-	for( UINT i = 0; i < vPeople.size()- S_COLUMNSCOUNT+1; i += S_COLUMNSCOUNT )
+	for( UINT i = 0; i < vPeople.size()- L_COLUMNSCOUNT+1; i += L_COLUMNSCOUNT )
 	{
 		loop = _wtoi( vPeople.at(i+1) );
 		if( loop == 2 )
 		{
-			for( UINT j = 0; j < S_COLUMNSCOUNT; ++j ) // ix-1 a cnt-re mutat
+			for( UINT j = 0; j < L_COLUMNSCOUNT; ++j ) // ix-1 a cnt-re mutat
 			{
 				vFiltered.push_back( vPeople.at( i + j  ) );
 			}
@@ -465,114 +470,19 @@ void CContractedPeople::OnFilter2()
 	m_ListCtrl.SetItemCountEx( vFiltered.size() + 1  );
 	m_ListCtrl.AttachDataset( &vFiltered );
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-LRESULT CContractedPeople::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
-{
-	CPoint* point=(CPoint*) lParam;
-    CMenu	Menu;
-	CMenu*	pPopup;
-
-
-	if(Menu.LoadMenu( IDR_DROPDOWN_HTML_P ))
-    {
-		pPopup = Menu.GetSubMenu(0);
-		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
-    }
-	return TRUE;
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CContractedPeople::OnEdit2lines()
-{
-	theApp.editHtmlLines( &m_ListCtrl, S_LINE );
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CContractedPeople::OnHtmlNotepad()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	CString lineNumber = m_ListCtrl.GetItemText( nItem, 	S_LINE );
-	if( !lineNumber.IsEmpty() ) 
-		theApp.editNotepad( lineNumber );
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CContractedPeople::OnHtmlEditLines()
-{
-		CString title;
-	int selectedCount	= m_ListCtrl.GetSelectedCount();
-	int nItem			= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	if( selectedCount == 1 )
-		title.Format( L"%s a ga.html fájlban  (%s. sor)", m_ListCtrl.GetItemText( nItem, S_NAME ), m_ListCtrl.GetItemText( nItem, S_LINE ) );
-	else
-		title.Format( L"%d kijelölt ember a ga.html fájlban", selectedCount );
-
-	theApp.htmlEditLines( &m_ListCtrl, S_LINE, title );
-	/*
-	POSITION	pos = m_ListCtrl.GetFirstSelectedItemPosition();
-	int			nItem;
-	std::vector<CString> vLines;
-
-	int cnt = 0;
-	CString name(L"");
-
-	while( pos )
-	{
-		nItem = m_ListCtrl.GetNextSelectedItem( pos );
-		vLines.push_back( m_ListCtrl.GetItemText( nItem, S_LINE ) );
-		if( name.Compare( m_ListCtrl.GetItemText( nItem, S_NAME ) ) )
-		{
-			name = m_ListCtrl.GetItemText( nItem, S_NAME );
-			++cnt;
-		}
-	
-
-	}
-
-	CHtmlEditLines dlg;
-	if( !name.IsEmpty() )
-	{
-		str.Format( L"%s kijelölt sora a html fájlban", name ); 
-		dlg.m_title = str;
-	}
-	else
-		dlg.m_title = L"Kijelölt sorok a htm fájlban";
-	dlg.vLines = &vLines;
-
-	dlg.DoModal();
-	*/
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CContractedPeople::OnHtmlPeoplefather()
-{
-	int nItem		= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	CString rowid	= m_ListCtrl.GetItemText( nItem, S_ROWID );
-	CHtmlEditLines dlg;
-	dlg.m_rowid = rowid;
-	dlg.DoModal();
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CContractedPeople::OnEditNotepadParents()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	if( nItem == - 1 )
-	{
-		theApp.message( L"", L"Nincs kijelölve ember!" );
-		return;
-	}
-	CString lineNumberF	= m_ListCtrl.GetItemText( nItem, 	S_LINEF );
-	if( !lineNumberF.IsEmpty() ) theApp.editNotepad( lineNumberF );
-}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedPeople::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 
 	int nItem = pNMItemActivate->iItem;
-	if( m_ListCtrl.GetItemText( nItem, S_STATUS ) == L"-1" )
+	if( m_ListCtrl.GetItemText( nItem, L_STATUS ) == L"-1" )
 	{
 		AfxMessageBox( L"Ez összevont bejegyzés, nincs mögötte már ember!" );
 		return;
 	}
 
-	CString rowid	= m_ListCtrl.GetItemText( nItem, S_ROWID );
+	CString rowid	= m_ListCtrl.GetItemText( nItem, L_ROWID );
 
 	CRelations dlg;
 	dlg.nItem		= nItem;
@@ -618,3 +528,74 @@ void CContractedPeople::getFileSpec( int type, int subType )
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+LRESULT CContractedPeople:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
+{
+	CPoint* point=(CPoint*) lParam;
+    CMenu	Menu;
+	CMenu*	pPopup;
+
+
+	if(Menu.LoadMenu( IDR_DROPDOWN_HTML ))
+    {
+		pPopup = Menu.GetSubMenu(0);
+		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
+		{
+			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
+			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
+		}
+		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
+    }
+	return TRUE;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedPeople::OnHtmlEditLines()
+{
+	CString title;
+	int selectedCount	= m_ListCtrl.GetSelectedCount();
+	int nItem			= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	if( selectedCount == 1 )
+		title.Format( L"%s a ga.html fájlban (%s. sor)", m_ListCtrl.GetItemText( nItem, L_NAME ), m_ListCtrl.GetItemText( nItem, L_LINENUMBER )  );
+	else
+		title.Format( L"%d kijelölt ember a ga.html fájlban", selectedCount );
+
+	theApp.htmlEditLines( &m_ListCtrl, L_LINENUMBER, title );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedPeople::OnHtmlNotepad()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	CString lineNumber = m_ListCtrl.GetItemText( nItem,	L_LINENUMBER );
+	if( !lineNumber.IsEmpty() ) 
+		theApp.editNotepad( lineNumber );
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedPeople::OnHtmlNotepadParents()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+	CString rowid = m_ListCtrl.GetItemText( nItem, L_ROWID );
+
+	theApp.HtmlNotepadParents( rowid );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedPeople::OnHtmlFatherAndSiblings()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
+	CHtmlEditLines dlg;
+	dlg.m_title.Format( L"%s szülei és testvérei", m_ListCtrl.GetItemText( nItem, L_NAME ) );
+	dlg.m_type	= L"F_SIBLINGS";
+	dlg.m_rowid = rowid;
+	dlg.DoModal();
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedPeople::OnDbEdit()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
+	CRelations dlg;
+	dlg.m_rowid = rowid;
+	dlg.DoModal();
+}
+

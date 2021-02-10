@@ -51,19 +51,17 @@ void CTableTables::DoDataExchange(CDataExchange* pDX)
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CTableTables, CDialogEx)
-
+// Dropdown functions
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
 	ON_COMMAND(ID_HTML_EDIT, &CTableTables::OnHtmlEdit)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CTableTables::OnHtmlNotepad)
-
-
 	ON_COMMAND(ID_EDIT_INSERT, &CTableTables::OnEditInsert)
 	ON_COMMAND(ID_EDIT_UPDATE, &CTableTables::OnEditUpdate)
 	ON_COMMAND(ID_EDIT_DELETE, &CTableTables::OnEditDelete)
 
 	ON_WM_SIZE()
 	ON_WM_SIZING()
-//	ON_EN_CHANGE(IDC_SEARCH, &CTableTables::OnChangeSearch)
+
 	ON_MESSAGE(WM_SET_COLUMN_COLOR, OnSetColumnColor)
 	ON_MESSAGE(WM_CLICKED_COLUMN, OnColumnSorted)
 	ON_COMMAND(ID_EXPORT_ALL, &CTableTables::OnExportAll)
@@ -78,9 +76,8 @@ BEGIN_MESSAGE_MAP(CTableTables, CDialogEx)
 	ON_COMMAND(ID_DESCENDANTS_TABLE, &CTableTables::OnDescendantsTable)
 	ON_COMMAND(ID_FILTER_NAME, &CTableTables::OnFilterName)
 	ON_COMMAND(ID_FILTER_TABLES, &CTableTables::OnFilterTables)
-//	ON_COMMAND(ID_PRIVAT_DESCENDANTS_TABLE, &CTableTables::OnPrivatDescendantsTable)
-ON_COMMAND(ID_PRIVAT_DESCENDANTS_TABLE, &CTableTables::OnPrivatDescendantsTable)
-ON_STN_CLICKED(IDC_KERES, &CTableTables::OnClickedKeres)
+	ON_COMMAND(ID_PRIVAT_DESCENDANTS_TABLE, &CTableTables::OnPrivatDescendantsTable)
+	ON_STN_CLICKED(IDC_KERES, &CTableTables::OnClickedKeres)
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CTableTables::OnInitDialog()
@@ -551,18 +548,25 @@ LRESULT CTableTables::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 	int		MENU_IDR;
 
 	if( theApp.m_inputMode == GEDCOM )
-		MENU_IDR = IDR_DROPDOWN_DELETE;
+		MENU_IDR = IDR_DROPDOWN_EDIT;
 	else if( theApp.m_inputMode == GAHTML )
 		MENU_IDR = IDR_DROPDOWN_HTML;
 	else if( theApp.m_inputMode == MANUAL )
-		MENU_IDR = IDR_DROPDOWN_DELETE;
+		MENU_IDR = IDR_DROPDOWN_EDIT;
 
 	if(Menu.LoadMenu( MENU_IDR ))
     {
 		pPopup = Menu.GetSubMenu(0);
+		pPopup->EnableMenuItem(ID_EDIT_INSERT,MF_BYCOMMAND | MF_GRAYED);
+		pPopup->EnableMenuItem(ID_EDIT_UPDATE,MF_BYCOMMAND | MF_GRAYED);
+
+
+		pPopup->EnableMenuItem(ID_HTML_NOTEPAD_PARENTS,MF_BYCOMMAND | MF_GRAYED);
+		pPopup->EnableMenuItem(ID_HTML_FATHERANDSIBLINGS,MF_BYCOMMAND | MF_GRAYED);
+		pPopup->EnableMenuItem(ID_DB_EDIT,MF_BYCOMMAND | MF_GRAYED);
+
 		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
 		{
-//			pPopup->EnableMenuItem(ID_DB_EDIT,MF_BYCOMMAND | MF_GRAYED);
 //			pPopup->EnableMenuItem(ID_EDIT_DELETE,MF_BYCOMMAND | MF_GRAYED);
 		}
 		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);

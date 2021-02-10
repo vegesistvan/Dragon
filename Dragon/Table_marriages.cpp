@@ -16,6 +16,7 @@
 #include "windows.h"
 #include "ProgressWnd.h"
 #include "utilities.h"
+#include "Relations.h"
 
 #include "checkParam0.h"
 #include <algorithm>
@@ -170,7 +171,15 @@ BEGIN_MESSAGE_MAP(CTableMarriages, CDialogEx)
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
 	ON_COMMAND(ID_EDIT_UPDATE, &CTableMarriages::OnEditUpdate)
 	ON_COMMAND(ID_EDIT_DELETE, &CTableMarriages::OnEditDelete)
-	ON_COMMAND(ID_EDIT_GAHTML, &CTableMarriages::OnEditGahtml)
+
+	ON_COMMAND(ID_DB_EDIT, &CTableMarriages::OnDbEdit)
+	ON_COMMAND(ID_HTML_NOTEPAD_PARENTS, &CTableMarriages::OnHtmlNotepadParents )
+	ON_COMMAND(ID_HTML_FATHERANDSIBLINGS, &CTableMarriages::OnHtmlFatherAndSiblings)
+	ON_COMMAND(ID_HTML_EDIT, &CTableMarriages::OnHtmlEditLines)
+	ON_COMMAND(ID_HTML_NOTEPAD, &CTableMarriages::OnHtmlNotepad)	
+
+
+//	ON_COMMAND(ID_EDIT_GAHTML, &CTableMarriages::OnEditGahtml)
 	
 	
 END_MESSAGE_MAP()
@@ -701,58 +710,6 @@ void CTableMarriages::OnClose()
 	theApp.m_pMainWnd->SetForegroundWindow();
 	CDialogEx::OnClose();
 }
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTableMarriages::OnHtmlNotepad()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	CString linenumber;
-	if( m_columnsCount == 18 )
-		linenumber = m_ListCtrl.GetItemText( nItem, LIST_LINENUMBER );
-	else
-		linenumber = m_ListCtrl.GetItemText( nItem, L_LINENUMBER );
-
-	if( !linenumber.IsEmpty() ) 
-		theApp.editNotepad( linenumber );
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-void CTableMarriages::OnHtmlEdit()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	int linenumber;
-	if( m_columnsCount == 18 )
-		linenumber = _wtoi( m_ListCtrl.GetItemText( nItem, LIST_LINENUMBER ) );
-	else
-		linenumber = _wtoi( m_ListCtrl.GetItemText( nItem, L_LINENUMBER ) );
-
-
-	theApp.listHtmlLine( linenumber );
-}
-*/
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTableMarriages::OnHtmlEditLines()
-{
-	CString title;
-	int selectedCount	= m_ListCtrl.GetSelectedCount();
-	int nItem			= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	if( selectedCount == 1 )
-	{
-		if( m_columnsCount == 18 )
-			title.Format( L"%s a ga.html fájlban (%s. sor)",  m_ListCtrl.GetItemText( nItem, LIST_HFIRSTNAME), m_ListCtrl.GetItemText( nItem, LIST_LINENUMBER ) );
-		else
-			title.Format( L"%s. sor a ga.html fájlban",   m_ListCtrl.GetItemText( nItem, LIST_LINENUMBER ) );
-	}
-	else
-		title.Format( L"%d kijelölt ember a ga.html fájlban", selectedCount );
-
-		
-
-	if( m_columnsCount == 18 )
-		theApp.htmlEditLines( &m_ListCtrl, LIST_LINENUMBER, title );
-	else
-		theApp.htmlEditLines( &m_ListCtrl, L_LINENUMBER, title );
-}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTableMarriages::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
 {
@@ -776,113 +733,6 @@ void CTableMarriages::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
 			theApp.listHtmlLine( lineNumber );
 		}
 	}
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-LRESULT CTableMarriages::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
-{
-	CPoint* point=(CPoint*) lParam;
-    CMenu	Menu;
-	CMenu*	pPopup = NULL;
-
-
-	if( theApp.m_inputMode == GAHTML )
-	{
-//		if(Menu.LoadMenu( IDR_DROPDOWN_HTML ))
-		if(Menu.LoadMenu( IDR_DROPDOWN_EDIT ))
-		{
-			pPopup = Menu.GetSubMenu(0);
-			if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
-			{
-				pPopup->EnableMenuItem(ID_EDIT_UPDATE,MF_BYCOMMAND | MF_GRAYED);
-				pPopup->EnableMenuItem(ID_EDIT_DELETE,MF_BYCOMMAND | MF_GRAYED);
-				pPopup->EnableMenuItem(ID_EDIT_GAHTML,MF_BYCOMMAND | MF_GRAYED);
-			}
-		 }
-	}
-	else
-	{
-		if(Menu.LoadMenu( IDR_DROPDOWN_DELETE_UPDATE ))
-		{
-			pPopup = Menu.GetSubMenu(0);
-			if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
-			{
-				pPopup->EnableMenuItem(ID_EDIT_UPDATE,MF_BYCOMMAND | MF_GRAYED);
-				pPopup->EnableMenuItem(ID_EDIT_DELETE,MF_BYCOMMAND | MF_GRAYED);
-			}
-
-		 }
-	}
-	pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
-
-	return TRUE;
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTableMarriages::OnEditUpdate()
-{
-
-
-//	ShowWindow( SW_HIDE );
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	CEditMarriage dlg;
-	dlg.m_rowid = m_ListCtrl.GetItemText( nItem, LIST_ROWID );
-	dlg.DoModal();
-
-
-
-//	HWND hWind = ::FindWindow( TEXT( "CTableMarriages" ), NULL );
-//	ShowWindow( hWind, SW_RESTORE );
-
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTableMarriages::OnEditDelete()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-
-	CString	rowid;
-	rowid		= m_ListCtrl.GetItemText( nItem, LIST_ROWID );
-
-	str.Format( L"Tényleg törölni akarod a rowid=%s házasságot?", rowid );
-	if( AfxMessageBox( str, MB_YESNO ) == IDNO ) return;
-
-
-	m_command.Format( L"DELETE FROM marriages WHERE rowid='%s'", rowid );
-	if( !theApp.execute( m_command ) ) return;
-
-	m_ListCtrl.DeleteItem( nItem );
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTableMarriages::OnEditGahtml()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-
-	if( _waccess( theApp.m_htmlFileSpec, 0 ) )
-	{
-		AfxMessageBox( L"file does not exist!" );
-		return;
-	}
-
-	int htmlLineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	LIST_LINENUMBER ) );
-	CHtmlEditLine dlg;
-
-	theApp.m_inputCode = GetInputCode( theApp.m_htmlFileSpec );
-	CStdioFile file( theApp.m_htmlFileSpec, CFile::modeRead); 
-	CString cLine;
-	
-	for( int i = 0; i < htmlLineNumber; ++i ) 
-		file.ReadString( cLine );
-
-	file.Close();
-
-	cLine.Trim();
-	if( theApp.m_inputCode == UTF8 || theApp.m_inputCode == UTF8BOM ) cLine = Utf8ToAnsi( cLine );
-	if( cLine.GetAt(0) != '%' || cLine.Left(3) == L"%%%" )
-	{
-		cLine = cleanHtmlLine( cLine );
-	}
-	dlg.m_line = cLine;
-	dlg.DoModal();
-
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTableMarriages::OnClickedNext()
@@ -1737,4 +1587,119 @@ L"rowid", L"anyja", L"születés", L"halál"\
 void CTableMarriages::OnManMorespouses()
 {
 	// TODO: Add your command handler code here
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+LRESULT CTableMarriages::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
+{
+	CPoint* point=(CPoint*) lParam;
+    CMenu	Menu;
+	CMenu*	pPopup = NULL;
+
+
+	if( theApp.m_inputMode == GAHTML )
+	{
+		if(Menu.LoadMenu( IDR_DROPDOWN_HTML ))
+		{
+			pPopup = Menu.GetSubMenu(0);
+		}
+	}
+	else
+	{
+		if(Menu.LoadMenu( IDR_DROPDOWN_EDIT ))
+		{
+			pPopup = Menu.GetSubMenu(0);
+			pPopup->EnableMenuItem(ID_EDIT_INSERT,MF_BYCOMMAND | MF_GRAYED);
+			if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
+			{
+				pPopup->EnableMenuItem(ID_EDIT_UPDATE,MF_BYCOMMAND | MF_GRAYED);
+				pPopup->EnableMenuItem(ID_EDIT_DELETE,MF_BYCOMMAND | MF_GRAYED);
+			}
+
+		 }
+	}
+	pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
+
+	return TRUE;
+}
+// MANUAL DB
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTableMarriages::OnEditUpdate()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	CEditMarriage dlg;
+	dlg.m_rowid = m_ListCtrl.GetItemText( nItem, LIST_ROWID );
+	dlg.DoModal();
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTableMarriages::OnEditDelete()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+
+	CString	rowid;
+	rowid		= m_ListCtrl.GetItemText( nItem, LIST_ROWID );
+
+	str.Format( L"Tényleg törölni akarod a rowid=%s házasságot?", rowid );
+	if( AfxMessageBox( str, MB_YESNO ) == IDNO ) return;
+
+
+	m_command.Format( L"DELETE FROM marriages WHERE rowid='%s'", rowid );
+	if( !theApp.execute( m_command ) ) return;
+
+	m_ListCtrl.DeleteItem( nItem );
+}
+
+// GA.HTML DB
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTableMarriages::OnHtmlEditLines()
+{
+	CString title;
+	int selectedCount	= m_ListCtrl.GetSelectedCount();
+	int nItem			= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	if( selectedCount == 1 )
+		title.Format( L"%s %s a ga.html fájlban (%s. sor)", m_ListCtrl.GetItemText( nItem, LIST_HLASTNAME ), m_ListCtrl.GetItemText( nItem, LIST_HFIRSTNAME ), m_ListCtrl.GetItemText( nItem, LIST_LINENUMBER )  );
+	else
+		title.Format( L"%d kijelölt ember a ga.html fájlban", selectedCount );
+
+	theApp.htmlEditLines( &m_ListCtrl, LIST_LINENUMBER, title );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTableMarriages::OnHtmlNotepad()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	CString lineNumber = m_ListCtrl.GetItemText( nItem,	LIST_LINENUMBER );
+	if( !lineNumber.IsEmpty() ) 
+		theApp.editNotepad( lineNumber );
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTableMarriages::OnHtmlNotepadParents()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+	CString rowid = m_ListCtrl.GetItemText( nItem, LIST_SPOUSE1_ID );
+
+	theApp.HtmlNotepadParents( rowid );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTableMarriages::OnHtmlFatherAndSiblings()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	LIST_SPOUSE1_ID );
+	CHtmlEditLines dlg;
+	dlg.m_title.Format( L"%s %s szülei és testvérei", m_ListCtrl.GetItemText( nItem, LIST_HLASTNAME ), m_ListCtrl.GetItemText( nItem, LIST_HFIRSTNAME ) );
+	dlg.m_type	= L"F_SIBLINGS";
+	dlg.m_rowid = rowid;
+	dlg.DoModal();
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTableMarriages::OnDbEdit()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	LIST_SPOUSE1_ID );
+	CRelations dlg;
+	dlg.m_rowid = rowid;
+	dlg.DoModal();
 }

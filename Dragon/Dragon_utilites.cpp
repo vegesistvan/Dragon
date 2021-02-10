@@ -5,7 +5,6 @@
 #include <algorithm>
 #include "GetString.h"
 #include "Languages.h"
-#include "Table_places.h"
 #include "Table_firstnames.h"
 #include "Message.h"
 #include "html_EditLine.h"
@@ -183,7 +182,7 @@ _int64 CDragonApp::dateDiff( CString date1, CString date2 )
 {
 	_int64 d1;
 	_int64 d2;
-	double	diffD;
+	float	diffD;
 	int		diffI;
 	
 	if( date1 == L"1802-07-05" || date2 == L"1802-07-05" )
@@ -198,7 +197,7 @@ _int64 CDragonApp::dateDiff( CString date1, CString date2 )
 	if( !query4( m_command ) ) return 0;
 	d2 = _wtoi64( m_recordset4->GetFieldString( 0 ) );
 
-	diffD = (double)(d1 - d2)/365 + 0,5;
+	diffD = (float)(d1 - d2)/365 + 0,5;
 
 	diffI = (int)diffD;
 
@@ -801,13 +800,6 @@ void CDragonApp::OnLanguages()
 	if( dlg.DoModal() == IDCANCEL ) return;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragonApp::OnPlaces()
-{
-	CTablePlaces dlg;
-
-	if( dlg.DoModal() == IDCANCEL ) return;
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonApp::message( CString caption, CString str )
 {
 	CMessage dlg;
@@ -858,95 +850,7 @@ CString CDragonApp::getTable( CString tableNumber )
 	if( !query4( m_command ) ) return L"";
 	return( m_recordset4->GetFieldString( 0 ) );
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragonApp::htmlEditLines( CListCtrlEx* p_ListCtrl, int col_linenumber, CString title )
-{
-	POSITION	pos = p_ListCtrl->GetFirstSelectedItemPosition();
-	std::vector<CString> vLines;
-	int nItem;
-	CString linenumber;
 
-
-	while( pos )
-	{
-		nItem = p_ListCtrl->GetNextSelectedItem( pos );
-		vLines.push_back( p_ListCtrl->GetItemText( nItem, col_linenumber ) );
-	}
-	if( vLines.size() == 1 )
-	{
-		linenumber = p_ListCtrl->GetItemText( nItem, col_linenumber );
-		CHtmlEditLine dlg1;
-		dlg1.m_title = title;
-		dlg1.m_linenumber = linenumber;
-		dlg1.DoModal();
-	}
-	else 
-	{
-		CHtmlEditLines dlg;
-		dlg.m_title = title;
-		dlg.vLines = &vLines;
-		dlg.DoModal();
-	}
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragonApp::HtmlNotepadParents( CString rowid )
-{
-	CString linenumber;
-	CString father_id;
-	m_command.Format( L"SELECT father_id FROM people WHERE rowid='%s'", rowid );
-	if( !query( m_command ) ) return;
-	if( !m_recordset->RecordsCount() )
-	{
-		AfxMessageBox( L"Nincs apja!" );
-		return;
-	}
-	father_id = m_recordset->GetFieldString( 0 );
-	m_command.Format( L"SELECT linenumber FROM people WHERE rowid='%s'", father_id );
-	if( !query( m_command ) ) return;
-	linenumber = m_recordset->GetFieldString( 0 );
-	editNotepad( linenumber );
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragonApp::editHtmlLines( CListCtrlEx* p_ListCtrl, int col_linenumber )
-{
-	POSITION	pos = p_ListCtrl->GetFirstSelectedItemPosition();
-	std::vector<CString> vLines;
-	int nItem;
-	int linenumber;
-	while( pos )
-	{
-		nItem = p_ListCtrl->GetNextSelectedItem( pos );
-		vLines.push_back( p_ListCtrl->GetItemText( nItem, col_linenumber ) );
-	}
-	if( vLines.size() == 1 )
-	{
-		linenumber = _wtoi( p_ListCtrl->GetItemText( nItem, col_linenumber ) );
-		edit1line( linenumber );
-	}
-	else if( vLines.size() == 2 )
-	{
-		edit2lines( &vLines );
-	}
-	else
-	{
-		AfxMessageBox( L"1 vagy 2 sort kell kijelölni!" );
-		return;
-	}
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragonApp::edit1line( int lineNumber )
-{
-	CHtmlEditLines dlg;
-	dlg.m_linenumber = lineNumber;
-	dlg.DoModal();
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragonApp::edit2lines( std::vector<CString>* vLines )
-{
-	CEditTwoLines dlg;
-	dlg.vLines = vLines;
-	dlg.DoModal();
-}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonApp::change( CString linenumber, CString line )
 {
@@ -1203,3 +1107,70 @@ CString CDragonApp::getHtmlLine( CString lineNumber )
 	file.Close();
 	return cLine;
 }
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDragonApp::htmlEditLines( CListCtrlEx* p_ListCtrl, int col_linenumber, CString title )
+{
+	POSITION	pos = p_ListCtrl->GetFirstSelectedItemPosition();
+	std::vector<CString> vLines;
+	int nItem;
+	CString linenumber;
+
+
+	while( pos )
+	{
+		nItem = p_ListCtrl->GetNextSelectedItem( pos );
+		vLines.push_back( p_ListCtrl->GetItemText( nItem, col_linenumber ) );
+	}
+	if( vLines.size() == 1 )
+	{
+		linenumber = p_ListCtrl->GetItemText( nItem, col_linenumber );
+		CHtmlEditLine dlg1;
+		dlg1.m_title = title;
+		dlg1.m_linenumber = linenumber;
+		dlg1.DoModal();
+	}
+	else 
+	{
+		CHtmlEditLines dlg;
+		dlg.m_title = title;
+		dlg.vLines = &vLines;
+		dlg.DoModal();
+	}
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDragonApp::HtmlNotepadParents( CString rowid )
+{
+	CString linenumber;
+	CString father_id;
+	m_command.Format( L"SELECT father_id FROM people WHERE rowid='%s'", rowid );
+	if( !query( m_command ) ) return;
+	if( !m_recordset->RecordsCount() )
+	{
+		AfxMessageBox( L"Nincs apja!" );
+		return;
+	}
+	father_id = m_recordset->GetFieldString( 0 );
+	if( father_id.IsEmpty() || father_id == L"0" )
+	{
+		AfxMessageBox( L"Nincs apja!" );
+		return;
+	}
+
+	m_command.Format( L"SELECT linenumber FROM people WHERE rowid='%s'", father_id );
+	if( !query( m_command ) ) return;
+	linenumber = m_recordset->GetFieldString( 0 );
+	editNotepad( linenumber );
+}
+/*
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDragonApp::edit2lines( std::vector<CString>* vLines )
+{
+	CEditTwoLines dlg;
+	dlg.vLines = vLines;
+	dlg.DoModal();
+}
+*/

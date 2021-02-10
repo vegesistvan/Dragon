@@ -28,11 +28,12 @@ protected:
 	void spousesDiff();
 	void createColumns();
 
-	void OnHtmlEdit();
-	void OnHtmlNotepad();
 	void OnHtmlEditLines();
+	void OnHtmlNotepad();
+	void OnHtmlNotepadParents();
+	void OnHtmlFatherAndSiblings();
 	void OnDbEdit();
-
+	
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnInitDialog();

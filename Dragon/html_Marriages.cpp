@@ -77,7 +77,6 @@ BEGIN_MESSAGE_MAP(CMarriages, CDialogEx)
 	ON_WM_SIZING()
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CMarriages::OnDblclkList)
 	ON_EN_CHANGE(IDC_SEARCH, &CMarriages::OnChangeSearch)
-//	ON_COMMAND(ID_MSUBSTR_NEWTABLE, &CMarriages::OnNewtable)
 	ON_COMMAND(ID_MSUBSTR_FILTER, &CMarriages::OnFilter)
 	ON_COMMAND(ID_MSUBSTR_UNFILTER, &CMarriages::OnUnfilter)
 	ON_COMMAND(ID_MSUBSTR_LIST, &CMarriages::OnList)
@@ -442,43 +441,6 @@ void CMarriages::PostNcDestroy()
 	delete this;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-LRESULT CMarriages::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
-{
-	CPoint* point=(CPoint*) lParam;
-    CMenu	Menu;
-	CMenu*	pPopup;
-	int		MENU_IDR;
-
-	MENU_IDR = IDR_DROPDOWN_HTML;
-	if(Menu.LoadMenu( MENU_IDR ))
-    {
-		pPopup = Menu.GetSubMenu(0);
-		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
-		{
-//			pPopup->EnableMenuItem(ID_DB_EDIT,MF_BYCOMMAND | MF_GRAYED);
-//			pPopup->EnableMenuItem(ID_EDIT_DELETE,MF_BYCOMMAND | MF_GRAYED);
-		}
-		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
-    }
-	return TRUE;
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CMarriages::OnHtmlEdit()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	L_LINE ) );
-	theApp.listHtmlLine( lineNumber );
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CMarriages::OnHtmlNotepad()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	CString lineNumber = m_ListCtrl.GetItemText( nItem, L_LINE );
-	if( !lineNumber.IsEmpty() ) 
-		theApp.editNotepad( lineNumber );
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CMarriages::OnMarriagesFile()
 {
@@ -575,4 +537,41 @@ void CMarriages::OnMarriagesLine()
 		dlg.m_pMarriagesL->ShowWindow( SW_RESTORE);		// ha az ablakot "bezártok" vagy levittük a toolbarra
 	}
 }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+LRESULT CMarriages::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
+{
+	CPoint* point=(CPoint*) lParam;
+    CMenu	Menu;
+	CMenu*	pPopup;
+	int		MENU_IDR;
 
+	MENU_IDR = IDR_DROPDOWN_HTML;
+	if(Menu.LoadMenu( MENU_IDR ))
+    {
+		pPopup = Menu.GetSubMenu(0);
+
+		pPopup->EnableMenuItem(ID_DB_EDIT,MF_BYCOMMAND | MF_GRAYED);
+		pPopup->EnableMenuItem(ID_HTML_NOTEPAD_PARENTS,MF_BYCOMMAND | MF_GRAYED);
+		pPopup->EnableMenuItem(ID_HTML_FATHERANDSIBLINGS,MF_BYCOMMAND | MF_GRAYED);
+		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
+    }
+	return TRUE;
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CMarriages::OnHtmlEdit()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	L_LINE ) );
+	theApp.listHtmlLine( lineNumber );
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CMarriages::OnHtmlNotepad()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	CString lineNumber = m_ListCtrl.GetItemText( nItem, L_LINE );
+	if( !lineNumber.IsEmpty() ) 
+		theApp.editNotepad( lineNumber );
+}

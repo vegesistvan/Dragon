@@ -50,17 +50,18 @@ enum
 // m_ListCtrl oszlopok
 enum
 {
-	Q_CNT = 0,
-	Q_TYPE,
-	Q_LINENUMBER,
-	Q_MARRIAGE,
-	Q_INDEX,
-	Q_ROWID,
-	Q_NAME,
-	Q_BIRTH,
-	Q_DEATH,
-	Q_COMMENT,
-	Q_NUMOFCOLUMNS
+	L_CNT = 0,
+	L_TYPE,
+	L_LINENUMBER,
+	L_MARRIAGE,
+	L_INDEX,
+	L_ROWID,
+	L_NAME,
+	L_BIRTH,
+	L_DEATH,
+	L_AGE,
+	L_COMMENT,
+	L_NUMOFCOLUMNS
 };
 
 
@@ -72,16 +73,6 @@ IMPLEMENT_DYNAMIC(CCheckFamilyDates, CDialogEx)
 CCheckFamilyDates::CCheckFamilyDates(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CCheckFamilyDates::IDD, pParent)
 {
-	m_colors.Add( L"hotpink" );
-	m_colors.Add( L"aquamarine" );		//127,255,212
-	m_colors.Add( L"yellow" );			//255,255,0
-	m_colors.Add( L"deepskyblue" );		//0,191,255
-	m_colors.Add( L"greenyellow" );		//173,255,47
-	m_colors.Add( L"thistle" );			//216,191,216
-	m_colors.Add( L"hotpink" );			//255,105,180
-	m_colors.Add( L"lightyellow" );		//255,255,224
-	m_colors.Add( L"aqua" );			//0,255,255
-	m_colors.Add( L"lightGray" );		//211,211,211
 
 	m_rgb[0] = RGB( 255, 105, 180 );
 	m_rgb[1] = RGB( 127, 255, 212 );
@@ -94,15 +85,6 @@ CCheckFamilyDates::CCheckFamilyDates(CWnd* pParent /*=NULL*/)
 	m_rgb[8] = RGB( 0,255,255 );
 	m_rgb[9] = RGB( 211,211,211 );
 
-	m_maxDiffCM			= 55;	// gyerek és anya maximális korküönbsége
-	m_minDiffCM			= 14;	// gyerek és anya minimális korkülönbsége
-	m_minDiffCF			= 15;	// gyerek és apa minimális korkülönbsége
-	m_maxDiffCF			= 70;	// gyerek és apa maximális korkülönbsége;
-
-
-	m_maxLifeSpan		= 100;
-	m_minAgeWedding		= 10;
-	
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CCheckFamilyDates::~CCheckFamilyDates()
@@ -129,6 +111,7 @@ BEGIN_MESSAGE_MAP(CCheckFamilyDates, CDialogEx)
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
 	ON_COMMAND(ID_HTML_EDIT, &CCheckFamilyDates::OnHtmlEditLines)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CCheckFamilyDates::OnHtmlNotepad)
+	ON_COMMAND(ID_HTML_NOTEPAD_PARENTS, &CCheckFamilyDates::OnHtmlNotepadParents)
 	ON_COMMAND(ID_HTML_FATHERANDSIBLINGS, &CCheckFamilyDates::OnHtmlFatherAndSiblings)
 	ON_COMMAND(ID_DB_EDIT, &CCheckFamilyDates::OnDbEdit)
 END_MESSAGE_MAP()
@@ -147,7 +130,17 @@ BOOL CCheckFamilyDates::OnInitDialog()
 		CDialog::OnCancel();
 		return false; 
 	}
-	m_type = dlg.m_type;
+	m_type				= dlg.m_type;
+	m_maxLifespan		= dlg.m_maxLifespan;
+	m_maxDiffBetweenHW	= dlg.m_maxDiffBetweenHW;
+	m_maxAgeHAtWedd		= dlg.m_maxAgeHAtWedd;
+	m_minAgeHAtWedd		= dlg.m_minAgeHAtWedd;
+	m_maxAgeWAtWedd		= dlg.m_maxAgeWAtWedd;
+	m_minAgeWAtWedd		= dlg.m_minAgeWAtWedd;
+	m_maxDiffFC			= dlg.m_maxDiffFC;
+	m_minDiffFC			= dlg.m_minDiffFC;
+	m_minDiffMC			= dlg.m_minDiffMC;
+	m_maxDiffMC			= dlg.m_maxDiffMC;
 
 	CString title;
 	switch( m_type )
@@ -163,6 +156,12 @@ BOOL CCheckFamilyDates::OnInitDialog()
 		break;
 	}
 
+	CString caption;
+	caption.Format( L"max élet=%d, férj-felség max korkülönbség:%d, nõk életkora esküvõn: (%d-%d), férfiak életkora esküvõn: (%d-%d), gyermek és anya korkülönbsége( %d-%d ), gyermek és apa korkülönbsége( %d-%d)", \
+	m_maxLifespan, m_maxDiffBetweenHW, m_minAgeWAtWedd, m_maxAgeWAtWedd, m_minAgeHAtWedd, m_maxAgeHAtWedd, m_minDiffMC, m_maxDiffMC, m_minDiffFC, m_maxDiffFC );
+	GetDlgItem( IDC_CAPTION )->SetWindowTextW( caption );
+
+
 	colorKeres.SetTextColor( theApp.m_colorClick );
 	colorNext.SetTextColor( theApp.m_colorClick );
 
@@ -172,7 +171,7 @@ BOOL CCheckFamilyDates::OnInitDialog()
 	CString fileName = L"childrenFAmily";
 	m_filespec = theApp.openTextFile( &textF, fileName, L"w+" );
 
-	str.Format( L"Az anya %d éves kora után született gyerekeket fogadj el a program helyesnek.\n\n", m_maxDiffCM ); 
+	str.Format( L"Az anya %d éves kora után született gyerekeket fogadj el a program helyesnek.\n\n", m_maxDiffMC ); 
 	fwprintf( textF, str );
 
 	createColumns();
@@ -199,6 +198,26 @@ void CCheckFamilyDates::OnSizing(UINT fwSide, LPRECT pRect)
 	CDialogEx::OnSizing(fwSide, pRect);
 	EASYSIZE_MINSIZE(430,314,fwSide,pRect); 
 }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckFamilyDates::createColumns()
+{
+
+	m_ListCtrl.KeepSortOrder(TRUE);
+	m_ListCtrl.SetExtendedStyle(m_ListCtrl.GetExtendedStyle()| LVS_EX_GRIDLINES );
+
+	m_ListCtrl.InsertColumn( L_CNT,			L"cnt",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_TYPE,		L"type",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_LINENUMBER,	L"line#",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_MARRIAGE,	L"esküvõ",		LVCFMT_LEFT,	 80,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_INDEX,		L"ix",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_ROWID,		L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_NAME,		L"név",			LVCFMT_LEFT,	200,-1,COL_TEXT );
+	m_ListCtrl.InsertColumn( L_BIRTH,		L"születés",	LVCFMT_LEFT,	 80,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_DEATH,		L"halál",		LVCFMT_LEFT,	 80,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_AGE,			L"kor",			LVCFMT_RIGHT,	 35,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_COMMENT,		L"hiba",		LVCFMT_LEFT,	500,-1,COL_TEXT);
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckFamilyDates::OnClickedKeres()
 {
@@ -244,7 +263,7 @@ void CCheckFamilyDates::keress( int start )
 
 	for( nItem = start; nItem < itemCnt-1; ++nItem )
 	{
-		str = m_ListCtrl.GetItemText( nItem, Q_NAME );
+		str = m_ListCtrl.GetItemText( nItem, L_NAME );
 		str = str.Left(length);						// az aktuális search string hosszával azonos hosszúság leválasztása
 		if( str == search )	break;
 		wndProgress.StepIt();
@@ -327,7 +346,7 @@ bool CCheckFamilyDates::collectFamily()
 	{
 		h.rowid = theApp.m_recordset->GetFieldString( X_ROWID );
 
-		m_command.Format( L"SELECT rowid,* FROM marriages WHERE spouse1_id='%s'", h.rowid );
+		m_command.Format( L"SELECT rowid,* FROM marriages WHERE spouse1_id='%s' ORDER by orderWife", h.rowid );
 		if( !theApp.query1( m_command ) ) break;
 		if( m_type == 1 && theApp.m_recordset1->RecordsCount() != 1 )
 			goto cont;				// csak 1 feleségüeket akarunk, de ez nem az
@@ -335,35 +354,11 @@ bool CCheckFamilyDates::collectFamily()
 			goto cont;				// csak több feleségûeket akarunk, de ez nem az
 
 		h.numOfSpouses	= theApp.m_recordset1->RecordsCount();
-
-		//gyerekek lekérdezése
-		m_command.Format( L"SELECT rowid, linenumber, first_name, last_name, birth_date, death_date, mother_id, parentIndexCalc FROM people WHERE father_id ='%s' ORDER BY parentIndexCalc", h.rowid );
-		if( !theApp.query2( m_command ) ) break;
-		if( !theApp.m_recordset2->RecordsCount() ) goto cont;		// nincsenek gyerekek
-		
 		h.linenumber	= theApp.m_recordset->GetFieldString( X_LINENUMBER );
 		h.name.Format( L"%s %s", theApp.m_recordset->GetFieldString( X_LAST_NAME), getFirstWord( theApp.m_recordset->GetFieldString( X_FIRST_NAME) ) );
 		h.birth			= theApp.m_recordset->GetFieldString( X_BIRTH );
 		h.death			= theApp.m_recordset->GetFieldString( X_DEATH );
 		h.message		= L"";
-
-
-		vChildren.clear();
-		for( UINT k = 0; k < theApp.m_recordset2->RecordsCount() ; ++k, theApp.m_recordset2->MoveNext() )
-		{
-			c.name.Format( L"%s %s", theApp.m_recordset2->GetFieldString( Z_LAST_NAME), getFirstWord( theApp.m_recordset2->GetFieldString( Z_FIRST_NAME) ) );
-
-			c.linenumber	= theApp.m_recordset2->GetFieldString( Z_LINENUMBER );
-			c.rowid			= theApp.m_recordset2->GetFieldString( Z_ROWID );
-			c.birth			= theApp.m_recordset2->GetFieldString( Z_BIRTH );
-			c.death			= theApp.m_recordset2->GetFieldString( Z_DEATH );
-			c.father_id		= h.rowid;
-			c.mother_id		= theApp.m_recordset2->GetFieldString( Z_MOTHER_ID );
-			c.mother_index	= _wtoi( theApp.m_recordset2->GetFieldString( Z_MOTHERINDEX ) );
-			c.message		= L"";
-
-			vChildren.push_back( c );
-		}
 
 		// házasságok lekérdezése
 		vWifes.clear();
@@ -390,11 +385,33 @@ bool CCheckFamilyDates::collectFamily()
 
 
 
+
+		//gyerekek lekérdezése
+		m_command.Format( L"SELECT rowid, linenumber, first_name, last_name, birth_date, death_date, mother_id, parentIndexCalc FROM people WHERE father_id ='%s' ORDER BY parentIndexCalc", h.rowid );
+		if( !theApp.query2( m_command ) ) break;
+		
+		// ha csak gyerektelenket akarunk, de ennek van, akkor kihagyjuk
+		if( m_type == 0 && theApp.m_recordset2->RecordsCount() ) goto cont;
+
+
+		vChildren.clear();
+		for( UINT k = 0; k < theApp.m_recordset2->RecordsCount() ; ++k, theApp.m_recordset2->MoveNext() )
+		{
+			c.name.Format( L"%s %s", theApp.m_recordset2->GetFieldString( Z_LAST_NAME), getFirstWord( theApp.m_recordset2->GetFieldString( Z_FIRST_NAME) ) );
+
+			c.linenumber	= theApp.m_recordset2->GetFieldString( Z_LINENUMBER );
+			c.rowid			= theApp.m_recordset2->GetFieldString( Z_ROWID );
+			c.birth			= theApp.m_recordset2->GetFieldString( Z_BIRTH );
+			c.death			= theApp.m_recordset2->GetFieldString( Z_DEATH );
+			c.father_id		= h.rowid;
+			c.mother_id		= theApp.m_recordset2->GetFieldString( Z_MOTHER_ID );
+			c.mother_index	= _wtoi( theApp.m_recordset2->GetFieldString( Z_MOTHERINDEX ) );
+			c.message		= L"";
+
+			vChildren.push_back( c );
+		}
+
 		checkFamily();
-
-
-
-
 
 cont:	wndP.StepIt();
 		wndP.PeekAndPump();
@@ -402,24 +419,6 @@ cont:	wndP.StepIt();
 	}
 	wndP.DestroyWindow();
 	return true;
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckFamilyDates::createColumns()
-{
-
-	m_ListCtrl.KeepSortOrder(TRUE);
-	m_ListCtrl.SetExtendedStyle(m_ListCtrl.GetExtendedStyle()| LVS_EX_GRIDLINES );
-
-	m_ListCtrl.InsertColumn( Q_CNT,			L"cnt",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( Q_TYPE,		L"type",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( Q_LINENUMBER,	L"line#",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( Q_MARRIAGE,	L"esküvõ",		LVCFMT_LEFT,	 80,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( Q_INDEX,		L"ix",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( Q_ROWID,		L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( Q_NAME,		L"név",			LVCFMT_LEFT,	200,-1,COL_TEXT );
-	m_ListCtrl.InsertColumn( Q_BIRTH,		L"születés",	LVCFMT_LEFT,	 80,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( Q_DEATH,		L"halál",		LVCFMT_LEFT,	 80,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( Q_COMMENT,		L"hiba",		LVCFMT_LEFT,	500,-1,COL_TEXT);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckFamilyDates::checkFamily()
@@ -439,6 +438,7 @@ void CCheckFamilyDates::checkFamily()
 
 	_int64 birthH;
 	_int64 deathH;
+	_int64 deathH9;
 	_int64 birthW;
 	_int64 deathW;
 
@@ -464,15 +464,15 @@ void CCheckFamilyDates::checkFamily()
 	{
 		if(deathH < birthH )
 		{
-			h.message = L"halála < születése";
+			h.message += L", halála < születése";
 			hiba = true;
 		}
-
 		diff = theApp.dateDiff( h.death, h.birth );
-		if( (int)diff > m_maxLifeSpan )
+		h.age.Format( L"%d", diff );
+		if( (int)diff > m_maxLifespan )
 		{
-			str.Format( L"%d évesen halt meg", diff );
-			h.message = str;
+			str.Format( L", %d évesen halt meg", diff );
+			h.message += str;
 			hiba = true;
 		}
 	}
@@ -501,19 +501,30 @@ void CCheckFamilyDates::checkFamily()
 		{
 			if(  deathW < birthW )
 			{
-				vWifes.at(i).message = L"halála < születése";
+				vWifes.at(i).message += L", halála < születése";
 				hiba = true;
 			}
-
 			diff = theApp.dateDiff( w.death, w.birth );
-			if( diff > m_maxLifeSpan )
+			vWifes.at(i).age.Format( L"%d", diff );
+			if( diff > m_maxLifespan )
 			{
-				str.Format( L"%d évesen halt meg", diff );
-				vWifes.at(i).message = str;
+				str.Format( L", %d évesen halt meg", diff );
+				vWifes.at(i).message += str;
 				hiba = true;
 			}
 		}
 
+		if( birthH && birthW )
+		{
+			diff = theApp.dateDiff( h.birth, w.birth );
+			diff = abs( diff );
+			if( diff > m_maxDiffBetweenHW )
+			{
+				str.Format( L", férj és feleség korkülönbsége nagyobb mint %d", m_maxDiffBetweenHW );
+				vWifes.at(i).message += str;
+				hiba = true;
+			}
+		}
 
 
 
@@ -527,12 +538,16 @@ void CCheckFamilyDates::checkFamily()
 			if( birthW && marriage )
 			{
 				diff = theApp.dateDiff( w.marriage, w.birth );
-				if( diff == 7 )
-					z = 2;
-				if( diff < m_minAgeWedding )
+				if( diff < m_minAgeWAtWedd )
 				{
-					str.Format( L" %d éves korában házasodott", diff ); 
-					vWifes.at(i).message = str;
+					str.Format( L", házasságkötéskor kevesebb mint %d éves volt", m_minAgeWAtWedd ); 
+					vWifes.at(i).message += str;
+					hiba = true;
+				}
+				if( diff > m_maxAgeWAtWedd )
+				{
+					str.Format( L", házasságkötéskor több mint %d éves volt", m_maxAgeWAtWedd ); 
+					h.message += str;
 					hiba = true;
 				}
 			}
@@ -541,10 +556,16 @@ void CCheckFamilyDates::checkFamily()
 			if( birthH && marriage )
 			{
 				diff = theApp.dateDiff( w.marriage, h.birth );
-				if( diff < m_minAgeWedding )
+				if( diff < m_minAgeHAtWedd )
 				{
-					str.Format( L" %d éves korában házasodott", diff ); 
-					h.message = str;
+					str.Format( L", házasságkötéskor kevesebb mint %d éves volt", m_minAgeHAtWedd ); 
+					h.message += str;
+					hiba = true;
+				}
+				if( diff > m_maxAgeHAtWedd )
+				{
+					str.Format( L", házasságkötéskor több mint %d éves volt", m_maxAgeHAtWedd ); 
+					h.message += str;
 					hiba = true;
 				}
 			}
@@ -573,14 +594,15 @@ void CCheckFamilyDates::checkFamily()
 		{
 			if( deathC < birthC )
 			{
-				vChildren.at(i).message = L"halála < születése";
+				vChildren.at(i).message += L", halála < születése";
 				hiba = true;
 			}
 			diff = theApp.dateDiff( c.death, c.birth );
-			if( diff > m_maxLifeSpan )
+			vChildren.at(i).age.Format( L"%d", diff );
+			if( diff > m_maxLifespan )
 			{
-				str.Format( L"%d évesen halt meg", diff );
-				vChildren.at(i).message = str;
+				str.Format( L", %d évesen halt meg", diff );
+				vChildren.at(i).message += str;
 				hiba = true;
 			}
 		}
@@ -612,7 +634,7 @@ void CCheckFamilyDates::checkFamily()
 
 		if(  mx + 1 > vWifes.size() )
 		{
-			vChildren.at(i).message.Format( L"Anya index nagyobb, mint %d", vWifes.size() );
+			vChildren.at(i).message.Format( L"Anya index nagyobb mint %d", vWifes.size() );
 			hiba = true;
 			break;
 		}
@@ -647,46 +669,57 @@ void CCheckFamilyDates::checkFamily()
 
 		if( marriage && birthC && birthC < marriage )
 		{
-			vChildren.at(i).message += L" házasságkötés elõtt született";
+			vChildren.at(i).message += L", házasságkötés elõtt született";
 			hiba = true;
 		}
 
-		// gyerek születési dátum és anya születési dátum + 16 év
 
+		// gyerek születési dátum és anya születési dátum + 16 év
 		if( birthC && birthW )
 		{
 			diff = theApp.dateDiff( c.birth, w.birth );
-			if( diff < m_minDiffCM || m_maxDiffCM < diff )
+			if( diff < m_minDiffMC || m_maxDiffMC < diff )
 			{
-				str.Format( L" anyja %d éves korában született", diff ); 
+				str.Format( L", anyja %d éves korában született", diff ); 
 				vChildren.at(i).message += str;
 				hiba = true;
 			}
 		}
 
-		// gyerek és apa korkülönbsége
+		// gyerek születési dátum és anya halálozási dátum
+		if( birthC && deathW )
+		{
+			diff = theApp.dateDiff( c.birth, w.death );
+			if( diff > 0 )
+			{
+				str.Format( L",  anyja halála után született", diff ); 
+				vChildren.at(i).message += str;
+				hiba = true;
+			}
+		}
 
-		if( birthH && birthC )
+
+		// gyerekek születési dátumának összehasonlítása apa születési dátumával
+		if( birthC && birthH )
 		{
 			diff = theApp.dateDiff( c.birth, h.birth );
-			if( diff < m_minDiffCF || m_maxDiffCF < diff )
+			if( diff < m_minDiffFC || m_maxDiffFC < diff )
 			{
-				str.Format( L" apa %d éves korában született", diff ); 
+				str.Format( L", apja %d éves korában született", diff ); 
 				vChildren.at(i).message += str;
 				hiba = true;
 			}
 		}
-
-
-		// gyerek születési dátum és apa halálozási + 8 hónap
-
-		if( deathH )
+		
+		// gyerek születési dátum és apa halálozási + 9 hónap
+		if( birthC &&  deathH )
 		{
-			deathH	= theApp.getDateI( h.death, 9 );
-			if( birthC && deathH < birthC )
+			
+			deathH9	= theApp.getDateI( h.death, 9 );
+			if( deathH9 < birthC )
 			{
-				str = L" apja halála után több mint 9 hónapra született"; 
-				vChildren.at(i).message = str;
+				str = L", apja halála után több mint 9 hónapra született"; 
+				vChildren.at(i).message += str;
 				hiba = true;
 			}
 		}
@@ -698,24 +731,35 @@ void CCheckFamilyDates::printFamily()
 {
 	WIFES		w;
 	CHILDREN	c;
+	CString message;
+	
+	message = L"";
+	if( h.message.GetLength() > 2 ) message = h.message.Mid( 2 );
 
-	fwprintf( textF, L"%8s %10s %2d %8s %-25s %10s %10s %s\n", h.linenumber, L"", h.numOfSpouses, h.rowid, h.name, h.birth, h.death, h.message );
+	fwprintf( textF, L"%8s %10s %2d %8s %-25s %10s %10s %s\n", h.linenumber, L"", h.numOfSpouses, h.rowid, h.name, h.birth, h.death, message );
 
 	for( UINT j = 0; j < vWifes.size(); ++j )
 	{
 		w = vWifes.at(j);
-		fwprintf( textF, L"%8s %10s %2d %8s %-25s %10s %10s %s\n", w.linenumber, w.marriage, w.motherOrder, w.rowid, w.name, w.birth, w.death, w.message );
+		message = L"";
+		if( w.message.GetLength() > 2 ) message = w.message.Mid( 2 );
+
+		fwprintf( textF, L"%8s %10s %2d %8s %-25s %10s %10s %s\n", w.linenumber, w.marriage, w.motherOrder, w.rowid, w.name, w.birth, w.death, message );
 	}
 	for( UINT k = 0; k < vChildren.size(); ++k )
 	{
 		c = vChildren.at(k );
-		fwprintf( textF, L"%8s %10s %2d %8s %-25s %10s %10s %s", c.linenumber, L"", c.mother_index, c.rowid, c.name, c.birth, c.death, c.message );
+		message = L"";
+		if( c.message.GetLength() > 2 ) message = c.message.Mid( 2 );
+		fwprintf( textF, L"%8s %10s %2d %8s %-25s %10s %10s %s", c.linenumber, L"", c.mother_index, c.rowid, c.name, c.birth, c.death, message );
 		fwprintf( textF, L"\n" );
 	}
 	fwprintf( textF, L"\n" );
 	fflush( textF );
 
 
+	message = L"";
+	if( h.message.GetLength() > 2 ) message = h.message.Mid( 2 );
 	str.Format( L"%d", m_cnt );
 	push( str );
 	push( L"1" );							// type
@@ -726,11 +770,15 @@ void CCheckFamilyDates::printFamily()
 	push( h.name );
 	push( h.birth );
 	push( h.death );
-	push( h.message );
+	push( h.age );
+	push( message );
 
 	for( UINT j = 0; j < vWifes.size(); ++j )
 	{
 		w = vWifes.at(j);
+		message = L"";
+		if( w.message.GetLength() > 2 ) 
+			message = w.message.Mid( 2 );
 		push( L"" );						// cnt
 		push( L"2" );						// type
 		push( w.linenumber );
@@ -741,12 +789,16 @@ void CCheckFamilyDates::printFamily()
 		push( w.name );
 		push( w.birth );
 		push( w.death );
-		push( w.message );
+		push( w.age );
+		push( message );
 	}
 
 	for( UINT k = 0; k < vChildren.size(); ++k )
 	{
 		c = vChildren.at(k );
+		message = L"";
+		if( c.message.GetLength() > 2 ) message = c.message.Mid( 2 );
+
 
 		push( L"" );							// cnt
 		push( L"3" );							// type
@@ -758,7 +810,8 @@ void CCheckFamilyDates::printFamily()
 		push( c.name );
 		push( c.birth );
 		push( c.death );
-		push( c.message );
+		push( c.age );
+		push( message );
 	}
 	emptyLine();
 	++m_cnt;
@@ -778,7 +831,7 @@ void CCheckFamilyDates::push( CString item )
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckFamilyDates::emptyLine()
 {
-	for( UINT i = 0; i < Q_NUMOFCOLUMNS; i++ ) push( L"" );
+	for( UINT i = 0; i < L_NUMOFCOLUMNS; i++ ) push( L"" );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckFamilyDates::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
@@ -805,13 +858,13 @@ void CCheckFamilyDates::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
 		nItem	= pLVCD->nmcd.dwItemSpec;
 		nCol	= pLVCD->iSubItem;
 		mask	= 1 << nCol;
-		if( _wtoi( vList.at( nItem * Q_NUMOFCOLUMNS + Q_LINENUMBER ))  )
+		if( _wtoi( vList.at( nItem * L_NUMOFCOLUMNS + L_LINENUMBER ))  )
 		{
-			index = _wtoi( vList.at( nItem * Q_NUMOFCOLUMNS + Q_INDEX ) );
+			index = _wtoi( vList.at( nItem * L_NUMOFCOLUMNS + L_INDEX ) );
 			pLVCD->clrTextBk = m_rgb[index];
 /*
-			type = _wtoi( vList.at( nItem * Q_NUMOFCOLUMNS + Q_TYPE ) );
-			if( nCol == Q_NAME && type == 2 ) 
+			type = _wtoi( vList.at( nItem * L_NUMOFCOLUMNS + L_TYPE ) );
+			if( nCol == L_NAME && type == 2 ) 
 				pLVCD->clrTextBk = WHITE;
 */
 		}
@@ -878,28 +931,36 @@ void CCheckFamilyDates::OnHtmlEditLines()
 	int selectedCount	= m_ListCtrl.GetSelectedCount();
 	int nItem			= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
 	if( selectedCount == 1 )
-		title.Format( L"%s a ga.html fájlban (%s. sor)", m_ListCtrl.GetItemText( nItem, Q_NAME ), m_ListCtrl.GetItemText( nItem, Q_LINENUMBER )  );
+		title.Format( L"%s a ga.html fájlban (%s. sor)", m_ListCtrl.GetItemText( nItem, L_NAME ), m_ListCtrl.GetItemText( nItem, L_LINENUMBER )  );
 	else
 		title.Format( L"%d kijelölt ember a ga.html fájlban", selectedCount );
 
-	theApp.htmlEditLines( &m_ListCtrl, Q_LINENUMBER, title );
+	theApp.htmlEditLines( &m_ListCtrl, L_LINENUMBER, title );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckFamilyDates::OnHtmlNotepad()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	CString lineNumber = m_ListCtrl.GetItemText( nItem,	Q_LINENUMBER );
+	CString lineNumber = m_ListCtrl.GetItemText( nItem,	L_LINENUMBER );
 	if( !lineNumber.IsEmpty() ) 
 		theApp.editNotepad( lineNumber );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckFamilyDates::OnHtmlFamily()
+void CCheckFamilyDates::OnHtmlNotepadParents()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+	CString rowid = m_ListCtrl.GetItemText( nItem, L_ROWID );
+
+	theApp.HtmlNotepadParents( rowid );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckFamilyDates::OnHtmlFatherAndSiblings()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
 
-	CString rowid = m_ListCtrl.GetItemText( nItem, 	Q_ROWID );
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
 	CHtmlEditLines dlg;
-	dlg.m_title.Format( L"%s szülei és testvérei", m_ListCtrl.GetItemText( nItem, Q_NAME ) );
+	dlg.m_title.Format( L"%s szülei és testvérei", m_ListCtrl.GetItemText( nItem, L_NAME ) );
 	dlg.m_type	= L"F_SIBLINGS";
 	dlg.m_rowid = rowid;
 	dlg.DoModal();
@@ -908,20 +969,8 @@ void CCheckFamilyDates::OnHtmlFamily()
 void CCheckFamilyDates::OnDbEdit()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
-	CString rowid = m_ListCtrl.GetItemText( nItem, 	Q_ROWID );
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
 	CRelations dlg;
-	dlg.m_rowid = rowid;
-	dlg.DoModal();
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckFamilyDates::OnHtmlFatherAndSiblings()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
-
-	CString rowid = m_ListCtrl.GetItemText( nItem, 	Q_ROWID );
-	CHtmlEditLines dlg;
-	dlg.m_title.Format( L"%s szülei és testvérei", m_ListCtrl.GetItemText( nItem, Q_NAME ) );
-	dlg.m_type	= L"F_SIBLINGS";
 	dlg.m_rowid = rowid;
 	dlg.DoModal();
 }

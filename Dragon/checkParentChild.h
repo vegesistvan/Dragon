@@ -35,13 +35,19 @@ protected:
 	CString str;
 	int m_diff;
 
+	CColorStatic colorNext;
+	CColorStatic colorKeres;
+
 	void createColumns();
 	void fillColumns();
 
-//	void OnHtmlEdit();
-	void OnHtmlNotepad();
+
 	void OnHtmlEditLines();
+	void OnHtmlNotepad();
+	void OnHtmlNotepadParents();
+	void OnHtmlFatherAndSiblings();
 	void OnDbEdit();
+
 	void keress( int start );
 	BOOL PreTranslateMessage(MSG* pMsg);
 
@@ -51,12 +57,7 @@ public:
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
 	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
-	afx_msg void OnGahtmlLine();
 	afx_msg void OnList();
-
-	afx_msg void OnHtmlFamily();
-	CColorStatic colorNext;
-	CColorStatic colorKeres;
 	afx_msg void OnClickedKeres();
 	afx_msg void OnClickedNext();
 };

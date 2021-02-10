@@ -36,6 +36,8 @@ protected:
 
 	void OnHtmlEditLines();
 	void OnHtmlNotepad();
+	void OnHtmlNotepadParents();
+	void OnHtmlFatherAndSiblings();
 	void OnDbEdit();
 
 	DECLARE_MESSAGE_MAP()
