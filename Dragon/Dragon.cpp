@@ -175,6 +175,8 @@ BOOL CDragonApp::InitInstance()
 	sourceA.Add( L"leszármazott házastársának anyja" );
 	sourceA.Add( L"leszármazott további házastársa" );
 
+	m_pszAppName=_tcsdup(_T("Dragon - családfa adatbázis"));
+
 	createColumnList();
 
 	DWORD username_size = sizeof( m_username);

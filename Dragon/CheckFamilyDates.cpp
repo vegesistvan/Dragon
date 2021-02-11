@@ -6,7 +6,6 @@
 #include "afxdialogex.h"
 #include "CheckFamilyDates.h"
 #include "utilities.h"
-#include "ContractInfo.h"
 #include "html_EditLines.h"
 #include "Relations.h"
 #include "FamilyDatesStart.h"
@@ -124,6 +123,8 @@ BOOL CCheckFamilyDates::OnInitDialog()
 	EASYSIZE_INIT();
 
 	CFamilyDatesStart dlg;
+
+	theApp.m_pszAppName = _tcsdup( L"Családon belüli dátumok vizsgálata" );
 
 	if( dlg.DoModal() == IDCANCEL )
 	{
@@ -876,34 +877,39 @@ void CCheckFamilyDates::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
 void CCheckFamilyDates::OnInfo()
 {
 	CString info = L"\
-Azon férfiak családját -feleségeit és gyerekeit- listázzuk, akiknek több felesége volt, és a dátumok ellenõrzése valamilyen \
-problémára hívta fel a figyelmet.\r\n\
+Az adatbázisban a születés, az elhalálozás és az esküvõk dátumait tartjuk nyilván. Ezek egy-egy családon belüli \
+ellentmodásait keressük, amik nyilvánvalóan valamilyen adathibára hívják fel a figyelmünket.\r\n\
 \r\n\
 Az alábbi dátumokat ellenõrizzük:\r\n\
-- minden ember élettartamát\r\n\
+\r\n\
+- az emberek élettartama\r\n\
+- házastársak korkülönbsége\r\n\
+- férj életkora az esküvõn\r\n\
+- feleség életkora az esküvõn\r\n\
 - apa és gyermeke korkülönbsége\r\n\
 - anya és gyermeke korkülönbsége\r\n\
-- apa és anya korkülönbsége\r\n\
-- apa életkora az esküvõn\r\n\
-- anya életkora az esküvõn\r\n\
+- gyerek anyja halála elõtt született\r\n\
+- gyerek 9 hónappal apja halála elõtt született\r\n\
 \r\n\
-A funkció indításakor beállítható, hogy a fenti ellenõrzések milyen értékhatáron belül tekintsék normálisnak az értékeket, \
-azon kívül pedig jelezze az eltérést. Természetesen csak azokat a dátumokat ellenõrzi, amelyek meg vannak adva és \
-helyes formátumúak ( 2021.02.07 - 2021.02. . 2021.02 - 2021 )\r\n\
+A dátum különbségekre határértékeket állíthatunk be az indításkor megjelenõ paraméter ablakban.\n\r\
+Ebben az ablakban azt is kijelölhetjük, hogy mely családokat vizsgáljunk: gyerektelen családokat, vagy \
+olyanokat, amelyekben a férjnek csak egy felesége volt, vagy olyanokat, amelyekben több felesége is volt.\n\r\
+Ezt a választást azért ajánlja fel a program, mert az összes család túl nagy, nehezen kezelhetõ listát eredményezhet, \
+másrészt az így megkülönbözetet családokban talált dátum hibák sokszor külünbözõ fajta adathibákra utalhatnak.\r\n\
+Természetesen csak azokat a dátumokat ellenõrzi a program, amelyek meg vannak adva és helyes formátumúak \
+( 2021.02.07 - 2021.02. . 2021.02 - 2021 )\r\n\
 \r\n\
-A listán az elsõ sorban az apa áll, õt követik a feleségek, majd a gyerekek. A családokat üres  sor választja el.\r\n\
-Az apa halvány piros színû a feleségek különbözõ színûek, a gyereke ugyanolyan színûek, mint az anyjuk.\r\n\
+Minden embernél a rá vonatkozó dátum hibát jelzõ üzenetet listázunk az utolsó oszlopban.\r\n\
+Csak azokat a családokat listázzuk, amelyekben valamely dátumok között összeférhetetlenséget állapított meg a program.\n\r\
+A listán az elsõ sorban az apa áll, õt követik a feleségek, majd a gyerekek. A családokat üres  sor választja el.\
+Az apa halvány piros színû a feleségek különbözõ színûek, a gyerekek ugyanolyan színûek, mint az anyjuk.\r\n\
 \r\n\
-Egy sorra kattintva jobb egérgombban, egy legördülõ menürõl választhatunk olyan funkciókat, amelyekkel megbézhetjük a \
+Egy sorra kattintva jobb egérgombban, egy legördülõ menürõl választhatunk olyan funkciókat, amelyekkel megnézhetjük a \
 bementi ga.html fájlt ill. szerkeszthetjük, javíthatjuk a hibás adatokat akár a bementi html fájlban, akár az adatbázisban.\r\n\
+\r\n\
 ";
 
-
-
-	CContractInfo dlg;
-	dlg.m_title = L"Családok, amelyekben a férjnek több házassága volt, és a dátumok valamelyike ellentmondásos"; 
-	dlg.m_info = info;
-	dlg.DoModal();
+	AfxMessageBox( info, MB_ICONINFORMATION );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 LRESULT CCheckFamilyDates:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)

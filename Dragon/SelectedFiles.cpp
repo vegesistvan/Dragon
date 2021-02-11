@@ -86,7 +86,7 @@ void CSelectedFiles::OnClickedStaticHtml()
 void CSelectedFiles::OnClickedStaticTexteditor()
 {
 	theApp.selectTextEditor();
-	GetDlgItem( IDC_TEXTEDITOR )->SetWindowTextW( m_texteditor );
+	GetDlgItem( IDC_TEXTEDITOR )->SetWindowTextW( theApp.m_texteditor );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSelectedFiles::OnClickedStaticGed()
