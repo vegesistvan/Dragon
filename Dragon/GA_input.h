@@ -120,7 +120,7 @@ public:
 	CString getCsalad( CString root );
 
 
-	void	inputFile();
+	bool	inputFile();
 	void	splitLine( CString cLine);
 	int		processTableHeader( CString cLine );
 
@@ -203,7 +203,7 @@ public:
 	void	updatePreviousDescendant( CString cLine );
 
 
-	void	insertIntoFiles( CString fileSpec );	
+//	bool	insertIntoFiles( CString fileSpec );	
 
 	BOOL	InputFile();
 	BOOL	InputFamily( CString familyName, int familyNumber);

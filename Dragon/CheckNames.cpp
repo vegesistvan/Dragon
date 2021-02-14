@@ -49,6 +49,7 @@ BEGIN_MESSAGE_MAP(CCheckNames, CDialogEx)
 	ON_COMMAND(ID_DB_EDIT, &CCheckNames::OnDbEdit)
 
 
+	ON_COMMAND(ID_LIST, &CCheckNames::OnList)
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CCheckNames::OnInitDialog()
@@ -63,12 +64,13 @@ BOOL CCheckNames::OnInitDialog()
 	SetWindowTextW( caption );
 
 	CString info = L"\
-Alább sor-párokat láthatunk felsorolva. A sor-pár elsõ sorában olyan ember személyleírását találjuk, akinek a vezeték és/vagy \
-keresztneve hiányzik. Ennek többnyire az az oka, hogy a program valami miatt nem tudta ezt/ezeket meghatározni a \
-második sorban ábrázolt ga.html sorból.\
-A hiányzó vezeték nevet X, a hiányzó keresztnevet Y karakter jelzi a kérdéses ember személyleírásában.\
-Az ember személyleírása segít azonosítani, hogy hozzá tartozó ga.html sorban melyik emberrõl is van szó.\
-\r\n\r\n\
+Alább olyan sorkat láthatunk a GA.html fájlból, amelyekbõl valamelyik ember család és/vagy keresztnevét nem sikerült \
+kibányászni. A hiányzó családnevet X, a hiányzó keresztnevet Y karakter jelzi a név oszlopban. Nekünk kell kitalánunk, \
+hogy melyik ember neve okozhatott problémát a programnak.\r\n\
+\r\n\
+A hiba okának megállapításában segítségünkre lehet a 'GA.html fájl ellenõrzése' menüpont, aholis egyes sorok \
+felbontását is kérhetjük, amélkül, hogy az az adatbázisba kerülne.\r\n\
+\r\n\
 A hibákat többnyire az értelmezhetetlen keresztnevek okozzák, de más oka is lehet. Ha felismerjük a hibát és az javítható. akkor a \
 a jobb egérgombbal a kiválasztott sorra kattintva egy legördülõ menü jelenik meg, amibõl választhatjuk 'A sor szerkesztése' \n\
 ill. 'A sor a Notepad-ben' funkciókat. Bármelyikban javíthatjuk a ga.html fájl megfelelõ sorát.\
@@ -82,10 +84,7 @@ ill. 'A sor a Notepad-ben' funkciókat. Bármelyikban javíthatjuk a ga.html fájl m
 	m_ListCtrl.InsertColumn( L_LINENUMBER,	L"line#",	LVCFMT_RIGHT,	 60,-1,COL_NUM );
 	m_ListCtrl.InsertColumn( L_ROWID,		L"rowid",	LVCFMT_RIGHT,	 60,-1,COL_NUM );
 	m_ListCtrl.InsertColumn( L_NAME,		L"név",		LVCFMT_LEFT,	200,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( L_PEOPLE,		L"",		LVCFMT_LEFT,   2000,-1,COL_TEXT);
-
-	
-
+	m_ListCtrl.InsertColumn( L_PEOPLE,		L"GA.html sor",	LVCFMT_LEFT,   2000,-1,COL_TEXT);
 
 	m_command = L"SELECT rowid, * FROM people WHERE last_name= '' OR first_name='' ORDER BY lineNumber";
 	if( !theApp.query( m_command ) ) return false;
@@ -127,14 +126,14 @@ ill. 'A sor a Notepad-ben' funkciókat. Bármelyikban javíthatjuk a ga.html fájl m
 		m_ListCtrl.SetItemText( nItem, L_ROWID, rowid );
 		m_ListCtrl.SetItemText( nItem, L_NAME, name );
 		m_ListCtrl.SetItemText( nItem, L_PEOPLE, people );
-		++nItem;
+//		++nItem;
 
-		nItem = m_ListCtrl.InsertItem( nItem, L"" );
+//		nItem = m_ListCtrl.InsertItem( nItem, L"" );
 		m_ListCtrl.SetItemText( nItem, L_LINENUMBER, lineNumber );
 		m_ListCtrl.SetItemText( nItem, L_PEOPLE, gaLine );
 		++nItem;
 
-		nItem = m_ListCtrl.InsertItem( nItem, L"" );
+//		nItem = m_ListCtrl.InsertItem( nItem, L"" );
 		++nItem;
 
 		wndP.StepIt();
@@ -344,4 +343,10 @@ void CCheckNames::OnDbEdit()
 	CRelations dlg;
 	dlg.m_rowid = rowid;
 	dlg.DoModal();
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckNames::OnList()
+{
+	CString	logFile(L"nameproblems"); 
+	theApp.exportAll( logFile, L"Név problémák", &m_ListCtrl );
 }

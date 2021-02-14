@@ -945,9 +945,9 @@ bool checkDate( CString datum)
 	if( length <= 7 ) return false;
 
 // hónap ellenõrzése a 2019.11 
-	if( !isdigit( datum.GetAt( 5 ) ) ) 
+	if( !iswdigit( datum.GetAt( 5 ) ) ) 
 		return false;
-	if( !isdigit( datum.GetAt( 6 ) ) ) 
+	if( !iswdigit( datum.GetAt( 6 ) ) ) 
 		return false;
 	int	month = _wtoi( datum.Mid( 5, 2 ) );
 	if( month < 1 || month > 12 ) return false;
@@ -958,9 +958,9 @@ bool checkDate( CString datum)
 	if( length < 10 ) return false;
 
 // nap ellenõrzése 2019.11.12
-	if( !isdigit( datum.GetAt( 8 ) ) ) 
+	if( !iswdigit( datum.GetAt( 8 ) ) ) 
 		return false;
-	if( !isdigit( datum.GetAt( 9 ) ) ) 
+	if( !iswdigit( datum.GetAt( 9 ) ) ) 
 		return false;
 	int	day = _wtoi( datum.Mid( 8, 2 ) );
 	if( day < 1 ) return false;

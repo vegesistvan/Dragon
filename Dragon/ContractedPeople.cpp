@@ -126,7 +126,7 @@ BOOL CContractedPeople::OnInitDialog()
 void CContractedPeople::OnInputDifferent()
 {
 	str.Format( L"Azonos nevû emberek bejegyzései, akik nem vonhatóak össze (adat-azonosságok megkövetelt száma: %d )", m_azonos );
-	inputFile( DIFFERENTTXT );
+	inputFile( DIFFERENT_FILE );
 
 	UNITED = false;
 	menu.EnableMenuItem( ID_INPUT_UNITED, MF_BYCOMMAND | MF_ENABLED);
@@ -138,7 +138,7 @@ void CContractedPeople::OnInputDifferent()
 void CContractedPeople::OnInputUnited()
 {
 	str.Format( L"Azonos nevû emberek bejegyzései, amik részben összevonásra kerültek (adat-azonosságok megkövetelt száma: %d)", m_azonos );
-	inputFile( UNITEDTXT );
+	inputFile( UNITED_FILE );
 
 	UNITED = true;
 	menu.EnableMenuItem( ID_INPUT_UNITED, MF_BYCOMMAND | MF_GRAYED);
@@ -148,10 +148,25 @@ void CContractedPeople::OnInputUnited()
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CContractedPeople::inputFile( int subType )
+void CContractedPeople::inputFile( int type )
 {
 	CString filespec;
 
+	while( true )
+	{
+		m_command.Format( L"SELECT filespec FROM filespec WHERE type=%d", type );
+		if( !theApp.query( m_command ) );
+		filespec = theApp.m_recordset->GetFieldString( 0 );
+		if( filespec.IsEmpty() || _waccess( filespec, 0 ) )
+		{
+			CContractPeople cc;
+			if( !cc.contractPeople() )
+				CDialog::OnCancel();
+		}
+		else
+			break;
+	}
+/*
 	// Ha nincs a "files" táblában a keresett fájl, akkor elõször összevonást végez
 	while( true )
 	{
@@ -167,7 +182,7 @@ void CContractedPeople::inputFile( int subType )
 		else
 			break;
 	}
-
+*/
 	CStdioFile file( filespec, CFile::modeRead);   // input csv fájl
 	int fileLength = (int)file.GetLength();
 
@@ -494,29 +509,33 @@ void CContractedPeople::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedPeople::OnHtml1D()
 {
-	getFileSpec( CONTRACTED_PEOPLE_HTML1, DIFFERENTTXT );
+//	getFileSpec( CONTRACTED_PEOPLE_HTML1, DIFFERENTTXT );
+	getFileSpec( DIFFERENT1_HTML_FILE );
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedPeople::OnHtml1U()
 {
-	getFileSpec( CONTRACTED_PEOPLE_HTML1, UNITEDTXT );
+//	getFileSpec( CONTRACTED_PEOPLE_HTML1, UNITEDTXT );
+	getFileSpec( UNITED1_HTML_FILE );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedPeople::OnHtml2D()
 {
-	getFileSpec( CONTRACTED_PEOPLE_HTML2, DIFFERENTTXT );
+//	getFileSpec( CONTRACTED_PEOPLE_HTML2, DIFFERENTTXT );
+	getFileSpec( DIFFERENT2_HTML_FILE );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedPeople::OnHtml2U()
 {
-	getFileSpec( CONTRACTED_PEOPLE_HTML2, UNITEDTXT );
+//	getFileSpec( CONTRACTED_PEOPLE_HTML2, UNITEDTXT );
+	getFileSpec( UNITED2_HTML_FILE );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CContractedPeople::getFileSpec( int type, int subType )
+void CContractedPeople::getFileSpec( int type )
 {
 	CString filespec;
-	m_command.Format( L"SELECT filespec FROM files WHERE type=%d AND subtype=%d", type, subType );
+	m_command.Format( L"SELECT filespec FROM filespec WHERE type=%d", type );
 	if( !theApp.query( m_command ) );
 	filespec = theApp.m_recordset->GetFieldString( 0 );
 	if( filespec.IsEmpty() || _waccess( filespec, 0 ) )

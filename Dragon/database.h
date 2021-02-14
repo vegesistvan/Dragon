@@ -39,6 +39,27 @@ enum
 	M_SQL							// CREATE .....
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+const COLUMN filespec[] =
+{
+	{ L"xid",			L"INTEGER PRIMARY KEY ASC" },
+	{ L"type",			L"NUM" },							// fájl típus a FILETYPES szerint
+	{ L"filespec",		L"TEXT"	},
+	{ L"created",		L"TEXT" },
+	{ L"modified",		L"TEXT" },
+	{ L"loaded",		L"TEXT" },
+};
+enum
+{
+	FS_ROWID = 0,
+	FSC_XID,
+	FS_TYPE,
+	FS_FILESPEC,
+	FS_CREATED,
+	FS_MODIFIED,
+	FS_LOADED,
+};
+/*
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const COLUMN files[] =
 {
 	{ L"xid",			L"INTEGER PRIMARY KEY ASC" },
@@ -81,6 +102,7 @@ enum
 	F_MODIFIED,
 	F_LOADED,
 };
+*/
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const COLUMN marriages[] =
 {
@@ -353,8 +375,9 @@ enum
 // ABC sorrendben!!!
 const DB databaseTables[] =
 {
-	{ L"files", (COLUMN*)&files, sizeof( files )/sizeof(COLUMN) },
-	{ L"inputFiles", (COLUMN*)&inputFiles, sizeof( inputFiles )/sizeof(COLUMN) },
+//	{ L"files", (COLUMN*)&files, sizeof( files )/sizeof(COLUMN) },
+	{ L"filespec", (COLUMN*)&filespec, sizeof( filespec )/sizeof(COLUMN) },
+//	{ L"inputFiles", (COLUMN*)&inputFiles, sizeof( inputFiles )/sizeof(COLUMN) },
 	{ L"marriages", (COLUMN*)&marriages, sizeof( marriages )/sizeof(COLUMN) },
 	{ L"people", (COLUMN*)&people, sizeof( people )/sizeof(COLUMN) },
 	{ L"tables", (COLUMN*)&tables, sizeof( tables )/sizeof(COLUMN) },

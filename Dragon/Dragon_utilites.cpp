@@ -545,7 +545,7 @@ void CDragonApp::newDatabase( CString tag )
 	if( !theApp.openDatabase() ) return;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragonApp::insertIntoFiles( CString fileSpec )
+bool CDragonApp::insertIntoFiles( CString fileSpec, int type )
 {
 	CFileStatus status;
 	CString mtime;
@@ -564,18 +564,33 @@ void CDragonApp::insertIntoFiles( CString fileSpec )
 	// a fájl azonosítóinak megõrzése
 	presentDate = theApp.getPresentDateTime();
 
+	m_command.Format( L"SELECT rowid FROM filespec WHERE type ='%d'", type );
+	if( !query( m_command ) )return false;
+
+
+	if( !m_recordset->RecordsCount() )
+	{
+		m_command.Format( L"INSERT INTO filespec ( type, filespec, created, modified, loaded ) VALUES ( '%d', '%s', '%s', '%s', '%s' ) ", type, fileSpec, mtime, ctime, presentDate );
+		if( !theApp.execute( m_command ) ) return false;
+		m_command = L"SELECT last_insert_rowid() FROM filespec";	
+		if( !query( m_command ) ) return false;
+	}
+
+/*
 	m_command.Format( L"SELECT rowid FROM inputFiles WHERE filename ='%s'", fileSpec );
-	if( !query( m_command ) )return;
+	if( !query( m_command ) )return false;
 
 
 	if( !m_recordset->RecordsCount() )
 	{
 		m_command.Format( L"INSERT INTO inputFiles ( filename, size, created, modified, loaded ) VALUES ( '%s', '%s', '%s', '%s', '%s' ) ", fileSpec, size, mtime, ctime, presentDate );
-		if( !theApp.execute( m_command ) ) return;
+		if( !theApp.execute( m_command ) ) return false;
 		m_command = L"SELECT last_insert_rowid() FROM inputFiles";	
-		if( !query( m_command ) ) return;
+		if( !query( m_command ) ) return false;
 	}
+*/
 	m_fileNumber = _wtoi( m_recordset->GetFieldString(0) );
+	return true;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -312,6 +312,7 @@ BOOL CDragonApp::openSystemDatabase()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CDragonApp::getInputMode()
 {
+	int type;
 	CString filename;
 	CString ext;
 
@@ -324,6 +325,30 @@ CString CDragonApp::getInputMode()
 	}
 	else
 	{
+		m_command = L"SELECT type FROM filespec WHERE rowid == 1";
+		if( !query( m_command ) ) return L"";
+		if( !m_recordset->RecordsCount() ) 
+		{
+			m_inputMode = MANUAL;
+		}
+		else
+		{
+			type = _wtoi( m_recordset->GetFieldString( 0 ) );
+			if( type == GA_HTML )
+				m_inputMode = GAHTML;
+			else if( type == GEDCOM_FILE )
+				m_inputMode = GEDCOM;
+			else
+			{
+					m_inputMode = L"";
+					AfxMessageBox( L"Ismeretlen eredetû adatbázis!" );
+			}
+		}
+	}
+	return m_inputMode;
+
+/*
+
 
 		m_command = L"SELECT filename FROM inputFiles";
 		if( !query( m_command ) ) return L"";
@@ -345,8 +370,10 @@ CString CDragonApp::getInputMode()
 				AfxMessageBox( L"Ismeretlen eredetû adatbázis!" );
 			}
 		}
+
 	}
 	return m_inputMode;
+*/
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonApp::createColumnList()
@@ -463,39 +490,22 @@ BOOL CDragonApp::selectTextEditor()
 	CString path;
 	CString filename;
 	CString ext;
-	CString initialDir;
-	CString newFile;
 
 	CFileDialog dlg( TRUE, L".*", NULL, OFN_HIDEREADONLY | OFN_EXPLORER,
 		L"exe files (*.exe)|*.exe|All Files (*.*)|*.*||" );
 
 	dlg.m_ofn.lpstrTitle = L"Válaszd ki a kívánt text editort!";
-/*	
-	if( !m_texteditor.IsEmpty() )
-	{
-		splitFilespec( m_texteditor, &drive, &path,&filename,&ext );
-		initialDir.Format( L"%s:%s", drive,path );
-		dlg.m_ofn.lpstrInitialDir = initialDir;
-	}
-*/
 	if( dlg.DoModal( ) == IDCANCEL ) return FALSE;
 
 	POSITION pos = dlg.GetStartPosition( );
 	m_texteditor = dlg.GetNextPathName( pos );
 
-//	if( m_texteditor != newFile )
-//	{
-//		m_texteditor = newFile;
-		theApp.WriteProfileStringW( L"Settings", L"texteditor", m_texteditor );
-		splitFilespec( m_texteditor, &drive,&path,&filename,&ext );
-		m_editorName.Format( L"%s.%s", filename, ext );
-		m_editorFolder.Format( L"%s:%s", drive, path );
-		NOTEPAD = false;
-		if( filename == L"notepad++" ) NOTEPAD = true;
+	theApp.WriteProfileStringW( L"Settings", L"texteditor", m_texteditor );
+	splitFilespec( m_texteditor, &drive,&path,&filename,&ext );
+	m_editorName.Format( L"%s.%s", filename, ext );
+	m_editorFolder.Format( L"%s:%s", drive, path );
 
-		return TRUE;
-//	}
-//	return FALSE;
+	return TRUE;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CDragonApp::selectViewer()

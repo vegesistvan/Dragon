@@ -176,36 +176,15 @@ BOOL CEditPeople::OnInitDialog()
 
 
 	GetDlgItem( IDC_TABLE )->SetWindowText( m_table );
-/*
-	m_last_name = getLastWord( m_table );
-	if( !m_last_name.IsEmpty() )
-		GetDlgItem( IDC_LAST_NAME )->SetWindowText( m_last_name );
-*/
 	displayPicture();
 
-/*
-	m_command.Format( L"SELECT rowid FROM pictures WHERE id='%s' AND table_id=%d AND primaryPic=1", m_rowid, PEOPLE );
-	if( !theApp.queryBlob( m_command ) ) return false;
-
-	InvalidateRect( NULL, true );
-	m_paint = false;
-	CString rowid = theApp.m_recordsetBlob->GetFieldString( 0 );
-	if( !rowid.IsEmpty() )
-	{
-		_int64 blob_size;
-		void* block = theApp.blobDB->blobRead( "pictures", "picture", rowid, &blob_size );
-		if( block == NULL ) return false;
-		if( !writeBlockToFile( block, blob_size ) ) return false;
-		m_paint = true;
-	}
-*/
 	return TRUE;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CEditPeople::displayPicture()
 {
 
-	m_command.Format( L"SELECT rowid FROM pictures WHERE id='%s' AND table_id=%d AND primaryPic=1", m_rowid, PEOPLE );
+	m_command.Format( L"SELECT rowid FROM pictures WHERE id='%s' AND table_id=%d AND primaryPic=1", m_rowid, PEOPLEX );
 	if( !theApp.queryBlob( m_command ) ) return;
 
 	InvalidateRect( NULL, true );
@@ -741,7 +720,7 @@ void CEditPeople::EditUpdate( bool all )
 
 	CPictures dlg;
 
-	dlg.m_filter.Format( L"WHERE table_id='%d' AND id='%s'", PEOPLE, m_rowid ); 
+	dlg.m_filter.Format( L"WHERE table_id='%d' AND id='%s'", PEOPLEX, m_rowid ); 
 	dlg.m_name		= m_name;	// az ember neve
 	dlg.m_rowidP	= m_rowid;	// ember rowid-ja
 	dlg.m_rowidB	= rowidB;	// kép rowid-ja:  Az ember összes képeit a rowidB-vel kezdve mutassa be
@@ -794,7 +773,7 @@ void CEditPeople::OnEditInsert()
 		rowid = theApp.blobDB->blobInsert( "pictures", "picture", &stat );
 		if( !rowid ) return;
 	
-		m_command.Format( L"UPDATE pictures SET id='%s', table_id='%d', title='%s', filename= '%s', ext='%s', size='%d' WHERE rowid='%d'", m_rowid, PEOPLE, stat.filename, stat.filename, stat.ext, stat.size, rowid );
+		m_command.Format( L"UPDATE pictures SET id='%s', table_id='%d', title='%s', filename= '%s', ext='%s', size='%d' WHERE rowid='%d'", m_rowid, PEOPLEX, stat.filename, stat.filename, stat.ext, stat.size, rowid );
 		if( !theApp.executeBlob( m_command ) ) return;
 
 		str.Format( L"%d", rowid );

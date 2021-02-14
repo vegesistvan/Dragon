@@ -238,7 +238,7 @@ void CContractedCouples::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
 void CContractedCouples::OnInputDifferent()
 {
 	str.Format( L"Azonos nevû házaspárok, akik nem vonhatóak össze" );
-	if( !inputFile( DIFFERENTTXT ) )return;
+	if( !inputFile( COUPLESD_TEXT_FILE ) )return;
 
 	menu.EnableMenuItem( ID_INPUT_UNITED, MF_BYCOMMAND | MF_ENABLED);
 	menu.EnableMenuItem( ID_INPUT_DIFFERENT, MF_BYCOMMAND | MF_GRAYED);
@@ -251,7 +251,7 @@ void CContractedCouples::OnInputDifferent()
 void CContractedCouples::OnInputUnited()
 {
 	str.Format( L"Azonos nevû házaspárok, akik között összevonások történtek (%d azonos nevû házaspár )", m_numOfGroups );
-	if( !inputFile( UNITEDTXT ) )return;
+	if( !inputFile( COUPLESU_TEXT_FILE ) )return;
 
 	UNITED = true;
 	menu.EnableMenuItem( ID_INPUT_UNITED, MF_BYCOMMAND | MF_GRAYED);
@@ -261,14 +261,14 @@ void CContractedCouples::OnInputUnited()
 	ShowWindow( SW_MAXIMIZE );
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CContractedCouples::inputFile( int subType )
+bool CContractedCouples::inputFile( int type )
 {
 	CString filespec;
 
 	// Ha nincs a "files" táblában a keresett fájl, akkor elõször összevonást végez
 	while( true )
 	{
-		m_command.Format( L"SELECT filespec FROM files WHERE type=%d AND subtype=%d", CONTRACTED_COUPLES, subType );
+		m_command.Format( L"SELECT filespec FROM filespec WHERE type=%d", type );
 		if( !theApp.query( m_command ) );
 		filespec = theApp.m_recordset->GetFieldString( 0 );
 		if( filespec.IsEmpty() || _waccess( filespec, 0 ) )
@@ -514,29 +514,28 @@ megengedjük, hogy a házastársak egyyike legyen, nem azonos.\r\n\
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedCouples::OnHtml1D()
 {
-	getFileSpec( CONTRACTED_COUPLES_HTML1, DIFFERENTTXT );
+	getFileSpec( COUPLESD1_HTML_FILE );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedCouples::OnHtml1U()
 {
-	getFileSpec( CONTRACTED_COUPLES_HTML1, UNITEDTXT );
+	getFileSpec( COUPLESU1_HTML_FILE );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedCouples::OnHtml2D()
 {
-	getFileSpec( CONTRACTED_COUPLES_HTML2, DIFFERENTTXT );
+	getFileSpec( COUPLESD2_HTML_FILE );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedCouples::OnHtml2U()
 {
-	getFileSpec( CONTRACTED_COUPLES_HTML2, UNITEDTXT );
+	getFileSpec( COUPLESU2_HTML_FILE );
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CContractedCouples::getFileSpec( int type, int subType )
+void CContractedCouples::getFileSpec( int type )
 {
 	CString filespec;
-	m_command.Format( L"SELECT filespec FROM files WHERE type=%d AND subtype=%d", type, subType );
+	m_command.Format( L"SELECT filespec FROM filespex WHERE type=%d" , type );
 	if( !theApp.query( m_command ) );
 	filespec = theApp.m_recordset->GetFieldString( 0 );
 	if( filespec.IsEmpty() || _waccess( filespec, 0 ) )

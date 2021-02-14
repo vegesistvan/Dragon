@@ -228,7 +228,14 @@ U - a név alatt egyesített bejegyzések száma\n\
 G - generációs kód\n\
 s - az ember hierarchia száma (1-4)\
 ";
-
+/*
+	theApp.m_pszAppName = _tcsdup( L"Azonos nevû házastársakkal rendelkezõ emberek listája" );
+	if( (AfxMessageBox( _info, MB_ICONINFORMATION | MB_OKCANCEL )) == IDCANCEL ) 
+	{
+		OnCancel();
+		return false;
+	}
+*/
 	CCheckParam0 dlg;
 	dlg._caption = L"Azonos nevû házastársakkal rendelkezõ emberek listája";
 	dlg._info = _info;
@@ -1095,7 +1102,8 @@ void CCheckSameSpouses::OnHtml()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckSameSpouses::OnInfo()
 {
-	AfxMessageBox( _info );
+	theApp.m_pszAppName = _tcsdup( L"Azonos nevû házastársakkal rendelkezõ emberek listája" );
+	AfxMessageBox( _info, MB_ICONINFORMATION );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckSameSpouses::OnSpousesDiff()

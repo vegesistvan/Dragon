@@ -238,17 +238,17 @@ bool CContractPeople::contractPeople()
 			theApp.execute( L"VACUUM");
 		}
 
-		if( m_loop < 3 )
+		if( m_loop == 1 )
 		{
-			int type = CONTRACTED_PEOPLE_HTML1;
-			if( m_loop == 2 )
-				type = CONTRACTED_PEOPLE_HTML2;
-			m_command.Format( L"INSERT INTO files (type, subtype, filespec) VALUES( %d, %d, '%s')", type, UNITEDTXT, unitedSpec );
-			if( !theApp.execute( m_command ) ) return false;
-	
-			m_command.Format( L"INSERT INTO files (type, subtype, filespec) VALUES( %d, %d, '%s')", type, DIFFERENTTXT, differentSpec );
-			if( !theApp.execute( m_command ) ) return false;
+			theApp.insertIntoFiles( unitedSpec, UNITED1_HTML_FILE );
+			theApp.insertIntoFiles( differentSpec, DIFFERENT1_HTML_FILE );
 		}
+		if( m_loop == 2 )
+		{
+			theApp.insertIntoFiles( unitedSpec, UNITED2_HTML_FILE );
+			theApp.insertIntoFiles( differentSpec, DIFFERENT2_HTML_FILE );
+		}
+
 
 		if( !vContract.size() ) break;		// nincs összevont ember, vége a programnak
 		fclose( fU );
@@ -258,11 +258,15 @@ bool CContractPeople::contractPeople()
 	}
 	wndP.DestroyWindow();
 
+	theApp.insertIntoFiles( m_fileSpecTextU, UNITED_FILE );
+	theApp.insertIntoFiles( m_fileSpecTextD, DIFFERENT_FILE );
+	/*
 	m_command.Format( L"INSERT INTO files( type, subtype, filespec) VALUES ( %d, %d,'%s')", CONTRACTED_PEOPLE, UNITEDTXT, m_fileSpecTextU );
 	if( !theApp.execute( m_command ) ) return false;
 
 	m_command.Format( L"INSERT INTO files( type, subtype, filespec) VALUES ( %d, %d,'%s')", CONTRACTED_PEOPLE, DIFFERENTTXT, m_fileSpecTextD );
 	if( !theApp.execute( m_command ) ) return false;
+	*/
 
 	fclose( fU );
 	fclose( fD );

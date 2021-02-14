@@ -1356,7 +1356,7 @@ void CRelations::editMarriage( int nItem )
 void CRelations::displayPicture( CString rowid )
 {
 
-	m_command.Format( L"SELECT rowid FROM pictures WHERE id='%s' AND table_id=%d AND primaryPic=1", rowid, PEOPLE );
+	m_command.Format( L"SELECT rowid FROM pictures WHERE id='%s' AND table_id=%d AND primaryPic=1", rowid, PEOPLEX );
 	if( !theApp.queryBlob( m_command ) ) return;
 
 	InvalidateRect( NULL, true );
@@ -1495,7 +1495,7 @@ void CRelations::OnPictures()
 	CString rowidB(L"");
 	CPictures dlg;
 
-	dlg.m_filter.Format( L"WHERE table_id='%d' AND id='%s'", PEOPLE, m_rowid ); 
+	dlg.m_filter.Format( L"WHERE table_id='%d' AND id='%s'", PEOPLEX, m_rowid ); 
 	dlg.m_name		= m_name;	// az ember neve
 	dlg.m_rowidP	= m_rowid;	// ember rowid-ja, akinek a képeit browse-olja
 	dlg.m_rowidB	= rowidB;	// kép rowid-ja, amit ábrázolni fog

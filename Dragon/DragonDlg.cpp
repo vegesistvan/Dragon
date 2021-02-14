@@ -333,7 +333,7 @@ void CDragonDlg::OnSelectedFiles()
 	CSelectedFiles dlg;
 	if( dlg.DoModal() == IDCANCEL ) return;
 
-	theApp.m_texteditor = dlg.m_texteditor;
+//	theApp.m_texteditor = dlg.m_texteditor;
 	theApp.WriteProfileStringW( L"Settings", L"texteditor", theApp.m_texteditor );
 
 	splitFilespec( theApp.m_texteditor, &drive,&dir,&fname,&ext );
@@ -531,7 +531,7 @@ void CDragonDlg::OnMenuGahtml()
 	SetMenu(&menu);
 
 	if( wcscmp( theApp.m_username, L"végesistvan" ) )
-		menu.EnableMenuItem( 12, MF_BYPOSITION|MF_GRAYED);
+		menu.EnableMenuItem( 13, MF_BYPOSITION|MF_GRAYED);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnMenuGedcom()
@@ -543,7 +543,7 @@ void CDragonDlg::OnMenuGedcom()
 	SetMenu(&menu);
 
 	if( wcscmp( theApp.m_username, L"végesistvan" ) )
-			menu.EnableMenuItem( 12, MF_BYPOSITION|MF_GRAYED);
+			menu.EnableMenuItem( 17, MF_BYPOSITION|MF_GRAYED);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnMenuManual()
@@ -574,7 +574,7 @@ void CDragonDlg::OnMenuManual()
 		menu.EnableMenuItem( 8,MF_BYPOSITION| MF_ENABLED );
 	}
 	if( wcscmp( theApp.m_username, L"végesistvan" ) )
-		menu.EnableMenuItem( 12, MF_BYPOSITION|MF_GRAYED);
+		menu.EnableMenuItem( 15, MF_BYPOSITION|MF_GRAYED);
 	DrawMenuBar();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

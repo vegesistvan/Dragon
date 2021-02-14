@@ -288,7 +288,17 @@ void CContractCouples::contractCouples()
 		fclose( fD );
 		if( !vContract.size() ) break;
 
-
+		if( m_loop == 1 )
+		{
+			theApp.insertIntoFiles( m_fileSpecHtmlU, COUPLESU1_HTML_FILE );
+			theApp.insertIntoFiles( m_fileSpecHtmlD, COUPLESD1_HTML_FILE );
+		}
+		if( m_loop == 2 )
+		{
+			theApp.insertIntoFiles( m_fileSpecHtmlU, COUPLESU2_HTML_FILE );
+			theApp.insertIntoFiles( m_fileSpecHtmlD, COUPLESD2_HTML_FILE );
+		}
+/*
 		int type = CONTRACTED_COUPLES_HTML1;
 		if( m_loop == 2 )
 			type = CONTRACTED_COUPLES_HTML2;
@@ -297,7 +307,7 @@ void CContractCouples::contractCouples()
 	
 		m_command.Format( L"INSERT INTO files (type, subtype, filespec) VALUES( %d, %d, '%s')", type, DIFFERENTTXT, m_fileSpecHtmlD );
 		if( !theApp.execute( m_command ) ) return;
-
+*/
 		/*
 		if( vContract.size() )
 		{
@@ -327,12 +337,15 @@ void CContractCouples::contractCouples()
 	fclose( textU );
 	fclose( textD );
 
+	theApp.insertIntoFiles( m_fileSpecTextU, COUPLESU_TEXT_FILE );
+	theApp.insertIntoFiles( m_fileSpecTextD, COUPLESD_TEXT_FILE );
+/*
 	m_command.Format( L"INSERT INTO files (type, subtype, filespec) VALUES( %d, %d, '%s')", CONTRACTED_COUPLES, UNITEDTXT,m_fileSpecTextU );
 	if( !theApp.execute( m_command ) ) return;
 	
 	m_command.Format( L"INSERT INTO files (type, subtype, filespec) VALUES( %d, %d, '%s')", CONTRACTED_COUPLES, DIFFERENTTXT, m_fileSpecTextD );
 	if( !theApp.execute( m_command ) ) return;
-
+*/
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractCouples::core( int loop )

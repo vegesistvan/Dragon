@@ -5,7 +5,7 @@
 #include "Dragon.h"
 #include "Pictures.h"
 #include "afxdialogex.h"
-
+#include "utilities.h"
 
 enum
 {
@@ -479,7 +479,7 @@ void CPictures::OnClickList(NMHDR *pNMHDR, LRESULT *pResult)
 void CPictures::displayPicture()
 {
 
-	m_command.Format( L"SELECT rowid FROM pictures WHERE id='%s' AND table_id=%d AND primaryPic=1", m_rowidP, PEOPLE );
+	m_command.Format( L"SELECT rowid FROM pictures WHERE id='%s' AND table_id=%d AND primaryPic=1", m_rowidP, PEOPLEX );
 	if( !theApp.queryBlob( m_command ) ) return;
 
 	InvalidateRect( NULL, true );
@@ -535,7 +535,7 @@ void CPictures::EditUpdate( bool all )
 
 	CPictures dlg;
 
-	dlg.m_filter.Format( L"WHERE table_id='%d' AND id='%s'", PEOPLE, m_rowidP ); 
+	dlg.m_filter.Format( L"WHERE table_id='%d' AND id='%s'", PEOPLEX, m_rowidP ); 
 	dlg.m_name		= m_name;	// az ember neve
 	dlg.m_rowidP	= m_rowidP;	// ember rowid-ja
 	dlg.m_rowidB	= rowidB;	// kép rowid-ja:  Az ember összes képeit a rowidB-vel kezdve mutassa be
@@ -609,7 +609,7 @@ void CPictures::OnEditInsert()
 		rowid = theApp.blobDB->blobInsert( "pictures", "picture", &stat );
 		if( !rowid ) return;
 	
-		m_command.Format( L"UPDATE pictures SET id='%s', table_id='%d', title='%s', filename= '%s', ext='%s', size='%d' WHERE rowid='%d'", m_rowidP, PEOPLE, stat.filename, stat.filename, stat.ext, stat.size, rowid );
+		m_command.Format( L"UPDATE pictures SET id='%s', table_id='%d', title='%s', filename= '%s', ext='%s', size='%d' WHERE rowid='%d'", m_rowidP, PEOPLEX, stat.filename, stat.filename, stat.ext, stat.size, rowid );
 		if( !theApp.executeBlob( m_command ) ) return;
 /*
 		str.Format( L"%d", rowid );

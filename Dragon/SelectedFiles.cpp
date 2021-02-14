@@ -12,7 +12,6 @@ IMPLEMENT_DYNAMIC(CSelectedFiles, CDialogEx)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CSelectedFiles::CSelectedFiles(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CSelectedFiles::IDD, pParent)
-	, m_texteditor(_T(""))
 {
 
 }
@@ -24,7 +23,7 @@ CSelectedFiles::~CSelectedFiles()
 void CSelectedFiles::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Text(pDX, IDC_TEXTEDITOR, m_texteditor);
+	DDX_Text(pDX, IDC_TEXTEDITOR, theApp.m_texteditor_default );
 	DDX_Control(pDX, IDC_STATIC_TEXTEDITOR, m_color_texteditor);
 	DDX_Control(pDX, IDC_STATIC_HTML, m_color_htmlFileSpec);
 	DDX_Control(pDX, IDC_STATIC_GED, colorGedFile);
@@ -43,7 +42,6 @@ BOOL CSelectedFiles::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	GetDlgItem( IDC_DATABASE )->SetWindowText( theApp.m_databaseSpec );
 	GetDlgItem( IDC_TEXTEDITOR )->SetWindowText( theApp.m_texteditor );
 	GetDlgItem( IDC_HTMLFILESPEC)->SetWindowText( theApp.m_htmlFileSpec );
 	GetDlgItem( IDC_GED_FILESPEC )->SetWindowTextW( theApp.m_gedFileSpec );
@@ -59,18 +57,18 @@ BOOL CSelectedFiles::OnInitDialog()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSelectedFiles::OnClickedButtonDefault()
 {
+//	CString texteditor;
 	CString drive;
 	CString	dir;
 	CString	fname;
 	CString	ext;
 
-	m_texteditor = theApp.m_texteditor_default;
-	GetDlgItem( IDC_TEXTEDITOR )->SetWindowTextW( m_texteditor );
+	GetDlgItem( IDC_TEXTEDITOR )->SetWindowTextW( theApp.m_texteditor_default );
 
-	theApp.m_texteditor = m_texteditor;
-	theApp.WriteProfileStringW( L"Settings", L"texteditor", m_texteditor );
+	theApp.m_texteditor = theApp.m_texteditor_default;
+	theApp.WriteProfileStringW( L"Settings", L"texteditor", theApp.m_texteditor_default );
 
-	splitFilespec( m_texteditor, &drive,&dir,&fname,&ext );
+	splitFilespec( theApp.m_texteditor_default, &drive,&dir,&fname,&ext );
 	theApp.m_editorName.Format( L"%s.%s", fname, ext );
 	theApp.m_editorFolder.Format( L"%s:%s", drive, dir );
 }
@@ -78,24 +76,19 @@ void CSelectedFiles::OnClickedButtonDefault()
 void CSelectedFiles::OnClickedStaticHtml()
 {
 	if( theApp.selectHtml( FALSE ) )
-	{
 		GetDlgItem( IDC_HTMLFILESPEC )->SetWindowTextW( theApp.m_htmlFileSpec );
-	}
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSelectedFiles::OnClickedStaticTexteditor()
 {
-	theApp.selectTextEditor();
-	GetDlgItem( IDC_TEXTEDITOR )->SetWindowTextW( theApp.m_texteditor );
+	if( theApp.selectTextEditor() )
+		GetDlgItem( IDC_TEXTEDITOR )->SetWindowTextW( theApp.m_texteditor );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSelectedFiles::OnClickedStaticGed()
 {
 	if( theApp.selectGedcom( FALSE) )
-	{
 		GetDlgItem( IDC_GED_FILESPEC )->SetWindowTextW( theApp.m_gedFileSpec );
-	}
-
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSelectedFiles::OnClickedStaticViewer()

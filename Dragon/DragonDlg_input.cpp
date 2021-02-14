@@ -35,7 +35,11 @@ void CDragonDlg::OnInputGahtmlFile()
 	split.m_fileNumber		= 1;
 
 
-	split.inputFile();
+	if( !split.inputFile() )
+	{ 
+		OnCancel();
+		return;
+	}
 	mainTitle();
 	ChangeMenu();
 }
@@ -56,7 +60,11 @@ void CDragonDlg::OnInputGahtmlFamily()
 	split.m_familyName		= dlg.m_familyName;
 	split.m_fileNumber		= 1;
 
-	split.inputFile();
+	if( !split.inputFile() )
+	{
+		OnCancel();
+		return ;
+	}
 	mainTitle();
 	ChangeMenu();
 }
@@ -77,7 +85,11 @@ void CDragonDlg::OnInputGahtmlTable()
 	split.m_tableName		= dlg.m_tableNameSelected;
 	split.m_fileNumber		= 1;
 
-	split.inputFile();
+	if( !split.inputFile() )
+	{
+		OnCancel();
+		return;
+	}
 	mainTitle();
 	ChangeMenu();
 }
@@ -104,7 +116,12 @@ void CDragonDlg::OnInputGahtmlLine()
 	split.m_fileNumber		= 1;
 
 
-	split.inputFile();
+	if( !split.inputFile() )
+	{
+		OnCancel();
+		return;
+	}
+
 	mainTitle();
 	ChangeMenu();
 }
@@ -130,7 +147,11 @@ void CDragonDlg::OnInputGahtmlFromline()
 	split.m_rollToFamily	= 0;
 	split.m_fileNumber		= 1;
 
-	split.inputFile();
+	if( !split.inputFile() )
+	{
+		OnCancel();
+		return;
+	}
 	mainTitle();
 	ChangeMenu();
 }

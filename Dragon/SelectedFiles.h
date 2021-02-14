@@ -23,13 +23,11 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnInitDialog();
-	CString m_texteditor;
-	CString	m_databaseSpec;
 	CString	m_workingDirectory;
 
 	CColorStatic colorGedFile;
 	CColorStatic colorViewer;
-	CColorStatic m_color_database;
+//	CColorStatic m_color_database;
 	CColorStatic m_color_htmlFileSpec;
 	CColorStatic m_color_texteditor;
 

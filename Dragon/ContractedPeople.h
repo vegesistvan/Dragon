@@ -39,8 +39,8 @@ protected:
 	std::vector<TCHAR*> vFiltered; 
 
 
-	void inputFile( int subType );
-	void getFileSpec( int type, int subtype );
+	void inputFile( int type );
+	void getFileSpec( int type );
 
 	void OnEdit2lines();
 	BOOL PreTranslateMessage(MSG* pMsg);

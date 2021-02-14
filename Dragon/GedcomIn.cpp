@@ -61,7 +61,7 @@ bool CGedcomIn::gedcomInput()
 	if( _waccess( m_blobFolder, 0 ) ) _wmkdir( m_blobFolder);
 
 
-	theApp.insertIntoFiles( theApp.m_gedFileSpec );
+	theApp.insertIntoFiles( theApp.m_gedFileSpec, GEDCOM_FILE );
 
 	fillVectors();
 

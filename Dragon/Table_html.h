@@ -32,11 +32,13 @@ protected:
 	CString str;
 	CListCtrlEx m_ListCtrl;
 	CColorStatic colorCaption;
+	CColorStatic colorKeres;
 
 	void CTableHtml::title();
 	void CTableHtml::fillTable();
 	void CTableHtml::fillRow( CString item1, CString item2, CString item3 );
 	BOOL CTableHtml::isAncestor();
+	void CTableHtml::keress( int start );
 	
 	std::vector<TCHAR*> v_table_html; 
 //	virtual void PostNcDestroy();
@@ -48,11 +50,12 @@ public:
 	afx_msg void OnFilterUnfilter();
 	afx_msg void OnOpenHtml();
 	afx_msg void OnFilterSubstring();
-//	afx_msg void OnKillfocusSearh();
+	afx_msg void OnClickedKeres();
+	afx_msg void OnClickedNext();
 	afx_msg void OnDblclkListhtml(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg LRESULT OnSetColumnColor(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnColumnSorted(WPARAM wParam, LPARAM lParam);
-//	afx_msg void OnChangeSearch();
-//	afx_msg void OnSetfocusSearch();
-	afx_msg void OnChangeSearch();
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	
+	CColorStatic colorNext;
 };

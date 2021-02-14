@@ -3,7 +3,7 @@
 #include "afxwin.h"
 #include "listctrlex.h"
 
-#define PEOPLE		1
+#define PEOPLEX		1
 #define	MARRIAGE	2
 #define TABLE		3
 // CPictures dialog

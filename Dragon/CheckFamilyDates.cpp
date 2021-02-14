@@ -59,6 +59,8 @@ enum
 	L_BIRTH,
 	L_DEATH,
 	L_AGE,
+	L_DIFFH,
+	L_DIFFW,
 	L_COMMENT,
 	L_NUMOFCOLUMNS
 };
@@ -83,6 +85,39 @@ CCheckFamilyDates::CCheckFamilyDates(CWnd* pParent /*=NULL*/)
 	m_rgb[7] = RGB( 255, 255, 224 );
 	m_rgb[8] = RGB( 0,255,255 );
 	m_rgb[9] = RGB( 211,211,211 );
+
+	m_info = L"\
+Az adatbázisban a születés, az elhalálozás és az esküvõk dátumait tartjuk nyilván. Ezek egy-egy családon belüli \
+ellentmodásait keressük, amik nyilvánvalóan valamilyen adathibára hívják fel a figyelmünket.\r\n\
+\r\n\
+Az alábbi dátumokat ellenõrizzük:\r\n\
+\r\n\
+- az emberek élettartama\r\n\
+- házastársak korkülönbsége\r\n\
+- férj életkora az esküvõn\r\n\
+- feleség életkora az esküvõn\r\n\
+- apa és gyermeke korkülönbsége\r\n\
+- anya és gyermeke korkülönbsége\r\n\
+- gyerek anyja halála elõtt született\r\n\
+- gyerek 9 hónappal apja halála elõtt született\r\n\
+\r\n\
+A dátum különbségekre határértékeket állíthatunk be az indításkor megjelenõ paraméter ablakban.\n\r\
+Ebben az ablakban azt is kijelölhetjük, hogy mely családokat vizsgáljunk: gyerektelen családokat, vagy \
+olyanokat, amelyekben a férjnek csak egy felesége volt, vagy olyanokat, amelyekben több felesége is volt.\n\r\
+Ezt a választást azért ajánlja fel a program, mert az összes család túl nagy, nehezen kezelhetõ listát eredményezhet, \
+másrészt az így megkülönbözetet családokban talált dátum hibák sokszor külünbözõ fajta adathibákra utalhatnak.\r\n\
+Természetesen csak azokat a dátumokat ellenõrzi a program, amelyek meg vannak adva és helyes formátumúak \
+( 2021.02.07 - 2021.02. . 2021.02 - 2021 )\r\n\
+\r\n\
+Minden embernél a rá vonatkozó dátum hibát jelzõ üzenetet listázunk az utolsó oszlopban.\r\n\
+Csak azokat a családokat listázzuk, amelyekben valamely dátumok között összeférhetetlenséget állapított meg a program.\n\r\
+A listán az elsõ sorban az apa áll, õt követik a feleségek, majd a gyerekek. A családokat üres  sor választja el.\
+Az apa halvány piros színû a feleségek különbözõ színûek, a gyerekek ugyanolyan színûek, mint az anyjuk.\r\n\
+\r\n\
+Egy sorra kattintva jobb egérgombban, egy legördülõ menürõl választhatunk olyan funkciókat, amelyekkel megnézhetjük a \
+bementi ga.html fájlt ill. szerkeszthetjük, javíthatjuk a hibás adatokat akár a bementi html fájlban, akár az adatbázisban.\r\n\
+\r\n\
+";
 
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -124,6 +159,7 @@ BOOL CCheckFamilyDates::OnInitDialog()
 
 	CFamilyDatesStart dlg;
 
+	dlg.m_info = m_info;
 	theApp.m_pszAppName = _tcsdup( L"Családon belüli dátumok vizsgálata" );
 
 	if( dlg.DoModal() == IDCANCEL )
@@ -160,6 +196,8 @@ BOOL CCheckFamilyDates::OnInitDialog()
 	CString caption;
 	caption.Format( L"max élet=%d, férj-felség max korkülönbség:%d, nõk életkora esküvõn: (%d-%d), férfiak életkora esküvõn: (%d-%d), gyermek és anya korkülönbsége( %d-%d ), gyermek és apa korkülönbsége( %d-%d)", \
 	m_maxLifespan, m_maxDiffBetweenHW, m_minAgeWAtWedd, m_maxAgeWAtWedd, m_minAgeHAtWedd, m_maxAgeHAtWedd, m_minDiffMC, m_maxDiffMC, m_minDiffFC, m_maxDiffFC );
+
+	caption = L"dh: férj-feleség ill. apa-gyerek korkülönbsége || dw: anya-gyerek korkülönbsége"; 
 	GetDlgItem( IDC_CAPTION )->SetWindowTextW( caption );
 
 
@@ -216,6 +254,8 @@ void CCheckFamilyDates::createColumns()
 	m_ListCtrl.InsertColumn( L_BIRTH,		L"születés",	LVCFMT_LEFT,	 80,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_DEATH,		L"halál",		LVCFMT_LEFT,	 80,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_AGE,			L"kor",			LVCFMT_RIGHT,	 35,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_DIFFH,		L"dH",			LVCFMT_RIGHT,	 30,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_DIFFW,		L"dW",			LVCFMT_RIGHT,	 30,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_COMMENT,		L"hiba",		LVCFMT_LEFT,	500,-1,COL_TEXT);
 }
 
@@ -461,6 +501,7 @@ void CCheckFamilyDates::checkFamily()
 		deathH	= theApp.getDateI( h.death, 0 );
 	}
 
+	h.diffH = L"";
 	if( deathH && birthH )
 	{
 		if(deathH < birthH )
@@ -484,6 +525,8 @@ void CCheckFamilyDates::checkFamily()
 	{
 		w = vWifes.at(i);
 
+		vWifes.at(i).diffH = L"";
+		vWifes.at(i).diffW = L"";
 		birthW = 0;
 		if( checkDate( w.birth ) )
 		{
@@ -517,8 +560,10 @@ void CCheckFamilyDates::checkFamily()
 
 		if( birthH && birthW )
 		{
-			diff = theApp.dateDiff( h.birth, w.birth );
+			diff = theApp.dateDiff( w.birth, h.birth );
+			vWifes.at(i).diffH.Format( L"%d", diff );			// férj és feleség korkülönbsége
 			diff = abs( diff );
+		
 			if( diff > m_maxDiffBetweenHW )
 			{
 				str.Format( L", férj és feleség korkülönbsége nagyobb mint %d", m_maxDiffBetweenHW );
@@ -526,9 +571,6 @@ void CCheckFamilyDates::checkFamily()
 				hiba = true;
 			}
 		}
-
-
-
 
 		marriage = 0;
 		if( checkDate( w.marriage ) )
@@ -615,6 +657,7 @@ void CCheckFamilyDates::checkFamily()
 	{
 		c = vChildren.at(i);
 
+		vChildren.at(i).diffW = L"";
 		birthC = 0;
 		if( checkDate( c.birth ) )
 		{
@@ -679,6 +722,7 @@ void CCheckFamilyDates::checkFamily()
 		if( birthC && birthW )
 		{
 			diff = theApp.dateDiff( c.birth, w.birth );
+			vChildren.at(i).diffW.Format( L"%d", diff );		// anya életkora a gyerek születésekor
 			if( diff < m_minDiffMC || m_maxDiffMC < diff )
 			{
 				str.Format( L", anyja %d éves korában született", diff ); 
@@ -704,6 +748,7 @@ void CCheckFamilyDates::checkFamily()
 		if( birthC && birthH )
 		{
 			diff = theApp.dateDiff( c.birth, h.birth );
+			vChildren.at(i).diffH.Format( L"%d", diff );			// apa életkora a gyerek születésekor
 			if( diff < m_minDiffFC || m_maxDiffFC < diff )
 			{
 				str.Format( L", apja %d éves korában született", diff ); 
@@ -772,6 +817,8 @@ void CCheckFamilyDates::printFamily()
 	push( h.birth );
 	push( h.death );
 	push( h.age );
+	push( L"");							// diffH
+	push( h.diffW );
 	push( message );
 
 	for( UINT j = 0; j < vWifes.size(); ++j )
@@ -791,6 +838,8 @@ void CCheckFamilyDates::printFamily()
 		push( w.birth );
 		push( w.death );
 		push( w.age );
+		push( w.diffH );
+		push( w.diffW );
 		push( message );
 	}
 
@@ -812,6 +861,8 @@ void CCheckFamilyDates::printFamily()
 		push( c.birth );
 		push( c.death );
 		push( c.age );
+		push( c.diffH );
+		push( c.diffW );
 		push( message );
 	}
 	emptyLine();
@@ -876,40 +927,8 @@ void CCheckFamilyDates::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckFamilyDates::OnInfo()
 {
-	CString info = L"\
-Az adatbázisban a születés, az elhalálozás és az esküvõk dátumait tartjuk nyilván. Ezek egy-egy családon belüli \
-ellentmodásait keressük, amik nyilvánvalóan valamilyen adathibára hívják fel a figyelmünket.\r\n\
-\r\n\
-Az alábbi dátumokat ellenõrizzük:\r\n\
-\r\n\
-- az emberek élettartama\r\n\
-- házastársak korkülönbsége\r\n\
-- férj életkora az esküvõn\r\n\
-- feleség életkora az esküvõn\r\n\
-- apa és gyermeke korkülönbsége\r\n\
-- anya és gyermeke korkülönbsége\r\n\
-- gyerek anyja halála elõtt született\r\n\
-- gyerek 9 hónappal apja halála elõtt született\r\n\
-\r\n\
-A dátum különbségekre határértékeket állíthatunk be az indításkor megjelenõ paraméter ablakban.\n\r\
-Ebben az ablakban azt is kijelölhetjük, hogy mely családokat vizsgáljunk: gyerektelen családokat, vagy \
-olyanokat, amelyekben a férjnek csak egy felesége volt, vagy olyanokat, amelyekben több felesége is volt.\n\r\
-Ezt a választást azért ajánlja fel a program, mert az összes család túl nagy, nehezen kezelhetõ listát eredményezhet, \
-másrészt az így megkülönbözetet családokban talált dátum hibák sokszor külünbözõ fajta adathibákra utalhatnak.\r\n\
-Természetesen csak azokat a dátumokat ellenõrzi a program, amelyek meg vannak adva és helyes formátumúak \
-( 2021.02.07 - 2021.02. . 2021.02 - 2021 )\r\n\
-\r\n\
-Minden embernél a rá vonatkozó dátum hibát jelzõ üzenetet listázunk az utolsó oszlopban.\r\n\
-Csak azokat a családokat listázzuk, amelyekben valamely dátumok között összeférhetetlenséget állapított meg a program.\n\r\
-A listán az elsõ sorban az apa áll, õt követik a feleségek, majd a gyerekek. A családokat üres  sor választja el.\
-Az apa halvány piros színû a feleségek különbözõ színûek, a gyerekek ugyanolyan színûek, mint az anyjuk.\r\n\
-\r\n\
-Egy sorra kattintva jobb egérgombban, egy legördülõ menürõl választhatunk olyan funkciókat, amelyekkel megnézhetjük a \
-bementi ga.html fájlt ill. szerkeszthetjük, javíthatjuk a hibás adatokat akár a bementi html fájlban, akár az adatbázisban.\r\n\
-\r\n\
-";
 
-	AfxMessageBox( info, MB_ICONINFORMATION );
+	AfxMessageBox( m_info, MB_ICONINFORMATION );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 LRESULT CCheckFamilyDates:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)

@@ -140,7 +140,7 @@ CGaInput::~CGaInput(void)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CGaInput::inputFile()
+bool CGaInput::inputFile()
 {
 	GENERATIONS		gen;	// a generáció, az apa és max 10 feleség azonoosítója, amit a v_genertion-ben õriz késõbbi felhasználásra
 	
@@ -176,7 +176,7 @@ void CGaInput::inputFile()
 	CGaToDb dlgInput;
 	dlgInput.m_inputMode = GAHTML;
 	dlgInput.m_caption = caption;
-	if( dlgInput.DoModal() == IDCANCEL ) return;
+	if( dlgInput.DoModal() == IDCANCEL ) return false;
 
 	connect = dlgInput.m_connect;
 
@@ -217,7 +217,7 @@ Az alábbi sorokban ismeretlen keresztnevû embereket talált.<br>\
 	
 	
 	m_command.Format( L"SELECT last_insert_rowid() FROM people" );
-	if( !query( m_command ) ) return;
+	if( !query( m_command ) ) return false;
 	m_rowid = _wtoi( m_recordset.GetFieldString(0) );  // m_rowid az utoljára insertált people rowid-ja
 
 	clearTableHeader( &m_tableHeader);  // ha nem táblát, hanem leszármazotti listát olvasunk be, akkor ez kell
@@ -231,7 +231,7 @@ Az alábbi sorokban ismeretlen keresztnevû embereket talált.<br>\
 
 	int fileLength = (int)file.GetLength();
 	
-	if( !rollFile( &file ) ) return;			// eltekeri a fájlt a kívánt pozicióba, 
+	if( !rollFile( &file ) ) return false;			// eltekeri a fájlt a kívánt pozicióba, 
 												// ami beállítja az m_lineNumber, m_tableNumber, ill. m_familyNUmber értékeket.
 
 	CProgressWnd wndP(NULL, caption );
@@ -274,7 +274,7 @@ Az alábbi sorokban ismeretlen keresztnevû embereket talált.<br>\
 	}
 */
 
-	if( !theApp.execute( L"BEGIN" ) ) return;			// Ha nme itt lenne, hanem az insertEntries-ben, akkor nagyon lassú lenne!!!
+	if( !theApp.execute( L"BEGIN" ) ) return false;			// Ha nme itt lenne, hanem az insertEntries-ben, akkor nagyon lassú lenne!!!
 	while(file.ReadString(cLine)) 
 	{
 		cLine.Trim();
@@ -354,12 +354,15 @@ Az alábbi sorokban ismeretlen keresztnevû embereket talált.<br>\
 	}
 
 	wndP.DestroyWindow();
-	if( !theApp.execute( L"COMMIT" ) ) return;
+	if( !theApp.execute( L"COMMIT" ) ) return false;
 
 //	}
 
 	file.Close();
-	insertIntoFiles( theApp.m_htmlFileSpec );
+	if( !theApp.insertIntoFiles( theApp.m_htmlFileSpec, GA_HTML ) )
+	{
+		return false;
+	}
 	insertTableHeader();
 
 	if( connect )
@@ -427,6 +430,7 @@ Az alábbi sorokban ismeretlen keresztnevû embereket talált.<br>\
 //	if( m_error_cnt4 )	ShellExecute(NULL, L"open", fileSpec4,NULL, NULL, SW_SHOWNORMAL);
 
 	theApp.m_inputMode = GAHTML;
+	return true;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // A bemeneti ga-html fájlt az elõírt pozicióba tekeri.

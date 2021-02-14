@@ -15,6 +15,8 @@ public:
 	enum { IDD = IDD_FAMILYDATES_START };
 
 	// átadott adatok
+	CString m_info;
+
 	int	m_type;
     int	m_maxLifespan;
 	int	m_maxDiffBetweenHW;
@@ -33,12 +35,7 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void OnBnClickedOk();
 	virtual BOOL OnInitDialog();
-
-
-
-	
-	// 0 < megngedett érték < 120	int m_maxLifeSpan;
-
+	afx_msg void OnClickedInfo();
+	afx_msg void OnBnClickedOk();
 };

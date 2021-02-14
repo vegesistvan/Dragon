@@ -11,6 +11,8 @@ typedef struct
 	CString birth;
 	CString death;
 	CString age;
+	CString diffH;
+	CString diffW;
 	int		numOfSpouses;
 	CString message;
 }HUSBAND;
@@ -25,6 +27,8 @@ typedef struct
 	CString birth;
 	CString death;
 	CString	age;
+	CString diffH;
+	CString diffW;
 	CString marriage;
 	int		motherOrder;
 	CString message;
@@ -39,6 +43,8 @@ typedef struct
 	CString birth;
 	CString death;
 	CString	age;
+	CString diffH;
+	CString diffW;
 	CString father_id;
 	CString mother_id;
 	int		mother_index;
@@ -68,6 +74,7 @@ protected:
 
 	_int64 oneyear;
 
+	CString m_info;
 	CString m_command;
 	CString str;
 	CString m_filespec;

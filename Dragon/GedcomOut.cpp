@@ -7,6 +7,7 @@
 #include "afxdialogex.h"
 #include <algorithm>
 #include "ProgressWnd.h"
+#include "utilities.h"
 
 // GEDCOM
 enum

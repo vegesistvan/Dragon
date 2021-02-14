@@ -212,7 +212,7 @@ void CGaInput::processNameSubstr( CString nameSubstr, CString birthSubstr, CStri
 	any->sex_id = sex_id;
 	posterior = packWords( &A, i, n-i );
 	posterior.Trim();
-	if( !birthSubstr.IsEmpty() || !deathSubstr.IsEmpty() && !isdigit( posterior.GetAt(0) ) )
+	if( !birthSubstr.IsEmpty() || !deathSubstr.IsEmpty() && !iswdigit( posterior.GetAt(0) ) )
 		any->posterior = posterior;
 	else
 		any->comment = posterior;

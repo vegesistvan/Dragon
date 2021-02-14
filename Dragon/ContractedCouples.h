@@ -38,7 +38,7 @@ protected:
 	void push( CString item );
 	void keress( int start );
 
-	void getFileSpec( int type, int subType );
+	void getFileSpec( int type );
 
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	DECLARE_MESSAGE_MAP()
