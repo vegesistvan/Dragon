@@ -433,6 +433,8 @@ int CDragonApp::isFirstName( CString name )
 	else
 		n = wordList( &A, name, ' ', FALSE );
 
+	if( n > 1 )
+		z = 2;
 
 	for( i = 0; i < n; ++i )
 	{
@@ -442,7 +444,7 @@ int CDragonApp::isFirstName( CString name )
 	}
 	if( i == n )
 		return _wtoi( theApp.m_recordsetSystem->GetFieldString( 1 ) );		// megvan az adatbázisban, visszadja a sex-et
-
+/*
 	CSaveFirstName dlg;
 	dlg.m_first_name = A[i];
 	if( dlg.DoModal() == IDCANCEL ) return -1;
@@ -450,7 +452,8 @@ int CDragonApp::isFirstName( CString name )
 	m_command.Format( L"INSERT INTO firstnames (first_name, sex_id ) VALUES ('%s', '%d' )", A[i], dlg.m_sex_id );
 	if( !executeSys( m_command ) ) return -1;
 	return ( dlg.m_sex_id );
-
+*/
+	return -1;		// nincs sex
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int CDragonApp::getNumberOfDb( std::vector<CString>* vE )

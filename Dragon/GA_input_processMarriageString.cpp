@@ -45,7 +45,7 @@ void CGaInput::processMarriageSubstrings()
 	int pos1;
 	int pos2;
 
-	for( UINT i = 0; i < v_marriages.size(); ++i )
+ 	for( UINT i = 0; i < v_marriages.size(); ++i )
 	{
 		cLine = v_marriages.at(i).marriageSubstr.Trim();
 
@@ -66,7 +66,7 @@ void CGaInput::processMarriageSubstrings()
 
 // spouseSubstr-rõl le kell venni az esetleges esküvõ helyét és dátumát
 		peopleSubstr = processWedding( spouseSubstr, &w );
-		if( peopleSubstr.IsEmpty() )continue;			// elõfordul = 1848.03.15 minden további adat nélkül
+//		if( peopleSubstr.IsEmpty() )continue;			// elõfordul = 1848.03.15 minden további adat nélkül
 
 		v_marriages.at(i).place = w.place;
 		v_marriages.at(i).date	= w.date;
@@ -269,7 +269,10 @@ int CGaInput::checkSex( int sex_id )
 	return sexid;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// [place] [date]
+// visszadja:
+// pdb->place
+// pdb->date
+// peopleSubstr  // ez a marasdák a sorból
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CGaInput::processWedding( CString cLine, PLACE_DATE_BLOCK* pdb )
 {
@@ -289,6 +292,44 @@ CString CGaInput::processWedding( CString cLine, PLACE_DATE_BLOCK* pdb )
 	pdb->comment.Empty();
 	pdb->date.Empty();
 	pdb->place.Empty();
+
+	bool kilep = false;
+// Forneil, Fr 1966.07.30 Tunmer Nicol *Marseille 1943.07.30
+// ns Tarkó Imre 1753 csanádi kihird 1754/55 Nyitra és Csanád vm, nyitrai ppki ügyész, csanádi fõügyész (Mátyás-Fodor Kata, 1f. Marczibányi Júlia)
+// [place]date ...firstname struktúrát keres
+/*
+	for( i = 0 ; i < n; ++i )			// az elsõ dátumot és az azt követõ elsõ keresztnevet keresi
+	{
+		word = A[i];
+		if( iswdigit( word[0] ) )
+		{
+			for( j = i+1; j < n; ++j )
+			{
+				word = A[j];
+				if( ( ret = isFirstName( word ) ) != -1 )
+				{
+					if( (j - i ) < 4 )
+					{
+						if( i > 0 )
+							pdb->place = packWords( &A, 0, i );
+						pdb->date	= A[i];
+						if( (i + 1) < n )
+							peopleSubstr = packWords( &A, i + 1, n-i-1 );
+						else
+							peopleSubstr = L"N N";				// nincs név!!!
+						return peopleSubstr;
+					}
+					else
+					{
+						kilep = true;
+						break;
+					}
+				}
+			}
+		}
+		if( kilep ) break;
+	}
+*/
 	// megkeresi a név és a comment elválasztó indexét, hogy a dátumot a commentben ne keresse!!
 	for( i = 1 ; i < n; ++i )			// az elsõ keresztmevet keresi, de az lehet helyiség (pl. Gyula is, és lehet családnév is (pl. péter Zoltán
 	{
@@ -314,16 +355,8 @@ CString CGaInput::processWedding( CString cLine, PLACE_DATE_BLOCK* pdb )
 			if( volt ) break;								// keresztnevet követõ elsõ nem kersztnév. Elválasztó index!
 		}
 	}
-	if( !volt )												// nem talált kersztnevet, baj van!!
-	{
-		if( fh4 != NULL && !cLine.IsEmpty() )									// Privát->Házastársak nem nyitja meg az fh4-et!!!
-		{
-			fwprintf( fh4, L"%6d<br>\n", m_lineNumber, cLine );
-		}
-		++m_error_cnt4;
-		return L"";
-	}
-// megvan az i, ami a comment elválasztó indexe 
+
+	// megvan az i, ami a comment elválasztó indexe 
 
 	//	[place] [date] name  vagy [date] name
 	for( j = 0; j < i; ++j )						// j a 'date' és 'name' határa
@@ -336,6 +369,8 @@ CString CGaInput::processWedding( CString cLine, PLACE_DATE_BLOCK* pdb )
             pdb->date	= datum;
  			peopleSubstr = packWords( &A, j+ret , i-ret-j );
 			peopleSubstr = packWords( &A, j+ret , n-ret-j );
+			if( peopleSubstr.IsEmpty() )
+				peopleSubstr = L"N N";
 			return peopleSubstr;
 		}
 	}
@@ -355,6 +390,8 @@ CString CGaInput::processWedding( CString cLine, PLACE_DATE_BLOCK* pdb )
 	{
 		peopleSubstr = packWords( &A, 0, n );
 	}
+	if( peopleSubstr.IsEmpty() )
+		peopleSubstr = L"N N";
 	return peopleSubstr;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

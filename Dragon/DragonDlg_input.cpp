@@ -37,7 +37,7 @@ void CDragonDlg::OnInputGahtmlFile()
 
 	if( !split.inputFile() )
 	{ 
-		OnCancel();
+//		OnCancel();
 		return;
 	}
 	mainTitle();
@@ -62,7 +62,7 @@ void CDragonDlg::OnInputGahtmlFamily()
 
 	if( !split.inputFile() )
 	{
-		OnCancel();
+//		OnCancel();
 		return ;
 	}
 	mainTitle();
@@ -87,7 +87,7 @@ void CDragonDlg::OnInputGahtmlTable()
 
 	if( !split.inputFile() )
 	{
-		OnCancel();
+//		OnCancel();
 		return;
 	}
 	mainTitle();
@@ -118,7 +118,7 @@ void CDragonDlg::OnInputGahtmlLine()
 
 	if( !split.inputFile() )
 	{
-		OnCancel();
+//		OnCancel();
 		return;
 	}
 
@@ -149,13 +149,14 @@ void CDragonDlg::OnInputGahtmlFromline()
 
 	if( !split.inputFile() )
 	{
-		OnCancel();
+//		OnCancel();
 		return;
 	}
 	mainTitle();
 	ChangeMenu();
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 void CDragonDlg::OnFromtable()
 {
 
@@ -165,3 +166,4 @@ void CDragonDlg::OnFromfamily()
 {
 
 }
+*/

@@ -144,6 +144,10 @@ ill. 'A sor a Notepad-ben' funkciókat. Bármelyikban javíthatjuk a ga.html fájl m
 		m_ListCtrl.SetColumnWidth(i,LVSCW_AUTOSIZE_USEHEADER);
 	wndP.DestroyWindow();
 
+	if( !nItem )
+	{
+		OnCancel();
+	}
 	gafile.Close();
 	return TRUE;
 }

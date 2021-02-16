@@ -8,6 +8,9 @@
 #include "ConnectCsalad.h"
 #include "InputErrors.h"
 #include "ProgressWnd.h"
+#include "UnknownFirstNames.h"
+#include "CheckNames.h"
+#include "checkDateFormat.h"
 //
 // Egy leszármazotti string felbontása több lépésben történik, elõször kisebb substringekre, majd azokat elemeire szedjük szét
 
@@ -200,14 +203,6 @@ A programot vagy a html fájlt javítani kell!\
 </font><br><br>\n" );
 	fwprintf( fh3, L"<pre>\n" );
 
-	fileSpec4 = theApp.openHtmlFile( &fh4, fileName4, L"w+" );
-	fwprintf( fh4, L"%s<br><br\n", theApp.m_htmlFileSpec );
-	fwprintf( fh4, \
-L"<font color='red'>\
-Az alábbi sorokban ismeretlen keresztnevû embereket talált.<br>\
-</font><br><br>\n" );
-	fwprintf( fh4, L"<pre>\n" );
-
 	m_error_cnt1 = 0;
 	m_error_cnt2 = 0;
 	m_error_cnt3 = 0;
@@ -216,6 +211,7 @@ Az alábbi sorokban ismeretlen keresztnevû embereket talált.<br>\
 	int position;
 	
 	
+
 	m_command.Format( L"SELECT last_insert_rowid() FROM people" );
 	if( !query( m_command ) ) return false;
 	m_rowid = _wtoi( m_recordset.GetFieldString(0) );  // m_rowid az utoljára insertált people rowid-ja
@@ -274,6 +270,7 @@ Az alábbi sorokban ismeretlen keresztnevû embereket talált.<br>\
 	}
 */
 
+	bool kilepett = false;
 	if( !theApp.execute( L"BEGIN" ) ) return false;			// Ha nme itt lenne, hanem az insertEntries-ben, akkor nagyon lassú lenne!!!
 	while(file.ReadString(cLine)) 
 	{
@@ -348,17 +345,20 @@ Az alábbi sorokban ismeretlen keresztnevû embereket talált.<br>\
 			wndP.SetPos( position );
 			wndP.StepIt();
 			wndP.PeekAndPump();
-			if (wndP.Cancelled()) break;
+			if (wndP.Cancelled())
+			{
+				kilepett = true;
+				break;
+			}
 		}
 		if( m_rollToLine && !m_rollToLineFrom ) break;		// ha egy sort akartunk beolvasni
 	}
 
 	wndP.DestroyWindow();
-	if( !theApp.execute( L"COMMIT" ) ) return false;
-
-//	}
-
 	file.Close();
+	if( kilepett ) return false;
+	if( !theApp.execute( L"COMMIT" ) ) return false;
+	
 	if( !theApp.insertIntoFiles( theApp.m_htmlFileSpec, GA_HTML ) )
 	{
 		return false;
@@ -381,10 +381,17 @@ Az alábbi sorokban ismeretlen keresztnevû embereket talált.<br>\
 	fwprintf( fh3, L"</pre>\n" );
 	fclose( fh3 );
 
-	fwprintf( fh4, L"</pre>\n" );
-	fclose( fh4 );
-	
+	CUnknownFirstNames dlg;
+	dlg.DoModal();
 
+	CCheckNames dlgN;
+	dlgN.DoModal();
+
+	CDateFormat dlgD;
+	dlgD.DoModal();
+
+
+/*
 	int error = 0;
 	error = m_error_cnt1 + m_error_cnt2 + m_error_cnt3;
 	if( error )
@@ -420,7 +427,7 @@ Az alábbi sorokban ismeretlen keresztnevû embereket talált.<br>\
 	}
 //	else
 //		str = L"Hibátlan beolvasás!";
-
+*/
 	str.Format( L"Az adatok beolvasása befejezõdött a\n\n%s fájlból a\n%s adatbázisba.\n\nVégezd el az összes öszevonás elõtti ellenõrzést\nés amit lehet, javítsd a ga.html fájlban!", theApp.m_htmlFileName, theApp.m_databaseName );
 	AfxMessageBox( str, MB_ICONINFORMATION );
 

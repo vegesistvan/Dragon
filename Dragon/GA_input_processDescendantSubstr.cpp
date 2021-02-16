@@ -141,6 +141,7 @@ void CGaInput::processNameSubstr( CString nameSubstr, CString birthSubstr, CStri
 	int ret;
 	int sex_id;
 	bool volt = false;
+	int numOfFirstNames = 0;
 
 	nameSubstr.Trim();
 	// parentIndex leszedése, ha van
@@ -200,11 +201,8 @@ void CGaInput::processNameSubstr( CString nameSubstr, CString birthSubstr, CStri
 	}
 	if( !volt )												// nem talált kersztnevet, baj van!!
 	{
-		if( fh4 != NULL && !nameSubstr.IsEmpty() )									// Privát->Házastársak nem nyitja meg az fh4-et!!!
-		{
-			fwprintf( fh4, L"%6d %s<br>\n", m_lineNumber, nameSubstr );
-		}
-		++m_error_cnt4;
+		any->last_name = getFirstWord( nameSubstr );
+		any->first_name = getLastWord( nameSubstr );
 		return;
 	}
 	// i az elválasztó index a név és comment( posterior) között
@@ -259,6 +257,7 @@ void CGaInput::processNameSubstr( CString nameSubstr, CString birthSubstr, CStri
 		i += 4;
 	}
 
+	
 // Xi elõnevek azonosítása	
 	if( isLastCharacter( A[i], 'i' ) )					// i-re végzõdõ egytagú elõnebek azonosítása 
 	{													// elõnév következhet, de lehet családnév is!!
@@ -303,17 +302,41 @@ void CGaInput::processNameSubstr( CString nameSubstr, CString birthSubstr, CStri
 	}
 	any->title = title.TrimRight();
 
-
-	any->last_name = A[i];		// családnév
+	
 	// a végérõl leszedi az utótagot
 	if( iswlower( A[n-1][0] ) )
 	{
 		any->posterior = A[n-1];
 		--n;
 	}
-	// ami marad, aza keresztnév
-	any->first_name = packWords( &A, i+1, n-i-1 );
+	// kettõs vezetéknevek kezelése
 
+	int k = 1;   // a szavak száma
+	for( int j = i+1; j < n; ++j )
+	{
+		++k;
+		word = A[j];
+		if( ( ret = isFirstName( word ) ) != -1 )		// az ezt követõ szó keresznév, ami lehet családnév is
+			++numOfFirstNames;
+	}
+
+
+	any->first_name = packWords( &A, n-numOfFirstNames, numOfFirstNames );
+	any->last_name	= packWords( &A, i, k - numOfFirstNames );
+
+/*
+	if( ( n - i ) > 2  && numOfFirstNames == 1 ) // a nevt alkotó szavak száma
+	{
+		any->last_name = packWords( &A, i, n-i-1 );
+		any->first_name = A[ n-1 ];
+		
+	}
+	else
+	{
+		any->last_name = A[i];		// kerttõs családnév
+		any->first_name = packWords( &A, i+1, n-i-1 );
+	}
+*/
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //typedef struct

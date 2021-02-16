@@ -13,6 +13,7 @@
 #include "CheckGenerations.h"
 #include "ContractedPeople.h"
 #include "CheckFamilyDates.h"
+#include "UnknownFirstNames.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -31,6 +32,7 @@ ON_COMMAND(ID_EMAIL, &CDragonApp::OnEmail)
 ON_COMMAND(ID_CHECK_INEGRITY, &CDragonApp::OnCheckIntegrity)
 ON_COMMAND(ID_CHECK_GENERATIONS, &CDragonApp::OnCheckGenerations)
 ON_COMMAND(ID_FAMILYDATES, &CDragonApp::OnFamilyDates)
+ON_COMMAND(ID_UNKNOWN_FIRSTNAMES, &CDragonApp::OnUnknownFirstnames)
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CDragonApp::CDragonApp()
@@ -702,5 +704,10 @@ void CDragonApp::OnFamilyDates()
 {
 	CCheckFamilyDates dlg;
 	dlg.DoModal();
-
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDragonApp::OnUnknownFirstnames()
+{
+	CUnknownFirstNames dlg;
+	dlg.DoModal();
 }

@@ -166,23 +166,7 @@ void CContractedPeople::inputFile( int type )
 		else
 			break;
 	}
-/*
-	// Ha nincs a "files" táblában a keresett fájl, akkor elõször összevonást végez
-	while( true )
-	{
-		m_command.Format( L"SELECT filespec FROM files WHERE type=%d AND subtype=%d", CONTRACTED_PEOPLE, subType );
-		if( !theApp.query( m_command ) );
-		filespec = theApp.m_recordset->GetFieldString( 0 );
-		if( filespec.IsEmpty() || _waccess( filespec, 0 ) )
-		{
-			CContractPeople cc;
-			if( !cc.contractPeople() )
-				CDialog::OnCancel();
-		}
-		else
-			break;
-	}
-*/
+
 	CStdioFile file( filespec, CFile::modeRead);   // input csv fájl
 	int fileLength = (int)file.GetLength();
 

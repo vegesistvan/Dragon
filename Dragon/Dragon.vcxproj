@@ -298,6 +298,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Table_titles.h" />
     <ClInclude Include="SameParams.h" />
+    <ClInclude Include="UnknownFirstNames.h" />
     <ClInclude Include="utilities.h" />
     <ClInclude Include="version.h" />
     <ClInclude Include="version_num.h" />
@@ -429,6 +430,7 @@
     </ClCompile>
     <ClCompile Include="Table_titles.cpp" />
     <ClCompile Include="SameParams.cpp" />
+    <ClCompile Include="UnknownFirstNames.cpp" />
     <ClCompile Include="utilities.cpp" />
   </ItemGroup>
   <ItemGroup>

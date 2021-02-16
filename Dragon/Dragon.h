@@ -367,6 +367,7 @@ public:
 
 	afx_msg void OnCheckGenerations();
 	afx_msg void OnFamilyDates();
+	afx_msg void OnUnknownFirstnames();
 };
 extern CDragonApp theApp;
 

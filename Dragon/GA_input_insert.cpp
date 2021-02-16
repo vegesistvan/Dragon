@@ -9,54 +9,6 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-bool CGaInput::insertIntoFiles( CString fileSpec )
-{
-	CFileStatus status;
-	CString mtime;
-	CString ctime;
-	CString atime;
-	CString size;
-	CString presentDate;
-
-	if( CFile::GetStatus( fileSpec, status) )
-	{
-		mtime	= status.m_mtime.Format( L"%Y.%m.%d %H:%M:%S" );
-		ctime	= status.m_ctime.Format( L"%Y.%m.%d %H:%M:%S" );
-		atime	= status.m_atime.Format( L"%Y.%m.%d %H:%M:%S" );
-		size	= thousend( status.m_size );
-	}
-	// a fájl azonosítóinak megõrzése
-	presentDate = theApp.getPresentDateTime();
-
-	m_command.Format( L"SELECT rowid FROM filespec WHERE type='%d'", GA_HTML );
-	if( !query( m_command ) )return false;
-
-	if( !m_recordset.RecordsCount() )
-	{
-		m_command.Format( L"INSERT INTO filespec ( type, filespec, created, modified, loaded ) VALUES ( '%d', '%s', '%s', '%s', '%s' ) ", GA_HTML, fileSpec, mtime, ctime, presentDate );
-		if( !theApp.execute( m_command ) ) return false;
-		m_command = L"SELECT last_insert_rowid() FROM filespec";	
-		if( !query( m_command ) ) return false;
-	}
-
-
-	m_command.Format( L"SELECT rowid FROM inputFiles WHERE filename ='%s'", fileSpec );
-	if( !query( m_command ) )return;
-
-
-	if( !m_recordset.RecordsCount() )
-	{
-		m_command.Format( L"INSERT INTO inputFiles ( filename, size, created, modified, loaded ) VALUES ( '%s', '%s', '%s', '%s', '%s' ) ", fileSpec, size, mtime, ctime, presentDate );
-		if( !theApp.execute( m_command ) ) return;
-		m_command = L"SELECT last_insert_rowid() FROM inputFiles";	
-		if( !query( m_command ) ) return;
-	}
-
-	m_fileNumber = _wtoi( m_recordset.GetFieldString(0) );
-	return true;
-}
-*/
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////// I N S E R T   T A B L E H E A D E R   A N D   B R A N C H E S ////////////////////////////////////////////////
@@ -111,7 +63,7 @@ void CGaInput::insertEntries()
 // emberek insertáláa
 	
 	int z;
-	if( m_lineNumber == 190365 )
+	if( m_lineNumber == 114309 )
 		z = 1;
 
 	insertDescendant();					// a v_brunch-hoz meg kell adni a rowid-jét!!
@@ -144,8 +96,9 @@ void CGaInput::insertEntries()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CGaInput::insertDescendant( )
 {
+	d.source		= 1;
 	d.last_name		= m_familyName;
-	d.titolo		= m_tableHeader.titolo;
+//	d.titolo		= m_tableHeader.titolo;
 	d.rowid			= insertAny( &d );
 	m_rowidLastDescendant = d.rowid;
 	return( d.rowid );
@@ -155,7 +108,7 @@ CString CGaInput::insertDescendantSpouse( UINT i )
 {
 	CString rowid(L"0");
 
-	if( !v_marriages.at(i).lastNameM.IsEmpty() || !v_marriages.at(i).firstNameM )				// elõfordulhat ilyem: = 1848.03.15  semmi más
+//	if( !v_marriages.at(i).lastNameM.IsEmpty() || !v_marriages.at(i).firstNameM ) 				// elõfordulhat ilyem: = 1848.03.15  semmi más
 
 	s.source		= 2;
 	s.generation	= ' ';

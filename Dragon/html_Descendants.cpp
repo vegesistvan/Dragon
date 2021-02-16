@@ -140,7 +140,6 @@ void CDescendant::fillTable( )
 	CString descendant;
 	
 
-
 	CString logFile;
 	logFile.Format( L"psplit.txt" );
 	str.Format( L"\"%s\" betöltési hibák", theApp.m_htmlFileSpec ); 
@@ -284,7 +283,6 @@ void CDescendant::fillTable( )
 		ShellExecute(NULL, L"open", fileSpec,NULL, NULL, SW_SHOWNORMAL);
 	}
 }
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendant::OnSize(UINT nType, int cx, int cy)
 {

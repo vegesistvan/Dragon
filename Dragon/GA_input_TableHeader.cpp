@@ -200,3 +200,22 @@ void CGaInput::splitTableHeader( CString cLine )
 
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CGaInput::clearTableHeader( TABLEHEADER* tableHeader)
+{
+	tableHeader->arm.Empty();
+	tableHeader->comment.Empty();
+	tableHeader->familyName.Empty();
+	tableHeader->alias.Empty();
+	tableHeader->familyNumber = 0;
+	tableHeader->folyt.Empty();
+	tableHeader->joint = 0;
+	tableHeader->known_as.Empty();
+	tableHeader->lineNumber = 0;
+	tableHeader->percent.Empty();
+	tableHeader->torzs.Empty();
+	tableHeader->tableHeader.Empty();
+	tableHeader->tableNumber = 0;
+	tableHeader->tableRoman.Empty();
+	tableHeader->titolo.Empty();
+}

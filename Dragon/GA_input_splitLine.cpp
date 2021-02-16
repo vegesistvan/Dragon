@@ -184,3 +184,35 @@ void CGaInput::clearAll()
 	v_marriages.clear(); 
 	v_spouseSpouses.clear();
 }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CGaInput::clearPeople( PEOPLE *p)
+{
+	p->generation  = L'';
+	p->birth_date.Empty();
+	p->birth_place.Empty();
+	p->comment.Empty();
+	p->death_date.Empty();
+	p->death_place.Empty();
+	p->father_id = L"0";
+	p->first_name.Empty();
+	p->last_name.Empty();
+	p->known_as.Empty();
+	p->mother_id = L"0";
+	p->rowid.Empty();
+	p->sex_id = 0;
+	p->title.Empty();
+	p->titolo.Empty();
+	p->posterior.Empty();
+	p->parentIndex = 0;
+	p->parentIndexCalc = 0;
+	p->tableAncestry = 0;
+	p->tableNumber.Empty();
+	p->lineNumber = 0;
+	p->tableRoman.Empty();
+	p->orderFather = 1;
+	p->orderMother = 1;
+	p->folyt.Empty();
+	p->arm.Empty();
+	p->csalad.Empty();
+	p->gap = 0;
+}
