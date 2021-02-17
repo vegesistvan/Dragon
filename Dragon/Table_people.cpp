@@ -1672,7 +1672,7 @@ void CTablePeople::parent( CString rowid, PARENT* p)
 		m_command.Format( L"SELECT rowid,* FROM people WHERE rowid ='%s'",rowid );
 		if( !query2( m_command ) ) return;
 
-		p->m_rowid_table = m_recordset2->GetFieldString( PEOPLE_TABLENUMBER );
+		p->rowid_table = m_recordset2->GetFieldString( PEOPLE_TABLENUMBER );
 		p->name.Format( L"%s %s", m_recordset2->GetFieldString( PEOPLE_LAST_NAME ), m_recordset2->GetFieldString( PEOPLE_FIRST_NAME ) );
 		p->name.Replace( '|', '\'' );
 		p->birth_date	= m_recordset2->GetFieldString( PEOPLE_BIRTH_DATE );

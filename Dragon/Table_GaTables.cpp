@@ -115,7 +115,7 @@ void CTableGaTables::fillTable( )
 	wndProgress.SetStep(1);
 
 
-	split.m_error_cnt1 = 0;
+//	split.m_error_cnt1 = 0;
 	nItem = 0;
 	file.SeekToBegin();
 	while(file.ReadString(cLine)) 
@@ -143,11 +143,12 @@ void CTableGaTables::fillTable( )
 	wndProgress.DestroyWindow();
 
 	fclose( theApp.fl );
+/*
 	if( split.m_error_cnt1 )
 	{
 		theApp.showLogFile();
 	}
-
+*/
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////

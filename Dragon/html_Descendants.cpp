@@ -149,7 +149,7 @@ void CDescendant::fillTable( )
 	fileSpec = theApp.openHtmlFile( &fh1, fileName, L"w+" );
 	fwprintf( fh1, L"%s<br><br>", theApp.m_htmlFileSpec ); 
 
-	split.m_error_cnt1 = 0;
+//	split.m_error_cnt1 = 0;
 	split.m_tableAncestry = TRUE;
 
 	int fileLength;
@@ -159,7 +159,7 @@ void CDescendant::fillTable( )
 	CStdioFile file( theApp.m_htmlFileSpec, CFile::modeRead); 
 	fileLength = (int)file.GetLength();
 
-	split.m_error_cnt1 = 0;
+//	split.m_error_cnt1 = 0;
 
 	split.m_rollToLine		= m_lineNumber;
 	split.m_rollToTable		= m_tableNumber;
@@ -191,7 +191,7 @@ void CDescendant::fillTable( )
 	wndP.SetPos(0);
 	wndP.SetStep(1);
 
-	split.m_error_cnt1 = 0;
+//	split.m_error_cnt1 = 0;
 	m_ListCtrl.DeleteAllItems();
 	nItem = 0;
 
@@ -278,10 +278,12 @@ void CDescendant::fillTable( )
 	}
 	wndP.DestroyWindow();
 	fclose( fh1 );
+/*
 	if( split.m_error_cnt1 )
 	{
 		ShellExecute(NULL, L"open", fileSpec,NULL, NULL, SW_SHOWNORMAL);
 	}
+*/
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendant::OnSize(UINT nType, int cx, int cy)

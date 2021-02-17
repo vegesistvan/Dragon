@@ -57,7 +57,6 @@ void CGaInput::splitTableHeader( CString cLine )
 	m_tableHeader.tableNumber	= m_tableNumber;
 	m_tableHeader.lineNumber	= m_lineNumber;
 	
-
 	if( cLine.Left(3) == L"%%%" )
 	{
 		++m_familyNumber;

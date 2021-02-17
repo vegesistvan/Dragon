@@ -111,8 +111,8 @@ Természetesen csak azokat a dátumokat ellenõrzi a program, amelyek meg vannak ad
 \r\n\
 Minden embernél a rá vonatkozó dátum hibát jelzõ üzenetet listázunk az utolsó oszlopban.\r\n\
 Csak azokat a családokat listázzuk, amelyekben valamely dátumok között összeférhetetlenséget állapított meg a program.\n\r\
-A listán az elsõ sorban az apa áll, õt követik a feleségek, majd a gyerekek. A családokat üres  sor választja el.\
-Az apa halvány piros színû a feleségek különbözõ színûek, a gyerekek ugyanolyan színûek, mint az anyjuk.\r\n\
+A listán az elsõ sorban az apa áll halvány piros színnel, õt követi az elsõ felesége a gyerekeivel egyforma színnel, \
+majd a további feleségek a gyerekeikkel más-más színnel. A családokat üres  sor választja el.\r\n\
 \r\n\
 Egy sorra kattintva jobb egérgombban, egy legördülõ menürõl választhatunk olyan funkciókat, amelyekkel megnézhetjük a \
 bementi ga.html fájlt ill. szerkeszthetjük, javíthatjuk a hibás adatokat akár a bementi html fájlban, akár az adatbázisban.\r\n\
@@ -778,6 +778,7 @@ void CCheckFamilyDates::printFamily()
 	WIFES		w;
 	CHILDREN	c;
 	CString message;
+	UINT j;
 	
 	message = L"";
 	if( h.message.GetLength() > 2 ) message = h.message.Mid( 2 );
@@ -821,7 +822,7 @@ void CCheckFamilyDates::printFamily()
 	push( h.diffW );
 	push( message );
 
-	for( UINT j = 0; j < vWifes.size(); ++j )
+	for( j = 0; j < vWifes.size(); ++j )
 	{
 		w = vWifes.at(j);
 		message = L"";
@@ -841,11 +842,14 @@ void CCheckFamilyDates::printFamily()
 		push( w.diffH );
 		push( w.diffW );
 		push( message );
-	}
-
+//	}
+	
 	for( UINT k = 0; k < vChildren.size(); ++k )
 	{
 		c = vChildren.at(k );
+		if( c.mother_index != j + 1 ) continue;
+
+
 		message = L"";
 		if( c.message.GetLength() > 2 ) message = c.message.Mid( 2 );
 
@@ -864,6 +868,7 @@ void CCheckFamilyDates::printFamily()
 		push( c.diffH );
 		push( c.diffW );
 		push( message );
+	}
 	}
 	emptyLine();
 	++m_cnt;

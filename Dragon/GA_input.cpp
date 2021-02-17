@@ -145,24 +145,8 @@ CGaInput::~CGaInput(void)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CGaInput::inputFile()
 {
-	GENERATIONS		gen;	// a generáció, az apa és max 10 feleség azonoosítója, amit a v_genertion-ben õriz késõbbi felhasználásra
-	
-	CString cLine;
-	CString fileName1( L"házastársak neme" );
-	CString fileName2( L"anya-index" );
-	CString fileName3( L"értelmezési problémák" );
-	CString fileName4( L"ismeretlen keresztnevek" );
-
-	CString fileSpec1;
-	CString fileSpec2;
-	CString fileSpec3;
-	CString fileSpec4;
-
-	CString caption;
-	CString caption2;
-	CString caption3;
-	BOOL	connect;
-	int		pos;
+	GENERATIONS	gen;	// a generáció, az apa és max 10 feleség azonoosítója, amit a v_genertion-ben õriz késõbbi felhasználásra
+	CString		caption;
 
 	if( m_rollToLineFrom )
 		caption.Format( L"A %s fájl beolvasása a %d sortól", theApp.m_htmlFileName, m_rollToLineFrom );
@@ -175,43 +159,14 @@ bool CGaInput::inputFile()
 	else
 		caption.Format( L"A %s fájl beolvasása", theApp.m_htmlFileName );
 
-
+	// a bemeneti GA.html fájl megkérdezése
 	CGaToDb dlgInput;
 	dlgInput.m_inputMode = GAHTML;
 	dlgInput.m_caption = caption;
 	if( dlgInput.DoModal() == IDCANCEL ) return false;
 
-	connect = dlgInput.m_connect;
-
-	fileSpec1 = theApp.openHtmlFile( &fh1, fileName1, L"w+" );
-	fwprintf( fh1, L"%s<br><br>\n", theApp.m_htmlFileSpec );
-	fwprintf( fh1, L"<font color='red'>Az alábbi sorokban azonos nemû házastársak vannak!</font><br><br>\n" );
-	fwprintf( fh1, L"<pre>\n" );
-
-	fileSpec2 = theApp.openHtmlFile( &fh2, fileName2, L"w+" );
-	fwprintf( fh2, L"%s<br><br>\n", theApp.m_htmlFileSpec );
-	fwprintf( fh2, L"<font color='red'>Az alábbi leszármazottak anya-indexe nagyobb mint apja feleségeinek száma</font><br><br>\n" );
-	fwprintf( fh2, L"<pre>\n" );
-	
-	fileSpec3 = theApp.openHtmlFile( &fh3, fileName3, L"w+" );
-	fwprintf( fh3, L"%s<br><br\n", theApp.m_htmlFileSpec );
-	fwprintf( fh3, \
-L"<font color='red'>\
-Az alábbi htm sorokban értelmezési problámák miatt valamelyik ember vezeték vagy utóneve üres. A hibákat valószínûleg értelmezhetetlen keresztnevek okozzák.<br>\
-A sorpárok elsõ sorában a htm sor látható, a második sorában pedig a sorból hibásan értelezett ember személyleírása.<br>\
-A programot vagy a html fájlt javítani kell!\
-</font><br><br>\n" );
-	fwprintf( fh3, L"<pre>\n" );
-
-	m_error_cnt1 = 0;
-	m_error_cnt2 = 0;
-	m_error_cnt3 = 0;
-	m_error_cnt4 = 0;
-
 	int position;
 	
-	
-
 	m_command.Format( L"SELECT last_insert_rowid() FROM people" );
 	if( !query( m_command ) ) return false;
 	m_rowid = _wtoi( m_recordset.GetFieldString(0) );  // m_rowid az utoljára insertált people rowid-ja
@@ -219,15 +174,13 @@ A programot vagy a html fájlt javítani kell!\
 	clearTableHeader( &m_tableHeader);  // ha nem táblát, hanem leszármazotti listát olvasunk be, akkor ez kell
 	v_tableHeader.clear();
 
-	theApp.m_cntMarriages	= 0;
 	theApp.m_cntPeople		= 0;
 
-	theApp.m_inputCode = GetInputCode( theApp.m_htmlFileSpec );
-	CStdioFile file( theApp.m_htmlFileSpec, CFile::modeRead);   // input ga.html fájl
-
+	theApp.m_inputCode = GetInputCode( theApp.m_htmlFileSpec );		// a bemeneti fájl kódrendszere: UTF8 vagy ANSI
+	CStdioFile file( theApp.m_htmlFileSpec, CFile::modeRead);		// input ga.html fájl
 	int fileLength = (int)file.GetLength();
 	
-	if( !rollFile( &file ) ) return false;			// eltekeri a fájlt a kívánt pozicióba, 
+	if( !rollFile( &file ) ) return false;		// eltekeri a fájlt a kívánt pozicióba, 
 												// ami beállítja az m_lineNumber, m_tableNumber, ill. m_familyNUmber értékeket.
 
 	CProgressWnd wndP(NULL, caption );
@@ -236,52 +189,19 @@ A programot vagy a html fájlt javítani kell!\
 	wndP.SetPos(0);
 	wndP.SetStep(1);
 
-	// a fájl elején lévõ nem értelmezendõ sorok átugrása
-/*
-	if( !file.ReadString(cLine) ) 
-	{
-		AfxMessageBox( L"Olvasási hiba!" );
-			return;
-	}
-	if( cLine[0] != '%' )
-	{
-		while(file.ReadString(cLine)) 
-		{
-			if( cLine.Find( L"</pre>") != -1 )
-				break;
-		}
-	}
-	else
-		file.SeekToBegin();
-*/
-/*
-	Az alábbi nem tudom miért van???
-
-	_int64  pont = 0 ;
-	while( file.ReadString( cLine ) )
-	{
-		if( cLine.Left(2) == L"%%" || cLine.Left(3) == L"<ol" || cLine.Left(3) == L"<ul" )
-		{
-			file.Seek( pont, SEEK_SET );
-			break;
-		}
-		else
-			pont = file.GetPosition();
-	}
-*/
-
+	CString cLine;
 	bool kilepett = false;
 	if( !theApp.execute( L"BEGIN" ) ) return false;			// Ha nme itt lenne, hanem az insertEntries-ben, akkor nagyon lassú lenne!!!
 	while(file.ReadString(cLine)) 
 	{
 		cLine.Trim();
-//		cLine.Remove( ';' );
+		if( cLine.IsEmpty() ) continue;
+		
 		if( theApp.m_inputCode == UTF8 || theApp.m_inputCode == UTF8BOM )
 			cLine = Utf8ToAnsi( cLine );
 
 		cLine.Replace( '\'', '|' );	 // a nevekben elõfordulhat az ' jel, amit az SQLite nem szeret
 		++m_lineNumber;
-		if( cLine.IsEmpty() ) continue;
 
 		if(  cLine.Left( 2 ) == L"%%" )			// tábla fejléc feldolgozása
 		{
@@ -289,34 +209,34 @@ A programot vagy a html fájlt javítani kell!\
 			{
 				if( m_tableNumber >= m_rollToTable ) break;
 			}
+
 			if( cLine.Left(3) == L"%%%" && m_rollToFamily )		// ha megadott family-t akarunk beolvasni
 			{
 				if( m_familyNumber >= m_rollToFamily ) break;
 			}
+
 			processTableHeader( cLine );			// ez beállítja az m_tableNuber-t és az m_familyNumbert-t
 			v_generations.clear();					// új táblánál újrakezdi a generációkat
 			v_orderFather.clear();					// új tábla
 			vParent2Index.clear();
 			m_known_as.Empty();						// új táblánál megszûnik a known_as
 			m_tableAncestry = TRUE;					// az új tábla elsõ embere lesz a tábla õse
-
 		}
 		else if( cLine.Left(2) == L"% " )			// known_as  % N új sorban van!! A tableHeader beolvasása után egy külön sorban olvashatjuk be!!
 		{
 			if( m_tableAncestry && v_tableHeader.size() )
 				v_tableHeader.at( v_tableHeader.size()-1).known_as = cLine;  // az utolsó tableHeader-be beteszi a % N-t!
 
-			m_known_as = getWord( cLine, 2, &pos );
+			m_known_as = getSecondWord( cLine );
 			m_known_as.Replace( ',', ' ' );			// % Aba, aaaaa
 			m_known_as.Trim() ;
 			if( m_known_as == L"N;" ) continue;
 			m_familyName	= m_known_as;
 			updatePreviousDescendant( cLine );	// az elõzõ decendant know_as mezejébe updatei a "% nev"-et
 		}
-		else			// descendant l4ine
+		else			// descendant line
 		{
 			cLine = cleanHtmlTags( cLine );
-//			cLine = cleanHtmlLine( cLine );
 			if( cLine.IsEmpty() ) continue;
 			
 			splitLine( cLine );
@@ -333,16 +253,15 @@ A programot vagy a html fájlt javítani kell!\
 			gen.descendant_sex_id	= d.sex_id;							// leszármazott neme
 			gen.descendant_id		= d.rowid;							// leszármazott rowid-je
 			gen.numOfSpouses		= v_marriages.size();				// házastársak száma
-			gen.parentIndex		= d.parentIndexCalc;					// anya-index  ( apja hanyadik feleségae az anyja )
+			gen.parentIndex			= d.parentIndexCalc;				// anya-index  ( apja hanyadik feleségae az anyja )
 			gen.orderFather			= d.orderFather;					//új
 			for( UINT i = 0; i < v_marriages.size(); ++i )
 			{
-				gen.spouse_id[i] = v_marriages.at(i).rowid;				// beteszi az aktuális házastársak rowid-jeit
+				gen.spouse_id[i]	= v_marriages.at(i).rowid;			// beteszi az aktuális házastársak rowid-jeit
 			}
 			v_generations.push_back( gen );								// megõrzi a leendõ apák, anyák azonosítót késõbbio felhasználásra
 
-			position = (int)file.GetPosition();
-			wndP.SetPos( position );
+			wndP.SetPos( (int)file.GetPosition() );
 			wndP.StepIt();
 			wndP.PeekAndPump();
 			if (wndP.Cancelled())
@@ -353,33 +272,17 @@ A programot vagy a html fájlt javítani kell!\
 		}
 		if( m_rollToLine && !m_rollToLineFrom ) break;		// ha egy sort akartunk beolvasni
 	}
-
+	if( !theApp.execute( L"COMMIT" ) ) return false;
 	wndP.DestroyWindow();
 	file.Close();
 	if( kilepett ) return false;
-	if( !theApp.execute( L"COMMIT" ) ) return false;
 	
-	if( !theApp.insertIntoFiles( theApp.m_htmlFileSpec, GA_HTML ) )
-	{
-		return false;
-	}
+	theApp.insertIntoFiles( theApp.m_htmlFileSpec, GA_HTML );
 	insertTableHeader();
 
-	if( connect )
-	{
-		connectBranches();
-		setDummyFather();
-		connectCsalad();
-	}
-
-	fwprintf( fh1, L"</pre>\n" );
-	fclose( fh1 );
-
-	fwprintf( fh2, L"</pre>\n" );
-	fclose( fh2 );
-
-	fwprintf( fh3, L"</pre>\n" );
-	fclose( fh3 );
+	connectBranches();
+	setDummyFather();
+	connectCsalad();
 
 	CUnknownFirstNames dlg;
 	dlg.DoModal();
@@ -390,51 +293,8 @@ A programot vagy a html fájlt javítani kell!\
 	CDateFormat dlgD;
 	dlgD.DoModal();
 
-
-/*
-	int error = 0;
-	error = m_error_cnt1 + m_error_cnt2 + m_error_cnt3;
-	if( error )
-	{
-		CInputErrors dlg;
-
-		str = L"A beolvasás alatt talált hibákat az alábbi fájlok tartalmazzák:\n\n";
-		if( m_error_cnt1 )
-		{
-			str += fileName1;
-			str += L"\n";
-			dlg.fileSpec1 = fileSpec1;
-		}
-		if( m_error_cnt2 )
-		{
-			str += fileName2;
-			str += L"\n";
-			dlg.fileSpec2 = fileSpec2;
-		}
-		if( m_error_cnt3 )
-		{
-			str += fileName3;
-			str += L"\n";
-			dlg.fileSpec3 = fileSpec3;
-		}
-		if( m_error_cnt4 )
-		{
-			str += fileName4;
-			str += L"\n";
-			dlg.fileSpec4 = fileSpec4;
-		}
-//		dlg.DoModal();
-	}
-//	else
-//		str = L"Hibátlan beolvasás!";
-*/
 	str.Format( L"Az adatok beolvasása befejezõdött a\n\n%s fájlból a\n%s adatbázisba.\n\nVégezd el az összes öszevonás elõtti ellenõrzést\nés amit lehet, javítsd a ga.html fájlban!", theApp.m_htmlFileName, theApp.m_databaseName );
 	AfxMessageBox( str, MB_ICONINFORMATION );
-
-//	if( m_error_cnt1 )	ShellExecute(NULL, L"open", fileSpec1,NULL, NULL, SW_SHOWNORMAL);
-//	if( m_error_cnt2 )	ShellExecute(NULL, L"open", fileSpec2,NULL, NULL, SW_SHOWNORMAL);
-//	if( m_error_cnt3 )	ShellExecute(NULL, L"open", fileSpec3,NULL, NULL, SW_SHOWNORMAL);
-//	if( m_error_cnt4 )	ShellExecute(NULL, L"open", fileSpec4,NULL, NULL, SW_SHOWNORMAL);
 
 	theApp.m_inputMode = GAHTML;
 	return true;
@@ -596,30 +456,20 @@ void CGaInput::fillFatherMother( )
 			if( v_generations.at(i).descendant_sex_id == 1 )					// szülõ sex_id-ja
 			{
 				d.father_id = v_generations.at(i).descendant_id;				// leszedi az apa azonosítóját
-//				d.orderFather = v_generations.at(i).orderFather + 1;
 
 				if( d.parentIndexCalc  <= v_generations.at(i).numOfSpouses )
 					d.mother_id = v_generations.at(i).spouse_id[d.parentIndexCalc-1];
-				else if( v_generations.at(i).numOfSpouses && d.parentIndex != 0 )
-				{
-					fwprintf( fh2, L"%8dL %s<br>\n", m_lineNumber, m_cLine );
-					++m_error_cnt2;
-				}
 			}
 			else																// ha a nõk leszármazottait is nyilvántartjuk
 			{
 				d.mother_id = v_generations.at(i).descendant_id;
-//				if( v_marriages.size() )   // ez kell? nem értem miért van itt?
-					d.father_id = v_generations.at(i).spouse_id[d.parentIndexCalc - 1 ];				// leszedi az apa azonosítóját
+				d.father_id = v_generations.at(i).spouse_id[d.parentIndexCalc - 1 ];				// leszedi az apa azonosítóját
 			}
 		}
-//		else
-//			AfxMessageBox( L"Nincs elõzõ generáció!" );
 	}
 	else
 	{
 		d.father_id.Empty();
-//		d.orderFather	= 0;
 		d.orderMother	= 0;
 	}
 
@@ -787,14 +637,3 @@ void CGaInput::updatePreviousDescendant( CString cLine )
 	m_command.Format( L"UPDATE people SET known_as='%s' WHERE rowid ='%s'", known_as, m_rowidLastDescendant );
 	if( !theApp.execute( m_command ) ) return;
 }
-/*
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// A %N jelet az elõzõ ember comment mezejéhez hozzáteszi
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CGaInput::updatePreviousTable( CString cLine )
-{
-	m_command.Format( L"UPDATE tables SET known_as='%s' WHERE rowid ='%d'", cLine, m_rowid_table );
-	if( !theApp.execute( m_command ) ) return;
-}
-*/

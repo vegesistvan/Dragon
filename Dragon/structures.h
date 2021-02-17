@@ -54,7 +54,7 @@ typedef struct
 
 typedef struct
 {
-	CString m_rowid_table;
+	CString rowid_table;
 	CString name;
 	CString birth_date;
 }PARENT;

@@ -201,7 +201,7 @@ void CHtmlSpouses::fillTable( )
 						   téves a házastárs nevének meghatározása.<br><br>" );
 	fwprintf( fh1, L"<pre>" );
 
-	split.m_error_cnt1 = 0;
+//	split.m_error_cnt1 = 0;
 	split.m_tableAncestry = TRUE;
 	split.m_tableNumber	= 0;
 
@@ -348,11 +348,13 @@ void CHtmlSpouses::fillTable( )
 	wndP.DestroyWindow();
 	fwprintf( fh1, L"</pre>" );
 	fclose( fh1 );
+/*
 	if( split.m_error_cnt1 )
 	{
 		ShellExecute(NULL, L"open", fileSpec,NULL, NULL, SW_SHOWNORMAL);
 //		theApp.showLogFile();
 	}
+*/
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

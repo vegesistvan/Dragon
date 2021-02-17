@@ -26,14 +26,11 @@ void CGaToDb::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_COMMENT, colorComment);
 	DDX_Control(pDX, IDC_STATIC_HTML, colorHtml);
-	DDX_Control(pDX, IDC_CHECK_CONTRACTION, CheckContraction);
 }
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CGaToDb, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_EMPTY, &CGaToDb::OnClickedButtonEmpty)
 	ON_STN_CLICKED(IDC_STATIC_HTML, &CGaToDb::OnClickedStaticHtml)
-	ON_BN_CLICKED(IDOK, &CGaToDb::OnBnClickedOk)
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CGaToDb::OnInitDialog()
@@ -43,11 +40,8 @@ BOOL CGaToDb::OnInitDialog()
 	colorComment.SetTextColor( RED );
 	colorHtml.SetTextColor( theApp.m_colorClick );
 
-	
-
 	if( m_inputMode == GAHTML )
 	 {
-
 		SetWindowTextW( L"GA.html fájl beolvasása adatbázisba" );
 		GetDlgItem( IDC_STATIC_HTML )->SetWindowTextW( L"GA.html:" );
 		GetDlgItem( IDC_HTML )->SetWindowTextW( theApp.m_htmlFileSpec );
@@ -58,11 +52,7 @@ BOOL CGaToDb::OnInitDialog()
 		GetDlgItem( IDC_STATIC_HTML )->SetWindowTextW( L"GEDCOM:" );
 	 	GetDlgItem( IDC_HTML )->SetWindowTextW( theApp.m_gedFileSpec );
 	 }
-
 	setDB();
-
-	CheckContraction.SetCheck( true );
-	GetDlgItem( IDC_CHECK_CONTRACTION )->EnableWindow( false );
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -86,7 +76,6 @@ BOOL CGaToDb::setDB()
 			str = L"Az adatbázis üres.";
 		else
 			str = L"törölni kell az adatbázis!";
-		// törölni kellen a m_ListCtrl táblát!!
 	}
 	GetDlgItem( IDC_COMMENT )->SetWindowTextW( str );
 	return TRUE;
@@ -102,6 +91,8 @@ BOOL CGaToDb::query( CString command )
 	}
 	return TRUE;
 }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Az adatbázis törlése
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaToDb::OnClickedButtonEmpty()
 {
@@ -119,9 +110,9 @@ void CGaToDb::OnClickedButtonEmpty()
 	GetDlgItem( IDC_COMMENT )->SetWindowTextW( str );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// GA.html vagy GEDCOM fájl kiválasztása
 void CGaToDb::OnClickedStaticHtml()
 {
-
 	if( m_inputMode == GAHTML )
 	{
 		if( theApp.selectHtml( FALSE ) )
@@ -132,14 +123,5 @@ void CGaToDb::OnClickedStaticHtml()
 		if( theApp.selectGedcom( FALSE) )
 			GetDlgItem( IDC_HTML )->SetWindowTextW( theApp.m_gedFileSpec );
 	}
-
 	setDB();
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CGaToDb::OnBnClickedOk()
-{
-
-	UpdateData( FROMSCREEN );
-	m_connect = CheckContraction.GetCheck();
-	CDialogEx::OnOK();
 }

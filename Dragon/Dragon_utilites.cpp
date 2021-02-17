@@ -414,7 +414,8 @@ CString CDragonApp::contractions()
 // 2 nõi keresztnév
 int CDragonApp::isFirstName( CString name )
 {
-//	name.Replace( ')', ' ' );
+	name.Replace( '-', ' ' );
+	name.Replace( '_', ' ' );
 	name.Replace( '?', ' ' );
 	name.Trim();
 	if( name.IsEmpty() ) return -1;
@@ -425,12 +426,13 @@ int CDragonApp::isFirstName( CString name )
 	int i;
 	int n;
 	CStringArray A;
-
+/*
 	if( (pos = name.Find( '_' ) ) != -1 )
 		n = wordList( &A, name, '_', FALSE );
 	else if( (pos = name.Find( '-' ) ) != -1 )
 		n = wordList( &A, name, '-', FALSE );
 	else
+*/
 		n = wordList( &A, name, ' ', FALSE );
 
 	if( n > 1 )

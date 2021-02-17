@@ -163,7 +163,7 @@ void CSpouseSpouses::fillTable( )
 	CStdioFile file( theApp.m_htmlFileSpec, CFile::modeRead); 
 	fileLength = (int)file.GetLength();
 
-	split.m_error_cnt1 = 0;
+//	split.m_error_cnt1 = 0;
 	split.m_rollToLine		= m_lineNumber;
 	split.m_rollToTable		= m_tableNumber;
 	split.m_rollToFamily	= m_familyNumber;
@@ -201,7 +201,7 @@ void CSpouseSpouses::fillTable( )
 	wndProgress.SetPos(0);
 
 
-	split.m_error_cnt1 = 0;
+//	split.m_error_cnt1 = 0;
 	m_ListCtrl.DeleteAllItems();
 	nItem = 0;
 	while(file.ReadString(cLine)) 
@@ -276,9 +276,11 @@ void CSpouseSpouses::fillTable( )
 	file.Close();
 	wndProgress.DestroyWindow();
 	fclose( fh1 );
+/*
 	if( split.m_error_cnt1 )
 		ShellExecute(NULL, L"open", fileSpec,NULL, NULL, SW_SHOWNORMAL);
 //		theApp.showLogFile();
+*/
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////4

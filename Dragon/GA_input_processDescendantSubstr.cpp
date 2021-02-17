@@ -163,7 +163,7 @@ void CGaInput::processNameSubstr( CString nameSubstr, CString birthSubstr, CStri
 	}
 
 
-	// [titolo][title][családnév][keresztnév][leírás]
+	// [titolo][title][családnév][keresztnév][posterior][leírás]
 
 	// [leírás] azonosítása
 	if( nameSubstr == L"Palásthy Judit 1689" )
@@ -281,12 +281,13 @@ void CGaInput::processNameSubstr( CString nameSubstr, CString birthSubstr, CStri
 		++i;
 	}
 
-// most már csak ilyen lehet: [tile] [családnév] {keresztnév]
+// most már csak ilyen lehet: [title][családnév][keresztnév][posterior]
 // title azonsítása
 // kisbetûvel nem lehet megkülönböztetni a rangot, mert számos idegen családnév kezdõdik kisbetûvel
 // pl. di_, la_, von_, des_, del_
 
 // ELÕNEVEK ELÕTTI CÍMEK AZONOSÍTÁSA
+	title.Empty();
 	for( ; i < n; ++i )
 	{
 		if( iswlower( A[i].GetAt( 0 ) ) )
@@ -309,34 +310,21 @@ void CGaInput::processNameSubstr( CString nameSubstr, CString birthSubstr, CStri
 		any->posterior = A[n-1];
 		--n;
 	}
-	// kettõs vezetéknevek kezelése
 
-	int k = 1;   // a szavak száma
+
+	// kettõs vezetéknevek kezelése
+	// i-n a család- és keresztenevek sorozata
+	// a családnév is lehet kettõs és a kerezstnév is lehet kettõs, vagy többszörös
+
 	for( int j = i+1; j < n; ++j )
 	{
-		++k;
 		word = A[j];
 		if( ( ret = isFirstName( word ) ) != -1 )		// az ezt követõ szó keresznév, ami lehet családnév is
 			++numOfFirstNames;
 	}
-
-
+	int k = n - i;			// a szavak száma
 	any->first_name = packWords( &A, n-numOfFirstNames, numOfFirstNames );
 	any->last_name	= packWords( &A, i, k - numOfFirstNames );
-
-/*
-	if( ( n - i ) > 2  && numOfFirstNames == 1 ) // a nevt alkotó szavak száma
-	{
-		any->last_name = packWords( &A, i, n-i-1 );
-		any->first_name = A[ n-1 ];
-		
-	}
-	else
-	{
-		any->last_name = A[i];		// kerttõs családnév
-		any->first_name = packWords( &A, i+1, n-i-1 );
-	}
-*/
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //typedef struct

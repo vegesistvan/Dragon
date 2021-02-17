@@ -10,7 +10,7 @@ public:
 	~CGaInput(void);
 
 	int		m_tableAncestry;			// a táblák elsõ emberét, az õst jelzi ha TRUE; 
-	CString m_titolo;
+
 
 	int m_rollToTable;
 	int m_rollToFamily;
@@ -20,6 +20,7 @@ public:
 	int		m_fileNumber;
 	CString	m_familyName;
 	CString m_tableName;
+	CString m_titolo;
 
 	int		m_familyNumber;
 	int		m_tableNumber;
@@ -31,11 +32,6 @@ public:
 	PEOPLE sm;		// a leszármazott házastársa anyjának adatai				vector lesz belõle
 	PEOPLE ss;		// a leszármazott házastársa további házastársának adatai	vector lesz belõle, az s vector indexét megõrizni!
 
-	int		m_error_cnt1;
-	int		m_error_cnt2;
-	int		m_error_cnt3;
-	int		m_error_cnt4;
-
 	// elsõ foku substringek
 	CString	m_descendant;
 	CString _descNameSS;
@@ -43,17 +39,9 @@ public:
 	CString	_descDeathSS;
 	CString _descCommentSS;
 
-
 	TABLEHEADER m_tableHeader;
 	std::vector<MARRIAGES>		v_marriages;		// leszármazott házasságai
 	std::vector<SPOUSESPOUSES>	v_spouseSpouses;	// házastársak további házastársai	
-
-
-//	BOOL	InputFile();
-//	BOOL	InputFamily( CString familyName, int familyNumber);
-//	BOOL	InputTable( int tableNumber );
-//	BOOL	InputLine( int lineNumber );
-//	BOOL	InputFileFromLine( int lineNUmber);
 
 	void	insertEntries();
 	bool	inputFile();
@@ -79,11 +67,6 @@ protected:
 	CString m_fieldsM;		// "marriages" tábla oszlopai
 	CString m_fieldsT;		// "tables" tábla oszlopai 
 	
-	FILE* fh3;
-//	FILE* fh4;
-	FILE* fh1;
-	FILE* fh2;
-
 	CSqliteDBRecordSet m_recordset;
 	CSqliteDBRecordSet m_recordset1;
 	CSqliteDBRecordSet m_recordset2;
@@ -127,78 +110,44 @@ protected:
 ///////////// F E L B O N T Á S H O Z   H A S Z N Á L T   V Á L T O Z Ó K ,  S T R I U K T U R Á K ,  V E K T O R O K ////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // egy sor felbontása
-	
-
 	CString	m_folyt;			// a sor végérõl leszedett folyt utáni római szám
-	
-
 	CString m_known_as;
 	CString	m_generationFirst; // egy tábla õsének generációja ( az elágazások összekapcsolásához kell )
-
+	int		m_rowid;	// az utoljára insertált ember azonosítója. Azért számoljuk és nem visszakérdezzük a SELECT 'last_insert_rowid'-val
+						// mert ez magszakítaná a BEGIN_COMMIT tranzakciót és nagyon lelassulna a beolvasás!!!
+						// Az m_rowid-ra egyébként azért van szükség, hogy a házastársak rowid-párjait gyûjtsük és a marriages-táblában mrgõrizzük.
+						// Valamint a szülõk rowid-ját is megõrizzük a people tábláan!!
+//	CString	m_rowid_table;
 	CString	m_rowidLastDescendant;
 
-	std::vector<TABLEHEADER>	v_tableHeader;
-
- 
-	
-
-
+	std::vector<TABLEHEADER> v_tableHeader;
 	std::vector<GENERATIONS> v_generations;
 	std::vector<ORDERFATHER> v_orderFather;
+	std::vector<PARENT2INDEX> vParent2Index;
 	
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	bool	inputMethod1();
 	CString getBranch( CString cLine );
 	CString getCsalad( CString root );
-
-	
-	
-
 	void	connectBranches();
 	void	setDummyFather();
 	void	connectCsalad();
-
 	CString	splitLineToSubstrings( CString cLine );
-
-	void	splitMarriageSubstrings();
-	void	splitMarriageSubstrings2();
-
 	void	noDate( CString str, SNAMEBLOCK *snb );
-
 	CString	getDescendant( CString cLine );
 	void	getMarriageSubstrings( CString cLine );
-
 	int		getMotherIndex( TCHAR generation, int n_mother_index );
 	int		getSexId( CString first_name );
 	BOOL	isTitle( CString cLine ) ;
-
 	BOOL	isName( CString str, NAME* name );
-	void	splitSpouseString( CString marriageString, SNAMEBLOCK *snb );
-	void	splitSpouseStringNew( CString marriageString, SNAMEBLOCK *snb );
-	void	splitSpouseStringNew2( CString marriageString, SNAMEBLOCK *snb );
-
 	int		getOrderSpouse( std::vector<PEOPLE>* vp );
-
-	void	splitDescendantSubstring( CString cLine );
-	void	splitDescNameString( CString nameSubstring );
-	void	splitSpousesSpouses( CString sLine, std::vector<PEOPLE> *v_p);
 	void	splitSpFatherName( CString cLine, NAME* name );
 	void	splitSpouseNameString( CString nameComment, NAME* name ); 
-
 	void	splitSpouseNameString( int ix );
-	void	splitBirthSubstr( int ix );
-	void	splitDeathSubstr( int ix );
-	void	splitRelativesSubstr( int ix );
-
-	void	splitFullname( CStringArray* A, NAME* name );
-	void	splitName( CString namestr, NAME* name );
-
 	void	fillOrderFather( );
 	void	fillFatherMother( );
-	
+
 	CString	insertAny( PEOPLE* p );
 	CString	insertDescendant();
 	CString	insertDescendantSpouse( UINT i);
@@ -207,17 +156,11 @@ protected:
 	CString	insertSpouseS( UINT i );
 	CString	insertSpouseFather( std::vector<MARRIAGES>* vM, UINT i);
 	CString	insertSpouseMother( std::vector<MARRIAGES>* vM, UINT i);
-
-
 	int		insertMarriage( CString spouse1_id, CString spouse2_id, int sex_id1, int sex_id2, CString order1, CString order2, CString place, CString date, int source );
 	int		insertDescMarriage( UINT i );
 	int		insertSpouseParentsMarriage( UINT i );
 	int		insertSpouseSpousesMarriage( UINT i );
 	void	updatePreviousDescendant( CString cLine );
-
-
-
-
 
 
 	void	processPeopleString( int who,  CString cLine, PEOPLE * p );
@@ -230,18 +173,7 @@ protected:
 	int		getSpouseOrder( std::vector<PEOPLE>* vp );
 	int		getParent2Index( TCHAR generation, int n_mother_index );
 	void	splitFullnameA( CStringArray* A, NAME* name );
-
 	int		checkSex( int sex_id );
-
-	std::vector<PARENT2INDEX> vParent2Index;
-
-	int		m_rowid;	// az utoljára insertált ember azonosítója. Azért számoljuk és nem visszakérdezzük a SELECT 'last_insert_rowid'-val
-						// mert ez magszakítaná a BEGIN_COMMIT tranzakciót és nagyon lelassulna a beolvasás!!!
-						// Az m_rowid-ra egyébként azért van szükség, hogy a házastársak rowid-párjait gyûjtsük és a marriages-táblában mrgõrizzük.
-						// Valamint a szülõk rowid-ját is megõrizzük a people tábláan!!
-
-	CString	m_rowid_table;
-
 
 };
 

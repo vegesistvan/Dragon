@@ -54,7 +54,6 @@ CString		cleanCline( CString cLine );
 CString		cleanCline2( CString cLine );
 CString		cleanHtmlLine( CString cLine );
 CString		cleanHtmlTags( CString cLine );
-//void		clearTableHeader( TABLEHEADER* m_tableHeader);
 void		clearSpouseBlock( SNAMEBLOCK* sp);
 CString		packWords( CStringArray* A, int from, int db );
 CString		getPeopleBlock( CString cLine );

@@ -182,7 +182,7 @@ void CMarriages::fillTable( )
 //	if (( fh1 = theApp.openLogFile( logFile, str )) == NULL)return;
 
 
-	split.m_error_cnt1 = 0;
+//	split.m_error_cnt1 = 0;
 	split.m_tableAncestry = TRUE;
 	split.m_tableNumber	= 0;
 
@@ -319,10 +319,12 @@ split.v_marriages.at(i).firstNameM,split.v_marriages.at(i).posteriorM );
 	}
 	wndP.DestroyWindow();
 	fclose( fh1 );
+/*
 	if( split.m_error_cnt1 )
 	{
 		ShellExecute(NULL, L"open", fileSpec,NULL, NULL, SW_SHOWNORMAL);
 	}
+*/
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CMarriages::OnFilter()

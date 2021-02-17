@@ -14,21 +14,11 @@ void CGaInput::splitLine( CString cLine)
 	m_cLine = cLine;									// megõrzi a teljes sort esetleges késõbbi felhasználásra ( hibajelzés )
 	cLine	= getBranch( cLine );
 	
-	m_descendant = getDescendant( cLine );
-	getMarriageSubstrings( cLine );
+	m_descendant = getDescendant( cLine );				// leszedi róla a marrige-eket
+	getMarriageSubstrings( cLine );						// marriage substringeket a v_marriages vektorba teszi
 
-//	bool regi = false;
-
-//	if( !regi )
-//	{
-		processDescendantSubstring( m_descendant );			// d struktúrába teszi az elemeket
-		processMarriageSubstrings();							// a v_marriages vektor substringjeit felbontja és visszateszi a vektorba
-//	}
-//	else
-//	{
-//		splitDescendantSubstring( m_descendant );			// d struktúrába teszi az elemeket
-//		splitMarriageSubstrings();							// a v_marriages vektor substringjeit felbontja és visszateszi a vektorba
-//	}
+	processDescendantSubstring( m_descendant );			// d struktúrába teszi az elemeket
+	processMarriageSubstrings();						// a v_marriages vektor substringjeit felbontja, az értékekekt magába a vektorba teszi
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Leszedi a sor végérõl az elágazás jelzését, amit megtisztítva az 'm_folyt' változóba tesz;
@@ -66,7 +56,7 @@ CString CGaInput::getBranch( CString cLine )
 	int pos1;
 	int pos2;
 
-	// ezt már leszedte a splitDescendantSubstring
+	
 	while( (pos2 = cLine.ReverseFind( ']' ) ) != -1 )
 	{
 		if( cLine.GetAt( cLine.GetLength() - 1 ) == ']' )		// a cLine végén van
@@ -81,7 +71,7 @@ CString CGaInput::getBranch( CString cLine )
 					if( ( pos = cLine.Find( L"család]" ) ) != -1 ||  ( pos = cLine.Find( L"család õse]" ) ) != -1 )
 					{
 						root = cLine.Mid( pos1+1, pos2-pos1 - 1 );
-						if( isupper( root.GetAt( 0 ) ) )
+						if( iswupper( root.GetAt( 0 ) ) )
 							d.csalad = getCsalad( root );
 					}
 					else
@@ -173,8 +163,6 @@ void CGaInput::clearAll()
 	clearPeople( &sf );		// az insertáláshoz használt PEOPLE struktúra
 	clearPeople( &sm );		// az insertáláshoz használt PEOPLE struktúra
 	clearPeople( &ss );		// az insertáláshoz használt PEOPLE struktúra
-
-	
 
 	_descNameSS.Empty();
 	_descBirthSS.Empty();

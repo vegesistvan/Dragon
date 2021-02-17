@@ -531,7 +531,7 @@ void CDragonDlg::OnMenuGahtml()
 	SetMenu(&menu);
 
 	if( wcscmp( theApp.m_username, L"végesistvan" ) )
-		menu.EnableMenuItem( 13, MF_BYPOSITION|MF_GRAYED);
+		menu.EnableMenuItem( 12, MF_BYPOSITION|MF_GRAYED);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnMenuGedcom()

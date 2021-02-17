@@ -130,7 +130,7 @@ public:
 	TCHAR m_username[100];
 
 	int		m_cntPeople;
-	int		m_cntMarriages;
+//	int		m_cntMarriages;
 
 	int		m_requested;
 
