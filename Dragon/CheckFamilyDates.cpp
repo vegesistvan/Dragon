@@ -213,11 +213,11 @@ BOOL CCheckFamilyDates::OnInitDialog()
 
 	SetWindowTextW( title );
 
-	CString fileName = L"childrenFAmily";
-	m_filespec = theApp.openTextFile( &textF, fileName, L"w+" );
+//	CString fileName = L"childrenFAmily";
+//	m_filespec = theApp.openTextFile( &textF, fileName, L"w+" );
 
-	str.Format( L"Az anya %d éves kora után született gyerekeket fogadj el a program helyesnek.\n\n", m_maxDiffMC ); 
-	fwprintf( textF, str );
+//	str.Format( L"Az anya %d éves kora után született gyerekeket fogadj el a program helyesnek.\n\n", m_maxDiffMC ); 
+//	fwprintf( textF, str );
 
 	createColumns();
 	collectFamily();
@@ -226,7 +226,7 @@ BOOL CCheckFamilyDates::OnInitDialog()
 	m_ListCtrl.AttachDataset( &vList );
 
 
-	fclose( textF );
+//	fclose( textF );
 	ShowWindow( SW_MAXIMIZE );
 //	theApp.showFile( m_filespec );
 	return TRUE; 
@@ -590,7 +590,7 @@ void CCheckFamilyDates::checkFamily1()
 			}
 			else
 			{
-				if( age < m_minAgeHAtWedd > age || age > m_maxAgeHAtWedd )
+				if( m_minAgeHAtWedd > age || age > m_maxAgeHAtWedd )
 				{
 					str.Format( L", férj házasságkötéskor %d éves volt", age ); 
 					vWifes.at(i).message = str;
@@ -1069,7 +1069,7 @@ void CCheckFamilyDates::printFamily()
 	
 	message = L"";
 	if( h.message.GetLength() > 2 ) message = h.message.Mid( 2 );
-
+	/*
 	fwprintf( textF, L"%8s %10s %2d %8s %-25s %10s %10s %s\n", h.linenumber, L"", h.numOfSpouses, h.rowid, h.name, h.birth, h.death, message );
 
 	for( UINT j = 0; j < vWifes.size(); ++j )
@@ -1090,7 +1090,7 @@ void CCheckFamilyDates::printFamily()
 	}
 	fwprintf( textF, L"\n" );
 	fflush( textF );
-
+	*/
 
 	message = L"";
 	if( h.message.GetLength() > 2 ) message = h.message.Mid( 2 );
