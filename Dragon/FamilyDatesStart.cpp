@@ -15,7 +15,7 @@ CFamilyDatesStart::CFamilyDatesStart(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CFamilyDatesStart::IDD, pParent)
 	, m_type(2)
 
-	, m_maxDiffBetweenHW(50)
+//	, m_maxDiffBetweenHW(50)
 	, m_maxAgeHAtWedd(70)
 	, m_minAgeHAtWedd(18)
 	, m_maxAgeWAtWedd(60)
@@ -38,7 +38,6 @@ void CFamilyDatesStart::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Radio(pDX, IDC_RADIO_NOCHILDREN, m_type);
 
-	DDX_Text(pDX, IDC_MAXDIFFBETWEENHW, m_maxDiffBetweenHW);
 	DDX_Text(pDX, IDC_MAXAGEHATWEDD, m_maxAgeHAtWedd);
 	DDX_Text(pDX, IDC_MINAGEHATWEDD, m_minAgeHAtWedd);
 	DDX_Text(pDX, IDC_MAXAGEWATWEDD, m_maxAgeWAtWedd);

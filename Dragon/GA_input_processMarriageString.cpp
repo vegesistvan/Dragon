@@ -441,10 +441,37 @@ void CGaInput::processSpousesSpouses( CString spouses,  std::vector<PEOPLE> *v_p
 
 	int pos;
 	int pos2 = 0;
+	int pos3;
 	int posComma = 0;
 
 	v_p->clear();
 
+	while( true )
+	{
+		if( (pos = spouses.Find( L"f.", pos2 ) ) == -1 )  break;	// a házastársdnak nincs több házastársa
+		pos2 = pos + 1;
+ 		order = _wtoi( spouses.Mid( pos-1, 1 ) );
+		if( (posComma = spouses.Find( ',', posComma+1 ) ) != -1 )	// , is van, több házastárs is lesz
+			spouse = spouses.Mid( pos+3, posComma - pos - 3 );
+		else
+		{
+			spouse = spouses.Mid( pos+3 );
+		// ha nincs vesszõ a házastársak között, csak az nf.
+			if( (pos3 = spouse.Find( L"f." ) ) != -1 )
+			{
+				spouses = spouse.Mid( pos3 -1 );
+				spouse = spouse.Left( pos3-2 );
+				pos2 = 0;
+				
+			}
+		}
+		processPeopleStr( spouse,  &people );
+		people.parentIndex = order;   // a házastárs házastársának nincs megadva az anyja, ezért a parentIndex-et a házasság sorszámára használjuk
+		v_p->push_back( people );
+	};
+
+
+/*
 	while( true )
 	{
 		if( (pos = spouses.Find( L"f.", pos2 ) ) == -1 )  break;	// a házastársdnak nincs több házastársa
@@ -454,11 +481,12 @@ void CGaInput::processSpousesSpouses( CString spouses,  std::vector<PEOPLE> *v_p
 			spouse = spouses.Mid( pos+3, posComma - pos - 3 );
 		else
 			spouse = spouses.Mid( pos+3 );
-
+		
 		processPeopleString( 0,  spouse,  &people );
 		people.parentIndex = order;   // a házastárs házastársának nincs megadva az anyja, ezért a parentIndex-et a házasság sorszámára használjuk
 		v_p->push_back( people );
 	};
+*/
 }
 
 // who: 1 házastárs apja
@@ -470,6 +498,7 @@ void CGaInput::processSpousesSpouses( CString spouses,  std::vector<PEOPLE> *v_p
 // birthString: [place][date][comment]
 // deathString: [place][date][comment]
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 void CGaInput::processPeopleString( int who,  CString cLine, PEOPLE * p )
 {
 	clearPeople( p );
@@ -653,6 +682,7 @@ void CGaInput::processSpouseNameString( CString nameComment, NAME* name )
 		name->comment = nameComment;
 	}
 }
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // title nélküli fullname szétszedése
 // Ghyczi, Assa és Ablánczkürti Ghyczy János
@@ -692,15 +722,14 @@ void CGaInput::splitFullnameA( CStringArray* A, NAME* name )
 			i = 1;
 		}
 	
-/*
-		if( A->GetAt( 1 ) == L"és" )
-		{
-			titolo.Format( L"%s és %s", A->GetAt(0), A->GetAt( 2 ) );
-			i = 3;
-		}
-		titolo.Trim();
-		name->titolo = titolo;
-*/
+
+//		if( A->GetAt( 1 ) == L"és" )
+//		{
+//			titolo.Format( L"%s és %s", A->GetAt(0), A->GetAt( 2 ) );
+//			i = 3;
+//		}
+//		titolo.Trim();
+//		name->titolo = titolo;
 	}
 
 	word = A->GetAt( i );		// a titolo utáni elsõ szó mindenképpen vezetéknév. Nem!! Szentmiklósi és Óvári br Pongrácz Eszter
@@ -757,3 +786,4 @@ void CGaInput::splitFullnameA( CStringArray* A, NAME* name )
 		name->first_name = getWord( first_name, 2, &pos );
 	}
 }
+*/

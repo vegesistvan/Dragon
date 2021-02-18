@@ -143,15 +143,17 @@ void CTableMarriages::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CTableMarriages, CDialogEx)
 	ON_MESSAGE(WM_SET_COLUMN_COLOR, OnSetColumnColor)
 	ON_MESSAGE(WM_CLICKED_COLUMN, OnColumnSorted)
+	
 	ON_WM_SIZE()
 	ON_WM_SIZING()
+	ON_WM_CLOSE()
 	ON_COMMAND(ID_FILTER_HLASTNAME, &CTableMarriages::OnFilterHlastname)
 	ON_COMMAND(ID_EXPORT_ALL, &CTableMarriages::OnExportAll)
 	ON_COMMAND(ID_EXPORT_SELECTED, &CTableMarriages::OnExportSelected)
-	ON_COMMAND(ID_AZONOS_MARRIAGELIST, &CTableMarriages::OnAzonosMarriagelist)
+//	ON_COMMAND(ID_AZONOS_MARRIAGELIST, &CTableMarriages::OnAzonosMarriagelist)
 	ON_COMMAND(ID_UNFILTER, &CTableMarriages::OnUnfilter)
 	ON_COMMAND(ID_FILTER_WLASTNAME, &CTableMarriages::OnFilterWlastname)
-	ON_WM_CLOSE()
+
 	ON_COMMAND(ID_GROUPBY_PLACE, &CTableMarriages::OnGroupbyPlace)
 	ON_COMMAND(ID_MARRIAGES_DESCENDANTS, &CTableMarriages::OnMarriagesDescendants)
 	ON_COMMAND(ID_MARRIAGES_SPOUSES, &CTableMarriages::OnMarriagesSpouses)
@@ -160,14 +162,14 @@ BEGIN_MESSAGE_MAP(CTableMarriages, CDialogEx)
 	ON_COMMAND(ID_NAMEMARRIAGES, &CTableMarriages::OnNameMarriages)
 	ON_COMMAND(ID_HTML_EDIT, &CTableMarriages::OnHtmlEditLines)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CTableMarriages::OnHtmlNotepad)
-	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CTableMarriages::OnDblclkList)
-	ON_STN_CLICKED(IDC_KERES, &CTableMarriages::OnClickedKeres)
-	ON_COMMAND(ID_MOREMARRIAGES, &CTableMarriages::OnMoreMarriages)
-	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST, &CTableMarriages::OnCustomdrawList)
-	ON_STN_CLICKED(IDC_NEXT, &CTableMarriages::OnClickedNext)
-	ON_COMMAND(ID_MAN_MORESPOUSES, &CTableMarriages::OnManMorespouses)
+//	ON_COMMAND(ID_MOREMARRIAGES, &CTableMarriages::OnMoreMarriages)
 
-// IDR_DROPDOWN_EDIT
+	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST, &CTableMarriages::OnCustomdrawList)
+	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CTableMarriages::OnDblclkList)
+	
+	ON_STN_CLICKED(IDC_KERES, &CTableMarriages::OnClickedKeres)
+	ON_STN_CLICKED(IDC_NEXT, &CTableMarriages::OnClickedNext)
+
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
 	ON_COMMAND(ID_EDIT_UPDATE, &CTableMarriages::OnEditUpdate)
 	ON_COMMAND(ID_EDIT_DELETE, &CTableMarriages::OnEditDelete)
@@ -178,10 +180,6 @@ BEGIN_MESSAGE_MAP(CTableMarriages, CDialogEx)
 	ON_COMMAND(ID_HTML_EDIT, &CTableMarriages::OnHtmlEditLines)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CTableMarriages::OnHtmlNotepad)	
 
-
-//	ON_COMMAND(ID_EDIT_GAHTML, &CTableMarriages::OnEditGahtml)
-	
-	
 END_MESSAGE_MAP()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CTableMarriages::OnInitDialog()
@@ -212,6 +210,7 @@ BOOL CTableMarriages::OnInitDialog()
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 BOOL CTableMarriages::fillVectors()
 {
 
@@ -254,6 +253,7 @@ BOOL CTableMarriages::fillVectors()
 	wndP.DestroyWindow();
 	return true;
 }
+*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTableMarriages::enableMenu( BOOL flag)
 {
@@ -610,6 +610,7 @@ void CTableMarriages::OnExportSelected()
 	theApp.exportSelected( logFile, title, &m_ListCtrl );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 void CTableMarriages::OnAzonosMarriagelist()
 {
 	CString rowid;
@@ -686,6 +687,7 @@ void CTableMarriages::OnAzonosMarriagelist()
 		theApp.message( L"Házastársak listája", L"\nNem találtam többször elõforduló házasságot!" );
 //		AfxMessageBox( L"Nem találtam többször elõforduló házasságot!" );
 }
+*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -838,6 +840,7 @@ BOOL CTableMarriages::PreTranslateMessage(MSG* pMsg)
     return CWnd::PreTranslateMessage(pMsg);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 void CTableMarriages::OnMoreMarriages()
 {
 	enableMenu( MF_GRAYED );
@@ -946,10 +949,9 @@ void CTableMarriages::collectHusband()
 	{
 		spouse1_id = m_recordset->GetFieldString( MARRIAGES_SPOUSE1_ID );
 		m_recordset->MoveNext();
-
-		// ha volt == false, nem teszi el a férjet, csak akkor, ha a következõ is õ (rowid azonos)
 		if( spouse1_id == m_recordset->GetFieldString( MARRIAGES_SPOUSE1_ID ) )
 		{
+			// férjet csak egyszer teszi el!!
 			if( !volt )
 			{
 				husband.rowid	= spouse1_id;
@@ -957,12 +959,15 @@ void CTableMarriages::collectHusband()
 				volt = true;
 			}
 			m_recordset->MovePrevious();
+			// elteszi az elõzõ elõfordulás feleségét
 			wifes.rowidS	= spouse1_id;   // feleség férjének rowid-je
 			wifes.rowid	= m_recordset->GetFieldString( MARRIAGES_SPOUSE2_ID );
 
 			wifes.date	= m_recordset->GetFieldString( MARRIAGES_DATE );
 			wifes.place	= m_recordset->GetFieldString( MARRIAGES_PLACE );
+			
 			wifes.order	= m_recordset->GetFieldString( MARRIAGES_ORDERWIFE );
+			
 			wifes.sourceM = m_recordset->GetFieldString( MARRIAGES_SOURCE );	
 		
 			vSpouse2.push_back( wifes );
@@ -970,6 +975,7 @@ void CTableMarriages::collectHusband()
 		}
 		else
 		{
+			// ha más férj következik, de az elõzõnek volt már akkor elteszi az elõzõ azonost is
 			if( volt )
 			{
 				m_recordset->MovePrevious();
@@ -1207,7 +1213,9 @@ void CTableMarriages::fillSpouse2()
 		if (wndP.Cancelled()) break;
 	}
 }
+*/
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 void CTableMarriages::listHtml()
 {
 	CString header;
@@ -1252,6 +1260,8 @@ void CTableMarriages::listHtml()
 	fwprintf( fh1, L"</pre>" );
 	fclose( fh1 );
 }
+*/
+/*
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTableMarriages::fillTable()
 {
@@ -1327,7 +1337,9 @@ void CTableMarriages::fillTable()
 
 	SetForegroundWindow();  // kell, mert szûrés után csak így jön vissz az ablak!!!
 }
+*/
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 void CTableMarriages::fillTableF()
 {
 	CString rowid;
@@ -1467,6 +1479,7 @@ void CTableMarriages::emptyRow()
 	push( L"" );
 	vColor.push_back(0);
 }
+*/
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1579,14 +1592,6 @@ L"rowid", L"apja", L"születés", L"halál",\
 L"rowid", L"anyja", L"születés", L"halál"\
 );
 	fwprintf( fh1, str );
-}
-
-
-
-
-void CTableMarriages::OnManMorespouses()
-{
-	// TODO: Add your command handler code here
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

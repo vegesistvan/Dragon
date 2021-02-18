@@ -81,6 +81,7 @@ void CGaInput::processPeopleStr( CString cLine,  PEOPLE* any )
 {
 	if( cLine.IsEmpty() ) return;
 
+//	clearPeople( any );
 	PLACE_DATE_BLOCK bb;
 	PLACE_DATE_BLOCK db;
 	int		pos;

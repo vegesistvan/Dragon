@@ -263,7 +263,6 @@ CString CGaInput::insertAny( PEOPLE* p )
 		other_names.Replace( ')', ' ' );
 		other_names.TrimRight();
 	}
-
 	CString values;
 	values.Format( L"\
 '%d','%d','%d','%d','%d','%d','%d','%d','%d',\
@@ -282,40 +281,6 @@ p->tableRoman,p->arm,p->orderFather,p->orderMother,p->csalad,p->gap, numOfMarria
 	++theApp.m_cntPeople;
 	++m_rowid;	// az utoljára insertált ember azonosítója. Azért számoljuk és nem visszakérdezzük a SELECT 'last_insert_rowid'-val
 				// mert ez magszakítaná a BEGIN_COMMIT tranzakciót és nagyon lelassulna a beolvasás!!!
-/*
-	// hibajalzés
-	if( p->first_name.IsEmpty() || p->last_name.IsEmpty() )
-	{
-		str.Format( L"%s %s ", p->last_name.TrimRight(), p->first_name.TrimRight() );
-		if( !p->birth_place.IsEmpty() || !p->birth_date.IsEmpty() )
-		{
-			str += L" *";
-			if( !p->birth_place.IsEmpty() )
-			{
-				str += p->birth_place;
-				str += L" ";
-			}
-			str += p->birth_date;
-			str.TrimRight();
-		}
-		if( !p->death_place.IsEmpty() || !p->death_date.IsEmpty() )
-		{
-			str += L" +";
-			if( !p->death_place.IsEmpty() )
-			{
-				str += p->death_place;
-				str += L" ";
-			}
-			str += p->death_date;
-			str.TrimRight();
-		}
-		str += L" ";
-		str += p->comment;
-//		fwprintf( fh3, L"%6dL %s<br>\n", m_lineNumber,m_cLine );
-//		fwprintf( fh3, L"%6dR %s<br><br>\n\n", m_rowid, str );
-//		++m_error_cnt3;
-	}
-*/
 	p->rowid.Format( L"%d", m_rowid );
 	return( p->rowid );
 }

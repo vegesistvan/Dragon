@@ -10,6 +10,8 @@ typedef struct
 	CString name;
 	CString birth;
 	CString death;
+	bool	birthJo;
+	bool	deathJo ;
 	CString age;
 	CString diffH;
 	CString diffW;
@@ -26,10 +28,13 @@ typedef struct
 	CString name;
 	CString birth;
 	CString death;
+	bool	birthJo;
+	bool	deathJo;
 	CString	age;
 	CString diffH;
 	CString diffW;
 	CString marriage;
+	bool	marriageJo;
 	int		motherOrder;
 	CString message;
 }WIFES;
@@ -42,6 +47,8 @@ typedef struct
 	CString name;
 	CString birth;
 	CString death;
+	bool	birthJo;
+	bool	deathJo;
 	CString	age;
 	CString diffH;
 	CString diffW;
@@ -51,10 +58,7 @@ typedef struct
 	CString message;
 }CHILDREN;
 
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class CCheckFamilyDates : public CDialogEx
 {
 	DECLARE_DYNAMIC(CCheckFamilyDates)
@@ -91,6 +95,7 @@ protected:
 	std::vector<TCHAR*> vList;
 
 	UINT	m_rgb[10];
+	UINT	m_colorWife;
 
 	HUSBAND h;
 	WIFES w;
@@ -99,7 +104,7 @@ protected:
 	// átvett adatok
 	int	m_type;
     int	m_maxLifespan;
-	int	m_maxDiffBetweenHW;
+//	int	m_maxDiffBetweenHW;
 	int	m_maxAgeHAtWedd;
 	int	m_minAgeHAtWedd;
 	int	m_maxAgeWAtWedd;
@@ -110,12 +115,6 @@ protected:
 	int	m_maxDiffMC;
 
 
-/*
-	int	m_maxDiffCM;		// gyerek és anya max korkülönbsége
-	int	m_minDiffCM;		// gyerek és anya min korkülönbsége
-	int m_minDiffCF;		// gyerek és apa mainimális korkülönbsége
-	int	m_maxDiffCF;		// gyerek és apa maximális korkülönbsége
-*/
 
 	int m_cnt;
 
@@ -123,6 +122,7 @@ protected:
 	bool collectFamily();
 	void printFamily();
 	void checkFamily();
+	void checkFamily1();
 	void push( CString item );
 	void emptyLine();
 	void keress( int start );
@@ -132,6 +132,19 @@ protected:
 	void OnHtmlNotepadParents();
 	void OnHtmlFatherAndSiblings();
 	void OnDbEdit();
+
+	BOOL query( CString command );
+	BOOL query1( CString command );
+	BOOL query2( CString command );
+	BOOL query3( CString command );
+	BOOL query4( CString command );
+
+	CSqliteDBRecordSet*	 m_recordset;
+	CSqliteDBRecordSet*	 m_recordset1;
+	CSqliteDBRecordSet*	 m_recordset2;
+	CSqliteDBRecordSet*	 m_recordset3;
+	CSqliteDBRecordSet*	 m_recordset4;
+
 
 public:
 	virtual BOOL OnInitDialog();

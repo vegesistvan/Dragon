@@ -19,7 +19,7 @@ public:
 
 	int	m_type;
     int	m_maxLifespan;
-	int	m_maxDiffBetweenHW;
+//	int	m_maxDiffBetweenHW;
 	int	m_maxAgeHAtWedd;
 	int	m_minAgeHAtWedd;
 	int	m_maxAgeWAtWedd;

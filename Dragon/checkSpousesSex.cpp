@@ -53,10 +53,6 @@ void CCheckSpousesSex::DoDataExchange(CDataExchange* pDX)
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CCheckSpousesSex, CDialogEx)
-//	ON_WM_SIZE()
-//	ON_WM_SIZING()
-
-
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
 	ON_COMMAND(ID_HTML_EDIT, &CCheckSpousesSex::OnHtmlEditLines)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CCheckSpousesSex::OnHtmlNotepad)

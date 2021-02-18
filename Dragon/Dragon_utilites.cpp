@@ -177,6 +177,7 @@ CString	CDragonApp::getDateStrFromI( CString dateI )
 	}
 	return str;
 }
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 _int64 CDragonApp::dateDiff( CString date1, CString date2 )
 {
@@ -202,6 +203,48 @@ _int64 CDragonApp::dateDiff( CString date1, CString date2 )
 	diffI = (int)diffD;
 
 	return ( diffI );
+}
+/*
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+_int64 CDragonApp::dateDiff( CString date1, CString date2 )
+{
+	_int64 d1;
+	_int64 d2;
+	int len1 = date1.GetLength();
+	int len2 = date2.GetLength();
+	float	diffD;
+	int		diffI;
+	
+	date1.Replace( '.', '-' );
+	date2.Replace( '.', '-' );
+	if( len1 < len2 )
+		date2 =date2.Left(len1);
+	else if( len1 > len2 )
+		date1 = date1.Left( len2 );
+
+
+
+	m_command.Format( L"SELECT julianday( '%s')", date1 );
+	if( !query4( m_command ) ) return 0;
+	d1 = _wtoi64( m_recordset4->GetFieldString( 0 ) );
+
+	m_command.Format( L"SELECT julianday( '%s')", date2 );
+	if( !query4( m_command ) ) return 0;
+	d2 = _wtoi64( m_recordset4->GetFieldString( 0 ) );
+
+	diffD = (float)(d1 - d2)/365 + 0,5;
+
+	diffI = (int)diffD;
+
+	return ( diffI );
+}
+*/
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CString CDragonApp::getYear( _int64 diff )
+{
+	m_command.Format( L"SELECT strftime( '%s', '%d', 'unixepoch' )", L"%Y.%m.%d",  diff );
+	if( !query( m_command ) ) return 0;
+	return( m_recordset->GetFieldString(0) );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 _int64 CDragonApp::getPresentTime()
@@ -243,11 +286,13 @@ BOOL CDragonApp::dateDiff(  CString date1, CString date2, int month  )
 	CString d2;
 	int		pos;
 
+	if( !checkDate( date1 ) || !checkDate( date2 )  ) return false;
+	/*
 	if( date1.GetLength() == 8 )
 		date1 += "01";
 	if( date2.GetLength() == 8 )
 		date2 += "01";
-
+*/
 	if( date1.GetLength() < 10 || date2.GetLength() < 10 || (pos=date1.Find('?')) != -1 || (pos=date2.Find('?')) != -1 ) return FALSE;
 
 	/*
@@ -283,7 +328,7 @@ _int64 CDragonApp::getDateI( CString dateS, int month )
 		dateS.Replace('.','-');
 		datum.Format( L"%s 00:00:00.000", dateS );
 		modifier.Format( L"+%d month", month );
-		m_command.Format(L"SELECT strftime('%%s', '%s 00:00:00.000', '%s')",dateS, modifier);  // pontos datum-idõ kell, hogy 1970.01.01 -et == 0-ra 
+		m_command.Format(L"SELECT strftime('%%s', '%s 00:00:00.000', '%s', 'unixepoch' )",dateS, modifier);  // pontos datum-idõ kell, hogy 1970.01.01 -et == 0-ra 
 		if( !query2( m_command ) ) return dateI;
 		dateI = _wtoi64( m_recordset2->GetFieldString(0) );
 	}

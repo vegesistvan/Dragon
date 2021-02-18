@@ -99,18 +99,19 @@ protected:
 	CSqliteDBRecordSet*	 m_recordset3;
 	CSqliteDBRecordSet*	 m_recordset4;
 
-	BOOL CTableMarriages::fillVectors();
+//	BOOL CTableMarriages::fillVectors();
 	
 	void htmlHeader( CString title );
-	void collectHusband();
-	void collectWife();
-	void fillSpouse1();
-	void fillSpouse2();
+
+//	void collectHusband();
+//	void collectWife();
+//	void fillSpouse1();
+//	void fillSpouse2();
 	void listHtml();
-	void fillTable();
-	void CTableMarriages::fillTableF();
-	void CTableMarriages::push2( int i );
-	void emptyRow();
+//	void fillTable();
+//	void fillTableF();
+//	void push2( int i );
+//	void emptyRow();
 	void keress( int start );
 
 	BOOL query( CString command );
@@ -145,7 +146,7 @@ public:
 	afx_msg LRESULT OnColumnSorted(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnExportAll();
 	afx_msg void OnExportSelected();
-	afx_msg void OnAzonosMarriagelist();
+//	afx_msg void OnAzonosMarriagelist();
 	afx_msg void OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnClickedKeres();
 	afx_msg void OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult);
@@ -159,10 +160,8 @@ public:
 	afx_msg void OnMarriagesParents();
 	afx_msg void OnRowidMarriages();
 	afx_msg void OnNameMarriages();
-	afx_msg void OnMoreMarriages();
+//	afx_msg void OnMoreMarriages();
 	afx_msg void OnClickedNext();
-	afx_msg void OnManMorespouses();
-
 
 
 	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);

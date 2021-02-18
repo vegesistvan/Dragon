@@ -226,6 +226,8 @@ public:
 	std::vector<REPLACE> v_Replace;
 	std::vector<BLOBSTAT> vBlobs;
 
+	CString	getYear( _int64 diff );
+	int		diff( CString date1, CString date2 );
 	bool	checkIntegrity( CSqliteDB* db );
 	void	createColumnVector( CString list, std::vector<CString>* vColumns );
 	int		getUserVersion();

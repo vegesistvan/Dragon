@@ -961,7 +961,7 @@ CString roundDate( CString date )
 	switch( length ) 
 	{
 	case 4:
-		date += L".01.01";
+		date += L".06.30";
 		break;
 	case 7:
 		date += L".01";
@@ -1173,3 +1173,46 @@ int dateDiff( CString date1, CString date2 )
 	return diff;
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// return:
+// 1000000 - nem értékelhetõ
+
+//  0  date1 == date2
+// -1  date1 < date2
+//  1  date1 > date2
+int compDate( CString date1, CString date2 )
+{
+	int invalid = 100000;
+	if( !checkDate( date1 ) || !checkDate(date2 ) ) return invalid;
+
+	int n1 = date1.GetLength();
+	int n2 = date2.GetLength();
+	if( n1 < n2 )		date2 = date2.Left( n1 );
+	else if( n1> n2 )	date1 = date1.Left( n2 );
+	return( date1.Compare( date2 ) );
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Két dátum YYYY.MM.DD formátumú
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int diffD( CString date1, CString date2, int* pYear )
+{
+	_int64 d1;
+	_int64 d2;
+
+	if( !checkDate( date1 ) || !checkDate( date2 ) ) return INT_MAX;
+	*pYear  = _wtoi( date1.Left(4) ) - _wtoi( date2.Left(4) );
+
+
+	int len1 = date1.GetLength();
+	int len2 = date2.GetLength();
+	int len  = len1;
+
+	if( len1 < len2 )
+		date2 =date2.Left(len1);
+	else if( len1 > len2 )
+	{
+		date1 = date1.Left( len2 );
+		len = len2;
+	}
+	return( date1.Compare( date2 ) );
+}
