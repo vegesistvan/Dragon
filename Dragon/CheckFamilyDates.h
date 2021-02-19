@@ -83,7 +83,7 @@ protected:
 	CString str;
 	CString m_filespec;
 
-//	FILE * textF;
+
 	CProgressWnd wndP;
 
 	CListCtrlEx m_ListCtrl;

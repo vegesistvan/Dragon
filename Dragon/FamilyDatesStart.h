@@ -29,6 +29,7 @@ public:
 	int	m_minDiffMC;
 	int	m_maxDiffMC;
 
+
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	CColorStatic colorTitle;

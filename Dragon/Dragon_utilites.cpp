@@ -280,60 +280,31 @@ CString CDragonApp::get_time_elapsed()
 //        FALSE: ha 9 hónapnál kisebb
 BOOL CDragonApp::dateDiff(  CString date1, CString date2, int month  )
 {
-	CString str1;
-	CString str2;
-	CString d1;
-	CString d2;
 	int		pos;
 
 	if( !checkDate( date1 ) || !checkDate( date2 )  ) return false;
-	/*
-	if( date1.GetLength() == 8 )
-		date1 += "01";
-	if( date2.GetLength() == 8 )
-		date2 += "01";
-*/
 	if( date1.GetLength() < 10 || date2.GetLength() < 10 || (pos=date1.Find('?')) != -1 || (pos=date2.Find('?')) != -1 ) return FALSE;
-
-	/*
-	str1 = getDateI( date1, month );
-	str2 = getDateI( date2, 0 );
-
-	_int64 time1 = _wtoi64( str1 );
-	_int64 time2 = _wtoi64( str2 );
-	*/
 
 	_int64 time1 = getDateI( date1, month );
 	_int64 time2 = getDateI( date2, 0 );
 
-	d1 = getDateStrFromI( str1 );
-	d2 = getDateStrFromI( str2 );
-
-	if( time1 < time2 )			// apa halála + 9 hónap kisebb mint a gyerek születése
-	{
-		return TRUE;
-	}
+	if( time1 < time2 ) return true;			// apa halála + 9 hónap kisebb mint a gyerek születése
 	return FALSE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 _int64 CDragonApp::getDateI( CString dateS, int month ) 
 {
 	_int64 dateI = 0;
-	CString datum;
 	CString modifier;
 
-//	dateI.Empty();
 	if( !dateS.IsEmpty() )
 	{
 		dateS.Replace('.','-');
-		datum.Format( L"%s 00:00:00.000", dateS );
 		modifier.Format( L"+%d month", month );
-		m_command.Format(L"SELECT strftime('%%s', '%s 00:00:00.000', '%s', 'unixepoch' )",dateS, modifier);  // pontos datum-idõ kell, hogy 1970.01.01 -et == 0-ra 
+		m_command.Format(L"SELECT strftime('%%s', '%s 00:00:00.000', '%s', 'utc' )",dateS, modifier);  // pontos datum-idõ kell, hogy 1970.01.01 -et == 0-ra 
 		if( !query2( m_command ) ) return dateI;
 		dateI = _wtoi64( m_recordset2->GetFieldString(0) );
 	}
-//	dateI.Trim();
-//	if(dateI.IsEmpty()) dateI=L"0";
 	return dateI;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

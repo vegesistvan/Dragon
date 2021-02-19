@@ -48,7 +48,7 @@ void CFamilyDatesStart::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_TITLE, colorTitle);
 	DDX_Text(pDX, IDC_MAXLIFESPAN, m_maxLifespan);
 	DDX_Text(pDX, IDC_MAXDIFFFC, m_maxDiffFC);
-	DDV_MinMaxInt(pDX, m_maxDiffFC, 14, 90);
+	DDV_MinMaxInt(pDX, m_maxDiffFC, 10, 100);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CFamilyDatesStart, CDialogEx)
@@ -63,6 +63,7 @@ BOOL CFamilyDatesStart::OnInitDialog()
 	CButton* pButton = (CButton*)GetDlgItem(IDC_RADIO_MOREWIFES );
 	pButton->SetCheck(true);
 	m_type = 2;
+	
 
 	colorTitle.SetTextColor( RED );
 
