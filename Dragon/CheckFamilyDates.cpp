@@ -8,7 +8,7 @@
 #include "utilities.h"
 #include "html_EditLines.h"
 #include "Relations.h"
-#include "FamilyDatesStart.h"
+#include "CheckFamilyDatesStart.h"
 
 // SELECT  FROM people father
 enum
@@ -155,6 +155,7 @@ BEGIN_MESSAGE_MAP(CCheckFamilyDates, CDialogEx)
 	ON_COMMAND(ID_HTML_NOTEPAD_PARENTS, &CCheckFamilyDates::OnHtmlNotepadParents)
 	ON_COMMAND(ID_HTML_FATHERANDSIBLINGS, &CCheckFamilyDates::OnHtmlFatherAndSiblings)
 	ON_COMMAND(ID_DB_EDIT, &CCheckFamilyDates::OnDbEdit)
+	ON_COMMAND(ID_PARAMETERS, &CCheckFamilyDates::OnParameters)
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CCheckFamilyDates::OnInitDialog()
@@ -164,7 +165,7 @@ BOOL CCheckFamilyDates::OnInitDialog()
 	EASYSIZE_ADD( IDC_CAPTION,	ES_BORDER,	ES_BORDER,	ES_BORDER,		ES_KEEPSIZE,	0 );
 	EASYSIZE_INIT();
 
-	CFamilyDatesStart dlg;
+	CCheckFamilyDatesStart dlg;
 
 	dlg.m_info = m_info;
 	theApp.m_pszAppName = _tcsdup( L"Családon belüli dátumok vizsgálata" );
@@ -528,13 +529,7 @@ void CCheckFamilyDates::checkFamily1()
 				hiba = true;
 			}
 		}
-/*
-		// férj és feleség korkülönbsége
-		if( ( ret = diffD( h.birth, w.birth, &age ) ) != INT_MAX )
-		{
-			vWifes.at(i).diffH.Format( L"%d", age );
-		}
-*/
+
 		if( ( ret = diffD( w.marriage, w.birth, &age ) ) != INT_MAX )
 		{
 			vWifes.at(i).diffW.Format( L"%d", age );
@@ -544,7 +539,7 @@ void CCheckFamilyDates::checkFamily1()
 				vWifes.at(i).message = str;
 				hiba = true;
 			}
-			if( m_minAgeWAtWedd > age || age > m_maxAgeWAtWedd )
+			else if( m_minAgeWAtWedd > age || age > m_maxAgeWAtWedd )
 			{
 				str.Format( L", házasságkötéskor %d éves volt", age ); 
 				vWifes.at(i).message += str;
@@ -553,30 +548,27 @@ void CCheckFamilyDates::checkFamily1()
 		}
 		if( ( ret = diffD( w.marriage, w.death, &age ) ) != INT_MAX )
 		{
-				if( ret > 0 )
-				{
-					str.Format( L", házasságkötés elõtt meghalt!" ); 
-					vWifes.at(i).message = str;
-					hiba = true;
-				}
+			if( ret > 0 )
+			{
+				str.Format( L", házasságkötés elõtt meghalt!" ); 
+				vWifes.at(i).message = str;
+				hiba = true;
+			}
 		}
 		if( ( ret = diffD( w.marriage, h.birth, &age ) ) != INT_MAX )
 		{
-				vWifes.at(i).diffH.Format( L"%d", age );
+			vWifes.at(i).diffH.Format( L"%d", age );
 			if( ret < 0 )
 			{
 				str.Format( L", férj házasságkötés után született!!" ); 
 				vWifes.at(i).message = str;
 				hiba = true;
 			}
-			else
+			else if( m_minAgeHAtWedd > age || age > m_maxAgeHAtWedd )
 			{
-				if( m_minAgeHAtWedd > age || age > m_maxAgeHAtWedd )
-				{
-					str.Format( L", férj házasságkötéskor %d éves volt", age ); 
-					vWifes.at(i).message = str;
-					hiba = true;
-				}
+				str.Format( L", férj házasságkötéskor %d éves volt", age ); 
+				vWifes.at(i).message = str;
+				hiba = true;
 			}
 		}
 		if( ( ret = diffD( w.death, h.birth, &age ) ) != INT_MAX )
@@ -613,7 +605,7 @@ void CCheckFamilyDates::checkFamily1()
 				vChildren.at(i).message = L" , születés > halál";
 				hiba = true;
 			}
-			if( age > m_maxLifespan )
+			else if( age > m_maxLifespan )
 			{
 				str.Format( L" ,%d évesen halt meg", age );
 				vChildren.at(i).message += str;
@@ -670,8 +662,7 @@ void CCheckFamilyDates::checkFamily1()
 				vChildren.at(i).message += str;
 				hiba = true;
 			}
-			
-			if( age < m_minDiffMC || m_maxDiffMC < age  )
+			else if( age < m_minDiffMC || m_maxDiffMC < age  )
 			{
 				str.Format( L", anyja %d éves korában született", age ); 
 				vChildren.at(i).message += str;
@@ -687,7 +678,7 @@ void CCheckFamilyDates::checkFamily1()
 				vChildren.at(i).message += str;
 				hiba = true;
 			}
-			if( age < m_minDiffFC || m_maxDiffFC < age )
+			else if( age < m_minDiffFC || m_maxDiffFC < age )
 			{
 				str.Format( L", apja %d éves korában született", age ); 
 				vChildren.at(i).message += str;
@@ -1194,8 +1185,29 @@ void CCheckFamilyDates::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckFamilyDates::OnInfo()
 {
-
 	AfxMessageBox( m_info, MB_ICONINFORMATION );
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckFamilyDates::OnParameters()
+{
+	CString str;
+	str.Format( L"A lista az alábbi paraméter értékekkel készült:\r\n\r\n\
+Maximális élettartam:\t\t\t\t%3d év\r\n\
+Az apa és gyermeke közötti korkülönbség határai:\t%2d-%3d\r\n\
+Az anya és gyermeke közötti korkülönbség határai:\t%2d-%3d\r\n\
+A võlegény életkorának határai az esküvõn:\t\t%2d-%3d\r\n\
+A menyasszony életkorának határai az esküvõn:\t%2d-%3d",\
+	m_maxLifespan,\
+	m_minDiffFC,\
+	m_maxDiffFC,\
+	m_minDiffMC,\
+	m_maxDiffMC,\
+	m_minAgeHAtWedd,\
+	m_maxAgeHAtWedd,\
+	m_minAgeWAtWedd,\
+	m_maxAgeWAtWedd\
+);
+	AfxMessageBox( str, MB_ICONINFORMATION );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 LRESULT CCheckFamilyDates:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
@@ -1325,3 +1337,4 @@ BOOL CCheckFamilyDates::query4( CString command )
 	}
 	return TRUE;
 }
+	

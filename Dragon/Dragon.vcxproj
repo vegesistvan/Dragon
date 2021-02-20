@@ -196,7 +196,7 @@
     <ClInclude Include="EditComment.h" />
     <ClInclude Include="EditMarriage.h" />
     <ClInclude Include="EditPeople.h" />
-    <ClInclude Include="FamilyDatesStart.h" />
+    <ClInclude Include="CheckFamilyDatesStart.h" />
     <ClInclude Include="html_Edit2Lines.h" />
     <ClInclude Include="FatherMother.h" />
     <ClInclude Include="GedcomOut.h" />
@@ -251,6 +251,7 @@
     <ClInclude Include="sqlite3.h" />
     <ClInclude Include="TableCouples.h" />
     <ClInclude Include="Table_blobs.h" />
+    <ClInclude Include="Table_firstnames.h" />
     <ClInclude Include="Table_people.h" />
     <ClInclude Include="SelectMother.h" />
     <ClInclude Include="Setup.h" />
@@ -281,7 +282,6 @@
     <ClInclude Include="SelectTableHtml.h" />
     <ClInclude Include="SelectTableName.h" />
     <ClInclude Include="SelectedFiles.h" />
-    <ClInclude Include="Table_firstnames.h" />
     <ClInclude Include="sfqSort.h" />
     <ClInclude Include="GA_input.h" />
     <ClInclude Include="SqliteDB.h" />
@@ -317,7 +317,8 @@
     <ClCompile Include="EditComment.cpp" />
     <ClCompile Include="EditMarriage.cpp" />
     <ClCompile Include="EditPeople.cpp" />
-    <ClCompile Include="FamilyDatesStart.cpp" />
+    <ClCompile Include="CheckFamilyDatesStart.cpp" />
+    <ClCompile Include="GA_input_processPeople.cpp" />
     <ClCompile Include="html_Edit2Lines.cpp" />
     <ClCompile Include="FatherMother.cpp" />
     <ClCompile Include="GA_input_processDescendantSubstr.cpp" />
@@ -377,12 +378,12 @@
     <ClCompile Include="SaveFirstName.cpp" />
     <ClCompile Include="TableCouples.cpp" />
     <ClCompile Include="Table_blobs.cpp" />
+    <ClCompile Include="Table_firstnames.cpp" />
     <ClCompile Include="Table_people.cpp" />
     <ClCompile Include="SelectMother.cpp" />
     <ClCompile Include="Setup.cpp" />
     <ClCompile Include="html_Descendants.cpp" />
     <ClCompile Include="html_Spouses.cpp" />
-    <ClCompile Include="GA_input_common.cpp" />
     <ClCompile Include="checkSameSpouses.cpp" />
     <ClCompile Include="DragonDlg_input.cpp" />
     <ClCompile Include="Filter.cpp" />
@@ -402,7 +403,6 @@
     <ClCompile Include="GA_input.cpp" />
     <ClCompile Include="GA_input_splitLine.cpp" />
     <ClCompile Include="GA_input_insert.cpp" />
-    <ClCompile Include="Table_firstnames.cpp" />
     <ClCompile Include="GA_input_TableHeader.cpp" />
     <ClCompile Include="Table_GaTables.cpp" />
     <ClCompile Include="Table_files.cpp" />

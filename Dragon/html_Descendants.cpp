@@ -20,23 +20,21 @@ enum
 	PS_NAME_STR,
 	PS_BIRTH_STR,
 	PS_DEATH_STR,
+	PS_COMMENT,
 	PS_TITOLO,
 	PS_TITLE,
 	PS_LAST_NAME,
 	PS_FIRST_NAME,
+	PS_POSTERIOR,
 	PS_MOTHER_INDEX,
 	PS_MINDEX_CALC,
-	PS_POSTERIOR,
 	PS_SEX_ID,
 	PS_BPLACE,
 	PS_BDATE,
 	PS_DPLACE,
 	PS_DDATE,
-	PS_COMMENT,
 	PS_BRANCH,
 	PS_ARM,
-	PS_ROWIDF,
-	PS_ROWIDM,
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 IMPLEMENT_DYNAMIC(CDescendant, CDialogEx)
@@ -95,23 +93,21 @@ BOOL CDescendant::OnInitDialog()
 	m_ListCtrl.InsertColumn( PS_NAME_STR,		L"nameSubString",	LVCFMT_LEFT,	100,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( PS_BIRTH_STR,		L"birthSubstring",	LVCFMT_LEFT,	100,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( PS_DEATH_STR,		L"deathSubstring",	LVCFMT_LEFT,	100,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( PS_COMMENT,		L"leírás",			LVCFMT_LEFT,	100,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( PS_TITOLO,			L"elõnév",			LVCFMT_LEFT,	 50,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( PS_TITLE,			L"title",			LVCFMT_LEFT,	 50,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( PS_LAST_NAME,		L"családnév",		LVCFMT_LEFT,	 50,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( PS_FIRST_NAME,		L"utónév",			LVCFMT_LEFT,	 50,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( PS_POSTERIOR,		L"utótag",			LVCFMT_LEFT,	 50,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( PS_MOTHER_INDEX,	L"anyaIx",			LVCFMT_LEFT,	 50,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( PS_MINDEX_CALC,	L"anyaIx2",			LVCFMT_LEFT,	 50,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( PS_POSTERIOR,		L"utótag",			LVCFMT_LEFT,	 50,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( PS_SEX_ID,			L"sex",				LVCFMT_LEFT,	 30,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( PS_BPLACE,			L"b.hely",			LVCFMT_LEFT,	 80,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( PS_BDATE,			L"b.dátum",			LVCFMT_LEFT,	 70,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( PS_DPLACE,			L"d.hely",			LVCFMT_LEFT,	 80,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( PS_DDATE,			L"d.dátum",			LVCFMT_LEFT,	 70,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( PS_COMMENT,		L"leírás",			LVCFMT_LEFT,	100,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( PS_BRANCH,			L"elágazás",		LVCFMT_LEFT,	 80,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( PS_ARM,			L"ág",				LVCFMT_LEFT,	 80,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( PS_ROWIDF,			L"rowidF",			LVCFMT_LEFT,	 80,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( PS_ROWIDM,			L"rowidM",			LVCFMT_LEFT,	 80,-1,COL_TEXT);
 
 	colorCaption.SetTextColor( theApp.m_colorClick );
 	m_orderix = 0;
@@ -149,7 +145,6 @@ void CDescendant::fillTable( )
 	fileSpec = theApp.openHtmlFile( &fh1, fileName, L"w+" );
 	fwprintf( fh1, L"%s<br><br>", theApp.m_htmlFileSpec ); 
 
-//	split.m_error_cnt1 = 0;
 	split.m_tableAncestry = TRUE;
 
 	int fileLength;
@@ -159,7 +154,6 @@ void CDescendant::fillTable( )
 	CStdioFile file( theApp.m_htmlFileSpec, CFile::modeRead); 
 	fileLength = (int)file.GetLength();
 
-//	split.m_error_cnt1 = 0;
 
 	split.m_rollToLine		= m_lineNumber;
 	split.m_rollToTable		= m_tableNumber;
@@ -191,7 +185,7 @@ void CDescendant::fillTable( )
 	wndP.SetPos(0);
 	wndP.SetStep(1);
 
-//	split.m_error_cnt1 = 0;
+
 	m_ListCtrl.DeleteAllItems();
 	nItem = 0;
 
@@ -226,15 +220,16 @@ void CDescendant::fillTable( )
 
 			m_ListCtrl.SetItemText( nItem, PS_PEOPLE, split.m_descendant );
 
-			m_ListCtrl.SetItemText( nItem, PS_NAME_STR, split._descNameSS );
-			m_ListCtrl.SetItemText( nItem, PS_BIRTH_STR, split._descBirthSS );
-			m_ListCtrl.SetItemText( nItem, PS_DEATH_STR, split._descDeathSS );
+			m_ListCtrl.SetItemText( nItem, PS_NAME_STR, split.desc.name );
+			m_ListCtrl.SetItemText( nItem, PS_BIRTH_STR, split.desc.birth );
+			m_ListCtrl.SetItemText( nItem, PS_DEATH_STR, split.desc.death );
+			m_ListCtrl.SetItemText( nItem, PS_COMMENT, split.d.comment );
 
 			m_ListCtrl.SetItemText( nItem, PS_TITOLO, split.m_titolo );
 			m_ListCtrl.SetItemText( nItem, PS_TITLE, split.d.title );
 			m_ListCtrl.SetItemText( nItem, PS_LAST_NAME, split.d.last_name );
-//			m_ListCtrl.SetItemText( nItem, PS_LAST_NAME, split.m_tableHeader.familyName );
 			m_ListCtrl.SetItemText( nItem, PS_FIRST_NAME, split.d.first_name );
+			m_ListCtrl.SetItemText( nItem, PS_POSTERIOR, split.d.posterior );
 			str.Format( L"%d", split.d.parentIndex );
 			if( !str.Compare( L"0" ) ) str.Empty();
 			m_ListCtrl.SetItemText( nItem, PS_MOTHER_INDEX, str );
@@ -242,9 +237,6 @@ void CDescendant::fillTable( )
 				str.Format( L"%d", split.d.parentIndexCalc );
 			if( !str.Compare( L"0" ) ) str.Empty();
 			m_ListCtrl.SetItemText( nItem, PS_MINDEX_CALC, str );
-
-			m_ListCtrl.SetItemText( nItem, PS_POSTERIOR, split.d.posterior );
-	
 
 			str.Format( L"%d", split.d.sex_id );
 			m_ListCtrl.SetItemText( nItem, PS_SEX_ID, str );
@@ -255,16 +247,9 @@ void CDescendant::fillTable( )
 			m_ListCtrl.SetItemText( nItem, PS_DPLACE, split.d.death_place );
 			m_ListCtrl.SetItemText( nItem, PS_DDATE, split.d.death_date );
 
-			m_ListCtrl.SetItemText( nItem, PS_COMMENT, split.d.comment );
 			m_ListCtrl.SetItemText( nItem, PS_BRANCH, split.d.folyt );
 
 			m_ListCtrl.SetItemText( nItem, PS_ARM, split.d.arm );
-
-			str.Format( L"%d", split.d.father_id );
-			m_ListCtrl.SetItemText( nItem, PS_ROWIDF, str );
-
-			str.Format( L"%d", split.d.mother_id );
-			m_ListCtrl.SetItemText( nItem, PS_ROWIDM, str );
 
 			++nItem;
 
@@ -278,12 +263,7 @@ void CDescendant::fillTable( )
 	}
 	wndP.DestroyWindow();
 	fclose( fh1 );
-/*
-	if( split.m_error_cnt1 )
-	{
-		ShellExecute(NULL, L"open", fileSpec,NULL, NULL, SW_SHOWNORMAL);
-	}
-*/
+
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendant::OnSize(UINT nType, int cx, int cy)
@@ -363,25 +343,6 @@ void CDescendant::listHtmlLine()
 	dlg.m_line = cLine;
 	dlg.DoModal();
 }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CDescendant::PreTranslateMessage(MSG* pMsg)
-{
-	int x=(int)pMsg->wParam;
-
-    if( pMsg->message==WM_KEYDOWN)
-    {
-		switch( x )
-		{
-		case VK_RETURN:
-//			listHtmlLine();
-			return TRUE;
-		case VK_ESCAPE:
-			CDialogEx::OnCancel();
-			break;
-		}
-	}
-	return CDialogEx::PreTranslateMessage(pMsg);
-}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendant::OnDList()
 {
@@ -399,7 +360,6 @@ void CDescendant::OnChangeSearch()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendant::OnNewtable()
 {
-//	SetWindowPos(&wndNoTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 	CDragonDlg dlg;
 	if( m_lineNumber != 0 )
 		dlg.OnDescendantLine();
@@ -408,22 +368,6 @@ void CDescendant::OnNewtable()
 	else 
 		dlg.OnDescendantFile();
 }
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-void CDescendant::menu()
-{
-	CMenu* pMenu = GetMenu();
-
-	UINT cnt = pMenu->GetMenuItemCount();
-
-	for( int i=cnt; i > -1; --i )
-		pMenu->DeleteMenu( i, MF_BYPOSITION );
-
-	pMenu->AppendMenuW( MF_STRING, ID_NEWTABLE_D,	L"Új lekérdezés" );
-	pMenu->AppendMenuW( MF_STRING, ID_D_LIST,		L"Listázás" );
-}
-*/
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendant::PostNcDestroy()
 {
@@ -452,13 +396,6 @@ LRESULT CDescendant::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 		pPopup->EnableMenuItem(ID_DB_EDIT,MF_BYCOMMAND | MF_GRAYED);
 		pPopup->EnableMenuItem(ID_HTML_NOTEPAD_PARENTS,MF_BYCOMMAND | MF_GRAYED);
 		pPopup->EnableMenuItem(ID_HTML_FATHERANDSIBLINGS,MF_BYCOMMAND | MF_GRAYED);
-/*
-		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
-		{
-//			pPopup->EnableMenuItem(ID_DB_EDIT,MF_BYCOMMAND | MF_GRAYED);
-//			pPopup->EnableMenuItem(ID_EDIT_DELETE,MF_BYCOMMAND | MF_GRAYED);
-		}
-*/
 		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
     }
 	return TRUE;

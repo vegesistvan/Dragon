@@ -22,6 +22,10 @@ enum
 	L_MARRIAGE,
 	L_PLACE,
 	L_DATE,
+	L_NAMESUB,
+	L_BIRTHSUB,
+	L_DEATHSUB,
+	L_COMMENT,
 	L_SEX_ID,
 	L_TITLE,
 	L_TITOLO,
@@ -32,7 +36,6 @@ enum
 	L_BIRTH_DATE,
 	L_DEATH_PLACE,
 	L_DEATH_DATE,
-	L_COMMENT,
 	L_PARENTS,
 	L_FATHER,
 	L_LAST_NAMEF,
@@ -111,6 +114,11 @@ BOOL CMarriages::OnInitDialog()
 	m_ListCtrl.InsertColumn( L_MARRIAGE,		L"házasság",			LVCFMT_LEFT,    600,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_PLACE,			L"helye",				LVCFMT_LEFT,	 80,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_DATE,			L"ideje",				LVCFMT_LEFT,	 80,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_NAMESUB,			L"namesub",				LVCFMT_LEFT,	100,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_BIRTHSUB,		L"birthsub",			LVCFMT_LEFT,	100,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_DEATHSUB,		L"deathsub",			LVCFMT_LEFT,	100,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_COMMENT,			L"leírás",				LVCFMT_LEFT,	100,-1,COL_TEXT);
+
 	m_ListCtrl.InsertColumn( L_SEX_ID,			L"sex",					LVCFMT_LEFT,	 40,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_TITLE,			L"title",				LVCFMT_LEFT,	 80,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_TITOLO,			L"titolo",				LVCFMT_LEFT,	 80,-1,COL_TEXT);
@@ -121,7 +129,7 @@ BOOL CMarriages::OnInitDialog()
 	m_ListCtrl.InsertColumn( L_BIRTH_DATE,		L"birth",				LVCFMT_LEFT,	 80,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_DEATH_PLACE,		L"death",				LVCFMT_LEFT,	 80,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_DEATH_DATE,		L"death",				LVCFMT_LEFT,	 80,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( L_COMMENT,			L"leírás",				LVCFMT_LEFT,	100,-1,COL_TEXT);
+
 	m_ListCtrl.InsertColumn( L_PARENTS,			L"szülõk",				LVCFMT_LEFT,	100,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_FATHER,			L"apa",					LVCFMT_LEFT,	 80,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_LAST_NAMEF,		L"családnév",			LVCFMT_LEFT,	 80,-1,COL_TEXT);
@@ -263,6 +271,10 @@ void CMarriages::fillTable( )
 				m_ListCtrl.SetItemText( nItem, L_MARRIAGE, marriage );
 				m_ListCtrl.SetItemText( nItem, L_PLACE, split.v_marriages.at(i).place );
 				m_ListCtrl.SetItemText( nItem, L_DATE, split.v_marriages.at(i).date );
+				m_ListCtrl.SetItemText( nItem, L_NAMESUB, split.v_marriages.at(i).nameSubstr );
+				m_ListCtrl.SetItemText( nItem, L_BIRTHSUB, split.v_marriages.at(i).birthSubstr );
+				m_ListCtrl.SetItemText( nItem, L_DEATHSUB, split.v_marriages.at(i).deathSubstr );
+				m_ListCtrl.SetItemText( nItem, L_COMMENT, split.v_marriages.at(i).comment );
 
 				str.Format( L"%d", split.v_marriages.at(i).sex_id );
 				m_ListCtrl.SetItemText( nItem, L_SEX_ID, str );
@@ -275,7 +287,6 @@ void CMarriages::fillTable( )
 				m_ListCtrl.SetItemText( nItem, L_BIRTH_DATE, split.v_marriages.at(i).birth_date );
 				m_ListCtrl.SetItemText( nItem, L_DEATH_PLACE, split.v_marriages.at(i).death_place );
 				m_ListCtrl.SetItemText( nItem, L_DEATH_DATE, split.v_marriages.at(i).death_date );
-				m_ListCtrl.SetItemText( nItem, L_COMMENT, split.v_marriages.at(i).comment );
 				m_ListCtrl.SetItemText( nItem, L_PARENTS, split.v_marriages.at(i).parents );
 				
 				str.Format( L"%s %s %s %s %s",\

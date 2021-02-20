@@ -156,4 +156,5 @@ public:
 	afx_msg void OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnInfo();
 	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
+	afx_msg void OnParameters();
 };

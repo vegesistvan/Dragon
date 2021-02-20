@@ -60,7 +60,6 @@ CString		getPeopleBlock( CString cLine );
 int			isThere( CStringArray* A,  CString word );
 void		setCreationTime( CString filespec );
 
-void		splitPlaceDateComment( CString birthString, PLACE_DATE_BLOCK* ns );
 void		sameClear( SAME * same );
 
 //bool operator<(const SAMEMARRIAGE &s1, const SAMEMARRIAGE &s2);

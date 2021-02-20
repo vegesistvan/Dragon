@@ -433,27 +433,14 @@ int CDragonApp::isFirstName( CString name )
 	name.Replace( '-', ' ' );
 	name.Replace( '_', ' ' );
 	name.Replace( '?', ' ' );
+	name.Replace( ')', ' ' );
 	name.Trim();
 	if( name.IsEmpty() ) return -1;
 
-
-	int z;
-	int pos;
-	int i;
-	int n;
 	CStringArray A;
-/*
-	if( (pos = name.Find( '_' ) ) != -1 )
-		n = wordList( &A, name, '_', FALSE );
-	else if( (pos = name.Find( '-' ) ) != -1 )
-		n = wordList( &A, name, '-', FALSE );
-	else
-*/
-		n = wordList( &A, name, ' ', FALSE );
-
-	if( n > 1 )
-		z = 2;
-
+	int i;
+	int n = wordList( &A, name, ' ', FALSE );
+// többszörös keresztnevek minden tagját megvizsgálja, az utolso sex_id-ját adja vissza
 	for( i = 0; i < n; ++i )
 	{
 		m_command.Format( L"SELECT rowid, sex_id FROM firstnames WHERE first_name='%s'", A[i] );
@@ -462,16 +449,40 @@ int CDragonApp::isFirstName( CString name )
 	}
 	if( i == n )
 		return _wtoi( theApp.m_recordsetSystem->GetFieldString( 1 ) );		// megvan az adatbázisban, visszadja a sex-et
-/*
-	CSaveFirstName dlg;
-	dlg.m_first_name = A[i];
-	if( dlg.DoModal() == IDCANCEL ) return -1;
-
-	m_command.Format( L"INSERT INTO firstnames (first_name, sex_id ) VALUES ('%s', '%d' )", A[i], dlg.m_sex_id );
-	if( !executeSys( m_command ) ) return -1;
-	return ( dlg.m_sex_id );
-*/
 	return -1;		// nincs sex
+
+/////////////////////////////////
+/*
+	name.Replace( ')', ' ' );
+	name.Replace( '?', ' ' );
+	name.Trim();
+	if( name.IsEmpty() ) return -1;
+
+	int z;
+	int pos;
+	int i;
+	int n;
+	CStringArray A;
+
+	if( (pos = name.Find( '_' ) ) != -1 )
+		n = wordList( &A, name, '_', FALSE );
+	else if( (pos = name.Find( '-' ) ) != -1 )
+		n = wordList( &A, name, '-', FALSE );
+	else
+		n = wordList( &A, name, ' ', FALSE );
+
+
+
+	if( n > 1 && A[1] == L"Nep" )
+		z = 1;
+
+	m_command.Format( L"SELECT rowid, sex_id FROM firstnames WHERE first_name='%s'", A[0] );
+	if( !theApp.querySystem( m_command ) )	return -1;
+	if( theApp.m_recordsetSystem->RecordsCount() )
+		return _wtoi( theApp.m_recordsetSystem->GetFieldString( 1 ) );
+	else
+		return -1;
+*/
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int CDragonApp::getNumberOfDb( std::vector<CString>* vE )

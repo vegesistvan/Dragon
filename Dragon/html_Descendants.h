@@ -12,8 +12,6 @@ class CDescendant : public CDialogEx
 public:
 	CDescendant(CWnd* pParent = NULL);   // standard constructor
 	virtual ~CDescendant();
-
-// Dialog Data
 	enum { IDD = IDD_HTML_DESCENDANTS };
 
 	int m_lineNumber;
@@ -29,21 +27,20 @@ protected:
 
 	FILE* fh1;
 	CString str;
+	CColorStatic colorCaption;
 
-//	void menu();
 	void CDescendant::listHtmlLine();
 	void CDescendant::fillTable( );
-	BOOL PreTranslateMessage(MSG* pMsg);
 	virtual void PostNcDestroy();
 	void OnHtmlEdit();
 	void OnHtmlNotepad();
-
+	CListCtrlEx m_ListCtrl;
 	DECLARE_MESSAGE_MAP()
+
 public:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
-	CListCtrlEx m_ListCtrl;
 	afx_msg void OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnSetColumnColor(WPARAM wParam, LPARAM lParam);
@@ -51,5 +48,5 @@ public:
 	afx_msg void OnNewtable();
 	afx_msg void OnDList();
 	afx_msg void OnChangeSearch();
-	CColorStatic colorCaption;
+
 };

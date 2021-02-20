@@ -136,16 +136,10 @@ void CSpouseSpouses::fillTable( )
 	}SPOUSES1;
 
 	CGaInput split;
-//	std::vector<CString> v_Spouses;		// leszármazott házastársai
-//	std::vector<MARRIAGES> v_M;			// leszármazott házasságai
-//	std::vector<SPOUSES1> v_sps;		// házastárs házastársai
-//	std::vector<PEOPLE> v_p;
-
 	PEOPLE p;
 
 	CString cLine;
 	CString table_name;
-//	CString tableNumber;
 	CString spouses;
 	CString relatives;
 	CString spouse;
@@ -163,7 +157,6 @@ void CSpouseSpouses::fillTable( )
 	CStdioFile file( theApp.m_htmlFileSpec, CFile::modeRead); 
 	fileLength = (int)file.GetLength();
 
-//	split.m_error_cnt1 = 0;
 	split.m_rollToLine		= m_lineNumber;
 	split.m_rollToTable		= m_tableNumber;
 	split.m_rollToFamily	= m_familyNumber;

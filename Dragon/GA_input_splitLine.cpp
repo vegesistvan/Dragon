@@ -164,10 +164,6 @@ void CGaInput::clearAll()
 	clearPeople( &sm );		// az insertáláshoz használt PEOPLE struktúra
 	clearPeople( &ss );		// az insertáláshoz használt PEOPLE struktúra
 
-	_descNameSS.Empty();
-	_descBirthSS.Empty();
-	_descDeathSS.Empty();
-	_descCommentSS.Empty();
 
 	v_marriages.clear(); 
 	v_spouseSpouses.clear();

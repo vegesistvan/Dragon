@@ -34,10 +34,7 @@ public:
 
 	// elsõ foku substringek
 	CString	m_descendant;
-	CString _descNameSS;
-	CString	_descBirthSS;
-	CString	_descDeathSS;
-	CString _descCommentSS;
+	SUBSTRING desc;			// descendant substrings
 
 	TABLEHEADER m_tableHeader;
 	std::vector<MARRIAGES>		v_marriages;		// leszármazott házasságai
@@ -54,7 +51,7 @@ public:
 	void	insertTableHeader();
 	void	processMarriageSubstrings();
 	void	processPlaceDateComment( CString placeDateComment, PLACE_DATE_BLOCK* ns );
-	void	processPeopleStr( CString cLine,  PEOPLE* any );
+	void	processPeopleStr( CString cLine,  PEOPLE* any, SUBSTRING* sub );
 	void	processDescendantSubstring( CString cLine );
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -138,11 +135,8 @@ protected:
 	CString	getDescendant( CString cLine );
 	void	getMarriageSubstrings( CString cLine );
 	int		getMotherIndex( TCHAR generation, int n_mother_index );
-	int		getSexId( CString first_name );
-	BOOL	isTitle( CString cLine ) ;
 	BOOL	isName( CString str, NAME* name );
 	int		getOrderSpouse( std::vector<PEOPLE>* vp );
-	void	splitSpFatherName( CString cLine, NAME* name );
 	void	splitSpouseNameString( CString nameComment, NAME* name ); 
 	void	splitSpouseNameString( int ix );
 	void	fillOrderFather( );

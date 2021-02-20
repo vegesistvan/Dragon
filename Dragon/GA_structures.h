@@ -3,6 +3,14 @@
 
 typedef struct
 {
+	CString name;
+	CString birth;
+	CString death;
+	CString description;
+}SUBSTRING;
+
+typedef struct
+{
 	CString text;
 	CString code1;
 	CString code2;
