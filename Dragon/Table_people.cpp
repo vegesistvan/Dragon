@@ -164,7 +164,6 @@ BEGIN_MESSAGE_MAP(CTablePeople, CDialogEx)
 	
 	ON_COMMAND(ID_FILTER_UNFILTER, &CTablePeople::OnFilterUnfilter)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CTablePeople::OnDblclkList)
-	ON_COMMAND(ID_EDIT_DELETE, &CTablePeople::OnEditDelete)
 
 // DROPDOWN menü funkciók
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
@@ -173,7 +172,13 @@ BEGIN_MESSAGE_MAP(CTablePeople, CDialogEx)
 	ON_COMMAND(ID_HTML_FATHERANDSIBLINGS, &CTablePeople::OnHtmlFatherAndSiblings)
 	ON_COMMAND(ID_HTML_EDIT, &CTablePeople::OnHtmlEditLines)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CTablePeople::OnHtmlNotepad)	
-	
+
+	ON_COMMAND(ID_EDIT_DELETE, &CTablePeople::OnEditDelete)
+	ON_COMMAND(ID_EDIT_UPDATE, &CTablePeople::OnEditUpdate)
+	ON_COMMAND(ID_EDIT_INSERT, &CTablePeople::OnEditInsert)
+	ON_COMMAND(ID_3GENERATIONS, &CTablePeople::On3Generations )
+
+
 	ON_COMMAND(ID_FILTER_FILE, &CTablePeople::OnFilterFile)
 	ON_COMMAND(ID_FILTER_MEN, &CTablePeople::OnFilterMen)
 	ON_COMMAND(ID_FILTER_NODESCENDANT, &CTablePeople::OnFilterNodescendant)
@@ -806,7 +811,7 @@ void CTablePeople::fillTable( UINT nItem )
 		m_ListCtrl.EnsureVisible( nItem, FALSE );
 	}
 
-	m_ListCtrl.SetItemState( 0, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED);
+//	m_ListCtrl.SetItemState( 0, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED);
 	enableMenu( MF_ENABLED );
 	str.Format( L"%s (%d)", m_filterText, m_ListCtrl.GetItemCount() );
 	SetWindowTextW( str );
@@ -1082,17 +1087,7 @@ void CTablePeople::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
 	str.Format( L"%s %s adatainak módosítása", m_ListCtrl.GetItemText( nItem, N_LAST_NAME ), m_ListCtrl.GetItemText( nItem, N_FIRST_NAME ) );
 //	ShowWindow( SW_HIDE );
 
-/*
-	if( theApp.m_inputMode == GAHTML )
-	{
-		CEditPeople dlg;
-		dlg.m_caption = str;
-		dlg.m_rowid = m_ListCtrl.GetItemText( nItem, N_ROWID );
-		dlg.DoModal();
-	}
-	else
-*/
-		OnDbEdit();
+	OnDbEdit();
 
 	SetForegroundWindow();
 
@@ -1134,98 +1129,6 @@ Mégis megad új személyt?";
 	}
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-void CTablePeople::OnEditInsert()
-{
-	ShowWindow( SW_HIDE );
-	CEditPeople dlg;
-	dlg.m_caption = L"Új ember bevitele";
-	dlg.m_rowid.Empty();
-	if( dlg.DoModal() != IDCANCEL )
-	{
-//		m_rowid = dlg.m_m;  // ez érthetetlen! dlg.m_rowid rossz!!!
-//		insertRow();
-	}
-	ShowWindow( SW_RESTORE );
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTablePeople::OnEditUpdate()
-{
-	int	nItem;
-	CString name;
-	CString first_name;
-	CString last_name;
-
-	CNewPeople dlg;
-
-	dlg.m_rowid.Empty();
-	nItem	= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED); 
-	if( nItem == -1 ) return;
-
-	first_name = m_ListCtrl.GetItemText( nItem, N_FIRST_NAME );
-	last_name = m_ListCtrl.GetItemText( nItem, N_LAST_NAME );
-	name.Format( L"%s %s", last_name, first_name );
-
-	dlg.m_rowid	= m_ListCtrl.GetItemText( nItem, N_ROWID );
-	str.Format( L"%s szerkesztése", name );
-
-	ShowWindow( SW_HIDE );
-	if( dlg.DoModal() == IDCANCEL ) return;
-	ShowWindow( SW_RESTORE );
-
-
-	
-	fillTable( nItem );
-//	m_ListCtrl.SetItemState( nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED);
-//	m_ListCtrl.EnsureVisible( nItem, FALSE );
-}
-*/
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTablePeople::OnEditDelete()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	int sex_id;
-	CString rowid = m_ListCtrl.GetItemText( nItem, G_ROWID );
-	CString name;
-
-	ShowWindow( SW_HIDE );
-	if( theApp.m_inputMode == GEDCOM )
-	{
-		name.Format( L"%s %s", m_ListCtrl.GetItemText( nItem, G_LAST_NAME ), m_ListCtrl.GetItemText( nItem, G_FIRST_NAME ) ); 
-		sex_id = _wtoi( m_ListCtrl.GetItemText( nItem, G_SEX ) );
-	}
-	else if( theApp.m_inputMode == GAHTML )
-	{
-		name.Format( L"%s %s", m_ListCtrl.GetItemText( nItem, L_LAST_NAME ), m_ListCtrl.GetItemText( nItem, L_FIRST_NAME ) ); 
-		sex_id = _wtoi( m_ListCtrl.GetItemText( nItem, L_SEX ) );
-	}
-	else
-	{
-		name.Format( L"%s %s", m_ListCtrl.GetItemText( nItem, N_LAST_NAME ), m_ListCtrl.GetItemText( nItem, N_FIRST_NAME ) ); 
-		sex_id = _wtoi( m_ListCtrl.GetItemText( nItem, N_SEX ) );
-	}
-
-	str.Format( L"Valóban törölni akarod %s(%s) bejegyzést\nés minden rá való hivatkozást?", name, rowid );
-	if( AfxMessageBox( str, MB_YESNO ) == IDYES )
-	{
-		m_ListCtrl.DeleteItem( nItem );
-		m_command.Format(L"DELETE FROM people WHERE rowid='%s'",rowid );
-		if( !theApp.execute( m_command ) ) return;
-		--theApp.m_cntPeople;
-
-//		m_command.Format(L"DELETE FROM people WHERE father_id='%s' OR mother_id='%s'",rowid, rowid );
-		if( sex_id == MAN )
-			m_command.Format( L"UPDATE people SET father_id=0 WHERE father_id = '%s'", rowid );
-		else
-			m_command.Format( L"UPDATE people SET mother_id=0 WHERE mother_id = '%s'", rowid );
-		if( !theApp.execute( m_command ) ) return;
-	
-		m_command.Format(L"DELETE FROM marriages WHERE spouse1_id='%s' OR spouse2_id='%s'",rowid, rowid );
-		if( !theApp.execute( m_command ) ) return;
-	}
-	ShowWindow( SW_RESTORE );
-}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1848,18 +1751,11 @@ LRESULT CTablePeople::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 	else if( theApp.m_inputMode == GAHTML )
 		MENU_IDR = IDR_DROPDOWN_HTML;
 	else if( theApp.m_inputMode == MANUAL )
-		MENU_IDR = IDR_DROPDOWN_EDIT;
+		MENU_IDR = IDR_DROPDOWN_PEOPLE;
 
 	if(Menu.LoadMenu( MENU_IDR ))
     {
 		pPopup = Menu.GetSubMenu(0);
-		pPopup->EnableMenuItem(ID_EDIT_INSERT,MF_BYCOMMAND | MF_GRAYED);
-		pPopup->EnableMenuItem(ID_EDIT_UPDATE,MF_BYCOMMAND | MF_GRAYED);
-		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
-		{
-//			pPopup->EnableMenuItem(ID_DB_EDIT,MF_BYCOMMAND | MF_GRAYED);
-//			pPopup->EnableMenuItem(ID_EDIT_DELETE,MF_BYCOMMAND | MF_GRAYED);
-		}
 		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
     }
 	return TRUE;
@@ -1910,7 +1806,150 @@ void CTablePeople::OnDbEdit()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
 	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
+
+	CEditPeople dlg;
+	dlg.m_caption.Format( L"%s %s adatainak szerkesztése", m_ListCtrl.GetItemText( nItem, L_LAST_NAME ), m_ListCtrl.GetItemText( nItem, L_FIRST_NAME ) );
+	dlg.m_rowid = rowid;
+
+	ShowWindow( SW_HIDE );
+	dlg.DoModal();
+	ShowWindow( SW_RESTORE );
+
+
+/*	
 	CRelations dlg;
 	dlg.m_rowid = rowid;
 	dlg.DoModal();
+*/
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTablePeople::OnEditUpdate()
+{
+	int nItem	= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED); 
+	if( nItem == -1 ) return;
+
+	CString name;
+	CString first_name;
+	CString last_name;
+
+	first_name = m_ListCtrl.GetItemText( nItem, N_FIRST_NAME );
+ 	last_name = m_ListCtrl.GetItemText( nItem, N_LAST_NAME );
+	name.Format( L"%s %s", last_name, first_name );
+
+	
+//	CNewPeople dlg;
+//	dlg.m_rowid.Empty();
+
+	CEditPeople dlg;
+
+	dlg.m_rowid	= m_ListCtrl.GetItemText( nItem, N_ROWID );
+	dlg.m_caption.Format( L"%s szerkesztése", name );
+
+	ShowWindow( SW_HIDE );
+	dlg.DoModal();	
+//	if( dlg.DoModal() == IDCANCEL ) return;
+	ShowWindow( SW_RESTORE );
+
+	fillTable( nItem );
+
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTablePeople::OnEditDelete()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	int sex_id;
+	CString rowid = m_ListCtrl.GetItemText( nItem, G_ROWID );
+	CString name;
+
+	ShowWindow( SW_HIDE );
+	if( theApp.m_inputMode == GEDCOM )
+	{
+		name.Format( L"%s %s", m_ListCtrl.GetItemText( nItem, G_LAST_NAME ), m_ListCtrl.GetItemText( nItem, G_FIRST_NAME ) ); 
+		sex_id = _wtoi( m_ListCtrl.GetItemText( nItem, G_SEX ) );
+	}
+	else if( theApp.m_inputMode == GAHTML )
+	{
+		name.Format( L"%s %s", m_ListCtrl.GetItemText( nItem, L_LAST_NAME ), m_ListCtrl.GetItemText( nItem, L_FIRST_NAME ) ); 
+		sex_id = _wtoi( m_ListCtrl.GetItemText( nItem, L_SEX ) );
+	}
+	else
+	{
+		name.Format( L"%s %s", m_ListCtrl.GetItemText( nItem, N_LAST_NAME ), m_ListCtrl.GetItemText( nItem, N_FIRST_NAME ) ); 
+		sex_id = _wtoi( m_ListCtrl.GetItemText( nItem, N_SEX ) );
+	}
+
+	str.Format( L"Valóban törölni akarod %s(%s) bejegyzést\nés minden rá való hivatkozást?", name, rowid );
+	if( AfxMessageBox( str, MB_YESNO ) == IDYES )
+	{
+		m_ListCtrl.DeleteItem( nItem );
+		m_command.Format(L"DELETE FROM people WHERE rowid='%s'",rowid );
+		if( !theApp.execute( m_command ) ) return;
+		--theApp.m_cntPeople;
+
+//		m_command.Format(L"DELETE FROM people WHERE father_id='%s' OR mother_id='%s'",rowid, rowid );
+		if( sex_id == MAN )
+			m_command.Format( L"UPDATE people SET father_id=0 WHERE father_id = '%s'", rowid );
+		else
+			m_command.Format( L"UPDATE people SET mother_id=0 WHERE mother_id = '%s'", rowid );
+		if( !theApp.execute( m_command ) ) return;
+	
+		m_command.Format(L"DELETE FROM marriages WHERE spouse1_id='%s' OR spouse2_id='%s'",rowid, rowid );
+		if( !theApp.execute( m_command ) ) return;
+	}
+	ShowWindow( SW_RESTORE );
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTablePeople::OnEditInsert()
+{
+/*
+	int	nItem;
+	CString name;
+	CString first_name;
+	CString last_name;
+
+	
+	nItem	= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED); 
+	if( nItem == -1 ) return;
+
+	first_name = m_ListCtrl.GetItemText( nItem, N_FIRST_NAME );
+ 	last_name = m_ListCtrl.GetItemText( nItem, N_LAST_NAME );
+	name.Format( L"%s %s", last_name, first_name );
+
+
+	CNewPeople dlg;
+	dlg.m_rowid.Empty();
+
+
+
+	ShowWindow( SW_HIDE );
+	if( dlg.DoModal() == IDCANCEL ) return;
+	ShowWindow( SW_RESTORE );
+	
+	fillTable( nItem );
+*/
+
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
+
+	CRelations dlg;
+	dlg.m_rowid = rowid;
+	
+	ShowWindow( SW_HIDE );
+	dlg.DoModal();
+	ShowWindow( SW_RESTORE );
+
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTablePeople::On3Generations()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
+
+	CRelations dlg;
+	dlg.m_rowid = rowid;
+
+	ShowWindow( SW_HIDE );
+	dlg.DoModal();
+	ShowWindow( SW_RESTORE );
+
 }

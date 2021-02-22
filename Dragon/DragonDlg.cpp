@@ -62,6 +62,7 @@
 #include "ContractedPeople.h"
 #include "version.h"
 #include "TableCouples.h"
+#include "CheckFamilyDates.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -119,7 +120,7 @@ ON_COMMAND(ID_SS_FILE, &CDragonDlg::OnSsFile)
 ON_COMMAND(ID_SS_TABLE, &CDragonDlg::OnSsTable)
 ON_COMMAND(ID_SS_LINE, &CDragonDlg::OnSsLine)
 ON_COMMAND(ID_SELECTED_FILES, &CDragonDlg::OnSelectedFiles)
-ON_COMMAND(ID_TITLES, &CDragonDlg::OnTitles)
+//ON_COMMAND(ID_TITLES, &CDragonDlg::OnTitles)
 
 ON_WM_HSCROLL()
 ON_COMMAND(ID_OPEN_DB, &CDragonDlg::OnOpenDb)
@@ -185,7 +186,8 @@ ON_COMMAND(ID_SAMENAMEANDSPOUSE, &CDragonDlg::OnSamenameandspouse)
 ON_COMMAND(ID_APP_EXIT, &CDragonDlg::OnAppExit)
 ON_COMMAND(ID_CONTRACTEDCOUPLES, &CDragonDlg::OnContractedCouples)
 ON_COMMAND(ID_CONTRACT_PEOPLE, &CDragonDlg::OnContractedPeople)
-ON_COMMAND(ID_MARRIAGES_DETAILED, &CDragonDlg::OnMarriagesDetailed)
+//ON_COMMAND(ID_MARRIAGES_DETAILED, &CDragonDlg::OnMarriagesDetailed)
+ON_COMMAND(ID_DISPLAY_FAMILIES, &CDragonDlg::OnDisplayFamilies)
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CDragonDlg::OnInitDialog()
@@ -357,11 +359,13 @@ void CDragonDlg::mainTitle( )
 	SetWindowText( caption );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 void CDragonDlg::OnTitles()
 {
 	CTitles dlg;
 	if( dlg.DoModal() == IDCANCEL ) return;
 }
+*/
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CDragonDlg::PreTranslateMessage(MSG* pMsg)
 {
@@ -1138,8 +1142,9 @@ void CDragonDlg::OnContractedPeople()
 	mainTitle( );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragonDlg::OnMarriagesDetailed()
+void CDragonDlg::OnDisplayFamilies()
 {
-	CTableCouples dlg;
+	CCheckFamilyDates dlg;
+	dlg.m_always = true;
 	dlg.DoModal();
 }

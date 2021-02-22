@@ -13,8 +13,6 @@ IMPLEMENT_DYNAMIC(CCheckFamilyDatesStart, CDialogEx)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CCheckFamilyDatesStart::CCheckFamilyDatesStart(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CCheckFamilyDatesStart::IDD, pParent)
-	, m_type(2)
-
 	, m_maxAgeHAtWedd(70)
 	, m_minAgeHAtWedd(18)
 	, m_maxAgeWAtWedd(60)
@@ -35,8 +33,6 @@ CCheckFamilyDatesStart::~CCheckFamilyDatesStart()
 void CCheckFamilyDatesStart::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Radio(pDX, IDC_RADIO_NOCHILDREN, m_type);
-
 	DDX_Text(pDX, IDC_MAXAGEHATWEDD, m_maxAgeHAtWedd);
 	DDX_Text(pDX, IDC_MINAGEHATWEDD, m_minAgeHAtWedd);
 	DDX_Text(pDX, IDC_MAXAGEWATWEDD, m_maxAgeWAtWedd);
@@ -58,10 +54,6 @@ BOOL CCheckFamilyDatesStart::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	CButton* pButton = (CButton*)GetDlgItem(IDC_RADIO_MOREWIFES );
-	pButton->SetCheck(true);
-	m_type = 2;
-	
 	m_extrem = L"Extrém hatérértékek belálítása";
 	m_normal = L"Normál határértékek beállítása";
 

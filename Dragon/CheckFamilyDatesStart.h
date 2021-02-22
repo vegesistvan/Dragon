@@ -17,7 +17,6 @@ public:
 	// átadott adatok
 	CString m_info;
 
-	int	m_type;
     int	m_maxLifespan;
 	int	m_maxAgeHAtWedd;
 	int	m_minAgeHAtWedd;

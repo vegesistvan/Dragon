@@ -19,26 +19,28 @@ public:
 	enum { IDD = IDD_EDIT_PEOPLE };
 
 	CString m_caption;
-	CString	m_tableNumber;
-	CString m_father_id;
-	CString m_mother_id;
-	int		m_mother_index;
-	int		m_numberOfWifes;
-	CString m_title;
-	CString m_table;
-
-
-	CString m_m;
 	CString m_rowid;
-	int		m_role;
-	int		m_sex_id;
-	int		m_titleX;
-
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	CColorStatic colorTable;
 
 	CRect rectW;	// a dlg ablak adatai  ( 0,0 pont a menü alatt!!
+	
+	CString	m_tableNumber;
+	CString m_father_id;
+	CString m_mother_id;
+	int		m_mother_index;
+	int		m_numberOfWifes;
+	CString m_table;
+
+
+	CString m_m;
+	
+	int		m_role;
+	int		m_sex_id;
+//	int		m_titleX;
+
+
 
 	bool	m_paint;
 	int		m_orderix;
@@ -90,7 +92,6 @@ protected:
 	void CEditPeople::initialScreen();
 	void CEditPeople::fillMarriageTable();
 	void CEditPeople::fillBlobTable();
-	int CEditPeople::getTitleX( CString title );
 	CString CEditPeople::getTableName( CString tableNumber );
 	CString CEditPeople::getParent( CString rowid );
 	void CEditPeople::displayParent( int IDC, CString rowid );
@@ -142,4 +143,6 @@ public:
 	afx_msg LRESULT OnSetColumnColor(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnColumnSorted(WPARAM wParam, LPARAM lParam);
 
+	CString m_title;
+	CString m_posterior;
 };

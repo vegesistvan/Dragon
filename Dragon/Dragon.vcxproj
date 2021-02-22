@@ -249,7 +249,6 @@
     <ClInclude Include="ContractInfo.h" />
     <ClInclude Include="SaveFirstName.h" />
     <ClInclude Include="sqlite3.h" />
-    <ClInclude Include="TableCouples.h" />
     <ClInclude Include="Table_blobs.h" />
     <ClInclude Include="Table_firstnames.h" />
     <ClInclude Include="Table_people.h" />
@@ -296,7 +295,6 @@
     <ClInclude Include="Table_tables.h" />
     <ClInclude Include="Table_marriages.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="Table_titles.h" />
     <ClInclude Include="SameParams.h" />
     <ClInclude Include="UnknownFirstNames.h" />
     <ClInclude Include="utilities.h" />
@@ -376,7 +374,6 @@
     <ClCompile Include="SameName.cpp" />
     <ClCompile Include="ContractInfo.cpp" />
     <ClCompile Include="SaveFirstName.cpp" />
-    <ClCompile Include="TableCouples.cpp" />
     <ClCompile Include="Table_blobs.cpp" />
     <ClCompile Include="Table_firstnames.cpp" />
     <ClCompile Include="Table_people.cpp" />
@@ -428,7 +425,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Table_titles.cpp" />
     <ClCompile Include="SameParams.cpp" />
     <ClCompile Include="UnknownFirstNames.cpp" />
     <ClCompile Include="utilities.cpp" />

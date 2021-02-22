@@ -69,6 +69,7 @@ public:
 
 // Dialog Data
 	enum { IDD = IDD_CHECK_FAMILYDATES };
+	bool m_always;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
@@ -102,7 +103,6 @@ protected:
 	CHILDREN c;
 
 	// átvett adatok
-	int	m_type;
     int	m_maxLifespan;
 	int	m_maxAgeHAtWedd;
 	int	m_minAgeHAtWedd;
@@ -131,6 +131,9 @@ protected:
 	void OnHtmlNotepadParents();
 	void OnHtmlFatherAndSiblings();
 	void OnDbEdit();
+
+	void OnEditDatabase();
+	void On3Generations();
 
 	BOOL query( CString command );
 	BOOL query1( CString command );

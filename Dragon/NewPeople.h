@@ -39,7 +39,7 @@ protected:
 	CString m_command;
 
 	CComboBox comboSex;
-	CComboBox comboTitle;
+//	CComboBox comboTitle;
 	CComboBox comboBirth;
 	CComboBox comboDeath;
 
@@ -59,10 +59,11 @@ public:
 	CString m_last_name;
 	CString m_first_name;
 	CString m_titolo;
-	CString m_title;
+//	CString m_title;
 	CString m_comment;
 	CString m_death_date;
 	CString m_death_place;
 	CString m_birth_date;
 	CString m_birth_place;
+	CString m_title;
 };

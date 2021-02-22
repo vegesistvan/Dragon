@@ -92,7 +92,8 @@ public:
 	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
 	afx_msg LRESULT OnSetColumnColor(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnColumnSorted(WPARAM wParam, LPARAM lParam);
-	afx_msg void OnEditDelete();
+	
+
 	afx_msg void OnFilterUnfilter();
 	afx_msg void OnFilterAncestors();
 	afx_msg void OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult);
@@ -151,4 +152,8 @@ public:
 	afx_msg void OnHtmlFatherAndSiblings();
 	afx_msg void OnDbEdit();
 
+	afx_msg void OnEditDelete();
+	afx_msg void OnEditUpdate();
+	afx_msg void OnEditInsert();
+	afx_msg void On3Generations();
 };

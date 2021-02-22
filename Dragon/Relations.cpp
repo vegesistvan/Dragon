@@ -114,6 +114,7 @@ CRelations::CRelations(CWnd* pParent /*=NULL*/)
 	, m_comment(_T(""))
 	, m_occupation(_T(""))
 	, m_posterior(_T(""))
+	, m_title(_T(""))
 {
 	m_recordset		= new CSqliteDBRecordSet;
 	m_recordset2	= new CSqliteDBRecordSet;
@@ -139,7 +140,6 @@ void CRelations::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_NEW_FATHER, colorNewFather);
 	DDX_Control(pDX, IDC_NEW_MOTHER, colorNewMother);
 	DDX_Control(pDX, IDC_COMBO_SEX, comboSex);
-	DDX_Control(pDX, IDC_COMBO_TITLE, comboTitle);
 	DDX_Text(pDX, IDC_TITOLO, m_titolo);
 	DDX_Text(pDX, IDC_FIRST_NAME, m_first_name);
 	DDX_Text(pDX, IDC_DEATH_DATE, m_death_date);
@@ -156,6 +156,7 @@ void CRelations::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHILDREN, colorChildren);
 	DDX_Control(pDX, IDC_NAME, colorName);
 	DDX_Text(pDX, IDC_EDIT_POSTERIOR, m_posterior);
+	DDX_Text(pDX, IDC_EDIT_TITLE, m_title);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CRelations, CDialogEx)
@@ -171,7 +172,6 @@ ON_NOTIFY(NM_RDBLCLK, IDC_LISTM, &CRelations::OnRdblclkListM)
 ON_NOTIFY(NM_RDBLCLK, IDC_LISTC, &CRelations::OnRdblclkListC)
 ON_NOTIFY(NM_RDBLCLK, IDC_LISTS, &CRelations::OnRdblclkListS)
 
-//ON_COMMAND(ID_PHOTO, &CRelations::OnPhoto)
 ON_STN_CLICKED(IDC_MARRIAGES, &CRelations::OnClickedMarriages)
 ON_STN_CLICKED(IDC_NEW_FATHER, &CRelations::OnClickedNewFather)
 ON_STN_CLICKED(IDC_NEW_MOTHER, &CRelations::OnClickedNewMother)
@@ -192,7 +192,6 @@ ON_STN_DBLCLK(IDC_TABLE, &CRelations::OnDblclkTabla)
 ON_STN_CLICKED(IDC_STATIC_COMMENT, &CRelations::OnClickedStaticComment)
 ON_NOTIFY(NM_THEMECHANGED, IDC_STATIC_TABLE, &CRelations::OnThemechangedStaticTable)
 ON_CBN_SELCHANGE(IDC_COMBO_SEX, &CRelations::OnSelchangeComboSex)
-ON_CBN_SELCHANGE(IDC_COMBO_TITLE, &CRelations::OnSelchangeComboTitle)
 ON_EN_CHANGE(IDC_TITOLO, &CRelations::OnChangeTitolo)
 ON_EN_CHANGE(IDC_LAST_NAME, &CRelations::OnChangeLastName)
 ON_EN_CHANGE(IDC_FIRST_NAME, &CRelations::OnChangeFirstName)
@@ -206,8 +205,8 @@ ON_CBN_SELCHANGE(IDC_COMBO_DEATH, &CRelations::OnSelchangeComboDeath)
 ON_EN_CHANGE(IDC_COMMENT, &CRelations::OnChangeComment)
 
 
-
 ON_EN_CHANGE(IDC_EDIT_POSTERIOR, &CRelations::OnChangeEditPosterior)
+ON_EN_CHANGE(IDC_EDIT_TITLE, &CRelations::OnChangeEditTitle)
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CRelations::OnInitDialog()
@@ -222,9 +221,6 @@ BOOL CRelations::OnInitDialog()
 	colorNewMother.SetTextColor( theApp.m_colorClick );
 	colorComment.SetTextColor( theApp.m_colorClick );
 	colorChildren.SetTextColor( theApp.m_colorClick );
-
-	m_command = L"SELECT title FROM titles";
-	if( ! theApp.querySystem( m_command ) ) return FALSE;
 
 	// szülõk
 	
@@ -282,9 +278,6 @@ BOOL CRelations::OnInitDialog()
 	m_ListCtrlC.InsertColumn( LISTC_BIRTH,			L"született",			LVCFMT_LEFT,	 80,-1,COL_TEXT);
 	m_ListCtrlC.InsertColumn( LISTC_DEATH,			L"meghalt",				LVCFMT_LEFT,	 80,-1,COL_TEXT);
 	m_ListCtrlC.InsertColumn( LISTC_COMMENT,		L"leírás",				LVCFMT_LEFT,	100,-1,COL_TEXT );
-
-	m_command = L"SELECT title FROM titles ORDER BY title";
-	if( ! theApp.querySystem( m_command ) ) return false;
 
 	m_rowidFirst = m_rowid;
 	createScreen( m_rowid );
@@ -417,18 +410,6 @@ void CRelations::people( CString rowid )
 	}
 	comboDeath.SetCurSel(0);
 	
-	
-	int		titleX = 0;
-	comboTitle.AddString( L"" );
-	for( UINT i = 0; i < theApp.m_recordsetSystem->RecordsCount(); ++i )
-	{
-		title =  theApp.m_recordsetSystem->GetFieldString( 0 ); 
-		comboTitle.AddString( title );
-		if( title == m_title ) 
-			titleX = i+1;
-		theApp.m_recordsetSystem->MoveNext();
-	}
-	comboTitle.SetCurSel( titleX );
 
 	UpdateData( TOSCREEN );
 
@@ -1518,9 +1499,6 @@ void CRelations::savePeople()
 	CString title;
 	CString titolo;
 
-	int titleX = comboTitle.GetCurSel();
-	comboTitle.GetLBText( titleX, m_title );
-
 	UpdateData( FROMSCREEN );
 
 	int sex = comboSex.GetCurSel();
@@ -1601,10 +1579,6 @@ void CRelations::OnSelchangeComboSex()
 {
 	m_changed = true;
 }
-void CRelations::OnSelchangeComboTitle()
-{
-	m_changed = true;
-}
 void CRelations::OnChangeTitolo()
 {
 	m_changed = true;
@@ -1651,6 +1625,10 @@ void CRelations::OnChangeComment()
 	m_changed = true;
 }
 void CRelations::OnChangeEditPosterior()
+{
+	m_changed = true;
+}
+void CRelations::OnChangeEditTitle()
 {
 	m_changed = true;
 }

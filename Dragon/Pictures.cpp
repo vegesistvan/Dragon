@@ -198,6 +198,7 @@ bool CPictures::paintBlob( int nItem )
 
 	m_modified = false;
 
+	m_ext.MakeLower();
 	if( m_ext == L"jpg" || m_ext == L"png" || m_ext == L"bmp" || m_ext == L"jpeg" || m_ext == L"gif" )
 		GetDlgItem( IDC_VIEW )->SetWindowTextW( theApp.m_viewerName );
 	else if( m_ext == L"pdf" )

@@ -310,7 +310,7 @@ public:
 ///////////////////////////////////////
 
 	afx_msg void OnSelectedFiles();
-	afx_msg void OnTitles();
+//	afx_msg void OnTitles();
 	afx_msg void OnDatabaseInformation();
 //	afx_msg void OnTabletables();
 	afx_msg void OnPeoplessubstrings();
@@ -422,5 +422,6 @@ public:
 	afx_msg void OnAppExit();
 	afx_msg void OnContractedCouples();
 	afx_msg void OnContractedPeople();
-	afx_msg void OnMarriagesDetailed();
+//	afx_msg void OnMarriagesDetailed();
+	afx_msg void OnDisplayFamilies();
 };

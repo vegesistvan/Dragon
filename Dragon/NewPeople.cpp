@@ -31,12 +31,14 @@ CNewPeople::CNewPeople(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CNewPeople::IDD, pParent)
 	, m_last_name(_T(""))
 	, m_first_name(_T(""))
+	, m_title(_T(""))
 	, m_titolo(_T(""))
 	, m_comment(_T(""))
 	, m_death_date(_T(""))
 	, m_death_place(_T(""))
 	, m_birth_date(_T(""))
 	, m_birth_place(_T(""))
+	
 {
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,7 +49,6 @@ CNewPeople::~CNewPeople()
 void CNewPeople::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_COMBO_TITLE, comboTitle);
 	DDX_Control(pDX, IDC_BIRTH_COMBO, comboBirth);
 	DDX_Control(pDX, IDC_DEATH_COMBO, comboDeath);
 	DDX_Control(pDX, IDC_COMBO_SEX, comboSex);
@@ -59,6 +60,7 @@ void CNewPeople::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_DEATH_PLACE, m_death_place);
 	DDX_Text(pDX, IDC_BIRTH_DATE, m_birth_date);
 	DDX_Text(pDX, IDC_BIRTH_PLACE, m_birth_place);
+	DDX_Text(pDX, IDC_EDIT_TITLE, m_title);
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CNewPeople, CDialogEx)
@@ -78,16 +80,6 @@ BOOL CNewPeople::OnInitDialog()
 	comboSex.AddString( L"ffi" );
 	comboSex.AddString( L"nõ" );
 	comboSex.SetCurSel( 0);
-
-	m_command = L"SELECT title FROM titles ORDER BY title";
-	if( ! theApp.querySystem( m_command ) ) return false;
-	comboTitle.AddString( L"" );
-	for( UINT i = 0; i < theApp.m_recordsetSystem->RecordsCount(); ++i )
-	{
-		comboTitle.AddString( theApp.m_recordsetSystem->GetFieldString( 0 ) );
-		theApp.m_recordsetSystem->MoveNext();
-	}
-	comboTitle.SetCurSel( 0 );
 
 	for( UINT i = 0; i < modiDateCnt; ++i )
 	{
@@ -120,12 +112,7 @@ void CNewPeople::OnBnClickedOk()
 		return;
 	}
 
-	int ix = comboTitle.GetCurSel();
-	comboTitle.GetLBText( ix, m_title );
 	m_sex_id = comboSex.GetCurSel();
-
-//	comboBirth.GetLBText( comboBirth.GetCurSel(), str );
-//	comboDeath.GetLBText( comboBirth.GetCurSel(), str );
 
 	m_rowid.IsEmpty();
 	if( peopleExists() )

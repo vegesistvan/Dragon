@@ -59,6 +59,8 @@ CEditPeople::CEditPeople(CWnd* pParent /*=NULL*/)
 	, m_father(_T(""))
 	, m_csalad_ose(_T(""))
 	, m_tableAncestry(FALSE)
+	, m_title(_T(""))
+	, m_posterior(_T(""))
 {
 
 }
@@ -74,7 +76,6 @@ void CEditPeople::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_STATIC_FATHER, colorFather);
 	DDX_Control(pDX, IDC_STATIC_MOTHER, colorMother);
 	DDX_Control(pDX, IDC_COMBO_SEX, m_ComboSex);
-	DDX_Control(pDX, IDC_COMBO_TITLE, m_ComboTitle);
 	DDX_Control(pDX, IDC_COMBO_HIERARCHY, m_ComboRole);
 	DDX_Text(pDX, IDC_TITOLO, m_titolo);
 	DDX_Text(pDX, IDC_LAST_NAME, m_last_name);
@@ -100,6 +101,8 @@ void CEditPeople::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_TABLE_ANCESTRY, m_tableAncestry);
 	DDX_Control(pDX, IDC_BLOBS, m_ListCtrlB);
 	DDX_Control(pDX, IDC_PHOTOS, colorPhotos);
+	DDX_Text(pDX, IDC_EDIT_TITLE, m_title);
+	DDX_Text(pDX, IDC_EDIT_POSTERIOR, m_posterior);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CEditPeople, CDialogEx)
@@ -175,7 +178,6 @@ BOOL CEditPeople::OnInitDialog()
 	}
 
 
-	GetDlgItem( IDC_TABLE )->SetWindowText( m_table );
 	displayPicture();
 
 	return TRUE;
@@ -211,6 +213,7 @@ void CEditPeople::initialScreen()
 	m_titolo		= theApp.m_recordset->GetFieldString( PEOPLE_TITOLO);
 	m_last_name		= theApp.m_recordset->GetFieldString( PEOPLE_LAST_NAME );
 	m_first_name	= theApp.m_recordset->GetFieldString( PEOPLE_FIRST_NAME );
+	m_posterior		= theApp.m_recordset->GetFieldString( PEOPLE_POSTERIOR );
 	m_birth_place	= theApp.m_recordset->GetFieldString( PEOPLE_BIRTH_PLACE );
 	m_birth_date	= theApp.m_recordset->GetFieldString( PEOPLE_BIRTH_DATE );
 	m_death_place	= theApp.m_recordset->GetFieldString( PEOPLE_DEATH_PLACE );
@@ -232,34 +235,14 @@ void CEditPeople::initialScreen()
 	if( !m_rowid.IsEmpty() )
 		m_table			= getTableName( m_tableNumber );
 
-	
 
-	m_command = L"SELECT title FROM titles ORDER BY title";
-	if( ! theApp.querySystem( m_command ) ) return;
 
-	CString title;
-	m_ComboTitle.AddString( L"" );
-	for( UINT i = 0; i < theApp.m_recordsetSystem->RecordsCount(); ++i )
-	{
-		title =  theApp.m_recordsetSystem->GetFieldString( 0 ); 
-		m_ComboTitle.AddString( title );
-		if( title == m_title ) 
-			m_titleX = i+1;
-		theApp.m_recordsetSystem->MoveNext();
-	}
-
-//	m_titleX = getTitleX( m_title );
-
-	m_ComboTitle.SetCurSel( m_titleX );
 	m_ComboSex.SetCurSel( m_sex_id );
 	m_ComboRole.SetCurSel( m_role - 1);
 
 	m_father = getParent( m_father_id );
 	m_mother = getParent( m_mother_id );
 
-	
-//	if( m_sex_id != 1 )
-//		GetDlgItem( IDC_STATIC_MARRIAGES )->EnableWindow( FALSE );
 
 	UpdateData( TOSCREEN );
 	
@@ -315,6 +298,7 @@ void CEditPeople::fillBlobTable()
 
 	}
 	m_ListCtrlB.SetSortOrder( 1, 2 );
+
 	if( m_ListCtrlB.GetItemCount() )
 		GetDlgItem( IDC_PHOTOS )->EnableWindow( true );
 	else
@@ -389,17 +373,6 @@ CString CEditPeople::getTableName( CString tableNumber )
 	if( !theApp.query( m_command ) ) return L"";
 	m_table = theApp.m_recordset->GetFieldString( TABLES_TABLEHEADER );
 	return( m_table );
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int CEditPeople::getTitleX( CString title )
-{
-	m_command.Format( L"SELECT title FROM titles" );
-	if( !theApp.querySystem( m_command ) ) return 0;
-	for(UINT i = 0; i < theApp.m_recordsetSystem->RecordsCount(); ++i, theApp.m_recordsetSystem->MoveNext() )
-	{
-		if( theApp.m_recordsetSystem->GetFieldString( 0 ) == title ) return i+1;
-	}
-	return 0;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CEditPeople::OnClickedStaticTable()
@@ -846,132 +819,7 @@ void CEditPeople::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
 	updateM( nItem );
 	*pResult = 0;
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CEditPeople::OnBnClickedOk()
-{
-	theApp.WriteProfileInt( L"Settings", L"tableNumber", _wtoi(m_tableNumber) );
-	theApp.WriteProfileStringW( L"Settings", L"father_id", m_father_id );
-	theApp.WriteProfileStringW( L"Settings", L"mother_id", m_mother_id );
 
-	CString nameChanged;
-	CString csalad;
-
-	GetDlgItem( IDC_TITOLO )->GetWindowText( m_titolo );
-	GetDlgItem( IDC_LAST_NAME )->GetWindowText( m_last_name );
-	GetDlgItem( IDC_BIRTH_PLACE )->GetWindowText( m_birth_place );
-	GetDlgItem( IDC_DEATH_PLACE )->GetWindowText( m_death_place );
-	GetDlgItem( IDC_COMMENT )->GetWindowText( m_comment );
-	GetDlgItem( IDC_NAMECHANGED )->GetWindowText( nameChanged );
-	GetDlgItem( IDC_CSALAD )->GetWindowText( csalad );
-
-	m_sex_id = m_ComboSex.GetCurSel();
-
-	if( m_last_name.IsEmpty() )
-	{
-		AfxMessageBox( L"Családnevet meg kell adni!" );
-		return;
-	}
-	if( m_first_name.IsEmpty() )
-	{
-		AfxMessageBox( L"Keresztnevet meg kell adni!" );
-		return;
-	}
-
-	CString fields;
-	CString values;
-	if( m_rowid.IsEmpty() )
-	{
-
-		fields.Format( L"\
-tableNumber,\
-generation,\
-sex_id,\
-title,\
-titolo,\
-first_name,\
-last_name,\
-birth_place,\
-birth_date,\
-death_place,\
-death_date,\
-comment,\
-father_id,\
-mother_id,\
-known_as,\
-csalad,\
-tableAncestry" );
-		values.Format( L"'%s','%s', '%d','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%d'",
-		m_tableNumber,
-		m_generation,\
-		m_sex_id,\
-		m_title,\
-		m_titolo,\
-		m_first_name,\
-		m_last_name,\
-		m_birth_place,\
-		m_birth_date,\
-		m_death_place,\
-		m_death_date,\
-		m_comment,\
-		m_father_id,\
-		m_mother_id,\
-		nameChanged,\
-		csalad,\
-		m_tableAncestry\
-		);
-		m_command.Format( L"INSERT INTO people (%s) VALUES (%s)", fields, values );
-//		m_command.Format( L"INSERT INTO people (last_name, first_name) VALUES ('%s','%s')", m_last_name, m_first_name );
-		if( !theApp.execute( m_command ) ) return;
-
-		++theApp.m_cntPeople;
-		m_command = L"SELECT last_insert_rowid() FROM people";
-		if( ! theApp.query( m_command ) ) return;
-		m_rowid = theApp.m_recordset->GetFieldString(0);
-	}
-	else
-	{
-		m_command.Format( L"UPDATE people SET \
-		tableNumber='%s',\
-		sex_id='%d',\
-		title='%s',\
-		titolo='%s',\
-		first_name='%s',\
-		last_name='%s',\
-		birth_place='%s',\
-		birth_date='%s',\
-		death_place='%s',\
-		death_date='%s',\
-		comment='%s',\
-		father_id='%s',\
-		mother_id='%s',\
-		known_as='%s',\
-		csalad='%s',\
-		tableAncestry='%d' \
-		WHERE rowid='%s'\
-		",\
-		m_tableNumber,
-		m_sex_id,\
-		m_title,\
-		m_titolo,\
-		m_first_name,\
-		m_last_name,\
-		m_birth_place,\
-		m_birth_date,\
-		m_death_place,\
-		m_death_date,\
-		m_comment,\
-		m_father_id,\
-		m_mother_id,\
-		nameChanged,\
-		csalad,\
-		m_tableAncestry,\
-		m_rowid\
-		);
-		if( !theApp.execute( m_command ) ) return;
-	}
-	m_m = m_rowid;   // m_rowid rossz lesz a TableIndividual.ban!! m_m jó!!! Érthetetlen!
-	CDialogEx::OnOK();
-}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CEditPeople::getPeopleString( CString rowid )
 {
@@ -1138,4 +986,124 @@ LRESULT CEditPeople::OnColumnSorted(WPARAM wParam, LPARAM lParam) //wparam: colu
 {
 	m_orderix = wParam;
 	return TRUE;
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CEditPeople::OnBnClickedOk()
+{
+	UpdateData( FROMSCREEN );
+
+	theApp.WriteProfileInt( L"Settings", L"tableNumber", _wtoi(m_tableNumber) );
+	theApp.WriteProfileStringW( L"Settings", L"father_id", m_father_id );
+	theApp.WriteProfileStringW( L"Settings", L"mother_id", m_mother_id );
+
+	m_sex_id = m_ComboSex.GetCurSel();
+
+	if( m_last_name.IsEmpty() )
+	{
+		AfxMessageBox( L"Családnevet meg kell adni!" );
+		return;
+	}
+	if( m_first_name.IsEmpty() )
+	{
+		AfxMessageBox( L"Keresztnevet meg kell adni!" );
+		return;
+	}
+
+	CString fields;
+	CString values;
+	if( m_rowid.IsEmpty() )
+	{
+
+		fields.Format( L"\
+tableNumber,\
+generation,\
+sex_id,\
+title,\
+titolo,\
+first_name,\
+last_name,\
+posterior,\
+birth_place,\
+birth_date,\
+death_place,\
+death_date,\
+comment,\
+father_id,\
+mother_id,\
+known_as,\
+csalad,\
+tableAncestry" );
+		values.Format( L"'%s','%s', '%d','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%d'",
+		m_tableNumber,
+		m_generation,\
+		m_sex_id,\
+		m_title,\
+		m_titolo,\
+		m_first_name,\
+		m_last_name,\
+		m_posterior,\
+		m_birth_place,\
+		m_birth_date,\
+		m_death_place,\
+		m_death_date,\
+		m_comment,\
+		m_father_id,\
+		m_mother_id,\
+		m_nameChanged,\
+		m_csalad,\
+		m_tableAncestry\
+		);
+		m_command.Format( L"INSERT INTO people (%s) VALUES (%s)", fields, values );
+		if( !theApp.execute( m_command ) ) return;
+
+		++theApp.m_cntPeople;
+		m_command = L"SELECT last_insert_rowid() FROM people";
+		if( ! theApp.query( m_command ) ) return;
+		m_rowid = theApp.m_recordset->GetFieldString(0);
+	}
+	else
+	{
+		m_command.Format( L"UPDATE people SET \
+		tableNumber='%s',\
+		sex_id='%d',\
+		title='%s',\
+		titolo='%s',\
+		first_name='%s',\
+		last_name='%s',\
+		posterior='%s',\
+		birth_place='%s',\
+		birth_date='%s',\
+		death_place='%s',\
+		death_date='%s',\
+		comment='%s',\
+		father_id='%s',\
+		mother_id='%s',\
+		known_as='%s',\
+		csalad='%s',\
+		tableAncestry='%d' \
+		WHERE rowid='%s'\
+		",\
+		m_tableNumber,
+		m_sex_id,\
+		m_title,\
+		m_titolo,\
+		m_first_name,\
+		m_last_name,\
+		m_posterior,\
+		m_birth_place,\
+		m_birth_date,\
+		m_death_place,\
+		m_death_date,\
+		m_comment,\
+		m_father_id,\
+		m_mother_id,\
+		m_nameChanged,\
+		m_csalad,\
+		m_tableAncestry,\
+		m_rowid\
+		);
+		if( !theApp.execute( m_command ) ) return;
+	}
+	m_m = m_rowid;   // m_rowid rossz lesz a TableIndividual.ban!! m_m jó!!! Érthetetlen!
+	CDialogEx::OnOK();
 }

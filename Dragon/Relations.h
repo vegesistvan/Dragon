@@ -26,29 +26,33 @@ public:
 	
 	CWnd* m_pParent;
 
-	CSqliteDBRecordSet*	 m_recordset;
-	CSqliteDBRecordSet*	 m_recordset2;
+	CString m_rowid;
+	int nItem;
+
+
 // Dialog Data
 	enum { IDD = IDD_RELATIONS };
-	CString m_command;
-	CString m_rowid;
-
-
-	int nItem;
-//	CListCtrlEx* m_LCtrl;
 	
 	
-	int		m_order1;
-	CString m_order;
-	int		m_title_id;
 
+//	CString m_order;
+	
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+
+
+	CString m_command;
+	
+
+
 
 	bool	m_changed;
 	bool	m_paint;
 	CString	m_fileSpec;
 	CRect	rectW;
+
+	CSqliteDBRecordSet*	 m_recordset;
+	CSqliteDBRecordSet*	 m_recordset2;
 
 	CColorStatic colorSiblings;
 	CColorStatic colorMarriages;
@@ -56,6 +60,7 @@ protected:
 	CColorStatic colorNewMother;
 
 	int		listCtrlFlag;
+	int		m_order1;
 
 	CString p_rowid;
 	CString m_name;
@@ -70,9 +75,9 @@ protected:
 	int		m_sex_id;
 	int		m_menuValid;
 
-	int		m_type_id;
-	CString	m_start;
-	CString	m_end;
+//	int		m_type_id;
+//	CString	m_start;
+//	CString	m_end;
 	
 
 	void	createScreen( CString rowid );
@@ -89,8 +94,6 @@ protected:
 	void	gyerekek( CString rowid, int sex_id );
 
 	bool	newSpouse( int db );
-//	bool	newFather();
-//	bool	newMother();
 	void	insertMarriage();
 	void	savePeople();
 
@@ -108,8 +111,11 @@ protected:
 public:
 	virtual BOOL OnInitDialog();
 
-
 protected:
+
+	CComboBox comboSex;
+	CComboBox comboBirth;
+	CComboBox comboDeath;
 
 	CString m_rowidFirst;
 
@@ -118,14 +124,20 @@ protected:
 	CString m_titolo;
 	CString m_last_name;
 	CString m_first_name;
-//	CString m_posterior;
 	CString m_birth_date;
 	CString m_birth_place;
 	CString m_death_date;
 	CString m_death_place;
 	CString m_comment;
-//	CString m_occupation;
+	CString m_posterior;
+	CString m_occupation;
 
+	CColorStatic colorChildren;
+	CColorStatic colorName;
+	CColorStatic colorTable;
+	CColorStatic colorComment;
+
+	
 public:
 	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnEditDelete();
@@ -136,42 +148,25 @@ public:
 	afx_msg void OnDblclkListM(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnDblclkListC(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnDblclkListS(NMHDR *pNMHDR, LRESULT *pResult);
-//	afx_msg void OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult);
 	
-//	afx_msg void OnRdblclkList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnRdblclkListP(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnRdblclkListM(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnRdblclkListC(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnRdblclkListS(NMHDR *pNMHDR, LRESULT *pResult);
 
 	afx_msg void OnReset();
-//	afx_msg void OnPhoto();
-	
 	afx_msg void OnClickedMarriages();
 	afx_msg void OnClickedNewFather();
 	afx_msg void OnClickedNewMother();
 	afx_msg void OnClickedSiblings();
-//	afx_msg void OnClickedChildren();
 	afx_msg void OnPaint();
 	afx_msg void OnHelp();
-
 	afx_msg void OnPictures();
-//	afx_msg void OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult);
-	CComboBox comboSex;
-	CComboBox comboTitle;
 	afx_msg void OnBnClickedOk();
-
-	
-	CComboBox comboBirth;
-	CComboBox comboDeath;
 	afx_msg void OnDblclkTabla();
-	CColorStatic colorTable;
 	afx_msg void OnClickedStaticComment();
-	CString m_occupation;
-	CColorStatic colorComment;
 	afx_msg void OnThemechangedStaticTable(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnSelchangeComboSex();
-	afx_msg void OnSelchangeComboTitle();
 	afx_msg void OnChangeTitolo();
 	afx_msg void OnChangeLastName();
 	afx_msg void OnChangeFirstName();
@@ -184,8 +179,7 @@ public:
 	afx_msg void OnSelchangeComboDeath();
 	afx_msg void OnChangeComment();
 	afx_msg void OnClickedChildren();
-	CColorStatic colorChildren;
-	CColorStatic colorName;
-	CString m_posterior;
 	afx_msg void OnChangeEditPosterior();
+	afx_msg void OnChangeEditTitle();
+
 };
