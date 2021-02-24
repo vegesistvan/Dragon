@@ -10,8 +10,8 @@ typedef struct
 	CString name;
 	CString birth;
 	CString death;
-	bool	birthJo;
-	bool	deathJo ;
+	CString birthC;			// empty, ha nem szabályos a dátum, vagy a szabályos dátum
+	CString	deathC;			// empty, ha nem szabályos a dátum, vagy a szabályos dátum
 	CString age;
 	CString diffH;
 	CString diffW;
@@ -28,13 +28,13 @@ typedef struct
 	CString name;
 	CString birth;
 	CString death;
-	bool	birthJo;
-	bool	deathJo;
+	CString birthC;
+	CString deathC;
 	CString	age;
 	CString diffH;
 	CString diffW;
-	CString marriage;
-	bool	marriageJo;
+	CString wedding;
+	CString weddingC;
 	int		motherOrder;
 	CString message;
 }WIFES;
@@ -47,8 +47,8 @@ typedef struct
 	CString name;
 	CString birth;
 	CString death;
-	bool	birthJo;
-	bool	deathJo;
+	CString birthC;
+	CString deathC;
 	CString	age;
 	CString diffH;
 	CString diffW;
@@ -121,10 +121,11 @@ protected:
 	bool collectFamily();
 	void printFamily();
 	void checkFamily();
-	void checkFamily1();
 	void push( CString item );
 	void emptyLine();
 	void keress( int start );
+
+	CString checkDate( CString datum);
 
 	void OnHtmlEditLines();
 	void OnHtmlNotepad();

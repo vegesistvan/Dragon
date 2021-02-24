@@ -403,8 +403,8 @@ bool CCheckFamilyDates::collectFamily()
 		h.birth			= m_recordset->GetFieldString( X_BIRTH );
 		h.death			= m_recordset->GetFieldString( X_DEATH );
 
-		h.birthJo = checkDate( h.birth );
-		h.deathJo = checkDate( h.death );
+		h.birthC = checkDate( h.birth );
+		h.deathC = checkDate( h.death );
 		h.message.Empty();
 		h.age.Empty();
 	
@@ -415,8 +415,8 @@ bool CCheckFamilyDates::collectFamily()
 			w.rowidH	= h.rowid;
 			w.rowid		= m_recordset1->GetFieldString( MARRIAGES_SPOUSE2_ID );
 
-			w.marriage	= m_recordset1->GetFieldString( MARRIAGES_DATE );
-			w.marriageJo = checkDate( w.marriage );
+			w.wedding	= m_recordset1->GetFieldString( MARRIAGES_DATE );
+			w.weddingC = checkDate( w.wedding );
 			// feleség lekérdezése
 			m_command.Format( L"SELECT rowid, linenumber, first_name, last_name, birth_date, death_date FROM people WHERE rowid='%s'", w.rowid );
 			if( !query3( m_command ) ) break;
@@ -426,8 +426,8 @@ bool CCheckFamilyDates::collectFamily()
 			w.birth			= m_recordset3->GetFieldString( Y_BIRTH );
 			w.death			= m_recordset3->GetFieldString( Y_DEATH );
 	
-			w.birthJo = checkDate( w.birth );
-			w.deathJo = checkDate( w.death );
+			w.birthC = checkDate( w.birth );
+			w.deathC = checkDate( w.death );
 			w.age.Empty();
 
 			w.motherOrder	= j+1;
@@ -451,8 +451,8 @@ bool CCheckFamilyDates::collectFamily()
 			c.birth			= m_recordset2->GetFieldString( Z_BIRTH );
 			c.death			= m_recordset2->GetFieldString( Z_DEATH );
 
-			c.birthJo = checkDate( c.birth );
-			c.deathJo = checkDate( c.death );
+			c.birthC = checkDate( c.birth );
+			c.deathC = checkDate( c.death );
 
 			c.father_id		= h.rowid;
 			c.mother_id		= m_recordset2->GetFieldString( Z_MOTHER_ID );
@@ -478,25 +478,24 @@ void CCheckFamilyDates::checkFamily()
 	CHILDREN	c;
 	UINT i;
 	int	mx;
-	int age;
+	int diff;
 	int z;
 	int ret;
-//	_int64 diff;
 	bool hiba = false;
 
 
 	// születés-halál, életkor
-	if( ( ret = diffD( h.death, h.birth, &age ) ) != INT_MAX )
+	if( ( ret = diffD( h.deathC, h.birthC, &diff ) ) != INT_MAX )
 	{
-		h.age.Format( L"%d", age );
+		h.age.Format( L"%d", diff );
 		if( ret < 0 )
 		{
 			h.message = L"születés > halál";
 			hiba = true;
 		}
-		if( age > m_maxLifespan )
+		if( diff > m_maxLifespan )
 		{
-			str.Format( L", %d évesen halt meg", age );
+			str.Format( L", %d évesen halt meg", diff );
 			h.message += str;
 			hiba = true;
 		}
@@ -507,87 +506,82 @@ void CCheckFamilyDates::checkFamily()
 	{
 		w = vWifes.at(i);
 
-		if( ( ret = diffD( w.death, w.birth, &age ) ) != INT_MAX )
+
+		if( ( ret = diffD( w.deathC, w.birthC, &diff ) ) != INT_MAX )
 		{
-			vWifes.at(i).age.Format( L"%d", age );
+			vWifes.at(i).age.Format( L"%d", diff );
 			if( ret < 0 )
 			{
 				vWifes.at(i).message += L", születés > halál";
 				hiba = true;
 			}
-			if( age > m_maxLifespan )
+			if( diff > m_maxLifespan )
 			{
-				str.Format( L", %d évesen halt meg", age );
+				str.Format( L", %d évesen halt meg", diff );
 				vWifes.at(i).message += str;
 				hiba = true;
 			}
 		}
 
-		if( ( ret = diffD( w.marriage, w.birth, &age ) ) != INT_MAX )
+		if( ( ret = diffD( w.weddingC, w.birthC, &diff ) ) != INT_MAX )
 		{
-			vWifes.at(i).diffW.Format( L"%d", age );
+			vWifes.at(i).diffW.Format( L"%d", diff );
 			if( ret < 0 )
 			{
-				str.Format( L", házasságkötés után született!" ); 
-				vWifes.at(i).message += str;
+				vWifes.at(i).message += L", házasságkötés után született!";
 				hiba = true;
 			}
-			else if( m_minAgeWAtWedd > age || age > m_maxAgeWAtWedd )
+			else if( m_minAgeWAtWedd > diff || diff > m_maxAgeWAtWedd )
 			{
-				str.Format( L", házasságkötéskor %d éves volt", age ); 
+				str.Format( L", házasságkötéskor %d éves volt", diff ); 
 				vWifes.at(i).message += str;
 				hiba = true;
 			}
 		}
-		if( ( ret = diffD( w.marriage, w.death, &age ) ) != INT_MAX )
-		{
-			if( ret > 0 )
-			{
-				str.Format( L", házasságkötés elõtt meghalt!" ); 
-				vWifes.at(i).message += str;
-				hiba = true;
-			}
-		}
-		if( ( ret = diffD( w.marriage, h.birth, &age ) ) != INT_MAX )
-		{
-			vWifes.at(i).diffH.Format( L"%d", age );
-			if( ret < 0 )
-			{
-				str.Format( L", férj házasságkötés után született!!" ); 
-				vWifes.at(i).message += str;
-				hiba = true;
-			}
-			else if( m_minAgeHAtWedd > age || age > m_maxAgeHAtWedd )
-			{
-				str.Format( L", férj házasságkötéskor %d éves volt", age ); 
-				vWifes.at(i).message += str;
-				hiba = true;
-			}
-		}
-		if( ( ret = diffD( w.marriage, h.death, &age ) ) != INT_MAX )
-		{
-			if( ret > 0 )
-			{
-				str.Format( L", férj házasságkötés elõtt meghalt!" ); 
-				vWifes.at(i).message += str;
-				hiba = true;
-			}
-		}
-		if( ( ret = diffD( w.death, h.birth, &age ) ) != INT_MAX )
+		if( ( ret = diffD( w.deathC, w.weddingC, &diff ) ) != INT_MAX )
 		{
 			if( ret < 0 )
 			{
-				str.Format( L", férj a feleség halála után született!" ); 
+				vWifes.at(i).message += L", házasságkötés elõtt meghalt!"; 
+				hiba = true;
+			}
+		}
+		if( ( ret = diffD( w.weddingC, h.birthC, &diff ) ) != INT_MAX )
+		{
+			vWifes.at(i).diffH.Format( L"%d", diff );
+			if( ret < 0 )
+			{
+				vWifes.at(i).message += L", férj házasságkötés után született!!";
+				hiba = true;
+			}
+			else if( m_minAgeHAtWedd > diff || diff > m_maxAgeHAtWedd )
+			{
+				str.Format( L", férj házasságkötéskor %d éves volt", diff ); 
 				vWifes.at(i).message += str;
 				hiba = true;
 			}
 		}
-		if( ( ret = diffD( h.death, w.birth, &age ) ) != INT_MAX )
+		if( ( ret = diffD( h.deathC, w.weddingC, &diff ) ) != INT_MAX )
 		{
 			if( ret < 0 )
 			{
-				str.Format( L", feleség  a férj halála után született!" ); 
-				vWifes.at(i).message += str;
+				vWifes.at(i).message += L", férj házasságkötés elõtt meghalt!";
+				hiba = true;
+			}
+		}
+		if( ( ret = diffD( w.deathC, h.birthC, &diff ) ) != INT_MAX )
+		{
+			if( ret < 0 )
+			{
+				vWifes.at(i).message += L", férj a feleség halála után született!"; 
+				hiba = true;
+			}
+		}
+		if( ( ret = diffD( h.deathC, w.birthC, &diff ) ) != INT_MAX )
+		{
+			if( ret < 0 )
+			{
+				vWifes.at(i).message += L", feleség  a férj halála után született!"; 
 				hiba = true;
 			}
 		}
@@ -598,102 +592,103 @@ void CCheckFamilyDates::checkFamily()
 			c = vChildren.at(j);
 			if( c.mother_index != i+1 ) continue;
 
-			if( ( ret = diffD( c.death, c.birth, &age ) ) != INT_MAX )
+
+			if( ( ret = diffD( c.deathC, c.birthC, &diff ) ) != INT_MAX )
 			{
-				vChildren.at(j).age.Format( L"%d", age );
+				vChildren.at(j).age.Format( L"%d", diff );
 				if( ret < 0 )
 				{
 					vChildren.at(j).message = L", születés > halál";
 					hiba = true;
 				}
-				else if( age > m_maxLifespan )
+				else if( diff > m_maxLifespan )
 				{
-					str.Format( L", %d évesen halt meg", age );
-					vChildren.at(j).message += str;
-					hiba = true;
-				}
-			}
-		/*
-		mx = c.mother_index -1;
-		// kritikus hibák, utána return;!!!
-		if( !vWifes.size() ) break;
-
-		if(  mx + 1 > vWifes.size() )
-		{
-			vChildren.at(j).message.Format( L", Anya index nagyobb, mint amire a gyerek hivatkozik: %d, %d", vWifes.size(), c.mother_index );
-			hiba = true;
-			break;
-		}
-		if( mx < 0 )
-		{
-			vChildren.at(j).message.Format( L", Anya index %d", mx+1 );
-			hiba = true;
-			break;
-		}
-		// a mother indexxel kijelölt anyának dátumaival egyeztet
-		w = vWifes.at(mx);
-		*/
-
-
-			if( ( ret = diffD( w.marriage, c.birth, &age ) ) != INT_MAX )
-			{
-				if( ret > 0 )
-				{
-					str.Format( L", házasságkötés elõtt született" ); 
+					str.Format( L", %d évesen halt meg", diff );
 					vChildren.at(j).message += str;
 					hiba = true;
 				}
 			}
 
-			if( ( ret = diffD( w.death, c.birth, &age ) ) != INT_MAX )
+			if( ( ret = diffD( c.birthC, w.weddingC, &diff ) ) != INT_MAX )
 			{
 				if( ret < 0 )
 				{
-					str.Format( L", anyja halála után született" ); 
+					vChildren.at(j).message += L", házasságkötés elõtt született";
+					hiba = true;
+				}
+			}
+
+			if( ( ret = diffD( w.deathC, c.birthC, &diff ) ) != INT_MAX )
+			{
+				if( ret < 0 )
+				{
+					vChildren.at(j).message += L", anyja halála után született";
+					hiba = true;
+				}
+			}
+			if( ( ret = diffD( c.birthC, w.birthC, &diff ) ) != INT_MAX )
+			{
+				vChildren.at(j).diffW.Format( L"%d", diff );					// anya életkora a gyerek születésekor
+				if( ret < 0 )
+				{
+					vChildren.at(j).message += L", anyja születése elõtt született";
+					hiba = true;
+				}
+				else if( diff < m_minDiffMC || m_maxDiffMC < diff  )
+				{
+					str.Format( L", anyja %d éves korában született", diff ); 
 					vChildren.at(j).message += str;
 					hiba = true;
 				}
 			}
-			if( ( ret = diffD( c.birth, w.birth, &age ) ) != INT_MAX )
+			if( ( ret = diffD( c.birthC, h.birthC, &diff ) ) != INT_MAX )
 			{
-				vChildren.at(j).diffW.Format( L"%d", age );					// anya életkora a gyerek születésekor
+				vChildren.at(j).diffH.Format( L"%d", diff );					// apa életkora a gyerek születésekor
 				if( ret < 0 )
 				{
-					str.Format( L", anyja születése elõtt született", age ); 
-					vChildren.at(j).message += str;
+					vChildren.at(j).message += L", apja születése elõtt született";
 					hiba = true;
 				}
-				else if( age < m_minDiffMC || m_maxDiffMC < age  )
+				else if( diff < m_minDiffFC || m_maxDiffFC < diff )
 				{
-					str.Format( L", anyja %d éves korában született", age ); 
-					vChildren.at(j).message += str;
-					hiba = true;
-				}
-			}
-			if( ( ret = diffD( c.birth, h.birth, &age ) ) != INT_MAX )
-			{
-				vChildren.at(j).diffH.Format( L"%d", age );					// apa életkora a gyerek születésekor
-				if( ret < 0 )
-				{
-					str.Format( L", apja születése elõtt született", age ); 
-					vChildren.at(j).message += str;
-					hiba = true;
-				}
-				else if( age < m_minDiffFC || m_maxDiffFC < age )
-				{
-					str.Format( L", apja %d éves korában született", age ); 
+					str.Format( L", apja %d éves korában született", diff ); 
 					vChildren.at(j).message += str;
 					hiba = true;
 				}
 			}
 			// gyerek születési dátum és apa halálozási + 9 hónap
 
-			if( theApp.dateDiff( h.death, c.birth, 9 ) )
+			if( theApp.dateDiff( h.deathC, c.birthC, 9 ) )
 			{
-				str = L", apja halála után több mint 9 hónapra született"; 
-				vChildren.at(j).message += str;
+				vChildren.at(j).message += L", apja halála után több mint 9 hónapra született"; 
 				hiba = true;
 			}
+
+			if( ( ret = diffD( c.deathC, w.birthC, &diff ) ) != INT_MAX )
+			{
+				if( ret < 0 )
+				{
+					vChildren.at(j).message += L", anyja születése elõtt meghalt";
+					hiba = true;
+				}
+			}
+			if( ( ret = diffD( c.deathC, h.birthC, &diff ) ) != INT_MAX )
+			{
+				if( ret < 0 )
+				{
+					vChildren.at(j).message += L", apja születése elõtt meghalt";
+					hiba = true;
+				}
+			}
+			if( ( ret = diffD( c.deathC, w.weddingC, &diff ) ) != INT_MAX )
+			{
+				if( ret < 0 )
+				{
+					vChildren.at(j).message += L", házasságkötés elõtt meghalt";
+					hiba = true;
+				}
+			}
+
 		}
 	}
 
@@ -735,7 +730,7 @@ void CCheckFamilyDates::printFamily()
 		push( L"" );						// cnt
 		push( L"2" );						// type
 		push( w.linenumber );
-		push( w.marriage );
+		push( w.wedding );
 		str.Format( L"%d", w.motherOrder );  // index, ami szerint színez
 		str.Format( L"%d", j+1 );
 		push( str );
@@ -1026,4 +1021,63 @@ void CCheckFamilyDates::OnEditDatabase()
 	ShowWindow( SW_HIDE );
 	dlg.DoModal();	
 	ShowWindow( SW_RESTORE );
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Elfogadott formátum:
+// az évnek 1000 és az aktuális év közé kell esni
+
+// 1944
+// 1944.12.
+// 1944.12.17
+
+// hibás dátum esetén üres stringet ad vissza, jó dátrum esetén a dátumot
+CString CCheckFamilyDates::checkDate( CString datum)
+{
+	CString ures(L"");
+
+	datum.Trim();
+	int length = datum.GetLength();
+	if( length < 4 ) return ures;
+
+	int	year = _wtoi( datum.Left( 4 ) );
+	if( year < 1000 ) return ures;
+
+// év ellenõrzése
+	char	sTime[50];
+	time_t	now = time(0);
+	ctime_s( sTime, sizeof( sTime ), &now);
+	CString st;
+	st = sTime;
+	int	yearCurr = _wtoi( st.Right( 6 ) );		// "\n" miatt 6 karaktert vesz le, ami konverzinál ugyis lemarad
+	if( year > yearCurr ) return ures;
+
+	// év utáni '.' ellenõrzése
+	if( length == 4 ) return datum;	// csak 2001 a dátum
+
+// hónap ellenõrzése a 2019.11 
+	if( length <= 7 ) return ures;
+	if( datum.GetAt(4) != '.' ) return ures;
+	if( !iswdigit( datum.GetAt( 5 ) ) ) 
+		return ures;
+	if( !iswdigit( datum.GetAt( 6 ) ) ) 
+		return ures;
+	int	month = _wtoi( datum.Mid( 5, 2 ) );
+	if( month < 1 || month > 12 ) return ures;
+	if( length == 8  ) return datum;	// csak 2019.11.  a dátum
+
+// nap ellenõrzése 2019.11.12
+	if( datum.GetAt( 7 ) != '.' ) return ures;
+	if( length < 10 ) return ures;
+
+	if( !iswdigit( datum.GetAt( 8 ) ) ) 
+		return ures;
+	if( !iswdigit( datum.GetAt( 9 ) ) ) 
+		return ures;
+	int	day = _wtoi( datum.Mid( 8, 2 ) );
+	if( day < 1 ) return ures;
+	if( month == 2 && day > 29 ) return false;
+	if(( month == 4 || month == 6 || month == 9 || month == 11 ) && day > 30 ) return ures;
+	if( day > 31 ) return ures; 
+	if( length > 10 ) return ures;  // dátum után még van valami
+	return datum;
 }

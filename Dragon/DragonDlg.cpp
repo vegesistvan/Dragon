@@ -13,9 +13,7 @@
 #include "SelectOne.h"
 #include "SelectedFiles.h"
 #include "SelectHtmlFile.h"
-//#include "SelectCodesystem.h"
 #include "ProgressWnd.h"
-#include "Table_titles.h"
 #include "Table_html.h"
 #include "Info_db.h"
 #include "Table_marriages.h"
@@ -61,7 +59,6 @@
 #include "ContractInfo.h"
 #include "ContractedPeople.h"
 #include "version.h"
-#include "TableCouples.h"
 #include "CheckFamilyDates.h"
 
 #ifdef _DEBUG
@@ -120,7 +117,6 @@ ON_COMMAND(ID_SS_FILE, &CDragonDlg::OnSsFile)
 ON_COMMAND(ID_SS_TABLE, &CDragonDlg::OnSsTable)
 ON_COMMAND(ID_SS_LINE, &CDragonDlg::OnSsLine)
 ON_COMMAND(ID_SELECTED_FILES, &CDragonDlg::OnSelectedFiles)
-//ON_COMMAND(ID_TITLES, &CDragonDlg::OnTitles)
 
 ON_WM_HSCROLL()
 ON_COMMAND(ID_OPEN_DB, &CDragonDlg::OnOpenDb)
@@ -140,8 +136,6 @@ ON_WM_PAINT()
 ON_COMMAND(ID_BRACKETS_SQUARE, &CDragonDlg::OnBracketsSquare)
 ON_COMMAND(ID_BRACKETS_ROUND, &CDragonDlg::OnBracketsRound)
 ON_COMMAND(ID_BRACES, &CDragonDlg::OnBraces)
-//ON_COMMAND(ID_FROMTABLE, &CDragonDlg::OnFromtable)
-//ON_COMMAND(ID_FROMFAMILY, &CDragonDlg::OnFromfamily)
 ON_COMMAND(ID_CONNECT_CSALAD, &CDragonDlg::OnConnectCsalad)
 ON_COMMAND(ID_CSALAD, &CDragonDlg::OnCsalad)
 ON_COMMAND(ID_CSALAD_TORZS, &CDragonDlg::OnCsaladTorzs)
@@ -186,7 +180,6 @@ ON_COMMAND(ID_SAMENAMEANDSPOUSE, &CDragonDlg::OnSamenameandspouse)
 ON_COMMAND(ID_APP_EXIT, &CDragonDlg::OnAppExit)
 ON_COMMAND(ID_CONTRACTEDCOUPLES, &CDragonDlg::OnContractedCouples)
 ON_COMMAND(ID_CONTRACT_PEOPLE, &CDragonDlg::OnContractedPeople)
-//ON_COMMAND(ID_MARRIAGES_DETAILED, &CDragonDlg::OnMarriagesDetailed)
 ON_COMMAND(ID_DISPLAY_FAMILIES, &CDragonDlg::OnDisplayFamilies)
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -202,8 +195,11 @@ BOOL CDragonDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
+	// modless dialogs
+
 	m_pIndividuals	= NULL;
 	m_pMarriages	= NULL;
+	m_pFamilies		= NULL;
 
 	m_pMarriagesF	= NULL;
 	m_pMarriagesT	= NULL;
@@ -220,10 +216,6 @@ BOOL CDragonDlg::OnInitDialog()
 	mainTitle();
 
 	ChangeMenu();
-
-//	m_orderix = 1;
-//	createListColumns();
-//	OnFilterUnfilter();
 
 	CWnd wndBottom;
 // Az ablak helyének és méretének meghatározása., beállítása
@@ -358,14 +350,6 @@ void CDragonDlg::mainTitle( )
 	caption.Format( L"Dragon v. %s - %s || Családok nyilvántartása || adatbázis: %s (%d-%d) || %s ||", BUILT, PLATFORM, theApp.m_databaseSpec, userVersion && 0XFF, userVersion >> 16, theApp.m_inputMode );
 	SetWindowText( caption );
 }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-void CDragonDlg::OnTitles()
-{
-	CTitles dlg;
-	if( dlg.DoModal() == IDCANCEL ) return;
-}
-*/
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CDragonDlg::PreTranslateMessage(MSG* pMsg)
 {
@@ -430,13 +414,27 @@ void CDragonDlg::OnDisplayMarriages()
 		m_pMarriages->ShowWindow(SW_SHOW);
 	}
 }
+/*
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDragonDlg::OnDisplayFamilies()
+{
+	if( m_pFamilies != NULL )
+	{
+		m_pFamilies->ShowWindow(SW_RESTORE);		// néha kell!!
+		m_pFamilies->SetForegroundWindow();
+	}
+	else
+	{
+		m_pFamilies = new CCheckFamilyDates(this);
+		m_pFamilies->Create( IDD_CHECK_FAMILYDATES,GetDesktopWindow());
+		m_pFamilies->m_always = true;
+		m_pFamilies->ShowWindow(SW_SHOW);
+	}
+}
+*/
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnDisplayTables()
 {
-//	OnTabletables();
-//}
-//void CDragonDlg::OnTabletables()
-//{
 	CTableTables dlg;
 	dlg.m_select = false;
 	dlg.m_caption = L"Az adatbázisban lévõ táblák";
@@ -445,38 +443,9 @@ void CDragonDlg::OnDisplayTables()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnDisplayFilestable()
 {
-//	OnFiles();
-//}
-//void CDragonDlg::OnFiles()
-//{
 	CTableFiles dlg;
 	dlg.DoModal();
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-void CDragonDlg::OnListUtf8()
-{
-	CString filespec;
-	filespec = L"f:\\fa\\samlpefile.txt";
-	//Create file. Use UTF-8 to encode the file
-	CTextFileWrite myfile( filespec, CTextFileWrite::UTF_8 );
-
-	
-	ASSERT(myfile.IsOpen());
-
-	//Write some text
-	myfile << "Using 8 bit characters as input";
-	myfile.WriteEndl();
-	myfile << L"Using 16-bit characters. The following character is alfa: \x03b1";
-	myfile.WriteEndl();
-	CString temp = _T("Using CString.");
-	myfile << temp;
-	myfile.WriteEndl();
-	myfile << L"öüóõúéáûí\nÖÜÓÕÚÉÁÛÍ";
-	myfile.Close();
-	theApp.showFile( filespec );
-}
-*/
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnOpenDb()
 {
@@ -484,6 +453,8 @@ void CDragonDlg::OnOpenDb()
 		m_pIndividuals->OnClose();
 	if( m_pMarriages )
 		m_pMarriages->OnClose();
+//	if( m_pFamilies )
+//		m_pFamilies->OnClose();
 
 	if( !theApp.selectDatabase() ) return;
 	
@@ -581,13 +552,6 @@ void CDragonDlg::OnMenuManual()
 		menu.EnableMenuItem( 15, MF_BYPOSITION|MF_GRAYED);
 	DrawMenuBar();
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//void CDragonDlg::OnConnectBranches()
-//{
-//	CGaInput split;
-//	split.connectBranches();
-//	split.setDummyFather();
-//}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnInputKeyboard()
 {
@@ -919,23 +883,6 @@ család->törzs kapcsolatokról. Az alábbi felsorolásokban megtaláljuk a nemlétezõ 
 	theApp.showLogFile();	
 
 }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//void CDragonDlg::OnClose()
-//{
-//	if( m_pIndividuals != NULL )
-//		m_pIndividuals->CloseWindow();
-//	if( m_pMarriages )
-//		m_pMarriages->CloseWindow();
-//
-//	CDialogEx::OnClose();
-//}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//void CDragonDlg::OnGenerationcode()
-//{
-//	CCheckGenerations1 dlg;
-//	if( dlg.DoModal() == IDCANCEL ) return;
-//
-//}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnCheckLifespan()
 {
@@ -1107,6 +1054,8 @@ void CDragonDlg::OnClose()
 	if( m_pMarriagesF  != NULL )	m_pMarriagesF->CloseWindow();
 	if( m_pMarriagesT  != NULL )	m_pMarriagesT->CloseWindow();
 	if( m_pMarriagesL  != NULL )	m_pMarriagesL->CloseWindow();
+
+	if( m_pFamilies  != NULL )		m_pFamilies->CloseWindow();
 
 	if( m_pDescendantsF != NULL )	m_pDescendantsF->CloseWindow();
 	if( m_pDescendantsT != NULL )	m_pDescendantsT->CloseWindow();

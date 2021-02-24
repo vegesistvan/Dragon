@@ -10,6 +10,7 @@
 #include "html_Marriages.h"
 #include "html_SpouseSpouses.h"
 #include "afxwin.h"
+#include "CheckFamilyDates.h"
 
 
 enum
@@ -289,6 +290,7 @@ public:
 //modeless dialog boxes////////////////
 	CTablePeople* m_pIndividuals;
 	CTableMarriages* m_pMarriages;
+	CCheckFamilyDates* m_pFamilies;
 
 	CDescendant* m_pDescendantsF;
 	CDescendant* m_pDescendantsT;
@@ -305,6 +307,8 @@ public:
 	CSpouseSpouses* m_pSsF;
 	CSpouseSpouses* m_pSsT;
 	CSpouseSpouses* m_pSsL;
+	
+
 
 	CStatic m_picture;
 ///////////////////////////////////////

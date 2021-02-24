@@ -1199,7 +1199,8 @@ int diffD( CString date1, CString date2, int* pYear )
 	_int64 d1;
 	_int64 d2;
 
-	if( !checkDate( date1 ) || !checkDate( date2 ) ) return INT_MAX;
+	if( date1.IsEmpty() || date2.IsEmpty() ) return INT_MAX;
+//	if( !checkDate( date1 ) || !checkDate( date2 ) ) return INT_MAX;
 	*pYear  = _wtoi( date1.Left(4) ) - _wtoi( date2.Left(4) );
 
 
