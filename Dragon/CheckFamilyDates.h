@@ -9,14 +9,17 @@ typedef struct
 	CString linenumber;
 	CString name;
 	CString birth;
+	CString birthP;			// birth place
 	CString death;
+	CString deathP;
 	CString birthC;			// empty, ha nem szabályos a dátum, vagy a szabályos dátum
 	CString	deathC;			// empty, ha nem szabályos a dátum, vagy a szabályos dátum
 	CString age;
-	CString diffH;
-	CString diffW;
+	CString fatherAge;
+	CString motherAge;
 	int		numOfSpouses;
 	CString message;
+	CString comment;
 }HUSBAND;
 
 typedef struct
@@ -27,16 +30,19 @@ typedef struct
 	CString linenumber;
 	CString name;
 	CString birth;
+	CString birthP;
 	CString death;
+	CString deathP;
 	CString birthC;
 	CString deathC;
 	CString	age;
-	CString diffH;
-	CString diffW;
+	CString fatherAge;
+	CString motherAge;
 	CString wedding;
 	CString weddingC;
 	int		motherOrder;
 	CString message;
+	CString comment;
 }WIFES;
 
 
@@ -46,16 +52,19 @@ typedef struct
 	CString linenumber;
 	CString name;
 	CString birth;
+	CString birthP;
 	CString death;
+	CString deathP;
 	CString birthC;
 	CString deathC;
 	CString	age;
-	CString diffH;
-	CString diffW;
+	CString fatherAge;
+	CString motherAge;
 	CString father_id;
 	CString mother_id;
 	int		mother_index;
 	CString message;
+	CString comment;
 }CHILDREN;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -117,12 +126,18 @@ protected:
 
 	int m_cnt;
 
-	void createColumns();
 	bool collectFamily();
+
+	void createColumns();
 	void printFamily();
+	void emptyLine();
+	
+	void createColumnsAll();
+	void printFamilyAll();
+	void emptyLineAll();
+
 	void checkFamily();
 	void push( CString item );
-	void emptyLine();
 	void keress( int start );
 
 	CString checkDate( CString datum);
@@ -161,4 +176,5 @@ public:
 	afx_msg void OnInfo();
 	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnParameters();
+	afx_msg void OnInfoFamilies();
 };

@@ -87,7 +87,7 @@ protected:
 	BOOL	query( CString command );
 	BOOL	query2( CString command );
 
-	void	people( CString rowid );
+	bool	people( CString rowid );
 	void	szulok( CString father_id, CString mother_id );
 	void	testverek( CString rowid, CString father_id, CString mother_id );
 	void	hazastarsak( CString rowid, int sex_id );

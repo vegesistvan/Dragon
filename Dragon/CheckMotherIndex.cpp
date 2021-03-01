@@ -9,6 +9,7 @@
 #include "utilities.h"
 #include "Relations.h"
 #include "html_EditLine.h"
+#include "html_EditLines.h"
 
 enum
 {
@@ -42,9 +43,10 @@ BEGIN_MESSAGE_MAP(CCheckMotherIndex, CDialogEx)
 	ON_WM_SIZE()
 	ON_WM_SIZING()
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_HTML_EDIT, &CCheckMotherIndex::OnHtmlEdit)
+	ON_COMMAND(ID_HTML_EDIT, &CCheckMotherIndex::OnHtmlEditLines)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CCheckMotherIndex::OnHtmlNotepad)
 	ON_COMMAND(ID_DB_EDIT, &CCheckMotherIndex::OnDbEdit)
+	ON_COMMAND(ID_HTML_FATHERANDSIBLINGS, &CCheckMotherIndex::OnHtmlFatherAndSiblings)
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CCheckMotherIndex::OnInitDialog()
@@ -260,16 +262,18 @@ LRESULT CCheckMotherIndex:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 	if(Menu.LoadMenu( IDR_DROPDOWN_HTML ))
     {
 		pPopup = Menu.GetSubMenu(0);
-
+/*
 		if( m_ListCtrl.GetItemText( nItem, L_LINENUMBER ).IsEmpty() )
 		{
 			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
 			pPopup->EnableMenuItem(ID_HTML_NOTEPAD, MF_BYCOMMAND | MF_GRAYED);
 		}
+*/
 		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
     }
 	return TRUE;
 }
+/*
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckMotherIndex::OnHtmlEdit()
 {
@@ -278,6 +282,7 @@ void CCheckMotherIndex::OnHtmlEdit()
 	dlg.m_linenumber	= m_ListCtrl.GetItemText( nItem, L_LINENUMBER );
 	dlg.DoModal();
 }
+*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckMotherIndex::OnHtmlNotepad()
 {
@@ -291,7 +296,7 @@ void CCheckMotherIndex::OnDbEdit()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
 
-	CString rowid = m_ListCtrl.GetItemText( nItem, 2 );
+	CString rowid = m_ListCtrl.GetItemText( nItem, L_ROWID );
 	CRelations dlg;
 
 	dlg.m_rowid = rowid;
@@ -299,3 +304,25 @@ void CCheckMotherIndex::OnDbEdit()
 
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckMotherIndex::OnHtmlFatherAndSiblings()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
+	CHtmlEditLines dlg;
+	dlg.m_title.Format( L"Szülõk és testvérek" );
+	dlg.m_type	= L"F_SIBLINGS";
+	dlg.m_rowid = rowid;
+	dlg.DoModal();
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckMotherIndex::OnHtmlEditLines()
+{
+	CString title;
+	int selectedCount	= m_ListCtrl.GetSelectedCount();
+	int nItem			= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	title.Format( L"%d kijelölt ember a ga.html fájlban", selectedCount );
+
+	theApp.htmlEditLines( &m_ListCtrl, L_LINENUMBER, title );
+}

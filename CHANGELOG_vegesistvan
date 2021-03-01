@@ -1,3 +1,5 @@
+v 2.2.2.0 2021.03.01 Családok lstázása és ellenőrzése akkor is, ha az anya ismeretlen
+
 v 2.2.1.0 2021.02.24 Gyerekek halálotási dátumánka összehasonlítása a a szülők születési dátumával
 
 v 2.2.0.0 2021.02.22 Ellenőrzésnél minden házasság listázása, ha ahiba van. A Listák menüpomt alatt minden családot ki lehet listázni. 

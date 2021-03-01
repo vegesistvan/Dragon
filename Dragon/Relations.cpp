@@ -297,7 +297,11 @@ void CRelations:: createScreen( CString rowid )
 
 	m_rowid = rowid;
 
-	people(rowid);
+	if( !people(rowid) )
+	{
+		OnCancel();
+		return;
+	}
 	szulok( m_father_id, m_mother_id );
 	hazastarsak( rowid, m_sex_id );
 	testverek( rowid, m_father_id, m_mother_id );
@@ -314,7 +318,7 @@ void CRelations:: createScreen( CString rowid )
 ////////////////////////////////////////// S Z Ü L Õ K //////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CRelations::people( CString rowid )
+bool CRelations::people( CString rowid )
 {
 	CString fileNumber;
 	CString familyNumber;
@@ -347,19 +351,26 @@ void CRelations::people( CString rowid )
 
 
 	m_command.Format(L"SELECT rowid,* FROM people WHERE rowid='%s'", rowid );
-	if( !query( m_command ) ) return;
+	if( !query( m_command ) ) return false;
+	if( !m_recordset->RecordsCount() )
+	{
+		str.Format( L"%s rowid-jû ember nem létezik az adatbázisban!", rowid );
+		AfxMessageBox( str, MB_ICONEXCLAMATION );
+		return false;
+	}
+
 
 	fileNumber		= m_recordset->GetFieldString( PEOPLE_FILENUMBER );
 	familyNumber	= m_recordset->GetFieldString( PEOPLE_FAMILYNUMBER );
 	m_tableNumber	= m_recordset->GetFieldString( PEOPLE_TABLENUMBER );
 	lineNumber		= m_recordset->GetFieldString( PEOPLE_LINENUMBER );
 
-	if( !query2( L"SELECT rowid FROM tables" ) ) return;
+	if( !query2( L"SELECT rowid FROM tables" ) ) return false;
 	if( !m_recordset2->RecordsCount() )
 		GetDlgItem( IDC_TABLE )->EnableWindow( false );
 
 	m_command.Format( L"SELECT rowid,* FROM tables WHERE rowid='%s'", m_tableNumber );
-	if( !query2( m_command ) ) return;
+	if( !query2( m_command ) ) return false;
 
 
 	familyName	= m_recordset2->GetFieldString( TABLES_FAMILY_NAME );
@@ -436,7 +447,7 @@ void CRelations::people( CString rowid )
 	colorName.SetTextColor( colorRed );
 	GetDlgItem( IDC_NAME )->SetWindowText( m_name );
 	m_changed = false;
-
+	return true;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////// S Z Ü L Õ K //////////////////////////////////////////////////////////////////////

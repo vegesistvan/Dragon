@@ -1186,9 +1186,9 @@ bool CGaAscendants::findAscendants( bool maxG )
 
 	rowid = getPeople( m_rowid );
 
-	gk.g	= 1;
-	gk.k	= 1;
-	gk.w	= 0;
+	gk.g			= 1;
+	gk.k			= 1;
+	gk.w			= 0;
 	gk.name			= m_name;
 	gk.rowid		= m_rowid;
 	gk.sex_id		= m_sex;
