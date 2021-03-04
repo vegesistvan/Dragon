@@ -125,7 +125,7 @@ int CGaAscendants::getPDA( CString parent_id)
 		m_command.Format( L"SELECT %s FROM people WHERE rowid='%s'", parent_id, rowid );
 		if( !query( m_command ) ) return 0;
 		rowid =m_recordset.GetFieldString( 0 );
-		if( rowid.IsEmpty() || rowid == L"0" || _wtoi(rowid) > FATHERID )  break;
+		if( rowid.IsEmpty() || rowid == L"0" || _wtoi(rowid) > NOFATHERID )  break;
 	}
 	return( i );
 }
@@ -325,7 +325,7 @@ void CGaAscendants::directFatherAscendants()
 		if( !query( m_command ) ) return;
 
 		father_id =m_recordset.GetFieldString( 0 );
-		if( father_id.IsEmpty() || father_id == L"0" || _wtoi(father_id ) > FATHERID )  break;
+		if( father_id.IsEmpty() || father_id == L"0" || _wtoi(father_id ) > NOFATHERID )  break;
 
 		fel.orig		= vFel.size() + 1;
 		fel.id			= rowid;
@@ -426,7 +426,7 @@ void CGaAscendants::directMotherAscendants()
 		if( !query( m_command ) ) return;
 
 		father_id =m_recordset.GetFieldString( 0 );
-		if( father_id.IsEmpty() || father_id == L"0" || _wtoi(father_id ) > FATHERID )  break;
+		if( father_id.IsEmpty() || father_id == L"0" || _wtoi(father_id ) > NOFATHERID )  break;
 
 		fel.orig		= vFel.size() + 1;
 		fel.id			= rowid;
@@ -1273,7 +1273,7 @@ bool CGaAscendants::findAscendants( bool maxG )
 
 		if( !rowid.IsEmpty() )
 		{
-			if( _wtoi(m_father_id) > FATHERID ) m_father_id.Empty();
+			if( _wtoi(m_father_id) > NOFATHERID ) m_father_id.Empty();
 			gk.g			= G;
 			gk.k			= K;
 			gk.w			= 0;

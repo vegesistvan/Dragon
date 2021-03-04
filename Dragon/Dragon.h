@@ -31,7 +31,7 @@
 #define WOMANS L"2"
 
 
-#define FATHERID 1000000	// ha a táblában olyan leszármazottak vannak, akiknek nincs apjuk, de testvérek, és ezért kell nekik egy dummy apa
+#define NOFATHERID 1000000	// ha a táblában olyan leszármazottak vannak, akiknek nincs apjuk, de testvérek, és ezért kell nekik egy dummy apa
 
 
 #define MANUAL	L"kézi adatbevitel"

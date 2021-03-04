@@ -96,6 +96,55 @@ enum
 	LL_NUMOFCOLUMNS
 };
 
+typedef struct
+{
+	int code;
+	TCHAR* msg;
+}ERR;
+
+enum
+{
+	DEATHBIRTH = 0,
+
+	BORNAFTERWEDDING,
+	DIEDBEFOREWEDDING,
+	BORNBEFOREWEDDING,
+
+	DIEDBEFOREHUSBANDBIRTH,
+	BORNAFTERHUSBANDDEATH,
+	
+	BORNBEFOREMOTHERBIRTH,
+	BORNBEFOREFATHERBIRTH,
+	
+	BORNAFTERMOTHERDEATH,
+	BORNAFTERFATHERDEATH9,
+	
+	DIEDBEFOREMOTHERBIRTH,
+	DIEDBEFOREFATHERBIRTH,
+};
+
+
+ERR err[] = 
+{																					// melyik sorban fordulhat elõ?
+	DEATHBIRTH,				L", halál < születés",									// férj, feleség, gyerek
+
+	BORNAFTERWEDDING,		L", esküvõ után született",								// férj, feleség
+	DIEDBEFOREWEDDING,		L", esküvõ elõtt meghalt",								// férj, feleség, gyerek
+	BORNBEFOREWEDDING,		L", esküvõ elõtt született",							// gyerek
+
+	DIEDBEFOREHUSBANDBIRTH, L", férje születése elõtt meghalt",						// feleség
+	BORNAFTERHUSBANDDEATH,	L", férje halála után született",						// férj
+	
+	BORNBEFOREMOTHERBIRTH,	L", anyja születése elõtt született",					// gyerek
+	BORNBEFOREFATHERBIRTH,	L", apja születése elõtt született",					// gyerek
+
+	BORNAFTERMOTHERDEATH,	L", anyja halála után született",						// gyerek
+	BORNAFTERFATHERDEATH9,	L", apja halála után több mint 9 hónapra született",	// gyerek
+	
+	DIEDBEFOREMOTHERBIRTH,	L", anyja születése elõtt meghalt",						// gyerek
+	DIEDBEFOREFATHERBIRTH,	L", apja születése elõtt meghalt",						// gyerek
+};
+
 
 // CCheckFamilyDates dialog
 void clearW( WIFES* w );
@@ -196,6 +245,18 @@ BEGIN_MESSAGE_MAP(CCheckFamilyDates, CDialogEx)
 
 	ON_COMMAND(ID_PARAMETERS, &CCheckFamilyDates::OnParameters)
 	ON_COMMAND(ID_INFO_FAMILIES, &CCheckFamilyDates::OnInfoFamilies)
+	ON_COMMAND(ID_FILTER_FATHER9, &CCheckFamilyDates::OnFilterFather9)
+	ON_COMMAND(ID_FILTER_UNFILTERED, &CCheckFamilyDates::OnFilterUnfiltered)
+	ON_COMMAND(ID_FILTER_BEFOREMOTHER, &CCheckFamilyDates::OnFilterBeforemother)
+	ON_COMMAND(ID_FILTER_MOTHERAGE, &CCheckFamilyDates::OnFilterMotherage)
+	ON_COMMAND(ID_FILTER_BEFOREFATHER, &CCheckFamilyDates::OnFilterBeforefather)
+	ON_COMMAND(ID_FILTER_BIRTHDEATH, &CCheckFamilyDates::OnFilterBirthdeath)
+	ON_COMMAND(ID_FILTER_BIRTH, &CCheckFamilyDates::OnFilterBirth)
+	ON_COMMAND(ID_FILTER_DEATH, &CCheckFamilyDates::OnFilterDeath)
+	ON_COMMAND(ID_FILTER_WEDDING, &CCheckFamilyDates::OnFilterWedding)
+	ON_COMMAND(ID_BORNAFTERHDEATH, &CCheckFamilyDates::OnBornafterhdeath)
+	ON_COMMAND(ID_BORNBEFORE_MBIRTH, &CCheckFamilyDates::OnBornBeforeMotherBirth)
+	ON_COMMAND(ID_DIEDBEFORE_MBIRTH, &CCheckFamilyDates::OnDiedBeforeMotherBirth)
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CCheckFamilyDates::OnInitDialog()
@@ -207,6 +268,7 @@ BOOL CCheckFamilyDates::OnInitDialog()
 
 	if( !m_always )
 	{
+		m_title = L"Családok, amelyekben valamelyik dátumban ellentmondás van";
 		CCheckFamilyDatesStart dlg;
 
 		dlg.m_info = m_info;
@@ -227,19 +289,16 @@ BOOL CCheckFamilyDates::OnInitDialog()
 		m_minDiffMC			= dlg.m_minDiffMC;
 		m_maxDiffMC			= dlg.m_maxDiffMC;
 	}
-
-	CString title;
-	if( m_always )
+	else
 	{
-		title = L"Családok"; 
+		m_title = L"Családok"; 
 		SetMenu(NULL);
 		::DestroyMenu(GetMenu()->GetSafeHmenu());
 		CMenu menu;
 		menu.LoadMenuW(IDR_TABLE_FAMILIES );
 		SetMenu(&menu);
 	}
-	else
-		title = L"Családok, amelyekben valamelyik dátumban ellentmondás van";
+		
 
 	CString caption;
 	caption = L"apa: apa életkora esküvõn ill. a gyerek születésekor  || anya: anya életkora az esküvõn ill. a gyerek születésekor"; 
@@ -249,8 +308,6 @@ BOOL CCheckFamilyDates::OnInitDialog()
 	colorKeres.SetTextColor( theApp.m_colorClick );
 	colorNext.SetTextColor( theApp.m_colorClick );
 
-
-	SetWindowTextW( title );
 
 	if( m_always )
 		createColumnsAll();
@@ -265,8 +322,7 @@ BOOL CCheckFamilyDates::OnInitDialog()
 	}
 	else
 	{
-		m_ListCtrl.SetItemCountEx( vList.size() + 1  );
-		m_ListCtrl.AttachDataset( &vList );
+		OnFilterUnfiltered();
 		ShowWindow( SW_MAXIMIZE );
 	}
 	return TRUE; 
@@ -459,8 +515,9 @@ bool CCheckFamilyDates::collectFamily()
 	CString name;
 	bool push;
 
-	// férjek cikluse
-	for( UINT i = 0; i < m_recordset->RecordsCount(); ++i, m_recordset->MoveNext() )
+	// férjek ciklusa
+//	for( UINT i = 0; i < m_recordset->RecordsCount(); ++i, m_recordset->MoveNext() )
+	for( UINT i = 0; i < 10000; ++i, m_recordset->MoveNext() )
 	{
 		h.rowid = m_recordset->GetFieldString( X_ROWID );
 
@@ -591,7 +648,7 @@ void CCheckFamilyDates::checkFamily()
 	int z;
 	int ret;
 	bool hiba = false;
-
+	bool month9 = false;
 
 	// születés-halál, életkor
 	if( ( ret = diffD( h.deathC, h.birthC, &diff ) ) != INT_MAX )
@@ -599,7 +656,7 @@ void CCheckFamilyDates::checkFamily()
 		h.age.Format( L"%d", diff );
 		if( ret < 0 )
 		{
-			h.message = L"születés > halál";
+			h.message = err[DEATHBIRTH].msg;
 			hiba = true;
 		}
 		if( diff > m_maxLifespan )
@@ -621,7 +678,7 @@ void CCheckFamilyDates::checkFamily()
 			vWifes.at(i).age.Format( L"%d", diff );
 			if( ret < 0 )
 			{
-				vWifes.at(i).message += L", születés > halál";
+				vWifes.at(i).message += err[DEATHBIRTH].msg;
 				hiba = true;
 			}
 			if( diff > m_maxLifespan )
@@ -637,7 +694,7 @@ void CCheckFamilyDates::checkFamily()
 			vWifes.at(i).motherAge.Format( L"%d", diff );
 			if( ret < 0 )
 			{
-				vWifes.at(i).message += L", házasságkötés után született!";
+				vWifes.at(i).message += err[BORNAFTERWEDDING].msg;
 				hiba = true;
 			}
 			else if( m_minAgeWAtWedd > diff || diff > m_maxAgeWAtWedd )
@@ -647,11 +704,27 @@ void CCheckFamilyDates::checkFamily()
 				hiba = true;
 			}
 		}
+		if( ( ret = diffD( w.deathC, h.birthC, &diff ) ) != INT_MAX )
+		{
+			if( ret < 0 )
+			{
+				vWifes.at(i).message += err[DIEDBEFOREHUSBANDBIRTH].msg; 
+				hiba = true;
+			}
+		}
+		if( ( ret = diffD( h.deathC, w.birthC, &diff ) ) != INT_MAX )
+		{
+			if( ret < 0 )
+			{
+				vWifes.at(i).message += err[BORNAFTERHUSBANDDEATH].msg; 
+				hiba = true;
+			}
+		}
 		if( ( ret = diffD( w.deathC, w.weddingC, &diff ) ) != INT_MAX )
 		{
 			if( ret < 0 )
 			{
-				vWifes.at(i).message += L", házasságkötés elõtt meghalt!"; 
+				vWifes.at(i).message += err[DIEDBEFOREWEDDING].msg; 
 				hiba = true;
 			}
 		}
@@ -660,13 +733,13 @@ void CCheckFamilyDates::checkFamily()
 			vWifes.at(i).fatherAge.Format( L"%d", diff );
 			if( ret < 0 )
 			{
-				vWifes.at(i).message += L", férj házasságkötés után született!!";
+				h.message += err[BORNAFTERWEDDING].msg;
 				hiba = true;
 			}
 			else if( m_minAgeHAtWedd > diff || diff > m_maxAgeHAtWedd )
 			{
-				str.Format( L", férj házasságkötéskor %d éves volt", diff ); 
-				vWifes.at(i).message += str;
+				str.Format( L", házasságkötéskor %d éves volt", diff ); 
+				h.message += str;
 				hiba = true;
 			}
 		}
@@ -674,23 +747,7 @@ void CCheckFamilyDates::checkFamily()
 		{
 			if( ret < 0 )
 			{
-				vWifes.at(i).message += L", férj házasságkötés elõtt meghalt!";
-				hiba = true;
-			}
-		}
-		if( ( ret = diffD( w.deathC, h.birthC, &diff ) ) != INT_MAX )
-		{
-			if( ret < 0 )
-			{
-				vWifes.at(i).message += L", férj a feleség halála után született!"; 
-				hiba = true;
-			}
-		}
-		if( ( ret = diffD( h.deathC, w.birthC, &diff ) ) != INT_MAX )
-		{
-			if( ret < 0 )
-			{
-				vWifes.at(i).message += L", feleség  a férj halála után született!"; 
+				h.message += err[DIEDBEFOREWEDDING].msg;
 				hiba = true;
 			}
 		}
@@ -707,7 +764,7 @@ void CCheckFamilyDates::checkFamily()
 				vChildren.at(j).age.Format( L"%d", diff );
 				if( ret < 0 )
 				{
-					vChildren.at(j).message = L", születés > halál";
+					vChildren.at(j).message = err[DEATHBIRTH].msg;
 					hiba = true;
 				}
 				else if( diff > m_maxLifespan )
@@ -722,7 +779,16 @@ void CCheckFamilyDates::checkFamily()
 			{
 				if( ret < 0 )
 				{
-					vChildren.at(j).message += L", házasságkötés elõtt született";
+					vChildren.at(j).message += err[BORNBEFOREWEDDING].msg;
+					hiba = true;
+				}
+			}
+
+			if( ( ret = diffD( c.deathC, w.weddingC, &diff ) ) != INT_MAX )
+			{
+				if( ret < 0 )
+				{
+					vChildren.at(j).message += err[DIEDBEFOREWEDDING].msg;
 					hiba = true;
 				}
 			}
@@ -731,7 +797,7 @@ void CCheckFamilyDates::checkFamily()
 			{
 				if( ret < 0 )
 				{
-					vChildren.at(j).message += L", anyja halála után született";
+					vChildren.at(j).message += err[BORNAFTERMOTHERDEATH].msg;
 					hiba = true;
 				}
 			}
@@ -740,7 +806,7 @@ void CCheckFamilyDates::checkFamily()
 				vChildren.at(j).motherAge.Format( L"%d", diff );					// anya életkora a gyerek születésekor
 				if( ret < 0 )
 				{
-					vChildren.at(j).message += L", anyja születése elõtt született";
+					vChildren.at(j).message += err[BORNBEFOREMOTHERBIRTH].msg;
 					hiba = true;
 				}
 				else if( diff < m_minDiffMC || m_maxDiffMC < diff  )
@@ -750,34 +816,37 @@ void CCheckFamilyDates::checkFamily()
 					hiba = true;
 				}
 			}
+			
+			// gyerek születési dátum és apa halálozási + 9 hónap
+
+			if( theApp.dateDiff( h.deathC, c.birthC, 9 ) )
+			{
+				vChildren.at(j).message += err[BORNAFTERFATHERDEATH9].msg; 
+				month9 = true;
+				hiba = true;
+			}
+
 			if( ( ret = diffD( c.birthC, h.birthC, &diff ) ) != INT_MAX )
 			{
 				vChildren.at(j).fatherAge.Format( L"%d", diff );					// apa életkora a gyerek születésekor
 				if( ret < 0 )
 				{
-					vChildren.at(j).message += L", apja születése elõtt született";
+					vChildren.at(j).message += err[BORNBEFOREFATHERBIRTH].msg;
 					hiba = true;
 				}
-				else if( diff < m_minDiffFC || m_maxDiffFC < diff )
+				else if( ( diff < m_minDiffFC || m_maxDiffFC < diff ) && !month9 )
 				{
 					str.Format( L", apja %d éves korában született", diff ); 
 					vChildren.at(j).message += str;
 					hiba = true;
 				}
 			}
-			// gyerek születési dátum és apa halálozási + 9 hónap
-
-			if( theApp.dateDiff( h.deathC, c.birthC, 9 ) )
-			{
-				vChildren.at(j).message += L", apja halála után több mint 9 hónapra született"; 
-				hiba = true;
-			}
 
 			if( ( ret = diffD( c.deathC, w.birthC, &diff ) ) != INT_MAX )
 			{
 				if( ret < 0 )
 				{
-					vChildren.at(j).message += L", anyja születése elõtt meghalt";
+					vChildren.at(j).message += err[DIEDBEFOREMOTHERBIRTH].msg;
 					hiba = true;
 				}
 			}
@@ -785,19 +854,11 @@ void CCheckFamilyDates::checkFamily()
 			{
 				if( ret < 0 )
 				{
-					vChildren.at(j).message += L", apja születése elõtt meghalt";
+					vChildren.at(j).message += err[DIEDBEFOREFATHERBIRTH].msg;
 					hiba = true;
 				}
 			}
-			if( ( ret = diffD( c.deathC, w.weddingC, &diff ) ) != INT_MAX )
-			{
-				if( ret < 0 )
-				{
-					vChildren.at(j).message += L", házasságkötés elõtt meghalt";
-					hiba = true;
-				}
-			}
-
+ 
 		}
 	}
 
@@ -814,7 +875,8 @@ void CCheckFamilyDates::printFamily()
 	CString message;
 
 	UINT j;
-	
+
+	m_filtered = false;
 	message = L"";
 	if( h.message.GetLength() > 2 ) message = h.message.Mid( 2 );
 	message = L"";
@@ -1024,11 +1086,23 @@ void CCheckFamilyDates::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
 		}
 		else
 		{
-			if( _wtoi( vList.at( nItem * L_NUMOFCOLUMNS + L_TYPE ))  )
+			if( m_filtered )
 			{
-				index = _wtoi( vList.at( nItem * L_NUMOFCOLUMNS + L_INDEX ) );
-				pLVCD->clrTextBk = m_rgb[index];
+				if( _wtoi( vListFiltered.at( nItem * L_NUMOFCOLUMNS + L_TYPE ))  )
+				{
+					index = _wtoi( vListFiltered.at( nItem * L_NUMOFCOLUMNS + L_INDEX ) );
+					pLVCD->clrTextBk = m_rgb[index];
+				}
 			}
+			else
+			{
+				if( _wtoi( vList.at( nItem * L_NUMOFCOLUMNS + L_TYPE ))  )
+				{
+					index = _wtoi( vList.at( nItem * L_NUMOFCOLUMNS + L_INDEX ) );
+					pLVCD->clrTextBk = m_rgb[index];
+				}
+			}
+
 		}
 		*pResult = CDRF_DODEFAULT;
 		break;
@@ -1314,7 +1388,136 @@ void clearW( WIFES* w )
 	w->wedding.Empty();
 	w->weddingC.Empty();
 }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////// F I L T E R  //////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckFamilyDates::OnFilterUnfiltered()
+{
+	SetWindowTextW( m_title );
+	m_filtered = false;
+	m_ListCtrl.DeleteAllItems();
+	m_ListCtrl.DetachDataset();
+	m_ListCtrl.SetItemCountEx( vList.size() + 1  );
+	m_ListCtrl.AttachDataset( &vList );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckFamilyDates::OnFilterBirthdeath()
+{
+	filter( L"Születésük elõtt meghaltak", L"<" );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckFamilyDates::OnFilterBirth()
+{
+	filter( L"Születési dátumokkal ellentmondásban van", L"születése" );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckFamilyDates::OnFilterDeath()
+{
+	filter( L"Halálozási dátumokkal ellentmondásban van", L"halála" );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckFamilyDates::OnFilterWedding()
+{
+	filter( L"Esküvõ dátumával ellentmondásban van", L"esküvõ" );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckFamilyDates::OnBornafterhdeath()
+{
+	filter( L"Férje halála után született feleségek családjai", L"férje halála" );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckFamilyDates::OnBornBeforeMotherBirth()
+{
+	str = err[BORNBEFOREMOTHERBIRTH].msg;
 
+	filter( L"Anyja születése elõtt születtek", str.Mid( 2 ) );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckFamilyDates::OnDiedBeforeMotherBirth()
+{
+	str = err[DIEDBEFOREMOTHERBIRTH].msg;
+	filter( L"Anyja születése elõtt meghaltak", str.Mid( 2 ) );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckFamilyDates::OnFilterFather9()
+{
+	filter( L"Apja halála után több mint 9 hónappal születettek", L"9 h" );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckFamilyDates::OnFilterBeforemother()
+{
+	filter( L"Anyjuk születése elõtt születettek vagy meghaltak", L"anyja születése" );
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckFamilyDates::OnFilterMotherage()
+{
+	filter( L"Anyjuk X éves korában születtek", L"éves korában" );
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckFamilyDates::OnFilterBeforefather()
+{
+	filter( L"Apjuk születése elõtt születettek vagy meghaltak", L"apja születése" );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bool CCheckFamilyDates::filter( CString caption, CString azon )
+{
+	vListFiltered.clear();
 
+	CProgressWnd wndProgress(NULL, L"Folyik a keresés.." ); 
+	wndProgress.GoModal();
+	wndProgress.SetRange(0, vList.size()/L_NUMOFCOLUMNS );
+	wndProgress.SetPos(0);
+	wndProgress.SetStep(1);
 
+	for( int i = L_MESSAGE; i < vList.size() - L_NUMOFCOLUMNS; i += L_NUMOFCOLUMNS )
+	{
+		str = vList.at(i);
+		if( (str.Find( azon )) != -1 )
+		{
+			i = pushBlock( i );
+		}
+		wndProgress.StepIt();
+		wndProgress.PeekAndPump();
+		if (wndProgress.Cancelled()) break;
+	}
+	wndProgress.DestroyWindow();
 
+	if( vListFiltered.size() )
+	{
+		m_filtered = true;
+		m_ListCtrl.DeleteAllItems();
+		m_ListCtrl.DetachDataset();
+		m_ListCtrl.SetItemCountEx( vListFiltered.size() + 1  );
+		m_ListCtrl.AttachDataset( &vListFiltered );
+		SetWindowTextW( caption );
+	}
+	else
+		AfxMessageBox( L"Nincs semmi!" );
+	return true;
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// i az L_MASSAGE oszlopra mutat
+int CCheckFamilyDates::pushBlock( UINT i )
+{
+	int typeIndex = i  - L_MESSAGE + L_TYPE;  // ugyanannak a sornak az L_TYPE oszlopának indexe
+	int z;
+
+	while( typeIndex > 0 && typeIndex < vList.size() && (str = vList.at(typeIndex)) != L"1" )		// visszamegy az apáig
+		typeIndex -= L_NUMOFCOLUMNS;
+	int firstIndex = typeIndex - 1;			// a megtalált "férj" sor elejére mutet
+
+	while( typeIndex < vList.size() && ( str = vList.at( typeIndex ) ) != L"" )						// lemegy az üres sorig
+		typeIndex += L_NUMOFCOLUMNS;
+	int lastIndex = typeIndex -1 + L_NUMOFCOLUMNS;						// az üres sor utoló oszlopára mutat
+
+	for( int j = firstIndex; j < lastIndex; ++j )
+	{
+		if( j >= vList.size() )
+			z = 1;
+
+		vListFiltered.push_back( vList.at(j) );
+	}		
+	return(lastIndex - 1 );	// visszadja, a folytatáshoz az indexet, ami a következõ L_MESSAGE-re mutat
+}

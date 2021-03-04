@@ -6,25 +6,6 @@
 #include "ProgressWnd.h"
 #include "utilities.h"
 #include "Relations.h"
-// CCheckFatherDeath9 dialog
-// txt fájl oszlopok
-enum
-{
-	_WHO = 0,
-	_DIFF,
-	_ROWID,
-	_LINENUMBER,
-	_TABLENUMBER,
-	_SOURCE,
-	_UNITED,
-	_MOTHERINDEX,
-	_MARRIAGEDATE,
-	_NAME,
-	_BIRTH_DATE,
-	_DEATH_DATE,
-	_COLUMNS
-};
-
 
 // ListCtrl oszlopok
 enum
@@ -36,7 +17,7 @@ enum
 	L_TABLENUMBER,
 	L_SOURCE,
 	L_UNITED,
-	L_MOTHERINDEX,
+	L_ORDERWIFE,
 	L_MARRIAGEDATE,
 	L_NAME,
 	L_BIRTH,
@@ -44,33 +25,22 @@ enum
 	L_ITEMDATA,
 };
 
+// SELECT oszlopok
+
 enum 
 {
-	ROWIDC = 0,
-	LINEC,
-	TABLEC,
-	SOURCEC,
-	UNITEDC,
-	MOTHERINDEXC, 
-	LASTNAMEC,
-	FIRSTNAMEC,
-	BIRTHDATEC,
-	DEATHDATEC,
-	FATHERIDC,
-	MOTHERIDC,
+	ROWID = 0,
+	LINE,
+	TABLE,
+	SOURCE,
+	UNITED,
+	LASTNAME,
+	FIRSTNAME,
+	BIRTH,
+	DEATH,
 };
+CString m_columns = L"rowid,lineNumber,tableNumber,source,united,last_name,first_name,birth_date,death_date"; 
 
-enum
-{
-	LINEP = 0,
-	TABLEP,
-	SOURCEP,
-	UNITEDP,
-	LASTNAMEP,
-	FIRSTNAMEP,
-	BIRTHDATEP,
-	DEATHDATEP
-};
 
 IMPLEMENT_DYNAMIC(CCheckFatherDeath9, CDialogEx)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -120,12 +90,9 @@ BOOL CCheckFatherDeath9::OnInitDialog()
 	SetWindowTextW( title );
 	
 	createColumns();
-	m_cnt = 0;
 	fatherDeathChildBirth();
 
-	if( m_cnt )
-		fillTable();
-	else
+	if( !m_ListCtrl.GetItemCount() )
 	{
 		AfxMessageBox( L"Nem találtam olyan gyereket, aki apja halála után több mint 9 hónapra született." );
 		OnCancel();
@@ -208,14 +175,14 @@ void CCheckFatherDeath9::createColumns()
 {
 	m_ListCtrl.SetExtendedStyle(m_ListCtrl.GetExtendedStyle()| LVS_EX_GRIDLINES );
 	m_ListCtrl.InsertColumn( L_WHO,			L"who",			LVCFMT_RIGHT,	 60,-1,COL_HIDDEN);
-	m_ListCtrl.InsertColumn( L_DIFF,		L"diff",		LVCFMT_RIGHT,	 60,-1,COL_HIDDEN );
+	m_ListCtrl.InsertColumn( L_DIFF,		L"diff",		LVCFMT_RIGHT,	 60,-1,COL_HIDDEN);
 	m_ListCtrl.InsertColumn( L_ROWID,		L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_LINENUMBER,	L"line#",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_TABLENUMBER,	L"table#",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_SOURCE,		L"S",			LVCFMT_RIGHT,	 25,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_UNITED,		L"U",			LVCFMT_LEFT,	 25,-1,COL_NUM );
-	m_ListCtrl.InsertColumn( L_MOTHERINDEX,	L"X",			LVCFMT_LEFT,	 25,-1,COL_NUM );
 	m_ListCtrl.InsertColumn( L_MARRIAGEDATE,L"házasság",	LVCFMT_LEFT,	 80,-1,COL_TEXT );
+	m_ListCtrl.InsertColumn( L_ORDERWIFE,	L"ix",			LVCFMT_LEFT,	 25,-1,COL_TEXT );
 	m_ListCtrl.InsertColumn( L_NAME,		L"név",			LVCFMT_LEFT,	200,-1,COL_TEXT );
 	m_ListCtrl.InsertColumn( L_BIRTH,		L"születés",	LVCFMT_LEFT,	 80,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_DEATH,		L"halál",		LVCFMT_LEFT,	 80,-1,COL_NUM);
@@ -224,245 +191,160 @@ void CCheckFatherDeath9::createColumns()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckFatherDeath9::fatherDeathChildBirth()
 {
-	int	diff;
+	CString birthC;
+	CString deathF;
 
-	// gyerek adatai
-	CString child;
-	CString rowidC;
-	CString lineNumberC;
-	CString tableNumberC;
-	CString	sourceC;
-	CString unitedC;
-	CString birth_dateC;
-	CString death_dateC;
-	CString mother_indexC;
-
-
-	CString rowidF_Prev(L"");
 	CString rowidF;
-	CString father;
-	CString lineNumberF;
-	CString tableNumberF;
-	CString	sourceF;
-	CString unitedF;
-	CString marriage_indexF;
-	CString birth_dateF;
-	CString death_dateF;
-
 	CString rowidM;
-	CString mother;
-	CString lineNumberM;
-	CString tableNumberM;
-	CString	sourceM;
-	CString unitedM;
-	CString marriage_indexM;
-	CString birth_dateM;
-	CString death_dateM;
-	CString death_dateM1;
 
-	CString marriageDate;
-
-	CString fileName = L"checkFatherDeath";
-	m_fileSpec.Format(L"%s\\%s_%s.text",theApp.m_workingDirectory,fileName, getTimeTag() );
-	if( !openFileSpec( &fl, m_fileSpec, L"w+" ) ) return;
-
-//	if( (m_fileSpec = theApp.openTextFile( &fl, fileName, L"w+" ) ) == L"" ) return;
-
+	UINT	j;
+	int		nItem = 0;
 	
 	CProgressWnd wndP(NULL, L"Az apa halála után több mint 9 hónapra született gyerekek... "); 
 	wndP.GoModal();
 
-
-	// gyerekek lekérdezése
-	m_command = L"SELECT rowid, lineNumber, tableNumber, source, united, parentIndex, last_name, first_name, birth_date, death_date, father_id, mother_id FROM people ORDER BY last_name, first_name";
+	// apák lekérdezése
+	m_command.Format( L"SELECT %s FROM people WHERE sex_id=1 ORDER BY last_name, first_name", m_columns );
 	if( !query( m_command ) ) return;
 
 	wndP.SetRange(0, m_recordset->RecordsCount() );
 	wndP.SetPos(0);
 	wndP.SetStep(1);
 
-
-	wndP.SetRange(0, m_recordset->RecordsCount() );
-	wndP.SetPos(0);
-	wndP.SetStep(1);
-
-
-	m_recordset->MoveFirst();
 	for( UINT i = 0; i < m_recordset->RecordsCount(); ++i, m_recordset->MoveNext() )
 	{
-		birth_dateC = m_recordset->GetFieldString( BIRTHDATEC );
-		if( !birth_dateC.IsEmpty() && checkDate( birth_dateC ) )
+		rowidF = m_recordset->GetFieldString( ROWID );
+		deathF = m_recordset->GetFieldString( DEATH );
+		if( deathF.IsEmpty() || !checkDate( deathF ) ) goto cont;
+
+		// van olyan gyereke aki 9 hónap után született?
+		m_command.Format( L"SELECT birth_date FROM people WHERE father_id ='%s'", rowidF );
+		if( !query1( m_command ) ) return;
+		for( j = 0; j < m_recordset1->RecordsCount(); ++j, m_recordset1->MoveNext() )
 		{
-			rowidF	= m_recordset->GetFieldString( FATHERIDC );
-			if( !rowidF.IsEmpty() )
+			birthC = m_recordset1->GetFieldString( 0 );
+			if( !birthC.IsEmpty() && checkDate( birthC ) )
 			{
-				
-				// apa lekérdezése
-				m_command.Format( L"SELECT death_date FROM people WHERE rowid='%s'", rowidF );
-				if( !query1( m_command ) ) return;
-				death_dateF = m_recordset1->GetFieldString( 0 );
-				if( !death_dateF.IsEmpty() && checkDate( death_dateF )  )
-				{
-					if( theApp.dateDiff( death_dateF, birth_dateC, 9 ) )
-					{
-
-						++m_cnt;
-						// apa adatai
-						rowidF = m_recordset->GetFieldString( FATHERIDC );
-						if( !rowidF.Compare( rowidF_Prev ) ) continue;
-						rowidF_Prev = rowidF;
-
-						m_command.Format( L"SELECT lineNumber, tableNumber, source, united, last_name, first_name, birth_date, death_date FROM people WHERE rowid='%s'", rowidF );
-						if( !query1( m_command ) ) return;
-						lineNumberF		= m_recordset1->GetFieldString( LINEP );
-						tableNumberF	= m_recordset1->GetFieldString( TABLEP );
-						sourceF			= m_recordset1->GetFieldString( SOURCEP );
-						unitedF			= m_recordset1->GetFieldString( UNITEDP );
-						birth_dateF		= m_recordset1->GetFieldString( BIRTHDATEP );
-						death_dateF		= m_recordset1->GetFieldString( DEATHDATEP );
-						father.Format( L"%s %s", m_recordset1->GetFieldString( LASTNAMEP ), m_recordset1->GetFieldString( FIRSTNAMEP ) );
-
-						diff = 1;
-						str.Format( L"1\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t", diff, rowidF,lineNumberF,tableNumberF, sourceF,unitedF, L"",L"",father,birth_dateF, death_dateF );
-						fwprintf( fl, L"%s\n", str );
-
-						// apa feleségei
-
-						m_command.Format( L"SELECT rowid, * FROM marriages WHERE spouse1_id='%s'", rowidF );
-						if( !query2( m_command ) ) return;
-						for( UINT j = 0; j < m_recordset2->RecordsCount(); ++j, m_recordset2->MoveNext() )
-						{
-							diff = 0;
-
-							rowidM			= m_recordset2->GetFieldString( MARRIAGES_SPOUSE2_ID );
-							marriage_indexM = m_recordset2->GetFieldString( MARRIAGES_ORDERWIFE );
-							marriageDate	= m_recordset2->GetFieldString( MARRIAGES_DATE );
-							// anya adatai
-							m_command.Format( L"SELECT lineNumber, tableNumber, source, united, last_name, first_name, birth_date, death_date FROM people WHERE rowid='%s'", rowidM );
-							if( !query3( m_command ) ) return;
-							lineNumberM		= m_recordset3->GetFieldString( LINEP );
-							tableNumberM	= m_recordset3->GetFieldString( TABLEP );
-							sourceM			= m_recordset3->GetFieldString( SOURCEP );
-							unitedM			= m_recordset3->GetFieldString( UNITEDP );
-							mother.Format( L"%s %s", m_recordset3->GetFieldString( LASTNAMEP ), m_recordset3->GetFieldString( FIRSTNAMEP ) );
-							birth_dateM = m_recordset3->GetFieldString( BIRTHDATEP );
-							death_dateM = m_recordset3->GetFieldString( DEATHDATEP );
-							mother.Format( L"%s %s", m_recordset3->GetFieldString( LASTNAMEP ), m_recordset3->GetFieldString( FIRSTNAMEP ) );
-							
-							str.Format( L"2\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t", diff, rowidM,lineNumberM,tableNumberM, sourceM,unitedM, marriage_indexM, marriageDate, mother,birth_dateM, death_dateM );
-							fwprintf( fl, L"%s\n", str );
-						
-							// apa-anya gyermeke adatai
-
-							m_command.Format( L"SELECT rowid, lineNumber, tableNumber, source, united, parentIndexCalc, last_name, first_name, birth_date, death_date FROM people WHERE father_id='%s' AND mother_id='%s'", rowidF, rowidM );
-							if( !query3( m_command ) ) return;
-
-							for( UINT k = 0; k < m_recordset3->RecordsCount(); ++k, m_recordset3->MoveNext() )
-							{
-								rowidC			= m_recordset3->GetFieldString( ROWIDC );
-								lineNumberC		= m_recordset3->GetFieldString( LINEC );
-								tableNumberC	= m_recordset3->GetFieldString( TABLEC );
-								sourceC			= m_recordset3->GetFieldString( SOURCEC );
-								unitedC			= m_recordset3->GetFieldString( UNITEDC );
-								mother_indexC	= m_recordset3->GetFieldString( MOTHERINDEXC );
-								if( !mother_indexC.Compare( L"0" ) ) mother_indexC.Empty();
-								birth_dateC		= m_recordset3->GetFieldString( BIRTHDATEC );
-								death_dateC		= m_recordset3->GetFieldString( DEATHDATEC );
-								child.Format( L"%s %s", m_recordset3->GetFieldString( LASTNAMEC ), m_recordset3->GetFieldString( FIRSTNAMEC ) );		
-							
-								diff = 0;
-								if( theApp.dateDiff( death_dateF, birth_dateC, 9 ) ) diff = 1;
-								str.Format( L"3\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t", diff, rowidC,lineNumberC,tableNumberC, sourceC,unitedC, mother_indexC, L"", child,birth_dateC, death_dateC );
-								fwprintf( fl, L"%s\n", str );
-							}
-						}
-						fwprintf( fl, L"\n" );
-					}
-				}
+				if( theApp.dateDiff( deathF, birthC, 9 ) ) break;
 			}
 		}
-		wndP.StepIt();
+		if( j == m_recordset1->RecordsCount() ) goto cont;  // minden gyereke születési ideje OK
+
+		// apa adatai
+		m_rowid		= rowidF;
+		m_line		= m_recordset->GetFieldString( LINE );
+		m_table		= m_recordset->GetFieldString( TABLE );
+		m_source	= m_recordset->GetFieldString( SOURCE );
+		m_united	= m_recordset->GetFieldString( UNITED );
+		m_birth		= m_recordset->GetFieldString( BIRTH );
+		m_death		= m_recordset->GetFieldString( DEATH );
+		m_wedding	= L"";
+		m_orderWife	= L"";
+		m_diff		= L"1";
+		m_name.Format( L"%s %s", m_recordset->GetFieldString( LASTNAME ), m_recordset->GetFieldString( FIRSTNAME ) );
+
+		listPeople( nItem, 1 );
+		++nItem;
+
+		// apa feleségei
+		m_command.Format( L"SELECT rowid, * FROM marriages WHERE spouse1_id='%s' ORDER BY orderWife", rowidF );
+		if( !query2( m_command ) ) return;
+		for( UINT j = 0; j < m_recordset2->RecordsCount(); ++j, m_recordset2->MoveNext() )
+		{
+			rowidM		= m_recordset2->GetFieldString( MARRIAGES_SPOUSE2_ID );
+			m_orderWife = m_recordset2->GetFieldString( MARRIAGES_ORDERWIFE );
+			m_wedding	= m_recordset2->GetFieldString( MARRIAGES_DATE );
+
+			// anya adatai
+			m_command.Format( L"SELECT %s FROM people WHERE rowid='%s'", m_columns, rowidM );
+			if( !query3( m_command ) ) return;
+
+			m_diff		= L"0";
+			m_rowid		= rowidM;
+			m_line		= m_recordset3->GetFieldString( LINE );
+			m_table		= m_recordset3->GetFieldString( TABLE );
+			m_source	= m_recordset3->GetFieldString( SOURCE );
+			m_united	= m_recordset3->GetFieldString( UNITED );
+			m_birth		= m_recordset3->GetFieldString( BIRTH );
+			m_death		= m_recordset3->GetFieldString( DEATH );
+			m_name.Format( L"%s %s", m_recordset3->GetFieldString( LASTNAME ), m_recordset3->GetFieldString( FIRSTNAME ) );
+
+			listPeople( nItem, 2 );
+			++nItem;
+
+			// apa-anya gyermeke adatai
+			m_command.Format( L"SELECT %s FROM people WHERE father_id='%s' AND mother_id='%s'", m_columns, rowidF, rowidM );
+			if( !query4( m_command ) ) return;
+
+			for( UINT k = 0; k < m_recordset4->RecordsCount(); ++k, m_recordset4->MoveNext() )
+			{
+				m_diff		= L"0";
+				m_wedding	= L"";
+				m_rowid		= m_recordset4->GetFieldString( ROWID );
+				m_line		= m_recordset4->GetFieldString( LINE );
+				m_table		= m_recordset4->GetFieldString( TABLE );
+				m_source	= m_recordset4->GetFieldString( SOURCE );
+				m_united	= m_recordset4->GetFieldString( UNITED );
+				m_birth		= m_recordset4->GetFieldString( BIRTH );
+				m_death		= m_recordset4->GetFieldString( DEATH );
+				m_name.Format( L"%s %s", m_recordset4->GetFieldString( LASTNAME ), m_recordset4->GetFieldString( FIRSTNAME ) );		
+				
+
+				if( theApp.dateDiff( deathF, m_birth, 9 ) ) m_diff = L"1";
+				listPeople( nItem, 3 );
+				++nItem;
+			}
+		}
+		m_ListCtrl.InsertItem( nItem, L"" );
+		++nItem;
+cont:	wndP.StepIt();
 		wndP.PeekAndPump();
 		if (wndP.Cancelled()) break;
 	}
 	wndP.DestroyWindow();
-
-	fclose( fl );
 }
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckFatherDeath9::fillTable()
+void CCheckFatherDeath9::listPeople( int nItem, int who )
 {
-	int	nItem = 0;
-	int col;
-	int who;
-	int diff;
 
-	CString			cLine;
-	CStringArray	A;
-	int				n;
+	str.Format( L"%d", who );
+	nItem = m_ListCtrl.InsertItem( nItem, str );
+	m_ListCtrl.SetItemText( nItem, L_DIFF, m_diff );
+	m_ListCtrl.SetItemText( nItem, L_ROWID, m_rowid );
+	m_ListCtrl.SetItemText( nItem, L_LINENUMBER, m_line );
+	m_ListCtrl.SetItemText( nItem, L_TABLENUMBER, m_table );
+	m_ListCtrl.SetItemText( nItem, L_UNITED, m_united );
+	m_ListCtrl.SetItemText( nItem, L_SOURCE, m_source );
+	m_ListCtrl.SetItemText( nItem, L_MARRIAGEDATE, m_wedding );
+	m_ListCtrl.SetItemText( nItem, L_ORDERWIFE, m_orderWife );
+	m_ListCtrl.SetItemText( nItem, L_NAME, m_name );
+	m_ListCtrl.SetItemText( nItem, L_BIRTH, m_birth );
+	m_ListCtrl.SetItemText( nItem, L_DEATH, m_death );
 
-	CStdioFile file( m_fileSpec, CFile::modeRead); 
-	while(file.ReadString(cLine)) 
+	int col = 0;
+	int diff = _wtoi( m_diff );
+	switch( who )
 	{
-		if( cLine.IsEmpty() )
-		{	
-			nItem = m_ListCtrl.InsertItem( nItem, L"" );
-			++nItem;
-			continue;
-		}
+		case 1:
+			col = 1 << L_NAME;
+			if( diff )
+				col = col | 1 << L_DEATH;
+			break;
+		case 2:
+			col = 1 << L_NAME;
+			if( diff )
+				col = col | 1 << L_DEATH;
+			break;
+		default:
+			if( diff )
+				col = 1 << L_BIRTH;
+			break;
+	};
 
-		A.RemoveAll();
-		n = wordList( &A, cLine, '\t', TRUE );
-		if( n != _COLUMNS )
-		{
-			str.Format( L"Oszlopok száma %d !=%d\n%s\n'%s'", n, _COLUMNS, cLine, A[n-1] );
-			AfxMessageBox( str );
-			return;
-		}
-
-		nItem = m_ListCtrl.InsertItem( nItem, L"" );
-		m_ListCtrl.SetItemText( nItem, L_WHO, A[_WHO] );
-		m_ListCtrl.SetItemText( nItem, L_DIFF, A[_DIFF] );
-		m_ListCtrl.SetItemText( nItem, L_ROWID, A[_ROWID] );
-		m_ListCtrl.SetItemText( nItem, L_LINENUMBER, A[_LINENUMBER] );
-		m_ListCtrl.SetItemText( nItem, L_TABLENUMBER, A[_TABLENUMBER]);
-		m_ListCtrl.SetItemText( nItem, L_UNITED, A[_UNITED] );
-		m_ListCtrl.SetItemText( nItem, L_SOURCE, A[_SOURCE] );
-		m_ListCtrl.SetItemText( nItem, L_MOTHERINDEX, A[_MOTHERINDEX] );
-		m_ListCtrl.SetItemText( nItem, L_MARRIAGEDATE, A[_MARRIAGEDATE] );
-		m_ListCtrl.SetItemText( nItem, L_NAME, A[_NAME] );
-		m_ListCtrl.SetItemText( nItem, L_BIRTH, A[_BIRTH_DATE] );
-		m_ListCtrl.SetItemText( nItem, L_DEATH, A[_DEATH_DATE] );
-
-		col		= 0;
-		who		= _wtoi( A[_WHO] );
-		diff	= _wtoi( A[_DIFF] );
-
-		switch( who )
-		{
-			case 1:
-				col = 1 <<_NAME;
-				if( diff )
-					col = col | 1 << _DEATH_DATE;
-				break;
-			case 2:
-				col = 1 <<_NAME;
-				if( diff )
-					col = col | 1 << _DEATH_DATE;
-				break;
-			default:
-				if( diff )
-					col = 1 << _BIRTH_DATE;
-				break;
-		};
-
-		m_ListCtrl.SetItemData( nItem, col );
-		str.Format( L"%04X", col );
-		m_ListCtrl.SetItemText( nItem, L_ITEMDATA, str );
-
-		++nItem;
-	}
-	file.Close();
+	m_ListCtrl.SetItemData( nItem, col );
+//	str.Format( L"%04X", col );
+//	m_ListCtrl.SetItemText( nItem, L_ITEMDATA, str );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckFatherDeath9::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
@@ -491,21 +373,21 @@ void CCheckFatherDeath9::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
 		nCol	= pLVCD->iSubItem;
 		mask	= 1 << nCol;
 		iData	= m_ListCtrl.GetItemData( nItem );
-		who		= _wtoi( m_ListCtrl.GetItemText( nItem, _WHO ) );
-		diff	= _wtoi( m_ListCtrl.GetItemText( nItem, _DIFF ) );
+		who		= _wtoi( m_ListCtrl.GetItemText( nItem, L_WHO ) );
+		diff	= _wtoi( m_ListCtrl.GetItemText( nItem, L_DIFF ) );
 		if( iData & mask )	// a cella jelölve van szinezésre
 		{
 			if( who == MAN )
 			{
-				if( mask == 1 << _NAME )
+				if( mask == 1 << L_NAME )
 					pLVCD->clrText	 = RGB( 255,0,0 );
-				if( mask == (1 << _DEATH_DATE) && diff )
+				if( mask == (1 << L_DEATH ) && diff )
 					pLVCD->clrTextBk = YELLOW;
 			}
 			else if( who == WOMAN )
 			{
 				pLVCD->clrText	 = RGB( 0,0,255);
-				if( mask == (1 << _DEATH_DATE) && diff )
+				if( mask == (1 << L_DEATH ) && diff )
 					pLVCD->clrTextBk = YELLOW;
 			}
 			else
@@ -528,23 +410,6 @@ void CCheckFatherDeath9::OnList()
 	theApp.exportAll( logFile, title, &m_ListCtrl );
 
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-void CCheckFatherDeath9::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-
-	int nItem = pNMItemActivate->iItem;
-	CString rowid	= m_ListCtrl.GetItemText( nItem, L_ROWID );
-
-	CRelations dlg;
-	dlg.nItem		= nItem;
-	dlg.m_rowid		= rowid;
-	if( dlg.DoModal() == IDCANCEL ) return;
-
-	*pResult = 0;
-}
-*/
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 LRESULT CCheckFatherDeath9::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 {

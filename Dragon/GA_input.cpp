@@ -236,6 +236,13 @@ bool CGaInput::inputFile()
 		}
 		else			// descendant line
 		{
+			if( cLine.GetAt(0) != '<' )
+			{
+				str.Format( L"A %d. sor hibás!\n%s", m_lineNumber, cLine );
+				AfxMessageBox( str );
+				return false;
+			}
+
 			cLine = cleanHtmlTags( cLine );
 			if( cLine.IsEmpty() ) continue;
 			
@@ -481,7 +488,7 @@ void CGaInput::fillFatherMother( )
 void CGaInput::setDummyFather()
 {
 	// generációk azonosága is kellene?
-	m_command.Format( L"UPDATE people SET father_id=%d+tableNumber WHERE father_id=0 AND source=1 ", FATHERID );
+	m_command.Format( L"UPDATE people SET father_id=%d+tableNumber WHERE father_id=0 AND source=1 ", NOFATHERID );
 	if( !theApp.execute( m_command ) ) return;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

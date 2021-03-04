@@ -165,7 +165,7 @@ void CCheckIntegrity::fathers()
 	for( UINT i = 0; i < m_recordset->RecordsCount(); ++i )
 	{
 		father_id = _wtoi( m_recordset->GetFieldString( 3 ) );
-		if( father_id > FATHERID || !father_id ) goto cont1;
+		if( father_id > NOFATHERID || !father_id ) goto cont1;
 	//	if( father_id == L"0" || father_id.IsEmpty()  ) goto cont1;
 	
 		m_command.Format( L"SELECT count() FROM people WHERE rowid='%d'", father_id );

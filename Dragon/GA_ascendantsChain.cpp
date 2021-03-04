@@ -75,7 +75,7 @@ BOOL CGaAscendantsChain::getPeople( CString rowid )
 	m_sex_id	= theApp.m_recordset->GetFieldString( PEOPLE_SEX_ID );
 
 	m_father_id	= theApp.m_recordset->GetFieldString( PEOPLE_FATHER_ID );
-	if( _wtoi( m_father_id ) > FATHERID ) m_father_id.Empty();
+	if( _wtoi( m_father_id ) > NOFATHERID ) m_father_id.Empty();
 	if( _wtoi( m_father_id ) == 0 ) m_father_id.Empty();
 
 	m_mother_id	= theApp.m_recordset->GetFieldString( PEOPLE_MOTHER_ID );
@@ -922,7 +922,7 @@ BOOL CGaAscendantsChain::getProbantus( CString rowid, int kekule )
 			for( int i = 0; i < 2; ++i )
 			{
 				parent_id =m_recordset.GetFieldString( i );
-				if( parent_id.IsEmpty() || parent_id == L"0" || _wtoi(parent_id ) > FATHERID ) 
+				if( parent_id.IsEmpty() || parent_id == L"0" || _wtoi(parent_id ) > NOFATHERID ) 
 					continue;		// nincs apa vagy anya
 				// ha egy ember többször szerepelne különbözõ minõségben, akkor annak újabb elõfordulását kihagyja!!!
 				for( int j = 0; j < vFel.size(); ++j )

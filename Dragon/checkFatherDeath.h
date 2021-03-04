@@ -21,16 +21,23 @@ public:
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
-	FILE* fl;
-
-
-	int		m_cnt;
-
 	CString str;
 	CString m_command;
-	CString m_fileSpec;
 
 	CListCtrlEx m_ListCtrl;
+
+	CString m_diff;
+	CString m_rowid;
+	CString m_name;
+	CString m_line;
+	CString m_table;
+	CString	m_source;
+	CString m_united;
+	CString m_birth;
+	CString m_death;
+	CString m_wedding;
+	CString m_orderWife;
+
 
 	CSqliteDBRecordSet*	 m_recordset;
 	CSqliteDBRecordSet*	 m_recordset1;
@@ -46,7 +53,7 @@ protected:
 
 	void createColumns();
 	void fatherDeathChildBirth();
-	void fillTable();
+	void listPeople( int nItem, int who );
 
 	void OnHtmlEditLines();
 	void OnHtmlNotepad();

@@ -88,11 +88,12 @@ protected:
 
 	_int64 oneyear;
 
+	CString m_title;
 	CString m_info;
 	CString m_command;
 	CString str;
 	CString m_filespec;
-
+	bool m_filtered;
 
 	CProgressWnd wndP;
 
@@ -103,6 +104,7 @@ protected:
 	std::vector<WIFES> vWifes;
 	std::vector<CHILDREN> vChildren;
 	std::vector<TCHAR*> vList;
+	std::vector<TCHAR*> vListFiltered;
 
 	UINT	m_rgb[10];
 	UINT	m_colorWife;
@@ -139,6 +141,9 @@ protected:
 	void checkFamily();
 	void push( CString item );
 	void keress( int start );
+
+	int  pushBlock( UINT i );
+	bool filter( CString caption, CString azon );
 
 	CString checkDate( CString datum);
 
@@ -177,4 +182,16 @@ public:
 	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnParameters();
 	afx_msg void OnInfoFamilies();
+	afx_msg void OnFilterFather9();
+	afx_msg void OnFilterUnfiltered();
+	afx_msg void OnFilterBeforemother();
+	afx_msg void OnFilterMotherage();
+	afx_msg void OnFilterBeforefather();
+	afx_msg void OnFilterBirthdeath();
+	afx_msg void OnFilterBirth();
+	afx_msg void OnFilterDeath();
+	afx_msg void OnFilterWedding();
+	afx_msg void OnBornafterhdeath();
+	afx_msg void OnBornBeforeMotherBirth();
+	afx_msg void OnDiedBeforeMotherBirth();
 };
