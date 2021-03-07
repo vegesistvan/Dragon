@@ -1,3 +1,5 @@
+v 2.2.4.0 2021.03.06 A családok dátum hibáinak színezése megváltozott, és szűrhetőek bizonyos kritériumok szerint
+
 v 2.2.3.0 2021.03.04 Nem < karakterrel kezdődő GA.html sorokra hibajelzést
 
 v 2.2.2.0 2021.03.01 Családok lstázása és ellenőrzése akkor is, ha az anya ismeretlen

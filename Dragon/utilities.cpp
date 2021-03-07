@@ -115,20 +115,6 @@ CString dropLastCharacter( CString cLine )
 	return str;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int countWords( CString str )
-{
-	int pos; 
-	int cnt = 1;
-	str.Trim();
-	while( (pos=str.Find( ' ' )) != -1 )
-	{
-		str = dropUntil( str, ' ' );
-		str.Trim();
-		++cnt;
-	}
-	return cnt;
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString getUntil( CString str, char ch )
 {
 	int pos; 
@@ -212,6 +198,7 @@ CString getFirstWord( CString str )
 	if( ( pos = str.Find( ' ' ) ) == -1 ) return str;
 	return( str.Left( pos ) );
 }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString getSecondWord( CString str )
 {
 	CString out;
@@ -248,37 +235,6 @@ BOOL isRoman( CString word )
 	}
 	return FALSE;
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-BOOL isFirstUpper( CString str )
-{
-	CString upper;
-	upper = L"AÁBCDEÉFGHIÍJKLMNOÓÖÕPQRSTUÚÜÛVWXYZ";
-	CString kar;
-	kar = str[0];
-
-	CString benne;
-	benne = kar.SpanIncluding( upper );
-	if( benne.IsEmpty() )
-		return FALSE;
-	else
-		return TRUE;
-}
-*/
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString nagyra( CString word )
-{
-	int i = 0;
-	TCHAR alma[100];
-	for( int i = 0; i < word.GetLength(); ++i )
-	{
-		alma[i] = TCHAR(toupper( word[i] ));
-	}
-	alma[i] = 0;
-	CString nagy;
-	nagy = alma;
-	return nagy;
-}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString cleanCline( CString cLine )
 {
@@ -302,6 +258,7 @@ CString cleanCline( CString cLine )
 	return str;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 CString cleanCline2( CString cLine )
 {
 	
@@ -322,6 +279,7 @@ CString cleanCline2( CString cLine )
 		str.Format( L"%s %s", tag.Left(1), line );
 	return str;
 }
+*/
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // A soremlés és más kiszûrése
 CString cleanHtmlLine( CString cLine )
@@ -398,97 +356,6 @@ CString cleanHtmlTags( CString cLine )
 			str = cLine;
 	return str;
 }
-/*
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void clearPeople( PEOPLE *p)
-{
-	p->generation  = L'';
-	p->birth_date.Empty();
-	p->birth_place.Empty();
-	p->comment.Empty();
-	p->death_date.Empty();
-	p->death_place.Empty();
-	p->father_id = L"0";
-	p->first_name.Empty();
-	p->last_name.Empty();
-	p->known_as.Empty();
-	p->mother_id = L"0";
-	p->rowid.Empty();
-	p->sex_id = 0;
-	p->title.Empty();
-	p->titolo.Empty();
-	p->posterior.Empty();
-	p->parentIndex = 0;
-	p->parentIndexCalc = 0;
-	p->tableAncestry = 0;
-	p->tableNumber.Empty();
-	p->lineNumber = 0;
-	p->tableRoman.Empty();
-	p->orderFather = 1;
-	p->orderMother = 1;
-	p->folyt.Empty();
-	p->arm.Empty();
-	p->csalad.Empty();
-	p->gap = 0;
-}
-*/
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void cleanNameBlock( NAMEBLOCK *n )
-{
-	n->fullname.Empty();
-	n->comment.Empty();
-	n->first_name.Empty();
-	n->title.Empty();
-	n->posterior.Empty();
-	n->parentIndex = 0;
-	n->sex_id = 0;
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-void clearGenerations( GENERATIONS *gen )
-{
-	gen->gen = TCHAR(' ');
-	gen->descendant_id = L"0";
-	gen->orderFather = 0;
-	for( UINT i = 0; i < 10; ++i )	gen->spouse_id[i] = L"0";	// egy leszármazottnak max 10 házastársának rowid-jét tartja nyilván
-}
-*/
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void clearName( NAME* name ) 
-{
-	name->sex_id = 0;
-	name->titolo.Empty();
-	name->title.Empty();
-	name->first_name.Empty();
-	name->last_name.Empty();
-	name->posterior.Empty();
-	name->parentIndex  = 0;
-	name->fullname.Empty();
-	name->comment.Empty();
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void clearSpouseBlock( SNAMEBLOCK* sp)
-{
-	sp->comment.Empty();
-	sp->date.Empty();
-	sp->name.Empty();
-	sp->place.Empty();
-
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int isThere( CStringArray* A,  CString word )
-{
-	int i;
-	for( i= 0; i < A->GetCount(); ++i )
-	{
-		if( A->GetAt(i) == word ) break;
-	}
-	if( i == A->GetCount() )
-		return -1;
-	else
-		return i;
-}
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Az A arrajbõl az n-dik szótól m darab szót összerak szóközzel elválasztva, és azt visszadja
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -525,14 +392,6 @@ CString packWords( CStringArray* A, int n, int m )
 	return str.Trim();
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString getPeopleBlock( CString cLine )
-{
-	int pos;
-	if( ( pos= cLine.Find( '=' ) ) != -1 )
-		cLine = cLine.Left( pos-1 );
-	return cLine.Trim();
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString getLastWord( CString cLine )
 {
 	CString ret(L"" );
@@ -555,31 +414,6 @@ void setCreationTime( CString filespec )
 	SetFileTime( fileHandle, &thefiletime, (LPFILETIME) NULL,(LPFILETIME) NULL );
 	CloseHandle(fileHandle);
 }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString birthDateMinus( CString birth_date, int minus )
-{
-	CString str;
-	int year;
-	
-	year = _wtoi( birth_date.Left(4 ) ) - minus;
-	str.Format( L"%d", year ); 
-	if( year < 0  )
-	{
-		str.Empty();
-	}
-	return str;
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString cleanWord( CString word )
-{
-	word.Replace( '?', ' ' );		// bizonytalan név
-	word.Replace( ',', ' ' );		// Pl: János, Nemeslubella jelzi, hogy Nemeslubella nem tartozik a névhez, hanem comment
-//	word.Replace( '_', ' ' );		// nevekben gyakran van összekötés
-//	word.Replace( '-', ' ' );		// nevekben gyakran van összekötés
-	word.Replace( ';', ' ' );		// Pl: =N; János de Divék
-	word.Trim();
-	return word;
-}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void sameClear( SAME * same )
 {
@@ -592,43 +426,6 @@ void sameClear( SAME * same )
 	same->timeConflict = L"";
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString lowerToUpper( CString lowStr )
-{
-	CString str(L"");
-	const TCHAR low[] =
-	{
-		TCHAR('a'),TCHAR('á'),TCHAR('b'),TCHAR('c'),TCHAR('d')
-	};
-
-	const TCHAR upp[] =
-	{
-		TCHAR('A'),TCHAR('Á'),TCHAR('B'),TCHAR('C'),TCHAR('D')
-	};
-
-
-	CString uppStr(L"");
-	TCHAR	kar;
-	for( int i = 0; i < lowStr.GetLength(); ++i )
-	{
-		kar = lowStr[i];
-		for( int j = 0; j < sizeof( low ); ++j )
-		{
-			if( low[j] == kar )
-			{
-				str.Format( L"%s%c", uppStr, upp[j] );
-				uppStr = str;
-				break;
-			}
-			else
-			{
-				str.Format( L"%s%c", uppStr, low[j] );
-				uppStr = str;
-			}
-		}
-	}
-	return uppStr;
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString toLower( CString str )
 {
 	int tLen = str.GetLength()+1;
@@ -1192,17 +989,13 @@ int compDate( CString date1, CString date2 )
 	return( date1.Compare( date2 ) );
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Két dátum YYYY.MM.DD formátumú
+// Két dátum YYYY[[.MM.]DD[ formátumú
+// a hosszabb dátumot csonkítja a rövidebb hosszára és úgy hasonlítja össze
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int diffD( CString date1, CString date2, int* pYear )
 {
-	_int64 d1;
-	_int64 d2;
-
 	if( date1.IsEmpty() || date2.IsEmpty() ) return INT_MAX;
-//	if( !checkDate( date1 ) || !checkDate( date2 ) ) return INT_MAX;
 	*pYear  = _wtoi( date1.Left(4) ) - _wtoi( date2.Left(4) );
-
 
 	int len1 = date1.GetLength();
 	int len2 = date2.GetLength();

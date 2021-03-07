@@ -20,6 +20,7 @@ typedef struct
 	int		numOfSpouses;
 	CString message;
 	CString comment;
+	int		yellow;
 }HUSBAND;
 
 typedef struct
@@ -43,6 +44,7 @@ typedef struct
 	int		motherOrder;
 	CString message;
 	CString comment;
+	int		yellow;
 }WIFES;
 
 
@@ -65,6 +67,7 @@ typedef struct
 	int		mother_index;
 	CString message;
 	CString comment;
+	int		yellow;
 }CHILDREN;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -124,7 +127,7 @@ protected:
 	int	m_minDiffMC;
 	int	m_maxDiffMC;
 
-
+	int m_lifespan;
 
 	int m_cnt;
 
@@ -142,8 +145,8 @@ protected:
 	void push( CString item );
 	void keress( int start );
 
-	int  pushBlock( UINT i );
-	bool filter( CString caption, CString azon );
+	int  pushBlock( UINT i, int L_REF );
+	void filter( CString caption, CString azon );
 
 	CString checkDate( CString datum);
 
@@ -182,16 +185,18 @@ public:
 	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnParameters();
 	afx_msg void OnInfoFamilies();
-	afx_msg void OnFilterFather9();
+
+	afx_msg void OnBornAfterFatherDeath9();
 	afx_msg void OnFilterUnfiltered();
-	afx_msg void OnFilterBeforemother();
 	afx_msg void OnFilterMotherage();
 	afx_msg void OnFilterBeforefather();
-	afx_msg void OnFilterBirthdeath();
+	afx_msg void OnDeathBirth();
 	afx_msg void OnFilterBirth();
 	afx_msg void OnFilterDeath();
 	afx_msg void OnFilterWedding();
-	afx_msg void OnBornafterhdeath();
+	afx_msg void OnBornAftreHusbandDeath();
 	afx_msg void OnBornBeforeMotherBirth();
 	afx_msg void OnDiedBeforeMotherBirth();
+	afx_msg void OnBornaftermotherdeath();
+	afx_msg void OnLifespan();
 };

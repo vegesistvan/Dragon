@@ -23,7 +23,6 @@ void		splitFilespec( CString filespec, CString *drive, CString *path, CString *n
 int			wordList( CStringArray *arrayP,CString line, char sep, BOOL single );
 int			printStructure ();
 
-int			countWords( CString str );
 CString		dropUntil( CString str, char ch );
 CString		getUntil( CString str, char ch );
 CString		dropLastWord( CString cLine );
@@ -35,7 +34,6 @@ CString		getSecondWord( CString str );
 CString		getLastWord( CString str );
 CString		sepFirstName( CString str );
 
-CString		lowerToUpper( CString str );
 CString		toLower( CString str );
 
 CString		date2date( CString date );
@@ -45,19 +43,11 @@ BOOL		isNumeric( CString word );
 BOOL		isRoman( CString word );
 BOOL		isValidBrace( CString brace );
 
-//void		clearPeople( PEOPLE *p);
 
-CString		nagyra( CString word );
-void		clearName( NAME* name );
-void		cleanNameBlock( NAMEBLOCK *n );
 CString		cleanCline( CString cLine );
-CString		cleanCline2( CString cLine );
 CString		cleanHtmlLine( CString cLine );
 CString		cleanHtmlTags( CString cLine );
-void		clearSpouseBlock( SNAMEBLOCK* sp);
 CString		packWords( CStringArray* A, int from, int db );
-CString		getPeopleBlock( CString cLine );
-int			isThere( CStringArray* A,  CString word );
 void		setCreationTime( CString filespec );
 
 void		sameClear( SAME * same );
@@ -67,8 +57,6 @@ void		sameClear( SAME * same );
 bool		isLastCharacter( CString str, TCHAR kar );
 
 CString		getMultiItem( CStringArray A, int i, int j );
-CString		birthDateMinus( CString m_birth_date, int minus );
-CString		cleanWord( CString word );
 CString		upper( CString str );
 
 bool		sortByName(const SPOUSES &v1, const SPOUSES &v2);

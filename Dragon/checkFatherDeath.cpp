@@ -26,7 +26,6 @@ enum
 };
 
 // SELECT oszlopok
-
 enum 
 {
 	ROWID = 0,

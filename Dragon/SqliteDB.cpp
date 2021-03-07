@@ -856,7 +856,7 @@ int CSqliteDB::blobInsert( char* table, char* column, BLOBSTAT* stat )
 	if( ( ix = picSpec.ReverseFind( '.' ) ) != -1 )
 	{
 		ext = picSpec.Mid( ix + 1 );
-		ext = toLower( ext );
+		ext = ext.MakeLower();
 	}
 	stat->fileSpec	= picSpec;
 	stat->size		= filesize; 

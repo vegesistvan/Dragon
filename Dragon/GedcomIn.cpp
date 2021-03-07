@@ -156,7 +156,8 @@ orderMother\
 				ext.Empty();
 				if( (pos = str.ReverseFind( '.' )) != -1 )
 				{
-					ext = toLower( str.Mid( pos + 1 ) );
+//					ext = toLower( str.Mid( pos + 1 ) );
+					ext = str.Mid( pos + 1 ).MakeLower();
 				}
 				filename.Format( L"%s %s_%s_%d.%s", v_indi.at(i).last_name, v_indi.at(i).first_name, v_indi.at(i).rowid, cnt, ext );
 				vPhotos.at(j).fileName	= filename;

@@ -756,7 +756,8 @@ void CDragonApp::OnPrivatFolyt()
 
 		if(  cLine.Find( L"%%% folyt" ) != -1 )
 		{
-			str = cleanCline2( cLine );
+//			str = cleanCline2( cLine );
+			str = cleanCline( cLine );
 			fwprintf( theApp.fl, L"%s\n", str );
 		}
 	}
