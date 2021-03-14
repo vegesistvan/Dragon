@@ -32,10 +32,6 @@ public:
 	BOOL m_limited;
 	BOOL _woman;				// nõk leszármazottait is kistázza-e
 
-	CString m_rowid1;
-	CString m_name;
-	CString m_tableNumber;
-	int		m_source;
 
 
 protected:
@@ -58,6 +54,9 @@ protected:
 	CString m_mother_index;
 	CString m_familyName;
 
+	int		m_parentindexLast;
+	BOOL	m_checkFamily;
+
 	BOOL m_numOfSpouses;
 	CSqliteDBRecordSet m_recordset;
 	CSqliteDBRecordSet m_recordset1;
@@ -76,6 +75,12 @@ protected:
 
 	std::vector<DESCENDANTS> vDesc;		// A vDesc vektoban egy leszármazott addig marad benn, amíg minden gyermekét listáztuk
 	std::vector<UINT>vSerial;			// A Meurgey de Tupigny számozáshoz a sorszámok nyilvántartása
+
+	CComboBox m_ComboSpec;
+	CComboBox m_ComboBgrd;
+	CComboBox m_ComboComm;
+	CComboBox m_ComboName;
+	CButton m_szluhaCtrl;
 
 	DESCENDANTS desc;
 
@@ -97,9 +102,9 @@ protected:
 	void descendants();
 
 	void print( CString str );
-	void printGAline( UINT ix );
-	void printBegining( int ix );
-	void printDescendant( int ix );
+	void printGAline();
+	void printBegining();
+	void printDescendant();
 	void printMarriages();
 	void printMarriage( CString place, CString date, int i, int numberOfSpouses );
 	void printSpouse();
@@ -115,44 +120,44 @@ protected:
 	CString getCommentBlock( CString comment );
 
 	CString getFamilyName( CString family );
-	DECLARE_MESSAGE_MAP()
-public:
-	virtual BOOL OnInitDialog();
 
-	BOOL m_connect;
-	BOOL m_woman;
-
-//	int		m_numbering;
-
-	CComboBox m_ComboSpec;
 	int	m_ixName;
 	int	m_ixSpec;
 	int	m_ixComment;
 
 	BOOL m_CheckLastName;
-	BOOL m_code;
+	
 
-	CComboBox m_ComboComm;
-	CComboBox m_ComboName;
 	int m_setCombo;
+	
+	BOOL m_connect;
+	BOOL m_woman;
+	
+
+
+
+	DECLARE_MESSAGE_MAP()
+public:
+	virtual BOOL OnInitDialog();
+
+// bemeneti paraméterek
+	BOOL	m_code;
+	CString m_rowid1;
+	CString m_name;
+	CString m_tableNumber;
+	int		m_source;
+	int		m_numbering;
 
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnClickedRadioClear();
 	afx_msg void OnRadioDefault();
-
-	CComboBox m_ComboBgrd;
-
 	afx_msg LRESULT OnCtlColorBtn( WPARAM wparam, LPARAM lparam );
 	afx_msg void OnClickedCheckWoman();
 	afx_msg void OnClickedCheckConnect();
-
 	afx_msg void OnClickedSzluha();
 	afx_msg void OnTupigny();
 	afx_msg void OnVillers();
-	BOOL m_checkFamily;
 	afx_msg void OnClickedCheckFamily();
 	afx_msg void OnClickedCheckLastname();
-	int m_numbering;
-	CButton m_szluhaCtrl;
 };
 #endif // !defined(AFX_DESCENDANT_H__930379D8_BDD1_4973_93FF_041F3F3811E4__INCLUDED_)

@@ -88,7 +88,6 @@ typedef struct
 	BOOL	numOfMothers;			// az apának több felesége van
 	int		sex_id;
 	UINT	gen;					// generáció sorszáma
-	int		tupigny;
 	UINT	numOfChildren;			// hány gyereke van
 	UINT	childrenPrinted;		// hány gyereket listáztunk már
 	BOOL	hidden;					// ha van apja az õsnek ( %%% folyt ), akkor az apát hidden-ként elteszi 

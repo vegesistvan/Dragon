@@ -188,7 +188,6 @@
     <ClInclude Include="CheckFamilyDates.h" />
     <ClInclude Include="CheckGenerations.h" />
     <ClInclude Include="checkIntegrity.h" />
-    <ClInclude Include="CollectFamily.h" />
     <ClInclude Include="ContractPeople.h" />
     <ClInclude Include="ContractCouples.h" />
     <ClInclude Include="ContractedCouples.h" />
@@ -227,7 +226,7 @@
     <ClInclude Include="Color.h" />
     <ClInclude Include="ColorStatic.h" />
     <ClInclude Include="ComboItem.h" />
-    <ClInclude Include="ConnectCsalad.h" />
+    <ClInclude Include="ConnectCsaladTorzs.h" />
     <ClInclude Include="database.h" />
     <ClInclude Include="Date.h" />
     <ClInclude Include="EditFirstName.h" />
@@ -308,7 +307,6 @@
     <ClCompile Include="CheckFamilyDates.cpp" />
     <ClCompile Include="CheckGenerations.cpp" />
     <ClCompile Include="checkIntegrity.cpp" />
-    <ClCompile Include="CollectFamily.cpp" />
     <ClCompile Include="ContractPeople.cpp" />
     <ClCompile Include="ContractCouples.cpp" />
     <ClCompile Include="ContractedCouples.cpp" />
@@ -354,7 +352,7 @@
     <ClCompile Include="GedcomIn_fillVectors.cpp" />
     <ClCompile Include="ColorStatic.cpp" />
     <ClCompile Include="ComboItem.cpp" />
-    <ClCompile Include="ConnectCsalad.cpp" />
+    <ClCompile Include="ConnectCsaladTorzs.cpp" />
     <ClCompile Include="Date.cpp" />
     <ClCompile Include="EditFirstName.cpp" />
     <ClCompile Include="EditTable.cpp" />

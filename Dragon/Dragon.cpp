@@ -208,8 +208,6 @@ BOOL CDragonApp::selectDatabase()
 	CString initialDir;
 	CString newFile;
 
-	m_databaseSpec.Empty();
-
 	str.Format(L"Adatbázis fájl (*.db)|*.db|Minden fájl (*.*)|*.*|" );
 	CFileDialog dlg(TRUE,L".*",NULL,OFN_HIDEREADONLY|OFN_EXPLORER,str );
 
@@ -317,6 +315,27 @@ CString CDragonApp::getInputMode()
 	int type;
 	CString filename;
 	CString ext;
+	CString linenumber(L"");
+
+	if( !query( L"SELECT count() FROM people" ) ) return FALSE;
+	m_cntPeople = _wtoi( m_recordset->GetFieldString( 0 ) );
+	if( !m_cntPeople ) 
+	{
+		m_inputMode = URES;
+	}
+	else
+	{
+		if( !query( L"SELECT linenumber FROM people LIMIT 1" ) ) return FALSE;
+		linenumber =  m_recordset->GetFieldString(0);
+		if( !linenumber.IsEmpty() )
+			m_inputMode = GAHTML;
+		else
+			m_inputMode = MANUAL;
+	}
+
+
+	/*
+
 
 	if( !query( L"SELECT count() FROM people" ) ) return FALSE;
 	m_cntPeople = _wtoi( m_recordset->GetFieldString( 0 ) );
@@ -347,35 +366,9 @@ CString CDragonApp::getInputMode()
 			}
 		}
 	}
+	*/
 	return m_inputMode;
 
-/*
-
-
-		m_command = L"SELECT filename FROM inputFiles";
-		if( !query( m_command ) ) return L"";
-		if( !m_recordset->RecordsCount() ) 
-		{
-			m_inputMode = MANUAL;
-		}
-		else
-		{
-			filename = m_recordset->GetFieldString( 0 );
-			ext		= filename.Right( filename.GetLength() - filename.ReverseFind( '.' ) -1 );
-			if( !ext.CompareNoCase( L"html" ) || !ext.CompareNoCase( L"htm" ) ) 
-				m_inputMode = GAHTML;
-			else if( !ext.CompareNoCase( L"ged" ) )
-				m_inputMode = GEDCOM;
-			else
-			{
-				m_inputMode = L"";
-				AfxMessageBox( L"Ismeretlen eredetû adatbázis!" );
-			}
-		}
-
-	}
-	return m_inputMode;
-*/
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonApp::createColumnList()

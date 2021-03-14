@@ -172,6 +172,8 @@ BEGIN_MESSAGE_MAP(CTablePeople, CDialogEx)
 	ON_COMMAND(ID_HTML_FATHERANDSIBLINGS, &CTablePeople::OnHtmlFatherAndSiblings)
 	ON_COMMAND(ID_HTML_EDIT, &CTablePeople::OnHtmlEditLines)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CTablePeople::OnHtmlNotepad)	
+	ON_COMMAND(ID_HTML_CHILDREN, &CTablePeople::OnHtmlChildren)
+
 
 	ON_COMMAND(ID_EDIT_DELETE, &CTablePeople::OnEditDelete)
 	ON_COMMAND(ID_EDIT_UPDATE, &CTablePeople::OnEditUpdate)
@@ -223,6 +225,7 @@ ON_COMMAND(ID_GEDCOM_OUTPUT, &CTablePeople::OnGedcomOutput)
 ON_COMMAND(ID_PRIVATE_DESCENDANTS, &CTablePeople::OnPrivateDescendants)
 ON_COMMAND(ID_FILTER_BISEX, &CTablePeople::OnFilterBisex)
 ON_STN_CLICKED(IDC_KERES, &CTablePeople::OnClickedKeres)
+
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CTablePeople::OnInitDialog()
@@ -1796,8 +1799,20 @@ void CTablePeople::OnHtmlFatherAndSiblings()
 
 	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
 	CHtmlEditLines dlg;
-	dlg.m_title.Format( L"%s szülei és testvérei", m_ListCtrl.GetItemText( nItem, L_LAST_NAME ) );
+	dlg.m_title.Format( L"%s %s szülei és testvérei", m_ListCtrl.GetItemText( nItem, L_LAST_NAME ), m_ListCtrl.GetItemText( nItem, L_FIRST_NAME ) );
 	dlg.m_type	= L"F_SIBLINGS";
+	dlg.m_rowid = rowid;
+	dlg.DoModal();
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTablePeople::OnHtmlChildren()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
+	CHtmlEditLines dlg;
+	dlg.m_title.Format( L"%s %s és gyermekei", m_ListCtrl.GetItemText( nItem, L_LAST_NAME ), m_ListCtrl.GetItemText( nItem, L_FIRST_NAME ) );
+	dlg.m_type	= L"F_CHILDREN";
 	dlg.m_rowid = rowid;
 	dlg.DoModal();
 }
@@ -1814,14 +1829,22 @@ void CTablePeople::OnDbEdit()
 	ShowWindow( SW_HIDE );
 	dlg.DoModal();
 	ShowWindow( SW_RESTORE );
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTablePeople::On3Generations()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
 
-
-/*	
 	CRelations dlg;
 	dlg.m_rowid = rowid;
+
+	ShowWindow( SW_HIDE );
 	dlg.DoModal();
-*/
+	ShowWindow( SW_RESTORE );
+
 }
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTablePeople::OnEditUpdate()
 {
@@ -1934,20 +1957,6 @@ void CTablePeople::OnEditInsert()
 	CRelations dlg;
 	dlg.m_rowid = rowid;
 	
-	ShowWindow( SW_HIDE );
-	dlg.DoModal();
-	ShowWindow( SW_RESTORE );
-
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTablePeople::On3Generations()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
-	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
-
-	CRelations dlg;
-	dlg.m_rowid = rowid;
-
 	ShowWindow( SW_HIDE );
 	dlg.DoModal();
 	ShowWindow( SW_RESTORE );

@@ -314,12 +314,11 @@ public:
 ///////////////////////////////////////
 
 	afx_msg void OnSelectedFiles();
-//	afx_msg void OnTitles();
 	afx_msg void OnDatabaseInformation();
-//	afx_msg void OnTabletables();
+
 	afx_msg void OnPeoplessubstrings();
 	afx_msg void OnCheckDates();
-//	afx_msg void OnFiles();
+
 	afx_msg void OnFilterAncestors();
 	afx_msg void OnTreePeoplesTablesNoBranch();
 	afx_msg void OnTrsubstrings();
@@ -369,7 +368,6 @@ public:
 	afx_msg void OnInputGahtmlFromline();
 	afx_msg void OnInputGahtmlLine();
 	afx_msg void OnInputGahtmlTable();
-//	afx_msg void OnConnectBranches();
 	afx_msg void OnManualInputDialog();
 	afx_msg void OnInputKeyboard();
 
@@ -377,10 +375,7 @@ public:
 	afx_msg void OnBracketsSquare();
 	afx_msg void OnBracketsRound();
 	afx_msg void OnBraces();
-	//afx_msg void OnFromtable();
-	//afx_msg void OnFromfamily();
 	afx_msg void OnConnectCsalad();
-	afx_msg void OnCsalad();
 	afx_msg void OnCsaladTorzs();
 	afx_msg void OnMotherDeath();
 	afx_msg void OnCheckLifespan();
@@ -397,7 +392,6 @@ public:
 	afx_msg void OnGedcomInput();
 	afx_msg void OnListFamilyByName();
 	afx_msg void OnGedcomVindi();
-	afx_msg void OnNewFamilies();
 	afx_msg void OnCheckFather9();
 
 	afx_msg void OnCheckSpousesDiff();
@@ -426,6 +420,6 @@ public:
 	afx_msg void OnAppExit();
 	afx_msg void OnContractedCouples();
 	afx_msg void OnContractedPeople();
-//	afx_msg void OnMarriagesDetailed();
+
 	afx_msg void OnDisplayFamilies();
 };

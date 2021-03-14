@@ -235,7 +235,8 @@ void CGaInput::processNameSubstr( CString nameSubstr, CString birthSubstr, CStri
 		else
 			break;
 	}
-	any->title = title.TrimRight();
+	if( any->title.IsEmpty() )
+		any->title = title.TrimRight();
 
 	
 	// a végérõl leszedi az utótagot

@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "Dragon.h"
 #include "DragonDlg.h"
-#include "ConnectCsalad.h"
+#include "ConnectCsaladTorzs.h"
 #include "ProgressWnd.h"
 #include "utilities.h"
 
@@ -13,40 +13,6 @@
 IMPLEMENT_DYNAMIC(CConnectCsalad, CWnd)
 
 	
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragonDlg::OnCsaladTorzs()
-{
-	CString info = L"\
-A html fájlban egy leszármazott lehet egy új család alapítója. Ezt az [xxx család] jelzi és a hivatkozott család \
-ezt megerõsíti a [törzs: yyy] jelzéssel.\n\
-A html fájl beolvasásása során ezt a szülõ-gyerek kapcsolatot létrehozzuk.\r\n\
-Ez a funkció csak ellenõrzi az adatbázisban ennek a kapcsolatnak a létét és listázza a létezõ és nem létezõ kapcsolatokat is.\r\n\r\n\
-Természetesen nem hiba ha az egyik vagy másik deklaráció nem létezik, hiszen lehet, hogy a jelzett alapító ill. törzs nincs ebben az \
-adatbázisban.\r\n\r\n\
-Tehát ez nem egy hibalista, csak egy kimutatás a html fájlban megadott család->törzs kapcsolatokról.\
-\r\n\r\n\
- \
-";
-	if( AfxMessageBox( info, MB_OKCANCEL|MB_ICONINFORMATION ) == IDCANCEL )
-	{
-		return;
-	}
-
-	CConnectCsalad conn;
-	conn.connectCsalad( FALSE );
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragonDlg::OnCsalad()
-{
-	CConnectCsalad conn;
-	conn.connectCsalad( TRUE );
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragonDlg::OnConnectCsalad()
-{
-	CConnectCsalad conn;
-	conn.connectCsalad( FALSE );
-}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CConnectCsalad::CConnectCsalad()
 {
@@ -60,24 +26,24 @@ CConnectCsalad::~CConnectCsalad()
 BEGIN_MESSAGE_MAP(CConnectCsalad, CWnd)
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// flag	== true		Az összekötést létrehozza az adatbázisban
-//		== false	Csak listázza a kapcsolatokat
-void CConnectCsalad::connectCsalad( BOOL flag )
+// connect	== true		Az összekötést létrehozza az adatbázisban
+//			== false	Csak listázza a kapcsolatokat
+void CConnectCsalad::connectCsalad( BOOL connect )
 {
-	CString fname( L"root" );
-	CString title( L"új család-root kapcsolat ellenõrzése" );
-	CString attention;
-	CString torzs;
-
-	if( theApp.openLogFile( fname,title )==NULL)
-		return;
-
-	CString info = L"\
+	if( !connect )  // csak listázás
+	{
+		CString fname( L"család-törzs" );
+		CString title( L"család-törzs kapcsolat ellenõrzése" );
+		
+		if( theApp.openLogFile( fname,title )==NULL) return;
+		CString info = L"\
 A program ellenõrzi, hogy az [xxx család]->[törzs: XXXX] kapcsolat létezik-e. Természetesen nem hiba ha az egyik\n\
 vagy másik deklaráció nem létezik, tehát ez nem egy hibalista, csak egy kimutatás a html fájlban megadott\n\
 család->törzs kapcsolatokról. Az alábbi felsorolásokban megtaláljuk a nemlétezõ és létezõ kapcsolatokat is.\n\n";
 
-	fwprintf( theApp.fl, info );
+		fwprintf( theApp.fl, info );
+		fwprintf( theApp.fl, L"Az adatbázisban létezõ család apítói és leszármazottai:\n\n" );
+	}
 
 	CString rowid;
 	CString lineNumber;
@@ -86,7 +52,6 @@ család->törzs kapcsolatokról. Az alábbi felsorolásokban megtaláljuk a nemlétezõ 
 	CString percent;
 	CString csalad;
 	CString csaladR;
-	CString newFamilies;
 	CString familyName;
 	CString family;
 	CString roman;
@@ -94,20 +59,20 @@ család->törzs kapcsolatokról. Az alábbi felsorolásokban megtaláljuk a nemlétezõ 
 	CString death_date;
 
 	CString rowidF;
-	CString nameF;
-	CString rowidM;
-	CString nameM;
-	CString children;
-	CString rowidC;
 	CString nameC;
 	CString generation;
 	CStringArray A;
-	int		n;
-	
-	CProgressWnd wndP(NULL, L"Családalapítók [xxx család]->[törzs: yyyy] összekötése..."); 
+	int n;
+
+	CString caption;
+	if( connect )
+		caption = L"Családalapítók [xxx család]->[törzs: yyyy] összekötése..."; 
+	else
+		caption = L"Családalapítók [xxx család]->[törzs: yyyy] kapcsolatok..."; 
+	CProgressWnd wndP(NULL, caption); 
 	wndP.GoModal();
 
-	fwprintf( theApp.fl, L"Az adatbázisban létezõ család apítói és leszármazottai:\n\n" );
+	
 	m_command = L"SELECT rowid, lineNumber, first_name, last_name, csalad, tableNumber, birth_date, death_date FROM people WHERE csalad != '' AND gap == 0 ORDER BY csalad";
 	if( !theApp.query( m_command ) ) return;
 
@@ -115,11 +80,11 @@ család->törzs kapcsolatokról. Az alábbi felsorolásokban megtaláljuk a nemlétezõ 
 	wndP.SetPos(0);
 	wndP.SetStep(1);
 #ifndef _DEBUG
-		wndP.SetText( L"Családalapítók és gyeremekeik összekötése" );
+		wndP.SetText( caption );
 #endif
 
 
-
+	CString torzs;
 	int cnt = 0;
 	for( UINT i = 0; i < theApp.m_recordset->RecordsCount(); ++i, theApp.m_recordset->MoveNext() )
 	{
@@ -155,6 +120,8 @@ család->törzs kapcsolatokról. Az alábbi felsorolásokban megtaláljuk a nemlétezõ 
 		if( !theApp.query3( m_command ) ) return;
 
 		cnt = 0;
+		if( !theApp.execute( L"BEGIN" ) ) return;
+		
 		for( UINT j = 0; j < theApp.m_recordset3->RecordsCount(); ++j )  // több azonos nevû család is lehet!!!
 		{
 			tableNumber = theApp.m_recordset3->GetFieldString( 0 ); 
@@ -163,12 +130,14 @@ család->törzs kapcsolatokról. Az alábbi felsorolásokban megtaláljuk a nemlétezõ 
 
 			if( !torzs.Compare( family ) )
 			{
-				fwprintf( theApp.fl, L"%-20s %8s %8s %-30s %-12s %-12s [%s család]\n", family, lineNumber, rowidF, name, birth_date, death_date, csaladR );
+				if( !connect )
+					fwprintf( theApp.fl, L"%8s %-20s %8s %-30s [%s család õse]\n", lineNumber, family, rowidF, name, csaladR );
 
 				// gyerekek
 				if( theApp.m_recordset3->RecordsCount() == 0 )
 				{
-					fwprintf( theApp.fl, L"!!!!!!!!!!!!!!!!!!!!\n" );
+					if( !connect )
+						fwprintf( theApp.fl, L"A %s családalapítónak nincsenek gyerekei\n", name );
 				}
 				else
 				{
@@ -187,33 +156,34 @@ család->törzs kapcsolatokról. Az alábbi felsorolásokban megtaláljuk a nemlétezõ 
 							birth_date	= theApp.m_recordset3->GetFieldString( 4 );
 							death_date	= theApp.m_recordset3->GetFieldString( 5 );
 
-							fwprintf( theApp.fl, L"%-20s %8s %8s %-30s %-12s %-12s\n", csaladR, lineNumber, rowid, nameC, birth_date, death_date );
-
-							if( flag )
+							if( connect )
 							{
 								m_command.Format( L"UPDATE people SET father_id = '%s' WHERE rowid = '%s'", rowidF, rowid );
 								if( !theApp.execute( m_command ) ) return;
 							}
+							else
+								fwprintf( theApp.fl, L"%8s %-20s %8s %-30s [törzs: %s]\n", lineNumber, csaladR, rowid, nameC, torzs );
+	//							fwprintf( theApp.fl, L"%-20s %8s %8s %-30s %-12s %-12s\n", csaladR, lineNumber, rowid, nameC, birth_date, death_date );
 						}
 					}
 				}
-				fwprintf( theApp.fl, L"\n" );
+				if( !connect )	fwprintf( theApp.fl, L"\n" );
 				break ;
 			}
 		}
+		if( !theApp.execute( L"COMMIT" ) ) return;
 		wndP.StepIt();
 		wndP.PeekAndPump();
 		if (wndP.Cancelled()) break;
 	}
-	fwprintf( theApp.fl, L"\n\n" );
-
-	if( flag )
+	if( connect )
 	{
-		fclose( theApp.fl );
-		return;		// csak az õsöket és leszármazottakat kellett összekötni
+		wndP.DestroyWindow();
+		return;		// csak össze kellett kötni
 	}
 
 
+	fwprintf( theApp.fl, L"\n\n" );
 	fwprintf( theApp.fl, L"Az adatbázisban nem létezõ család alapítói: ([XY család õse])\n\n" );
 
 	m_command = L"SELECT rowid, lineNumber, first_name, last_name, csalad, tableNumber FROM people WHERE csalad != '' AND gap == 1 ORDER BY csalad ";
@@ -223,7 +193,7 @@ család->törzs kapcsolatokról. Az alábbi felsorolásokban megtaláljuk a nemlétezõ 
 	wndP.SetPos(0);
 	wndP.SetStep(1);
 #ifndef _DEBUG
-		wndP.SetText( L"Aadtbázisban nem létezõ család alapítói" );
+		wndP.SetText( L"Az adatbázisban nem létezõ család alapítói" );
 #endif
 
 	for( UINT i = 0; i < theApp.m_recordset->RecordsCount(); ++i, theApp.m_recordset->MoveNext() )
@@ -242,28 +212,26 @@ család->törzs kapcsolatokról. Az alábbi felsorolásokban megtaláljuk a nemlétezõ 
 		family.Format( L"%s %s", familyName, roman );
 		family.Trim();
 
-		fwprintf( theApp.fl, L"%-20s %8s %8s %-30s [%s család õse]\n", family, lineNumber, rowid, name, csalad );
+		fwprintf( theApp.fl, L"%8s %-20s %8s %-30s [%s család õse]\n", lineNumber, family, rowid, name, csalad );
 
 		wndP.StepIt();
 		wndP.PeekAndPump();
 		if (wndP.Cancelled()) break;
 	}
+//	wndP.DestroyWindow();
+
 	fwprintf( theApp.fl, L"\n\n" );
-
-
 	fwprintf( theApp.fl, L"Az alábbi [törzs: xxxx] jelzésû családoknak nincs alapítójuk ([xxxx csalad]):\n\n" );
-
 	m_command = L"SELECT rowid, * FROM tables WHERE torzs != '' ORDER BY torzs";
 	if( !theApp.query1( m_command ) ) return;
-	
+
 
 	wndP.SetRange(0, theApp.m_recordset->RecordsCount() );
 	wndP.SetPos(0);
 	wndP.SetStep(1);
 #ifndef _DEBUG
-		wndP.SetText( L"Alapítók nélküli törzsek" );
+	wndP.SetText( L"Alapítók nélküli törzsek" );
 #endif
-
 
 	for( UINT i = 0; i < theApp.m_recordset1->RecordsCount(); ++i, theApp.m_recordset1->MoveNext() )
 	{
@@ -277,16 +245,13 @@ család->törzs kapcsolatokról. Az alábbi felsorolásokban megtaláljuk a nemlétezõ 
 		csaladR.Format( L"%s %s", familyName, roman );
 		csaladR.Trim();
 
-
 		if( !torzs.IsEmpty() )
 		{
-//			m_command.Format( L"SELECT rowid FROM tables WHERE familyName='%s' AND newFamilies LIKE '%c%s%c'", torzs, '%', familyName, '%' );
 			m_command.Format( L"SELECT rowid FROM people WHERE csalad = '%s'", csaladR );
 			if( !theApp.query2( m_command ) ) return;
 		
 			if( !theApp.m_recordset2->RecordsCount() )
 			{
-	
 				fwprintf( theApp.fl, L"%6s %-3s %-20s [törzs: %s]\n", lineNumber, percent, csaladR,  torzs ); 
 			}
 		}
@@ -297,7 +262,7 @@ család->törzs kapcsolatokról. Az alábbi felsorolásokban megtaláljuk a nemlétezõ 
 	wndP.DestroyWindow();
 	fwprintf( theApp.fl, L"\n\n" );
 	fclose(theApp.fl);
-	theApp.showLogFile();	
+	theApp.showLogFile();
 }
 
 

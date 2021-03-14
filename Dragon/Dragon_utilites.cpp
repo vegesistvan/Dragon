@@ -50,6 +50,7 @@ FILE * CDragonApp::openLogFile(CString fname,CString title)
 	TCHAR	error_msg[100];
 	CString mode(L"w+");
 
+	
 	m_listFile.Format(L"%s\\%s_%s.text",m_workingDirectory,fname, getTimeTag() );
 	if( !openFileSpec( &fl, m_listFile, mode ) ) return NULL;
 

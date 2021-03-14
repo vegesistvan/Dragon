@@ -185,6 +185,7 @@ public:
 	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnParameters();
 	afx_msg void OnInfoFamilies();
+	afx_msg void OnHtmlChildren();
 
 	afx_msg void OnBornAfterFatherDeath9();
 	afx_msg void OnFilterUnfiltered();
@@ -199,4 +200,5 @@ public:
 	afx_msg void OnDiedBeforeMotherBirth();
 	afx_msg void OnBornaftermotherdeath();
 	afx_msg void OnLifespan();
+
 };

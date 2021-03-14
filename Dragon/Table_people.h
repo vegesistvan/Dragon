@@ -156,4 +156,5 @@ public:
 	afx_msg void OnEditUpdate();
 	afx_msg void OnEditInsert();
 	afx_msg void On3Generations();
+	afx_msg void OnHtmlChildren();
 };

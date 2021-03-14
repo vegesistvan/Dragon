@@ -38,9 +38,8 @@ protected:
 
 	void displayLine( );
 	void displayLines( );
-	void motherAndSiblings();
-	void fatherMotherHe();
 	void fatherAndSiblings();
+	void children();
 	void parents();
 
 	CString getHtmlLine( CString lineNumber );

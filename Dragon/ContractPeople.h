@@ -33,6 +33,7 @@ typedef struct
 	CString spouses;
 	CString rowidS;				// spouse 
 	CString lineF;
+	CString nameBD;
 }SAMENAMES;
 
 class CContractPeople : public CWnd
@@ -74,6 +75,8 @@ protected:
 	bool	m_contracted;		// jelzi, hogy vannak összevont bejegyzések a vPeople vektorban
 	
 	std::vector<SAMENAMES> vPeople;
+	std::vector<SAMENAMES> vSpouses;
+
 	std::vector<CONTRACT> vContract;
 	std::vector<TCHAR*> tableLines; 
 

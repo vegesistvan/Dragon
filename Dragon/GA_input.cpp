@@ -5,7 +5,7 @@
 #include "GA_input.h"
 #include "GAtoDB.h"
 #include "SelectTableName.h"
-#include "ConnectCsalad.h"
+#include "ConnectCsaladTorzs.h"
 #include "InputErrors.h"
 #include "ProgressWnd.h"
 #include "UnknownFirstNames.h"
@@ -471,6 +471,8 @@ void CGaInput::fillFatherMother( )
 			{
 				d.mother_id = v_generations.at(i).descendant_id;
 				d.father_id = v_generations.at(i).spouse_id[d.parentIndexCalc - 1 ];				// leszedi az apa azonosítóját
+				if( v_marriages.size() > 1 )
+					ix = 1;
 			}
 		}
 	}

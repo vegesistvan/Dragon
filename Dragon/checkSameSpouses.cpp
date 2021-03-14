@@ -13,6 +13,7 @@
 #include "ProgressWnd.h"
 #include "utilities.h"
 #include "html_Edit2Lines.h"
+#include "EditPeople.h"
 
 // txt fájl oszlopok
 enum
@@ -165,7 +166,6 @@ BEGIN_MESSAGE_MAP(CCheckSameSpouses, CDialogEx)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CCheckSameSpouses::OnDblclkList)
 	ON_COMMAND(ID_HTML, &CCheckSameSpouses::OnHtml)
 	ON_COMMAND(ID_INFO, &CCheckSameSpouses::OnInfo)
-	ON_COMMAND(ID_SPOUSES_DIFF, &CCheckSameSpouses::OnSpousesDiff)
 	ON_STN_CLICKED(IDC_KERESS, &CCheckSameSpouses::OnClickedKeress)
 	ON_STN_CLICKED(IDC_NEXT, &CCheckSameSpouses::OnClickedNext)
 	
@@ -176,7 +176,9 @@ BEGIN_MESSAGE_MAP(CCheckSameSpouses, CDialogEx)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CCheckSameSpouses::OnHtmlNotepad)
 	ON_COMMAND(ID_HTML_NOTEPAD_PARENTS, &CCheckSameSpouses::OnHtmlNotepadParents)
 	ON_COMMAND(ID_HTML_FATHERANDSIBLINGS, &CCheckSameSpouses::OnHtmlFatherAndSiblings)
+	ON_COMMAND(ID_HTML_CHILDREN, &CCheckSameSpouses::OnHtmlChildren)
 	ON_COMMAND(ID_DB_EDIT, &CCheckSameSpouses::OnDbEdit)
+	ON_COMMAND(ID_3GENERATIONS, &CCheckSameSpouses::On3Generations )
 
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1290,8 +1292,36 @@ void CCheckSameSpouses::OnHtmlFatherAndSiblings()
 	dlg.m_rowid = rowid;
 	dlg.DoModal();
 }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckSameSpouses::OnHtmlChildren()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
+	CHtmlEditLines dlg;
+	dlg.m_title.Format( L"%s és gyermekei", m_ListCtrl.GetItemText( nItem, L_NAME ) );
+	dlg.m_type	= L"F_CHILDREN";
+	dlg.m_rowid = rowid;
+	dlg.DoModal();
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckSameSpouses::OnDbEdit()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
+
+	CEditPeople dlg;
+	dlg.m_caption.Format( L"%s adatainak szerkesztése", m_ListCtrl.GetItemText( nItem, L_NAME ) );
+	dlg.m_rowid = rowid;
+
+	ShowWindow( SW_HIDE );
+	dlg.DoModal();
+	ShowWindow( SW_RESTORE );
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckSameSpouses::On3Generations()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
 	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );

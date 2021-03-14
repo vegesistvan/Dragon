@@ -88,7 +88,15 @@ BEGIN_MESSAGE_MAP(CGaDescendants, CDialogEx)
 	ON_BN_CLICKED(IDC_CHECK_FAMILY, &CGaDescendants::OnClickedCheckFamily)
 	ON_BN_CLICKED(IDC_CHECK_LASTNAME, &CGaDescendants::OnClickedCheckLastname)
 END_MESSAGE_MAP()
-
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Bemenet:
+// m_rowid1
+// m_name	
+// m_source
+// m_tableNumebr
+// 
+// m_numbering
+// m_code			ANSI/UTF8
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CGaDescendants::OnInitDialog()
 {
@@ -130,7 +138,14 @@ void CGaDescendants::treePeople()
 	CString file;
 	CString title;
 	CString table;
-	TCHAR* kicsoda[] = { L"leszármazott", L"leszármazott házastársa", L"Leszármazott házastársának apja", L"leszármazott házastársának anyja", L"leszármazott házastársának továnbbi házastársa" };
+	TCHAR* kicsoda[] = 
+	{ 
+		L"leszármazott",
+		L"leszármazott házastársa",
+		L"Leszármazott házastársának apja",
+		L"leszármazott házastársának anyja",
+		L"leszármazott házastársának további házastársa"
+	};
 
 	
 //	if( m_unordered == 0 )  // orderd list
@@ -167,9 +182,8 @@ void CGaDescendants::treePeople()
 		print( str );
 	}
 
-	queryP( m_rowid1 );
+	queryP( m_rowid1 );				// m_sex_id-t és m_numOfSpouses-t határozza meg
 	desc.gen				= 0;
-	desc.tupigny			= 1;
 	desc.rowid				= m_rowid1;
 	desc.sex_id				= m_sex_id;
 	desc.numOfSpouses		= m_numOfSpouses;
@@ -256,8 +270,6 @@ void CGaDescendants::treeTables()
 			break;
 		}
 
-		vSerial.clear();
-		vSerial.push_back(1);
 
 		father_id	= m_recordset.GetFieldString( 3 );
 		if( father_id.IsEmpty() || !father_id.Compare( L"0" ) )  // ha nincs apa, akkor magát az õst teszi be a vDesc-be
@@ -304,6 +316,12 @@ void CGaDescendants::treeTables()
 
 			vDesc.at(0).numOfChildren = getNumberOfChildren( father_id, m_sex_id );
 		}
+		vSerial.clear();
+		vSerial.push_back(1);
+		
+		m_genPrev	= 0;
+		cnt_ol		= 0;
+
 		descendants();
 
 		if( theApp.v_tableNumbers.size() > 1 )
@@ -329,12 +347,15 @@ void CGaDescendants::descendants()
 {
 	CString rowid;
 	int ix = 0;
-	
+
 	// az elsõ emeber a treePeople, treeTables-ben kerül betöltésre 
 
 	while( vDesc.size() )
 	{
-		if( !vDesc.at(ix).hidden	)	printGAline( ix );	// a leszármazottat kinyomttajuk
+		if( !vDesc.at(ix).hidden	)	
+		{
+			printGAline();	// a vDesc tetején lévõ leszármazottat kinyomttajuk  m_genPrev-et beállítja
+		}
 		
 		if( vDesc.at(ix).sex_id == WOMAN && !m_woman )		// ha nõ a leszármazott és annak a gyerekeit nem akarjuk listázni
 		{
@@ -342,39 +363,7 @@ void CGaDescendants::descendants()
 			vDesc.at(ix).childrenPrinted	= 0;
 		}
 
-		if( vDesc.at( ix ).numOfChildren > vDesc.at( ix ).childrenPrinted )	// ha még nem nyomtatott ki minden gyereket
-		{																	// akkor a következõ gyereket is beteszi  
-			// a kinyomtatott ember következõ, még ki nem nyomtatott gyerekét keresi
-			rowid = getNextChildRowid( ix );
-			if( !rowid.IsEmpty() )			// van még gyerek
-			{
-				queryP( rowid );		// lekérdezi a gyereket és elkészíti vDesc-ét
-				desc.gen				= vDesc.size();
-				desc.rowid				= rowid;
-				desc.sex_id				= m_sex_id;
-				desc.numOfSpouses		= m_numOfSpouses;
-				desc.numOfMothers		= vDesc.at(ix).numOfSpouses;
-				desc.childrenPrinted	= 0;
-				desc.children			= vDesc.at(ix).childrenPrinted + 1;
-				desc.hidden				= false;
-
-				vDesc.at(ix).childrenPrinted += 1;
-
-				vDesc.push_back( desc );
-
-				if( desc.gen < vSerial.size() ) ++vSerial.at(desc.gen);	// már létezõ generáció, 1-el növeli a sorszámot	
-				else	vSerial.push_back( 1 );							// új generáció: sorszám1-el kezdõdik 
-
-				ix += 1;
-				vDesc.at( vDesc.size() - 1 ).numOfChildren = getNumberOfChildren( rowid, m_sex_id );
-			}
-			else			// ha a gyerekek száma kisebb, mint amit kérünk. Csak hiba lehet
-			{
-				vDesc.clear();
-				AfxMessageBox( L"Hiba!" );
-			}
-		}
-		else   // nincs több gyereke, de a korábbiaknak lehet még!!
+		if( vDesc.at( ix ).numOfChildren == vDesc.at( ix ).childrenPrinted )	// már minden gyerekét kiírta
 		{
 			//visszamegy az elõzõ generációra, amelyiknak még van ki nem írt gyereke
 			while( ix >= 0 && vDesc.at( ix ).numOfChildren == vDesc.at( ix ).childrenPrinted )
@@ -382,29 +371,35 @@ void CGaDescendants::descendants()
 				vDesc.pop_back();		// visszamegy az elõzõ generációra
 				ix -= 1;
 			}
-
-			if( ix >= 0 && vDesc.at( ix ).numOfChildren > vDesc.at( ix ).childrenPrinted )  // van még kiirandó gyerek?
+		}
+		// ix a testvérre mutat vagy egy az apára ?
+		// desc-be a kinyomtatandó ember adatai kerülenk
+		if( ix >= 0 )
+		{																	// akkor a következõ gyereket is beteszi  
+			// a kinyomtatott ember következõ, még ki nem nyomtatott gyerekét keresi
+			rowid = getNextChildRowid( ix );
+			if( !rowid.IsEmpty() )			// van még gyerek
 			{
-				rowid = getNextChildRowid( ix );  // következõ gyerek
-				queryP( rowid );
-
+				queryP( rowid );		// lekérdezi a gyereket és beállítja m_sex_id-t és m_numOfSpouses-t
 				desc.gen				= vDesc.size();
 				desc.rowid				= rowid;
 				desc.sex_id				= m_sex_id;
-				desc.numOfSpouses		= m_numOfSpouses;
-				desc.numOfMothers		= vDesc.at(ix).numOfSpouses;
+				desc.numOfSpouses		= m_numOfSpouses;				// a gyerek apja feleségeinek számát megõrzi 
+				desc.numOfMothers		= vDesc.at(ix).numOfSpouses;	// a korábban megõrzött és most kinyomtatandó gyerek apja feleségeinek száma
 				desc.childrenPrinted	= 0;
+				desc.children			= vDesc.at(ix).childrenPrinted + 1;	// a korábban már kinyomtatott testvérek száma
 				desc.hidden				= false;
-				desc.children			= vDesc.at(ix).childrenPrinted + 1;
-				vDesc.at(ix).childrenPrinted += 1;
+				desc.numOfChildren		= getNumberOfChildren( rowid, m_sex_id );
+
+				vDesc.at(ix).childrenPrinted += 1;		// a most kinyomtatandó testvérek száma nõ egyet
 
 				vDesc.push_back( desc );
 
+				// Tupigny-hõz elõállítja a generáción belüõl egyesével növekvõ sorszámokat
 				if( desc.gen < vSerial.size() ) ++vSerial.at(desc.gen);	// már létezõ generáció, 1-el növeli a sorszámot	
 				else	vSerial.push_back( 1 );							// új generáció: sorszám1-el kezdõdik 
 
 				ix += 1;
-				vDesc.at( vDesc.size() - 1 ).numOfChildren = getNumberOfChildren( rowid, m_sex_id );
 			}
 		}
 	}
@@ -559,7 +554,7 @@ void CGaDescendants::OnBnClickedOk()
 	m_colorBgrnd = szin[m_ixBgrd].rgb;
 
 	if( m_woman ) m_connect = true;
-
+	
 	if( m_rowid1.IsEmpty() )
 		treeTables();
 	else

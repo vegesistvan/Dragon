@@ -49,6 +49,7 @@
 #include "CheckMotherIndex.h"
 #include "checkSameNameAnd.h"
 #include "checkSameSpouses.h"
+#include "ConnectCsaladTorzs.h"
 
 
 #include "GA_ascendantsChain.h"
@@ -107,11 +108,6 @@ ON_COMMAND(ID_MARRIAGES_TABLE, &CDragonDlg::OnMarriagesTable)
 ON_COMMAND(ID_MARRIAGES_LINE, &CDragonDlg::OnMarriagesLine)
 
 
-// házastársak
-ON_COMMAND(ID_SPOUSES_FILE, &CDragonDlg::OnSpousesFile)
-ON_COMMAND(ID_SPOUSES_TABLE, &CDragonDlg::OnSpousesTable)
-ON_COMMAND(ID_SPOUSES_LINE, &CDragonDlg::OnSpousesLine)
-
 // házastársak házasságai
 ON_COMMAND(ID_SS_FILE, &CDragonDlg::OnSsFile)
 ON_COMMAND(ID_SS_TABLE, &CDragonDlg::OnSsTable)
@@ -136,9 +132,9 @@ ON_WM_PAINT()
 ON_COMMAND(ID_BRACKETS_SQUARE, &CDragonDlg::OnBracketsSquare)
 ON_COMMAND(ID_BRACKETS_ROUND, &CDragonDlg::OnBracketsRound)
 ON_COMMAND(ID_BRACES, &CDragonDlg::OnBraces)
-ON_COMMAND(ID_CONNECT_CSALAD, &CDragonDlg::OnConnectCsalad)
-ON_COMMAND(ID_CSALAD, &CDragonDlg::OnCsalad)
-ON_COMMAND(ID_CSALAD_TORZS, &CDragonDlg::OnCsaladTorzs)
+
+ON_COMMAND(ID_CSALAD_TORZS, &CDragonDlg::OnCsaladTorzs)  // Private menübõl ( Család kapcsolatok )		listáz és összeköt
+
 ON_COMMAND(ID_MOTHERDEATH, &CDragonDlg::OnMotherDeath)
 ON_COMMAND(ID_CHECK_LIFESPAN, &CDragonDlg::OnCheckLifespan)
 ON_COMMAND(ID_DATEFORMAT, &CDragonDlg::OnDateFormat)
@@ -153,7 +149,7 @@ ON_COMMAND(ID_GEDCOM_HEAD, &CDragonDlg::OnGedcomHead)
 ON_COMMAND(ID_GEDCOM_INPUT, &CDragonDlg::OnGedcomInput)
 ON_COMMAND(ID_GEDCOM_FAMILIES, &CDragonDlg::OnListFamilyByName)
 ON_COMMAND(ID_GEDCOM_VINDI, &CDragonDlg::OnGedcomVindi)
-ON_COMMAND(ID_NEW_FAMILIES, &CDragonDlg::OnNewFamilies)
+
 ON_COMMAND(ID_CHECK_FATHER9, &CDragonDlg::OnCheckFather9)
 ON_COMMAND(ID_CHECK_SPOUSEDIFF, &CDragonDlg::OnCheckSpousesDiff)
 ON_COMMAND(ID_FATHERCHILD_GREATER, &CDragonDlg::OnFatherchildGreater)
@@ -176,7 +172,6 @@ ON_COMMAND(ID_DISPLAY_BLOB, &CDragonDlg::OnDisplayBlob)
 ON_COMMAND(ID_GEDCOM_TAGTABLE, &CDragonDlg::OnGedcomTagtable)
 ON_COMMAND(ID_GEDCOM_INDIFAMS, &CDragonDlg::OnGedcomINDIFAMS)
 ON_WM_CLOSE()
-ON_COMMAND(ID_SAMENAMEANDSPOUSE, &CDragonDlg::OnSamenameandspouse)
 ON_COMMAND(ID_APP_EXIT, &CDragonDlg::OnAppExit)
 ON_COMMAND(ID_CONTRACTEDCOUPLES, &CDragonDlg::OnContractedCouples)
 ON_COMMAND(ID_CONTRACT_PEOPLE, &CDragonDlg::OnContractedPeople)
@@ -713,177 +708,7 @@ void CDragonDlg::OnGedcomVindi()
 	CGedcomIn ged;
 	ged.listVindi();;
 }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragonDlg::OnNewFamilies()
-{
-	CString fname( L"root" );
-	CString title( L"új család-root kapcsolat ellenõrzése" );
-	CString attention;
-	CString torzs;
-
-	if( theApp.openLogFile( fname,title )==NULL)
-		return;
-
-	CString info = L"\
-A program ellenõrzi, hogy az [xxx család]->[törzs: XXXX] kapcsolat létezik-e. Természetesen nem hiba ha az egyik\n\
-vagy másik deklaráció nem létezik, tehát ez nem egy hibalista, csak egy kimutatás a html fájlban megadott\n\
-család->törzs kapcsolatokról. Az alábbi felsorolásokban megtaláljuk a nemlétezõ és létezõ kapcsolatokat is.\n\n";
-
-	fwprintf( theApp.fl, info );
-
-	CString rowid;
-	CString lineNumber;
-	CString tableNumber;
-	CString name;
-	CString percent;
-	CString csalad;
-	CString newFamilies;
-	CString familyName;
-	CString family;
-	CString roman;
-	CString birth_date;
-	CString death_date;
-
-	CString rowidF;
-	CString nameF;
-	CString rowidM;
-	CString nameM;
-	CString children;
-	CString rowidC;
-	CString nameC;
-
-	fwprintf( theApp.fl, L"Az adatbázisban létezõ család apítói és leszármazottai: ([XY család])\n\n" );
-	m_command = L"SELECT rowid, lineNumber, first_name, last_name, csalad, tableNumber, birth_date, death_date FROM people WHERE csalad != '' AND gap == 0 ORDER BY csalad";
-	if( !query( m_command ) ) return;
-
-
-	int cnt = 0;
-	for( UINT i = 0; i < m_recordset->RecordsCount(); ++i, m_recordset->MoveNext() )
-	{
-		rowid		= m_recordset->GetFieldString( 0 );
-		lineNumber	= m_recordset->GetFieldString( 1 );
-		tableNumber	= m_recordset->GetFieldString( 5 );
-		birth_date	= m_recordset->GetFieldString( 6 );
-		death_date	= m_recordset->GetFieldString( 7 );
-		name.Format( L"%s %s", m_recordset->GetFieldString( 3 ), m_recordset->GetFieldString( 2 ) );
-		csalad		= m_recordset->GetFieldString( 4 );
-		csalad.Trim();
-
-		m_command.Format( L"SELECT familyName, tableRoman FROM tables WHERE rowid = '%s'", tableNumber ); // a családalapító ebbena táblában van
-		if( !query3( m_command ) ) return;
-		familyName	= m_recordset3->GetFieldString( 0 );
-		roman		= m_recordset3->GetFieldString( 1 );
-		family.Format( L"%s %s", familyName, roman );
-		family.Trim();
-
-		m_command.Format( L"SELECT rowid, torzs FROM tables WHERE familyName='%s'", csalad );		// erre a táblára mutat
-		if( !query3( m_command ) ) return;
-
-		cnt = 0;
-		for( UINT j = 0; j < m_recordset3->RecordsCount(); ++j )  // több azonos nevû család is lehet!!!
-		{
-			torzs = m_recordset3->GetFieldString( 1 ); 
-			torzs.Trim();
-
-			if( !torzs.Compare( family ) )
-			{
-				fwprintf( theApp.fl, L"%-20s %8s %8s %-30s %-12s %-12s [%s család]\n", family, lineNumber, rowid, name, birth_date, death_date, csalad );
-
-				//gyerekek
-				m_command.Format( L"SELECT rowid, first_name, last_name, lineNumber, birth_date, death_date FROM people WHERE father_id ='%s'", rowid );
-				if( !query3( m_command ) ) return;
-					
-				if( m_recordset3->RecordsCount() == 0 )
-				{
-					fwprintf( theApp.fl, L"!!!!!!!!!!!!!!!!!!!!\n" );
-				}
-				else
-				{
-					for( UINT j = 0; j < m_recordset3->RecordsCount(); ++j, m_recordset3->MoveNext() )
-					{
-						rowidC = m_recordset3->GetFieldString( 0);
-						name.Format( L"%s %s", m_recordset3->GetFieldString( 2 ), m_recordset3->GetFieldString( 1 ) );
-						lineNumber	= m_recordset3->GetFieldString( 3 );
-						birth_date	= m_recordset3->GetFieldString( 4 );
-						death_date	= m_recordset3->GetFieldString( 5 );
-
-						attention.Empty();
-						if( torzs.Compare( family ) ) 
-							attention = L"!!!!!!";
-						fwprintf( theApp.fl, L"%-20s %8s %8s %-30s %-12s %-12s [törzs: %s]%s\n", csalad, lineNumber, rowidC, name, birth_date, death_date,  torzs, attention );
-					}
-				}
-				fwprintf( theApp.fl, L"\n" );
-				break ;
-			}
-
-		}
-	}
-	fwprintf( theApp.fl, L"\n\n" );
-
-	fwprintf( theApp.fl, L"Az adatbázisban nem létezõ család alapítói: ([XY család õse])\n\n" );
-
-	m_command = L"SELECT rowid, lineNumber, first_name, last_name, csalad, tableNumber FROM people WHERE csalad != '' AND gap == 1 ORDER BY csalad";
-	if( !query( m_command ) ) return;
-
-	for( UINT i = 0; i < m_recordset->RecordsCount(); ++i, m_recordset->MoveNext() )
-	{
-		rowid		= m_recordset->GetFieldString( 0 );
-		lineNumber	= m_recordset->GetFieldString( 1 );
-		tableNumber	= m_recordset->GetFieldString( 5 );
-		name.Format( L"%s %s", m_recordset->GetFieldString( 3 ), m_recordset->GetFieldString( 2 ) );
-		csalad		= m_recordset->GetFieldString( 4 );
-		csalad.Trim();
-
-		m_command.Format( L"SELECT familyName, tableRoman FROM tables WHERE rowid = '%s'", tableNumber ); // a családalapító ebbena táblában van
-		if( !query3( m_command ) ) return;
-		familyName	= m_recordset3->GetFieldString( 0 );
-		roman		= m_recordset3->GetFieldString( 1 );
-		family.Format( L"%s %s", familyName, roman );
-		family.Trim();
-
-
-
-		fwprintf( theApp.fl, L"%-20s %8s %8s %-30s [%s család õse]\n", family, lineNumber, rowid, name, csalad );
-	}
-	fwprintf( theApp.fl, L"\n\n" );
-
-
-	fwprintf( theApp.fl, L"Az alábbi [törzs: xxxx] jelzésû családoknak nincs alapítójuk ([xxxx csalad]):\n\n" );
-
-//	m_command = L"SELECT rowid, * FROM tables WHERE root != '' ORDER BY root";
-	m_command = L"SELECT rowid, * FROM tables WHERE familyname != '' ORDER BY familyname";
-	if( !query1( m_command ) ) return;
-	
-	for( UINT i = 0; i < m_recordset1->RecordsCount(); ++i, m_recordset1->MoveNext() )
-	{
-		lineNumber	= m_recordset1->GetFieldString( TABLES_LINENUMBER );
-		tableNumber = m_recordset1->GetFieldString( TABLES_ROWID );
-		familyName	= m_recordset1->GetFieldString( TABLES_FAMILY_NAME );
-		percent		= m_recordset1->GetFieldString( TABLES_PERCENT );
-		csalad		= m_recordset1->GetFieldString( TABLES_TORZS );
-		csalad.Trim();
-
-		if( !csalad.IsEmpty() )
-		{
-			m_command.Format( L"SELECT rowid FROM tables WHERE familyName='%s' AND newFamilies LIKE '%c%s%c'", csalad, '%', familyName, '%' );
-			if( !query2( m_command ) ) return;
-		
-			if( !m_recordset2->RecordsCount() )
-			{
-				fwprintf( fl, L"%6s %-3s %-20s [törzs: %s]\n", lineNumber, percent, familyName, csalad ); 
-			}
-		}
-	}
-	fwprintf( theApp.fl, L"\n\n" );
-
-
-	fclose(theApp.fl);
-	theApp.showLogFile();	
-
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnCheckLifespan()
 {
 	CLifeSpan dlg;
@@ -1096,4 +921,27 @@ void CDragonDlg::OnDisplayFamilies()
 	CCheckFamilyDates dlg;
 	dlg.m_always = true;
 	dlg.DoModal();
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDragonDlg::OnCsaladTorzs()
+{
+	CString info = L"\
+A html fájlban egy leszármazott lehet egy új család alapítója. Ezt az [xxx család] jelzi és a hivatkozott család \
+ezt megerõsíti a [törzs: yyy] jelzéssel.\n\
+A html fájl beolvasásása során ezt a szülõ-gyerek kapcsolatot létrehozzuk.\r\n\
+Ez a funkció csak ellenõrzi az adatbázisban ennek a kapcsolatnak a létét és listázza a létezõ és nem létezõ kapcsolatokat is.\r\n\r\n\
+Természetesen nem hiba ha az egyik vagy másik deklaráció nem létezik, hiszen lehet, hogy a jelzett alapító ill. törzs nincs ebben az \
+adatbázisban.\r\n\r\n\
+Tehát ez nem egy hibalista, csak egy kimutatás a html fájlban megadott család->törzs kapcsolatokról.\
+\r\n\r\n\
+ \
+";
+/*
+	if( AfxMessageBox( info, MB_OKCANCEL|MB_ICONINFORMATION ) == IDCANCEL )
+	{
+		return;
+	}
+*/
+	CConnectCsalad conn;
+	conn.connectCsalad( FALSE );
 }

@@ -126,7 +126,9 @@ public:
 	afx_msg void OnHtmlNotepad();
 	afx_msg void OnHtmlNotepadParents();
 	afx_msg void OnHtmlFatherAndSiblings();
+	afx_msg void OnHtmlChildren();
 	afx_msg void OnDbEdit();
+	afx_msg void On3Generations();
 
 
 };

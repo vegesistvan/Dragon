@@ -180,6 +180,8 @@ BEGIN_MESSAGE_MAP(CTableMarriages, CDialogEx)
 	ON_COMMAND(ID_HTML_EDIT, &CTableMarriages::OnHtmlEditLines)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CTableMarriages::OnHtmlNotepad)	
 
+	ON_COMMAND(ID_HTML_CHILDREN, &CTableMarriages::OnHtmlChildren)
+	ON_COMMAND(ID_3GENERATIONS, &CTableMarriages::On3generations)
 END_MESSAGE_MAP()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CTableMarriages::OnInitDialog()
@@ -1707,4 +1709,30 @@ void CTableMarriages::OnDbEdit()
 	CRelations dlg;
 	dlg.m_rowid = rowid;
 	dlg.DoModal();
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTableMarriages::OnHtmlChildren()
+{
+int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	LIST_SPOUSE1_ID );
+	CHtmlEditLines dlg;
+	dlg.m_title.Format( L"%s %s és gyermekei", m_ListCtrl.GetItemText( nItem, LIST_HLASTNAME ), m_ListCtrl.GetItemText( nItem, LIST_HFIRSTNAME ) );
+	dlg.m_type	= L"F_CHILDREN";
+	dlg.m_rowid = rowid;
+	dlg.DoModal();
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTableMarriages::On3generations()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	LIST_SPOUSE1_ID );
+
+	CRelations dlg;
+	dlg.m_rowid = rowid;
+
+	ShowWindow( SW_HIDE );
+	dlg.DoModal();
+	ShowWindow( SW_RESTORE );
+
 }

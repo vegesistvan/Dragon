@@ -30,16 +30,10 @@ enum
 	L_SOURCE,
 	L_ROWID,
 	L_NAME,
-	L_BIRTH,
-	L_DEATH,
 	L_ROWIDF,
 	L_FATHER,
-	L_BIRTHF,
-	L_DEATHF,
 	L_ROWIDM,
 	L_MOTHER,
-	L_BIRTHM,
-	L_DEATHM,
 	L_ROWIDS,
 	L_SPOUSES,
 	L_LINEF,
@@ -96,6 +90,8 @@ BEGIN_MESSAGE_MAP(CContractedPeople, CDialogEx)
 
 
 
+	ON_COMMAND(ID_FILTER_3, &CContractedPeople::OnFilter3)
+	ON_COMMAND(ID_FILTER_4, &CContractedPeople::OnFilter4)
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CContractedPeople::OnInitDialog()
@@ -344,25 +340,25 @@ void CContractedPeople::createColumns()
 	m_ListCtrl.InsertColumn( L_GROUP2,			L"gr2",			LVCFMT_RIGHT,	 30,-1,COL_HIDDEN);
 	m_ListCtrl.InsertColumn( L_STATUS,			L"st",			LVCFMT_RIGHT,	 30,-1,COL_HIDDEN);
 	m_ListCtrl.InsertColumn( L_RGBCOLOR,		L"color",		LVCFMT_RIGHT,	 30,-1,COL_HIDDEN);
-	m_ListCtrl.InsertColumn( L_LINENUMBER,			L"line#",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_LINENUMBER,		L"line#",		LVCFMT_RIGHT,	 50,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_UNITED,			L"U",			LVCFMT_LEFT,	 20,-1,COL_NUM );
 	m_ListCtrl.InsertColumn( L_SOURCE,			L"S",			LVCFMT_RIGHT,	 20,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_GENERATION,		L"G",			LVCFMT_RIGHT,	 20,-1,COL_NUM);
 	
 	m_ListCtrl.InsertColumn( L_ROWID,			L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( L_NAME,			L"név",			LVCFMT_LEFT,	200,-1,COL_TEXT );
-	m_ListCtrl.InsertColumn( L_BIRTH,			L"születés",	LVCFMT_LEFT,	 70,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( L_DEATH,			L"halálozás",	LVCFMT_LEFT,	 70,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_NAME,			L"név",			LVCFMT_LEFT,	250,-1,COL_TEXT );
+//	m_ListCtrl.InsertColumn( L_BIRTH,			L"születés",	LVCFMT_LEFT,	 70,-1,COL_NUM);
+//	m_ListCtrl.InsertColumn( L_DEATH,			L"halálozás",	LVCFMT_LEFT,	 70,-1,COL_NUM);
 	
 	m_ListCtrl.InsertColumn( L_ROWIDF,			L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( L_FATHER,			L"apa",			LVCFMT_LEFT,	200,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( L_BIRTHF,			L"születés",	LVCFMT_LEFT,	 70,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( L_DEATHF,			L"halál",		LVCFMT_LEFT,	 70,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_FATHER,			L"apa",			LVCFMT_LEFT,	250,-1,COL_TEXT);
+//	m_ListCtrl.InsertColumn( L_BIRTHF,			L"születés",	LVCFMT_LEFT,	 70,-1,COL_NUM);
+//	m_ListCtrl.InsertColumn( L_DEATHF,			L"halál",		LVCFMT_LEFT,	 70,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_ROWIDM,			L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	
-	m_ListCtrl.InsertColumn( L_MOTHER,			L"anya",		LVCFMT_LEFT,	200,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( L_BIRTHM,			L"születés",	LVCFMT_LEFT,	 70,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( L_DEATHM,			L"halál",		LVCFMT_LEFT,	 70,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_MOTHER,			L"anya",		LVCFMT_LEFT,	250,-1,COL_TEXT);
+//	m_ListCtrl.InsertColumn( L_BIRTHM,			L"születés",	LVCFMT_LEFT,	 70,-1,COL_NUM);
+//	m_ListCtrl.InsertColumn( L_DEATHM,			L"halál",		LVCFMT_LEFT,	 70,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_ROWIDS,			L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	
 	m_ListCtrl.InsertColumn( L_SPOUSES,			L"házastársak",	LVCFMT_LEFT,	500,-1,COL_TEXT );
@@ -423,6 +419,8 @@ void CContractedPeople::OnFilterAll()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedPeople::OnFilter1()
 {
+	filter( 1 );
+/*
 	int loop;
 	vFiltered.clear();
 	for( UINT i = 0; i < vPeople.size()- L_COLUMNSCOUNT+1; i += L_COLUMNSCOUNT)
@@ -444,10 +442,13 @@ void CContractedPeople::OnFilter1()
 	SetWindowTextW( str );
 	m_ListCtrl.SetItemCountEx( vFiltered.size() + 1  );
 	m_ListCtrl.AttachDataset( &vFiltered );
+*/
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedPeople::OnFilter2()
 {
+	filter( 2 );
+/*
 	int loop;
 	vFiltered.clear();
 	for( UINT i = 0; i < vPeople.size()- L_COLUMNSCOUNT+1; i += L_COLUMNSCOUNT )
@@ -468,8 +469,43 @@ void CContractedPeople::OnFilter2()
 	SetWindowTextW( str );
 	m_ListCtrl.SetItemCountEx( vFiltered.size() + 1  );
 	m_ListCtrl.AttachDataset( &vFiltered );
+	*/
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedPeople::OnFilter3()
+{
+	filter( 3 );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedPeople::OnFilter4()
+{
+	filter( 4 );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedPeople::filter( int iter )
+{
+	int loop;
+	vFiltered.clear();
+	for( UINT i = 0; i < vPeople.size()- L_COLUMNSCOUNT+1; i += L_COLUMNSCOUNT)
+	{
+		loop = _wtoi( vPeople.at(i+1) );
+		if( loop == iter )
+		{
+			for( UINT j = 0; j < L_COLUMNSCOUNT; ++j ) // ix-1 a cnt-re mutat
+			{
+				vFiltered.push_back( vPeople.at( i + j  ) );
+			}
+		}
+	}
+	if( m_contracted )
+		str.Format( L"Azonos nevû emberek, akik között összevonások történtek az %d. ciklusban", iter );
+	else
+		str.Format( L"A nem összevonható azonos nevû emberek az %d. ciklusban", iter );
+	SetWindowTextW( str );
+	m_ListCtrl.SetItemCountEx( vFiltered.size() + 1  );
+	m_ListCtrl.AttachDataset( &vFiltered );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedPeople::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);

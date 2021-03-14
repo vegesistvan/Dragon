@@ -146,6 +146,7 @@ ill. 'A sor a Notepad-ben' funkciókat. Bármelyikban javíthatjuk a ga.html fájl m
 
 	if( !nItem )
 	{
+		AfxMessageBox( L"Minden ember család és keresztneve meg van adva!" );
 		OnCancel();
 	}
 	gafile.Close();

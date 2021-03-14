@@ -94,6 +94,11 @@ BOOL CHtmlEditLines::OnInitDialog()
 		fatherAndSiblings();
 		return true;
 	}
+	if( m_type == L"F_CHILDREN" )
+	{
+		children();
+		return true;
+	}
 	if( m_linenumber )
 	{
 		displayLine();
@@ -246,36 +251,40 @@ void CHtmlEditLines::OnChangeEdit()
 	GetDlgItem( IDC_MODIFY )->EnableWindow( TRUE );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-void CHtmlEditLines::motherAndSiblings()
+void CHtmlEditLines::children()
 {
 	if( m_rowid.IsEmpty() ) return;
 
-	SetWindowTextW( L"Anya és gyermekei" );
+	SetWindowTextW( m_title );
 
 	int nItem;
 	CString line;
 	CString linenumber;
-	CString mother_id;
+	CString sex_id;
 
 	m_ListCtrl.InsertColumn( 0,	L"",		LVCFMT_RIGHT,	 120,-1,COL_TEXT );
 	m_ListCtrl.InsertColumn( 1,	L"line#",	LVCFMT_RIGHT,	  80,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( 2,	L"ga.line",	LVCFMT_LEFT,    1500,-1,COL_EDIT);
 
-	m_command.Format( L"SELECT mother_id FROM people WHERE rowid ='%s'", m_rowid );
+	m_command.Format( L"SELECT linenumber, sex_id FROM people WHERE rowid ='%s'", m_rowid );
 	if( !theApp.query( m_command ) ) return;
-	mother_id	= theApp.m_recordset->GetFieldString( 0 );
-
-	m_command.Format( L"SELECT linenumber FROM people WHERE rowid ='%s'", mother_id );
-	if( !theApp.query( m_command ) ) return;
+	sex_id		= theApp.m_recordset->GetFieldString( 1 );
 	linenumber	= theApp.m_recordset->GetFieldString( 0 );
 	line		= getHtmlLine( linenumber );
-	nItem = m_ListCtrl.InsertItem( 0, L"anya" );
+	nItem = m_ListCtrl.InsertItem( 0, L"szülõk" );
 	m_ListCtrl.SetItemText( nItem, 1, linenumber );
 	m_ListCtrl.SetItemText( nItem, 2, line );
 
 
-	m_command.Format( L"SELECT linenumber FROM people WHERE mother_id ='%s' ORDER BY linenumber", mother_id );
+	if( sex_id == L"1" )
+		m_command.Format( L"SELECT linenumber FROM people WHERE father_id ='%s' ORDER BY linenumber", m_rowid );
+	else if( sex_id == L"2" ) 
+		m_command.Format( L"SELECT linenumber FROM people WHERE mother_id ='%s' ORDER BY linenumber", m_rowid );
+	else
+	{
+		AfxMessageBox( L"A szülõ neme nem meghatározható!" );
+		return;
+	}
 	if( !theApp.query( m_command ) ) return;
 	for( INT i = 0; i < theApp.m_recordset->RecordsCount(); ++i, theApp.m_recordset->MoveNext() )
 	{
@@ -286,7 +295,6 @@ void CHtmlEditLines::motherAndSiblings()
 		m_ListCtrl.SetItemText( nItem, 2, line );
 	}
 }
-*/
 /*
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CHtmlEditLines::fatherMotherHe()

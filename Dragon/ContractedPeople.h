@@ -22,6 +22,8 @@ protected:
 	void createColumns();
 	void push( CString item );
 	void keress( int start );
+	void filter( int iter );
+
 	CMenu menu;
 	CListCtrlEx		m_ListCtrl;
 	CEdit			m_search;
@@ -70,4 +72,6 @@ public:
 	afx_msg void OnHtmlNotepadParents();
 	afx_msg void OnHtmlFatherAndSiblings();
 	afx_msg void OnDbEdit();
+	afx_msg void OnFilter3();
+	afx_msg void OnFilter4();
 };

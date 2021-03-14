@@ -8,15 +8,17 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ix a kiirandó leszármazott indexe a vDesc vektorban
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CGaDescendants::printGAline( UINT ix )
+void CGaDescendants::printGAline()
 {
 //	fwprintf( fl, L"%d %d %d %d\n", vDesc.at(ix).childrenPrinted, vDesc.at(ix).gen, vDesc.at(ix).numOfChildren, vDesc.size() );
 
-	CString rowid = vDesc.at( vDesc.size()-1).rowid;
+	CString rowid;
+	rowid = vDesc.at( vDesc.size()-1).rowid;
+//	rowid = vDesc.at(ix).rowid;
 	queryPeople( rowid, &p );
 
-	printBegining( ix );	// html kódok és generáció elkészítése; 
-	printDescendant( ix );
+	printBegining();	// html kódok és generáció elkészítése; 
+	printDescendant();
 	printMarriages(); 
 
 
@@ -40,10 +42,11 @@ void CGaDescendants::printGAline( UINT ix )
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // A genráció változástól függû behuzás és genrációs kód nyomtatása az m_sytax értékétõl függõen
-void CGaDescendants::printBegining( int ix )
+void CGaDescendants::printBegining()
 {
 	CString tags;
 	bool ul = false;
+	int ix = vDesc.size() -1;
 
 	UINT	generation	= vDesc.at(ix).gen;
 	TCHAR	gen			= TCHAR('A') + TCHAR(generation);	// a generációs karakter-jel ( A,B,C,D.....);
@@ -114,11 +117,11 @@ CString CGaDescendants::getFamilyName( CString family )
 	return( str );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CGaDescendants::printDescendant( int ix )
+void CGaDescendants::printDescendant()
 {
-	CString rowid = vDesc.at( vDesc.size()-1).rowid;
+//	CString rowid = vDesc.at( vDesc.size()-1).rowid;
 
-
+	int ix = vDesc.size() -1;
 // leszármazott neve
 	if( m_CheckLastName )
 		cLine.Format( L"%s %s",  getLastname( &p ), getFirstname( &p )); //attrib[m_ixName].code1, p.first_name, attrib[m_ixName].code2 ); 
@@ -126,20 +129,24 @@ void CGaDescendants::printDescendant( int ix )
 		cLine.Format( L"%s", getFirstname( &p )); //attrib[m_ixName].code1, p.first_name, attrib[m_ixName].code2 ); 
 	
 // ha apjának több felkesége volt,a felség sorszámának kiírása
+
 	if( vDesc.at(ix).numOfMothers > 1 )
 	{
+		if( p.parentIndex )									// parentindex != 0 csak ha változás van
+			m_parentindexLast = p.parentIndex;
 		if( m_numbering == SZLUHA || m_numbering == TUP )
 		{
 			if( p.parentIndex != 0 )
 			{
 				str.Format( L"/%d", p.parentIndex ); 
 				cLine += str;
+				m_parentindexLast = p.parentIndex;
 			}
 		}
 		else if( m_numbering == VIL )  // felség sorszámának kiírása a név elõtt
 		{
-			if( p.parentIndexCalc != 0 )
-				fwprintf( fl, L"%d. ", p.parentIndexCalc );
+			if( m_parentindexLast )
+				fwprintf( fl, L"%d. ", m_parentindexLast );
 		}
 	}
 	if( !p.posterior.IsEmpty() )
@@ -509,38 +516,6 @@ void CGaDescendants::queryPeople( CString rowid, PPEOPLE* p )
 	p->title			= m_recordset.GetFieldString( PEOPLE_TITLE );
 	p->titolo			= m_recordset.GetFieldString( PEOPLE_TITOLO );
 
-	int pos;
 	if( ( p->comment.Find( L"http" ) ) != -1 ) p->comment.Empty();
 
 }
-/*
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int CGaDescendants::getTupigny( UINT gen )
-{
-	for( UINT i = 0; i < v_tupigny.size(); ++i )
-	{
-		if( v_tupigny.at(i).gen == gen )
-			return v_tupigny.at(i).tupigny;
-	}
-	return 0;
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// HA a gen mér létezik, akkor 1-el növeli, ha nem, akkor 1-et tesz bele;
-int CGaDescendants::putTupigny( UINT gen )
-{
-	TUPIGNY tupigny;
-	for( UINT i = 0; i < v_tupigny.size(); ++i )
-	{
-		if( v_tupigny.at(i).gen == gen )
-		{
-			++v_tupigny.at(i).tupigny;
-			return v_tupigny.at(i).tupigny;
-		}
-	}
-	tupigny.gen			= gen;
-	tupigny.tupigny		= 1;
-	v_tupigny.push_back( tupigny );
-
-	return v_tupigny.at( v_tupigny.size() - 1 ).tupigny;
-}
-*/

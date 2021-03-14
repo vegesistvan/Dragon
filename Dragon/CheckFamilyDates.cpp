@@ -205,7 +205,7 @@ Természetesen csak azokat a dátumokat ellenõrzi a program, amelyek meg vannak ad
 Minden embernél a rá vonatkozó dátum hibát jelzõ üzenetet listázunk az utolsó oszlopban.\
 Csak azokat a családokat listázzuk, amelyekben valamely dátumok között összeférhetetlenséget állapított meg a program.\n\r\
 A listán a családok zöld színû sorokal vannak elválasztva. A család elsõ sorában az apa áll kék színnel, õt követi az \
-feleség piros színnel, majd a gyerekeik fekete színnel. Ha több felesége volt az apának, akkor következik a következõ \
+feleség piros színnel, majd a gyerekeik feketével. Ha több felesége volt az apának, akkor következik a következõ \
 feleség a gyerekeivel, és így tovább. Az ellentmondó dátumok sárga háttér színnel vannak jelölve\r\n\
 \r\n\
 Egy sorra kattintva jobb egérgombban, egy legördülõ menürõl választhatunk olyan funkciókat, amelyekkel megnézhetjük a \
@@ -242,9 +242,9 @@ BEGIN_MESSAGE_MAP(CCheckFamilyDates, CDialogEx)
 	ON_COMMAND(ID_HTML_NOTEPAD_PARENTS, &CCheckFamilyDates::OnHtmlNotepadParents)
 	ON_COMMAND(ID_HTML_FATHERANDSIBLINGS, &CCheckFamilyDates::OnHtmlFatherAndSiblings)
 	ON_COMMAND(ID_DB_EDIT, &CCheckFamilyDates::OnDbEdit)
-
 	ON_COMMAND(ID_EDIT_3GENERATIONS, &CCheckFamilyDates::On3Generations )
 	ON_COMMAND(ID_EDIT_DATABASE, &CCheckFamilyDates::OnEditDatabase )
+	ON_COMMAND(ID_HTML_CHILDREN, &CCheckFamilyDates::OnHtmlChildren)
 
 	ON_COMMAND(ID_PARAMETERS, &CCheckFamilyDates::OnParameters)
 	ON_COMMAND(ID_INFO_FAMILIES, &CCheckFamilyDates::OnInfoFamilies)
@@ -1349,6 +1349,50 @@ void CCheckFamilyDates::OnDbEdit()
 	dlg.m_rowid = rowid;
 	dlg.DoModal();
 }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckFamilyDates::On3Generations()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
+
+	CRelations dlg;
+	dlg.m_rowid = rowid;
+
+	ShowWindow( SW_HIDE );
+	dlg.DoModal();
+	ShowWindow( SW_RESTORE );
+
+}	
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckFamilyDates::OnHtmlChildren()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
+	CHtmlEditLines dlg;
+	dlg.m_title.Format( L"%s és gyermekei", m_ListCtrl.GetItemText( nItem, L_NAME ) );
+	dlg.m_type	= L"F_CHILDREN";
+	dlg.m_rowid = rowid;
+	dlg.DoModal();
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckFamilyDates::OnEditDatabase()
+{
+	int nItem	= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED); 
+	if( nItem == -1 ) return;
+
+	CString name;
+ 	name = m_ListCtrl.GetItemText( nItem, L_NAME );
+
+	CEditPeople dlg;
+
+	dlg.m_rowid	= m_ListCtrl.GetItemText( nItem, L_ROWID );
+	dlg.m_caption.Format( L"%s szerkesztése", name );
+
+	ShowWindow( SW_HIDE );
+	dlg.DoModal();	
+	ShowWindow( SW_RESTORE );
+}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1408,38 +1452,7 @@ BOOL CCheckFamilyDates::query4( CString command )
 	}
 	return TRUE;
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckFamilyDates::On3Generations()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
-	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
 
-	CRelations dlg;
-	dlg.m_rowid = rowid;
-
-	ShowWindow( SW_HIDE );
-	dlg.DoModal();
-	ShowWindow( SW_RESTORE );
-
-}	
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckFamilyDates::OnEditDatabase()
-{
-	int nItem	= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED); 
-	if( nItem == -1 ) return;
-
-	CString name;
- 	name = m_ListCtrl.GetItemText( nItem, L_NAME );
-
-	CEditPeople dlg;
-
-	dlg.m_rowid	= m_ListCtrl.GetItemText( nItem, L_ROWID );
-	dlg.m_caption.Format( L"%s szerkesztése", name );
-
-	ShowWindow( SW_HIDE );
-	dlg.DoModal();	
-	ShowWindow( SW_RESTORE );
-}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Elfogadott formátum:
 // az évnek 1000 és az aktuális év közé kell esni

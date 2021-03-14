@@ -1,3 +1,5 @@
+v 2.2.5.0 2021.03.14 Összevonásnál a házastársak születési és halálozási dátuma is kritérium
+
 v 2.2.4.0 2021.03.06 A családok dátum hibáinak színezése megváltozott, és szűrhetőek bizonyos kritériumok szerint
 
 v 2.2.3.0 2021.03.04 Nem < karakterrel kezdődő GA.html sorokra hibajelzést

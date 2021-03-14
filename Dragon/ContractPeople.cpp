@@ -38,24 +38,19 @@ enum
 	S_UNITED,
 	S_GENERATION,
 	S_SOURCE,
-	S_NAME,
 	S_ROWID,
-	S_BIRTH,
-	S_DEATH,
-	S_FATHER,
+	S_NAME,
 	S_ROWIDF,
-	S_BIRTHF,
-	S_DEATHF,
+	S_FATHER,
+	S_ROWIDM,	
 	S_MOTHER,
-	S_ROWIDM,
-	S_BIRTHM,
-	S_DEATHM,
  	S_ROWIDS,
 	S_SPOUSES,
 	S_LINEF,
 	COLUMNSCOUNT,
 };
 
+CString  getNameBD( CString name, CString birth, CString death );
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool sortBySourceX(const SAMENAMES &v1, const SAMENAMES &v2) 
 {
@@ -156,7 +151,7 @@ házastársak\n\n\
 	sWHITE.Format( L"%u", RGB(255,255,255) );
 
 	m_name = L"";				// ha csak egy embert akarunk vizsgálni, itt megadhatjuk a nevét
-	m_azonos	= 1;			// az azonos adatpárok elõírt száma
+	m_azonos	= 1;						// az azonos adatpárok elõírt száma
 	nItem		= 0;
 	m_loopMax   = 4;
 }
@@ -275,6 +270,10 @@ bool CContractPeople::contractPeople()
 	return true;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Azonos nevû emebereket keres és azok adatait beteszi a vPeople vektorba.
+// Ha összegyûltek az azonos nevû emberek, akkor meghívja a processPeople metódust,
+// amely megállapítja az azonosságot vagy különbözõséget.
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CContractPeople::core()
 {
 	CString namePrev;
@@ -299,6 +298,7 @@ bool CContractPeople::core()
 
 	CString nameR;
 	vPeople.clear();
+	vSpouses.clear();
 	for( UINT i = 0; i < m_recordset->RecordsCount()-1; ++i )
 	{
 		lastName  = m_recordset->GetFieldString( P_LAST_NAME );
@@ -327,6 +327,7 @@ bool CContractPeople::core()
 		{
 			processPeople();
 			vPeople.clear();
+			vSpouses.clear();
 			first = true;
 		}
 		namePrev = name;
@@ -352,12 +353,15 @@ bool CContractPeople::putPeople( CString name, UINT i )
 	m_recordset->MoveTo( i );
 
 	SAMENAMES vpeople;
+	SAMENAMES vspouses;
 	CString rowid = m_recordset->GetFieldString( P_ROWID );
 	CString spouses;
-	CString fullname;
+	CString nameBD;
 	CString spouse_id;
 	CString father_id;
-
+	CString birth;
+	CString death;
+	CString lfname;
 
 	int z;
 	if( rowid == L"136437" )
@@ -415,11 +419,32 @@ bool CContractPeople::putPeople( CString name, UINT i )
 	for( UINT i = 0; i < m_recordset1->RecordsCount(); ++i )
 	{
 		spouse_id = m_recordset1->GetFieldString( 0 );
-		m_command.Format( L"SELECT last_name, first_name FROM people WHERE rowid = '%s'", spouse_id );
+		m_command.Format( L"SELECT last_name, first_name, birth_date, death_date FROM people WHERE rowid = '%s'", spouse_id );
 		if( !query2( m_command ) ) return false;
-			fullname.Format( L"%s %s", m_recordset2->GetFieldString(0), sepFirstName( m_recordset2->GetFieldString(1) ) );
-		spouses += fullname.Trim();
+		birth = m_recordset2->GetFieldString( 2 );
+		death = m_recordset2->GetFieldString( 3 );
+		lfname.Format( L"%s %s", m_recordset2->GetFieldString(0),	sepFirstName( m_recordset2->GetFieldString(1) ) );
+		nameBD = getNameBD( lfname, birth, death );
+		/*
+		if( !birth.IsEmpty() && death.IsEmpty() )
+			nameBD.Format( L"%s(*%s)", lfname, birth );
+		else if( birth.IsEmpty() && !death.IsEmpty() )
+			nameBD.Format( L"%s(+%s)", lfname, death);
+		else if( !birth.IsEmpty() && !death.IsEmpty() )
+			nameBD.Format( L"%s(*%s +%s)", lfname, birth, death);
+		else
+			nameBD = lfname;
+		*/
+		spouses += nameBD.Trim();
 		spouses += L",";
+
+		vspouses.rowid	= rowid;		// a férj azonosítója!!!
+		vspouses.name	= lfname;
+		vspouses.nameBD	= nameBD;
+
+		vspouses.birth = m_recordset2->GetFieldString(2);
+		vspouses.death = m_recordset2->GetFieldString(3);
+		vSpouses.push_back( vspouses );
 		m_recordset1->MoveNext();
 	}
 	if( m_recordset1->RecordsCount() )
@@ -459,6 +484,7 @@ void CContractPeople::processPeople()
 	UINT db = 0;
 	int i;
 	int z;
+
 	int mi2;
 	int g;
 	CString gen1;
@@ -472,7 +498,7 @@ void CContractPeople::processPeople()
 	CString rowid1;
 	CString rowid2;
 
-	if( vPeople.at(0).name == L"Lányi János" )
+	if( vPeople.at(0).name == L"Abhortis Erzsébet" )
 		z = 1;
 	m_contracted = false;
 	resetRef();
@@ -494,7 +520,7 @@ void CContractPeople::processPeople()
 		if( db )
 		{
 //			printRef( group ); 
-			resetRef();  // ha új csoport kezdõdik, akkor üres rf-ek kellenek 
+ 			resetRef();  // ha új csoport kezdõdik, akkor üres rf-ek kellenek 
 			++group;
 		}
 		db = 0;
@@ -581,7 +607,7 @@ if( (i1 == 95921 && i2 == 141743 ) || (i1 == 141743 && i2 == 95921 ) )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Az i1 és i2 indexû házasspárok azonosságát állapíthja meg.
+// Az i1 és i2 indexû azonos nevû emberek azonosságát állapíthja meg.
 // return true: azonosak (nincs ellentmondás az adatai között!!!) 
 // return false: különbözõek
 int CContractPeople::identical( UINT i1, UINT i2 )
@@ -591,8 +617,10 @@ int CContractPeople::identical( UINT i1, UINT i2 )
 	int			g;
 	int z;
 
+	if( a.name == L"Adamovich Kata" && b.name == L"Adamovich Kata" )
+		z = 1;
 
-	if( a.rowid == L"261349" && b.rowid == L"26699" )
+	if( a.rowid == L"180235" || b.rowid == L"180235" )
 		z = 1;
 
 	if( a.source == L"1" && b.source == L"1" )  return false;
@@ -632,109 +660,87 @@ int CContractPeople::identical( UINT i1, UINT i2 )
 	else if( g == 1 ) ++m_match; 
 */
 
+	if( ( g = sameSpouses( a.rowid, b.rowid ) ) == -1 ) return false;
+	if( g == 1 ) ++m_match; 
+
+
+/*
 	if( ( g = sameSpouses( a.spouses, b.spouses ) ) == -1 ) return false;
 	if( g == 1 ) ++m_match; 
-	
+*/	
 	if( m_azonos <= m_match ) return true;			// legalább _azonos számú egyezés ellentmondás nélkül 
 	return false;
 
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Ha referencia és spouse2 is meg van adva, akkor eueket hasonlítja össze
-// Ha nincs, de spouse1 és spouse2 is adva van, akkor ezeket hasonlítja.
-// spouse1 vagy spouse2 üres, akkor return 0;
-//  1 : mindkettõ meg van adva és egyezik;
-//  0 : csak az egyik vagy egy sincs van megadva, így nincs ellentmondás
-//  -1 : mindkettõ meg van adva és nem egyezik
-int CContractPeople::sameSpouses( CString spouse1, CString spouse2 )
+// Az azonos nevû rowid1 és rowid 2 emberk házastársai a vSpouses vektorban vannak, amely az összes azonos nevû
+// ember összes házastársát tartalmazza. A vSpouse.rowid jelzi, hogy melyik férjhez tatozik egy feleség.
+// Ha a rowid1 és rowid2 házastársai között van azonos nevû, akkor ellenõrzi azok születési és halálozási dátumának 
+// egyezését is, ha meg vannak adva.
+// a házastársak a férjek rowid-ja szerint vannak rendezve
+
+// return -1		a férjek egyezésére kizáró ok van:
+//					mindkettõnek van házastársa, de nincs közöttük azonos nevû, vagy van, de az azonos nevûek 
+//					születési vagy halálozási dátumai között ellentmondás van.
+
+// return 1			a férjek egyezését megerõsíti:
+//					vannak azonos nevû házatársak, akik születési és halálozási dátuma között nincs ellentmondás
+
+// return 0			a férjek egyezésére nincs kizáró ok:
+//					egyiknek vagy mindkettõnek sincs házastársa
+
+
+int CContractPeople::sameSpouses( CString rowid1, CString rowid2 )
 {
-	CStringArray a;
-	CStringArray b;
-	CStringArray x;
-	int n1;
-	int n2;
-	int nx;
-	CString sx;
-	CString s1;
-	CString s2;
+	int i;
+	int j;
 	int z;
 
-//	if( spouse1 == L"Krucsay Klára" )
-//		z = 1;
-//	if( spouse2 == L"Krucsay Klára" && spouse1 == L"Krucsay Klára, Dobay Kata" )
-//		z = 1;
+	CString name1;
+	CString name2;
 
-//	if( spouse1.IsEmpty() || spouse2.IsEmpty() ) return 0;
+	CString birth1;
+	CString birth2;
 
-	n1 = wordList( &a, spouse1, ',', false );
-	n2 = wordList( &b, spouse2, ',', false );
-	nx = wordList( &x, r.spouses, ',', false );
-	if( !spouse1.IsEmpty() && !spouse2.IsEmpty() )
+	CString death1;
+	CString death2;
+
+	CString dummy;
+
+	int g;
+	int cnt1 = 0;
+	int cnt2 = 0;
+
+	for( i = 0; i < vSpouses.size(); ++i )
 	{
-		for( int i = 0; i < n1; ++i )
+		if( vSpouses.at(i).rowid == rowid1 )
 		{
-			s1 = a[i];
-			if( !s1.IsEmpty() )
+			++cnt1;
+			for( j = 0; j < vSpouses.size(); ++j )
 			{
-				for( int j = 0; j < n2; ++j )
+				if( vSpouses.at(j).rowid == rowid2 )
 				{
-					s2 = b[j];
-					if( !s2.IsEmpty() )
+					++cnt2;
+					name1 = vSpouses.at(i).name;
+					name2 = vSpouses.at(j).name;
+					if( name1 == name2 )
 					{
-						if( s1 == s2 )
-						{
-							return 1;
-						}
+						birth1	= vSpouses.at(i).birth;
+						birth2	= vSpouses.at(j).birth;
+						if( ( g = same( dummy, birth1, birth2 ) ) == -1 ) continue;
+
+						death1	= vSpouses.at(i).death;
+						death2	= vSpouses.at(j).death;
+						if( ( g = same( dummy, death1, death2 ) ) == -1 ) continue;
+
+						return 1;
 					}
 				}
 			}
 		}
-		return -1;
 	}
-
-
-
-	if( !r.spouses.IsEmpty() && !spouse2.IsEmpty() )
-	{
-		if( nx ==1 && n2 == 1 )
-			return( same( r.spouses, spouse1, spouse2 ) );
-	
-		for( int i = 0; i < nx; ++i )
-		{
-			sx = x[i];
-			for( int j = 0; j < n2; ++j )
-			{
-				s2 = b[j];
-				if( sx == s2 )
-				{
-					if( nx < n2 ) r.spouses = spouse2;
-					return 1;
-				}
-			}
-		}
-
-	}
-	if( !spouse1.IsEmpty() && !spouse2.IsEmpty() )
-	{
-		if( n1 ==1 && n2 == 1 )
-			return( same( r.spouses, spouse1, spouse2 ) );
-		
-		for( int i = 0; i < n1; ++i )
-		{
-			s1 = a[i];
-			for( int j = 0; j < n2; ++j )
-			{
-				s2 = b[j];
-				if( s1 == s2 ) 
-				{
-					if( n1 < n2 ) r.spouses = spouse2;
-					else r.spouses = spouse1;
-					return 1;
-				}
-			}
-		}
-	}
-	return 0;
+	if( !cnt1 || !cnt2 ) return 0;			// egyiküknek vagy mindkettõjüknek nincs házastársa
+	return -1;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Az iBy indexû emberrel helyettesíti az iDel indexû embert
@@ -920,6 +926,10 @@ void CContractPeople::listPeople()
 	int colorIndex;
 	int	rgbColor;
 
+	CString nameBD;
+	CString nameBDF;
+	CString nameBDM;
+	CString nameBDS;
 
 	int index;
 	int z;
@@ -944,19 +954,36 @@ void CContractPeople::listPeople()
 		if( !x.group )
 			ident = L"               ";
 
+		nameBD	= getNameBD( x.name, x.birth, x.death );
+		nameBDF	= getNameBD( x.father, x.birthF, x.deathF );
+		nameBDM	= getNameBD( x.mother, x.birthM, x.deathM );
 
 		str.Format( L"\
+%9s %2s %1s %1s \
+%8s %-30s\
+%8s %-30s\
+%8s %-30s \
+%8s %s",\
+x.line, x.united, x.generation, x.source,\
+x.rowid, nameBD,\
+x.rowidF, nameBDF,\
+x.rowidM, nameBDM,\
+x.rowidS, x.spouses\
+); 
+/*
+str.Format( L"\
 %9s %2s %1s %1s \
 %8s,%-30s,%12s %12s \
 %8s,%-30s,%12s %12s \
 %8s %-30s %12s %12s \
 %8s %s",\
 x.line, x.united, x.generation, x.source,\
-x.rowid, x.name, x.birth,  x.death,\
-x.rowidF, x.father, x.birthF, x.deathF,\
-x.rowidM, x.mother, x.birthM, x.deathM,\
+x.rowid, nameBD, x.birth,  x.death,\
+x.rowidF, nameBDF, x.birthF, x.deathF,\
+x.rowidM, nameBDM, x.birthM, x.deathM,\
 x.rowidS, x.spouses\
 ); 
+*/
 		ident += str;
 		if( m_contracted )
 		{
@@ -978,13 +1005,13 @@ x.rowidS, x.spouses\
 	if( m_contracted )
 	{
 		fwprintf( fU, L"\n" );
-		list();
+//		list();
 	}
 	else
 		fwprintf( fD, L"\n" );
 
 
-
+// nem összevont emberek
 // list into text file
 	for( UINT i = 0; i < vPeople.size(); ++i )
 	{
@@ -1005,6 +1032,24 @@ x.rowidS, x.spouses\
 
 		rgbColor = m_rgb[colorIndex];
 
+		nameBD = getNameBD( x.name, x.birth, x.death );
+		nameBDF	= getNameBD( x.father, x.birthF, x.deathF );
+		nameBDM	= getNameBD( x.mother, x.birthM, x.deathM );
+		str.Format( L"\
+%d\t%d\t%d\t%d\t%d\t%d\t%d\t\
+%s\t%s\t%s\t%s\t\
+%s\t%s\t\
+%s\t%s\t\
+%s\t%s\t\
+%s\t%s\t%s\t\n",\
+colorIndex, m_loop, x.group, x.match, x.group2, x.status, rgbColor,\
+x.line, x.united, x.generation, x.source,\
+x.rowid,nameBD,\
+x.rowidF,nameBDF,\
+x.rowidM,nameBDM,\
+x.rowidS, x.spouses, x.lineF\
+);
+/*
 		str.Format( L"\
 %d\t%d\t%d\t%d\t%d\t%d\t%d\t\
 %s\t%s\t%s\t%s\t\
@@ -1014,12 +1059,12 @@ x.rowidS, x.spouses\
 %s\t%s\t%s\t\n",\
 colorIndex, m_loop, x.group, x.match, x.group2, x.status, rgbColor,\
 x.line, x.united, x.generation, x.source,\
-x.rowid,x.name,x.birth,  x.death,\
-x.rowidF,x.father,x.birthF, x.deathF,\
-x.rowidM,x.mother,x.birthM, x.deathM,\
+x.rowid,nameBD,x.birth,  x.death,\
+x.rowidF,nameBDF,x.birthF, x.deathF,\
+x.rowidM,nameBDM,x.birthM, x.deathM,\
 x.rowidS, x.spouses, x.lineF\
 );
-
+*/
 		if( m_contracted )
 			fwprintf( textU, str );
 		else
@@ -1229,6 +1274,7 @@ BOOL CContractPeople::query2( CString command )
 	return TRUE;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 void CContractPeople::list()
 {
 	int status;
@@ -1281,18 +1327,18 @@ void CContractPeople::list()
 
 		push( vPeople.at(i).rowid );
 		push( vPeople.at(i).name );
-		push( vPeople.at(i).birth );
-		push( vPeople.at(i).death );
+//		push( vPeople.at(i).birth );
+//		push( vPeople.at(i).death );
 		
 		push( vPeople.at(i).rowidF );
 		push( vPeople.at(i).father );
-		push( vPeople.at(i).birthF );
-		push( vPeople.at(i).deathF );
+//		push( vPeople.at(i).birthF );
+//		push( vPeople.at(i).deathF );
 	
 		push( vPeople.at(i).rowidM );
 		push( vPeople.at(i).mother );
-		push( vPeople.at(i).birthM );
-		push( vPeople.at(i).deathM );
+//		push( vPeople.at(i).birthM );
+//		push( vPeople.at(i).deathM );
 		
 		push( vPeople.at(i).rowidS );
 		push( vPeople.at(i).spouses );
@@ -1321,3 +1367,21 @@ void CContractPeople::push( CString item )
 	tableLines.push_back( sT );
 
 }
+*/
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CString  getNameBD( CString name, CString birth, CString death )
+{
+	CString nameBD = name;
+
+	if( !birth.IsEmpty() && death.IsEmpty() )
+		nameBD.Format( L"%s (*%s)", name, birth );
+	else if( birth.IsEmpty() && !death.IsEmpty() )
+		nameBD.Format( L"%s (+%s)", name, death );
+	else if( !birth.IsEmpty() && !death.IsEmpty() )
+		nameBD.Format( L"%s (*%s +%s)", name, birth, death );
+
+	return nameBD;
+}
+
+
+
