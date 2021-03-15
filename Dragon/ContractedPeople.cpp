@@ -11,6 +11,7 @@
 #include "ContractInfo.h"
 #include "html_EditLines.h"
 #include "Relations.h"
+#include "GetString.h"
 //#include "FilterLoop.h"
 
 // CContractedPeople dialog
@@ -92,6 +93,7 @@ BEGIN_MESSAGE_MAP(CContractedPeople, CDialogEx)
 
 	ON_COMMAND(ID_FILTER_3, &CContractedPeople::OnFilter3)
 	ON_COMMAND(ID_FILTER_4, &CContractedPeople::OnFilter4)
+	ON_COMMAND(ID_FILTER_BYNAME, &CContractedPeople::OnFilterByname)
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CContractedPeople::OnInitDialog()
@@ -172,6 +174,7 @@ void CContractedPeople::inputFile( int type )
 	m_numOfGroups = 0;
 	
 	vPeople.clear();
+	vFiltered.clear();
 	CProgressWnd wndP( NULL, str ); 
 	wndP.GoModal();
 	wndP.SetRange( 0, fileLength );
@@ -387,13 +390,13 @@ void CContractedPeople::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
 		nItem	= pLVCD->nmcd.dwItemSpec;
 		nCol	= pLVCD->iSubItem;
 
-		if( UNITED )
-		{
+//		if( UNITED )
+//		{
 			if( vFiltered.size() )
 				pLVCD->clrTextBk = _wtoi( vFiltered.at( nItem*L_COLUMNSCOUNT + L_RGBCOLOR ) );
 			else
 				pLVCD->clrTextBk = _wtoi( vPeople.at( nItem*L_COLUMNSCOUNT + L_RGBCOLOR ) );
-		}
+//		}
 		*pResult = CDRF_DODEFAULT;
 		break;
 	}
@@ -420,56 +423,11 @@ void CContractedPeople::OnFilterAll()
 void CContractedPeople::OnFilter1()
 {
 	filter( 1 );
-/*
-	int loop;
-	vFiltered.clear();
-	for( UINT i = 0; i < vPeople.size()- L_COLUMNSCOUNT+1; i += L_COLUMNSCOUNT)
-	{
-		loop = _wtoi( vPeople.at(i+1) );
-		if( loop == 1 )
-		{
-			for( UINT j = 0; j < L_COLUMNSCOUNT; ++j ) // ix-1 a cnt-re mutat
-			{
-				vFiltered.push_back( vPeople.at( i + j  ) );
-			}
-		}
-	}
-	if( m_contracted )
-		str = L"Azonos nevû emberek, akik között összevonások történtek az 1. ciklusban";
-	else
-		str = L"A nem összevonható azonos nevû emberek az 1. ciklusban";
-	str.Format( L"Azonos nevû emberek összevonása az 1. cikusban" );
-	SetWindowTextW( str );
-	m_ListCtrl.SetItemCountEx( vFiltered.size() + 1  );
-	m_ListCtrl.AttachDataset( &vFiltered );
-*/
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedPeople::OnFilter2()
 {
 	filter( 2 );
-/*
-	int loop;
-	vFiltered.clear();
-	for( UINT i = 0; i < vPeople.size()- L_COLUMNSCOUNT+1; i += L_COLUMNSCOUNT )
-	{
-		loop = _wtoi( vPeople.at(i+1) );
-		if( loop == 2 )
-		{
-			for( UINT j = 0; j < L_COLUMNSCOUNT; ++j ) // ix-1 a cnt-re mutat
-			{
-				vFiltered.push_back( vPeople.at( i + j  ) );
-			}
-		}
-	}
-	if( m_contracted )
-		str = L"Azonos nevû emberek, akik között összevonások történtek a 2. ciklusban";
-	else
-		str = L"A nem összevonható azonos nevû emberek a 2. ciklusban";
-	SetWindowTextW( str );
-	m_ListCtrl.SetItemCountEx( vFiltered.size() + 1  );
-	m_ListCtrl.AttachDataset( &vFiltered );
-	*/
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedPeople::OnFilter3()
@@ -504,6 +462,78 @@ void CContractedPeople::filter( int iter )
 	SetWindowTextW( str );
 	m_ListCtrl.SetItemCountEx( vFiltered.size() + 1  );
 	m_ListCtrl.AttachDataset( &vFiltered );
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedPeople::OnFilterByname()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+	if( nItem == -1 )
+	{
+		AfxMessageBox( L"Nincs kijelölve sor!" );
+		return;
+	}
+
+	
+	CString name;
+	CString nev;
+	int pos;
+	name = m_ListCtrl.GetItemText( nItem, L_NAME );
+	if( (pos = name.Find( '(' ) ) != -1 )
+		name = name.Left( pos );
+	name.Trim();
+
+	/*
+	CGetString dlg;
+
+
+	name = theApp.GetProfileString( L"Settings", L"fullname", L"Thuránszky Pál" );
+	dlg.m_string = name;
+	dlg.m_caption.Format( L"Add meg a kívánt ember teljes nevét!" );
+	if( dlg.DoModal() == IDCANCEL ) return;
+
+	name = dlg.m_string;
+
+	theApp.WriteProfileStringW( L"Settings", L"fullname", name );
+*/
+
+	UINT i;
+	UINT j;
+	bool pushed = false;
+
+	UINT length = name.GetLength();
+
+	vFiltered.clear();
+	for( i = 0; i < vPeople.size()- L_COLUMNSCOUNT+1; i += L_COLUMNSCOUNT )
+	{
+		nev		= vPeople.at(i +L_NAME );
+		if( nev.Left( length ) == name  ) 
+		{
+			pushLine( i );
+			pushed = true;
+		}
+		else if( pushed )
+		{
+			pushLine( i );		// szeparáló üres sor
+			pushed = false;
+		}
+	}
+
+	if( m_contracted )
+		str.Format( L"%s nevû emberek, akik között összevonások történtek", name );
+	else
+		str.Format( L"%s nevû emeberek, akik nem lettek összevonva", name );
+	SetWindowTextW( str );
+	m_ListCtrl.SetItemCountEx( vFiltered.size() + 1  );
+	m_ListCtrl.AttachDataset( &vFiltered );
+
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedPeople::pushLine( int i )
+{
+	for( UINT j = 0; j < L_COLUMNSCOUNT; ++j ) // ix-1 a cnt-re mutat
+	{
+		vFiltered.push_back( vPeople.at( i + j  ) );
+	}
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedPeople::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
@@ -637,4 +667,4 @@ void CContractedPeople::OnDbEdit()
 	dlg.m_rowid = rowid;
 	dlg.DoModal();
 }
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

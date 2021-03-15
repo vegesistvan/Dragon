@@ -921,13 +921,31 @@ int same( CString ref, CString par1, CString par2 )
 			return -1;
 	}
 */
+	int len1 = par1.GetLength();
+	int len2 = par2.GetLength();
+	int len;
+	if( len1 && len2 )
+	{
+		len = ( len1 < len2) ? (len1):(len2);
+		if( par1.Left(len) == par2.Left(len ) )
+			return 1;
+		else
+			return -1;
+	}
+
+/*
+
 	if( !par1.IsEmpty() && !par2.IsEmpty() )
 	{
+
+
+
 		if( par1 == par2 )
 			return 1;
 		else
 			return -1;
 	}
+*/
 	return 0;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

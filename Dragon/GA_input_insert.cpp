@@ -184,6 +184,7 @@ CString CGaInput::insertSpouseM( UINT i )
 //	if( !v_marriages.at(i).mother.IsEmpty() )				// az apa csak utónevével szerepel
 	{
 		sm.source			= 4;
+		sm.source			= 3;
 		sm.generation		= ' ';
 		sm.sex_id			= v_marriages.at(i).sex_idM;
 		sm.sex_id			= 2;
@@ -220,6 +221,7 @@ CString CGaInput::insertSpouseS( UINT i )
 	CString  rowid(L"0");
 
 	ss.source			= 5;
+	ss.source			= 4;
 	ss.generation		= ' ';
 	ss.sex_id			= v_spouseSpouses.at(i).sex_id;
 	ss.title			= v_spouseSpouses.at(i).title;

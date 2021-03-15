@@ -23,6 +23,7 @@ protected:
 	void push( CString item );
 	void keress( int start );
 	void filter( int iter );
+	void pushLine( int i );
 
 	CMenu menu;
 	CListCtrlEx		m_ListCtrl;
@@ -74,4 +75,5 @@ public:
 	afx_msg void OnDbEdit();
 	afx_msg void OnFilter3();
 	afx_msg void OnFilter4();
+	afx_msg void OnFilterByname();
 };

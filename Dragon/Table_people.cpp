@@ -523,20 +523,23 @@ void CTablePeople::OnFilterSpouses()
 }
 void CTablePeople::OnFilterFathers()
 {
-	m_filterTextNew	= L"Leszármazottak házastársainak apja";
-	m_filterNew		= L"source=3"; 
+	m_filterTextNew	= L"Leszármazottak házastársainak apjai";
+	m_filterNew		= L"source=3 AND sex_id=1"; 
 	fillTable(0);
 }
+
 void CTablePeople::OnFilterMothers()
 {
-	m_filterTextNew	= L"Leszármazottak házastársainak anyja";
-	m_filterNew		= L"source=4"; 
+	m_filterTextNew	= L"Leszármazottak házastársainak anyjai";
+	m_filterNew		= L"source=3 AND sex_id==2"; 
 	fillTable(0);
 }
+
 void CTablePeople::OnFilterSpousespouses()
 {
 	m_filterTextNew	= L"Leszármazottak házastársainak további házastársai";
 	m_filterNew		= L"source=5"; 
+	m_filterNew		= L"source=4"; 
 	fillTable(0);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

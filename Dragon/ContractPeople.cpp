@@ -165,19 +165,6 @@ END_MESSAGE_MAP()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CContractPeople::contractPeople()
 {
-//	CContractPeopleDlg dlg;
-//	if( dlg.DoModal() == IDCANCEL ) return false;
-
-
-/*
-	CString fileName;
-	
-	fileName = L"peopleUnited";
-	m_fileSpecTextU = theApp.openTextFile( &textU, fileName, L"w+" );
-
-	fileName = L"peopleDifferent";
-	m_fileSpecTextD = theApp.openTextFile( &textD, fileName, L"w+" );
-*/
 
 	m_fileSpecTextU.Format( L"%s\\%s_UNITED.txt", theApp.m_databasePath, theApp.m_baseName );
 	if( !openFileSpec( &textU, m_fileSpecTextU, L"w+" ) ) return NULL;
@@ -255,13 +242,6 @@ bool CContractPeople::contractPeople()
 
 	theApp.insertIntoFiles( m_fileSpecTextU, UNITED_FILE );
 	theApp.insertIntoFiles( m_fileSpecTextD, DIFFERENT_FILE );
-	/*
-	m_command.Format( L"INSERT INTO files( type, subtype, filespec) VALUES ( %d, %d,'%s')", CONTRACTED_PEOPLE, UNITEDTXT, m_fileSpecTextU );
-	if( !theApp.execute( m_command ) ) return false;
-
-	m_command.Format( L"INSERT INTO files( type, subtype, filespec) VALUES ( %d, %d,'%s')", CONTRACTED_PEOPLE, DIFFERENTTXT, m_fileSpecTextD );
-	if( !theApp.execute( m_command ) ) return false;
-	*/
 
 	fclose( fU );
 	fclose( fD );
@@ -425,16 +405,7 @@ bool CContractPeople::putPeople( CString name, UINT i )
 		death = m_recordset2->GetFieldString( 3 );
 		lfname.Format( L"%s %s", m_recordset2->GetFieldString(0),	sepFirstName( m_recordset2->GetFieldString(1) ) );
 		nameBD = getNameBD( lfname, birth, death );
-		/*
-		if( !birth.IsEmpty() && death.IsEmpty() )
-			nameBD.Format( L"%s(*%s)", lfname, birth );
-		else if( birth.IsEmpty() && !death.IsEmpty() )
-			nameBD.Format( L"%s(+%s)", lfname, death);
-		else if( !birth.IsEmpty() && !death.IsEmpty() )
-			nameBD.Format( L"%s(*%s +%s)", lfname, birth, death);
-		else
-			nameBD = lfname;
-		*/
+
 		spouses += nameBD.Trim();
 		spouses += L",";
 
@@ -607,7 +578,9 @@ if( (i1 == 95921 && i2 == 141743 ) || (i1 == 141743 && i2 == 95921 ) )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Az i1 és i2 indexû azonos nevû emberek azonosságát állapíthja meg.
+// Az i1 és i2 indexû bejegyzéseket vizsgálja, amelyekben a nevek azonosak.
+// Tekintehetõ azonos ember bejegyzéseinek?
+// A többi atributum is ellentmondás mentes?
 // return true: azonosak (nincs ellentmondás az adatai között!!!) 
 // return false: különbözõek
 int CContractPeople::identical( UINT i1, UINT i2 )
@@ -615,13 +588,6 @@ int CContractPeople::identical( UINT i1, UINT i2 )
 	SAMENAMES	a = vPeople.at(i1);
 	SAMENAMES	b = vPeople.at(i2);
 	int			g;
-	int z;
-
-	if( a.name == L"Adamovich Kata" && b.name == L"Adamovich Kata" )
-		z = 1;
-
-	if( a.rowid == L"180235" || b.rowid == L"180235" )
-		z = 1;
 
 	if( a.source == L"1" && b.source == L"1" )  return false;
 
@@ -650,24 +616,11 @@ int CContractPeople::identical( UINT i1, UINT i2 )
 	if( ( g = same( r.deathF, a.deathF, b.deathF ) ) == -1 ) return false;
 	if( g == 1 ) ++m_match; 
 
-/*
-// a megadott házastársak azonos nevét nem lehet mindig kizáró oknak tekinteni, mert egy embernek lehetnek egyenkénti házasságai is
-	if( ( g = sameSpouses( a.spouses, b.spouses ) ) == -1 )
-	{
-		if( !m_match )	return false;	// ha nincs más egyezés, és a házastárs is különbözik, akkor kizáró
-										// de ha van más egyezés, akkor különbözõ nevû házastársakat is elfogad!!
-	}
-	else if( g == 1 ) ++m_match; 
-*/
 
 	if( ( g = sameSpouses( a.rowid, b.rowid ) ) == -1 ) return false;
 	if( g == 1 ) ++m_match; 
 
 
-/*
-	if( ( g = sameSpouses( a.spouses, b.spouses ) ) == -1 ) return false;
-	if( g == 1 ) ++m_match; 
-*/	
 	if( m_azonos <= m_match ) return true;			// legalább _azonos számú egyezés ellentmondás nélkül 
 	return false;
 
@@ -727,13 +680,13 @@ int CContractPeople::sameSpouses( CString rowid1, CString rowid2 )
 					{
 						birth1	= vSpouses.at(i).birth;
 						birth2	= vSpouses.at(j).birth;
-						if( ( g = same( dummy, birth1, birth2 ) ) == -1 ) continue;
+						if( ( g = same( dummy, birth1, birth2 ) ) == -1 ) continue;  // ellentmondás, ez nemlesz jó
 
 						death1	= vSpouses.at(i).death;
 						death2	= vSpouses.at(j).death;
-						if( ( g = same( dummy, death1, death2 ) ) == -1 ) continue;
+						if( ( g = same( dummy, death1, death2 ) ) == -1 ) continue;	// ellentmondás, ez nem lesz jó
 
-						return 1;
+						return 1; // ellemtmondás mentes, a házastrásakkal minden rendben van
 					}
 				}
 			}
@@ -970,20 +923,6 @@ x.rowidF, nameBDF,\
 x.rowidM, nameBDM,\
 x.rowidS, x.spouses\
 ); 
-/*
-str.Format( L"\
-%9s %2s %1s %1s \
-%8s,%-30s,%12s %12s \
-%8s,%-30s,%12s %12s \
-%8s %-30s %12s %12s \
-%8s %s",\
-x.line, x.united, x.generation, x.source,\
-x.rowid, nameBD, x.birth,  x.death,\
-x.rowidF, nameBDF, x.birthF, x.deathF,\
-x.rowidM, nameBDM, x.birthM, x.deathM,\
-x.rowidS, x.spouses\
-); 
-*/
 		ident += str;
 		if( m_contracted )
 		{
@@ -1005,13 +944,11 @@ x.rowidS, x.spouses\
 	if( m_contracted )
 	{
 		fwprintf( fU, L"\n" );
-//		list();
 	}
 	else
 		fwprintf( fD, L"\n" );
 
 
-// nem összevont emberek
 // list into text file
 	for( UINT i = 0; i < vPeople.size(); ++i )
 	{
@@ -1020,13 +957,13 @@ x.rowidS, x.spouses\
 		switch( x.status )
 		{
 		case 0:
-			colorIndex = 0;					// fehér
+			colorIndex = 0;					// egyedi, nem csinálunk vele semmit - fehér
 			break;
 		case 1:
-			colorIndex = x.group % 10;		// váltakozó színes
+			colorIndex = x.group % 10;		// megtartanadó -váltakozó színes
 			break;
 		case -1:
-			colorIndex = 9;					// szürke
+			colorIndex = 9;					// törlendõ - szürke
 			break;
 		}
 
@@ -1049,22 +986,6 @@ x.rowidF,nameBDF,\
 x.rowidM,nameBDM,\
 x.rowidS, x.spouses, x.lineF\
 );
-/*
-		str.Format( L"\
-%d\t%d\t%d\t%d\t%d\t%d\t%d\t\
-%s\t%s\t%s\t%s\t\
-%s\t%s\t%s\t%s\t\
-%s\t%s\t%s\t%s\t\
-%s\t%s\t%s\t%s\t\
-%s\t%s\t%s\t\n",\
-colorIndex, m_loop, x.group, x.match, x.group2, x.status, rgbColor,\
-x.line, x.united, x.generation, x.source,\
-x.rowid,nameBD,x.birth,  x.death,\
-x.rowidF,nameBDF,x.birthF, x.deathF,\
-x.rowidM,nameBDM,x.birthM, x.deathM,\
-x.rowidS, x.spouses, x.lineF\
-);
-*/
 		if( m_contracted )
 			fwprintf( textU, str );
 		else
@@ -1273,101 +1194,6 @@ BOOL CContractPeople::query2( CString command )
 	}
 	return TRUE;
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-void CContractPeople::list()
-{
-	int status;
-	int group;
-	int colorIndex;
-	int	i;
-
-	
-	for( UINT i = 0; i < vPeople.size(); ++i )
-	{
-		str.Format( L"%d", i+1 );
-		push( str );
-
-		str.Format( L"%d", m_loop );
-		push( str );
-
-		group = vPeople.at(i).group;
-		str.Format( L"%d", group );
-		push( str );
-
-		str.Format( L"%d", vPeople.at(i).match );
-		push( str );
-		
-		str.Format( L"%d", vPeople.at(i).group2 );
-		push( str );
-
-		status = vPeople.at(i).status;
-		switch( status )
-		{
-		case 0:
-			colorIndex = 0;
-			break;
-		case 1:
-			colorIndex = group % 10;
-			break;
-		case -1:
-			colorIndex = 9;
-			break;
-		}
-		str.Format( L"%d", status );
-		push( str );
-
-		str.Format( L"%u", m_rgb[ colorIndex ] );
-		push( str );
-
-		push( vPeople.at(i).line );
-		push( vPeople.at(i).united );
-		push( vPeople.at(i).generation );
-		push( vPeople.at(i).source );
-
-		push( vPeople.at(i).rowid );
-		push( vPeople.at(i).name );
-//		push( vPeople.at(i).birth );
-//		push( vPeople.at(i).death );
-		
-		push( vPeople.at(i).rowidF );
-		push( vPeople.at(i).father );
-//		push( vPeople.at(i).birthF );
-//		push( vPeople.at(i).deathF );
-	
-		push( vPeople.at(i).rowidM );
-		push( vPeople.at(i).mother );
-//		push( vPeople.at(i).birthM );
-//		push( vPeople.at(i).deathM );
-		
-		push( vPeople.at(i).rowidS );
-		push( vPeople.at(i).spouses );
-		push( vPeople.at(i).lineF );
-
-		++nItem;
-	}
-
-	for( i = 0; i < S_RGBCOLOR; i++ )	// egy üres sor az azonos nevû emberek után
-		push( L" " );
-	push( sWHITE );						// RGB color white
-	for( ; i < COLUMNSCOUNT-1; i++ )  // eg yüres sor az azonos nevû emberek után
-		push( L" " );
-
-	++nItem;
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CContractPeople::push( CString item )
-{
-
-	int tLen;
-	TCHAR* sT;
-	tLen	= item.GetLength()+1;
-	sT		= new TCHAR[tLen];
-	_tcscpy_s( sT, tLen, item.GetBuffer() );
-	tableLines.push_back( sT );
-
-}
-*/
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString  getNameBD( CString name, CString birth, CString death )
 {
