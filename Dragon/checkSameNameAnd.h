@@ -1,5 +1,6 @@
 #pragma once
 #include "listctrlex.h"
+#include "colorstatic.h"
 
 
 // CcheckSameNameAnd dialog
@@ -68,7 +69,7 @@ protected:
 	void OnHtmlFamily();
 	void OnDbEdit();
 	void OnHtmlFatherAndSiblings();
-
+	void keress( int start );
 /*
 	void CcheckSameNameAnd::OnHtmlPeoplefather();
 	void CcheckSameNameAnd::OnHtmlEditLines();
@@ -86,6 +87,7 @@ protected:
 	BOOL query3( CString command );
 	BOOL query4( CString command );
 
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnInitDialog();
@@ -100,4 +102,8 @@ public:
 	afx_msg void OnHtml();
 	afx_msg void OnEditNotepadParents();
 	afx_msg void OnFatherandsiblings();
+	afx_msg void OnClickedKeres();
+	afx_msg void OnClickedNext();
+	CColorStatic colorKeres;
+	CColorStatic colorNext;
 };

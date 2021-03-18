@@ -830,12 +830,21 @@ CString CDragonApp::getSpouses( CString rowid, CString sex_id, std::vector<SPOUS
 	for( UINT i = 0; i < vektor->size(); ++i )
 	{
 		names += vektor->at(i).name;
+		names2 += getNameBD( vektor->at(i).name, vektor->at(i).birth_date, vektor->at(i).death_date );
+		names += L", ";
+		names2 += L",";
+	}
+/*
+	for( UINT i = 0; i < vektor->size(); ++i )
+	{
+		names += vektor->at(i).name;
 		names2 += vektor->at(i).name2;
 		names += L", ";
 		names2 += L", ";
 	}
+*/
 	sp->spouses		= names.Left( names.GetLength() - 2 );   
-	sp->spouses2	= names2.Left( names2.GetLength() - 2 );   
+	sp->spouses2	= names2.Left( names2.GetLength() - 1 );   
 
 //	if( sp->spouses == L"Sváby Károly" )
 //		int z = 4;

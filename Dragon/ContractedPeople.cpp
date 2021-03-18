@@ -87,8 +87,9 @@ BEGIN_MESSAGE_MAP(CContractedPeople, CDialogEx)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CContractedPeople::OnHtmlNotepad)
 	ON_COMMAND(ID_HTML_NOTEPAD_PARENTS, &CContractedPeople::OnHtmlNotepadParents)
 	ON_COMMAND(ID_HTML_FATHERANDSIBLINGS, &CContractedPeople::OnHtmlFatherAndSiblings)
+	ON_COMMAND(ID_HTML_CHILDREN, &CContractedPeople::OnHtmlChildren)
 	ON_COMMAND(ID_DB_EDIT, &CContractedPeople::OnDbEdit)
-
+	ON_COMMAND(ID_3GENERATIONS, &CContractedPeople::On3Generations )
 
 
 	ON_COMMAND(ID_FILTER_3, &CContractedPeople::OnFilter3)
@@ -658,6 +659,18 @@ void CContractedPeople::OnHtmlFatherAndSiblings()
 	dlg.m_rowid = rowid;
 	dlg.DoModal();
 }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedPeople::OnHtmlChildren()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
+	CHtmlEditLines dlg;
+	dlg.m_title.Format( L"%s és gyermekei", m_ListCtrl.GetItemText( nItem, L_NAME ) );
+	dlg.m_type	= L"F_CHILDREN";
+	dlg.m_rowid = rowid;
+	dlg.DoModal();
+}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedPeople::OnDbEdit()
 {
@@ -668,3 +681,17 @@ void CContractedPeople::OnDbEdit()
 	dlg.DoModal();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractedPeople::On3Generations()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
+	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
+
+	CRelations dlg;
+	dlg.m_rowid = rowid;
+
+	ShowWindow( SW_HIDE );
+	dlg.DoModal();
+	ShowWindow( SW_RESTORE );
+
+}

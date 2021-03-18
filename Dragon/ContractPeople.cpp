@@ -50,7 +50,7 @@ enum
 	COLUMNSCOUNT,
 };
 
-CString  getNameBD( CString name, CString birth, CString death );
+//CString  getNameBD( CString name, CString birth, CString death );
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool sortBySourceX(const SAMENAMES &v1, const SAMENAMES &v2) 
 {
@@ -320,7 +320,7 @@ cont:	m_recordset->MoveNext();
 		processPeople();
 
 	theApp.execute( L"BEGIN" );
-	contractFull();
+	contractFull();			// a vContracxtban összegyûjtött megtartandó-törlendõ adatok alapján töröl
 	deleteMarriages();
 	theApp.execute( L"COMMIT" );
 	return true;
@@ -561,7 +561,7 @@ if( (i1 == 95921 && i2 == 141743 ) || (i1 == 141743 && i2 == 95921 ) )
 							vPeople.at( i1 ).status = 1;	// megtartani	
 							vPeople.at( i2 ).status = -1;   // törölni
 							vPeople.at( i2 ).match	= m_match;
-							contract( i1, i2 );
+							pushVContract( i1, i2 );
 
 							setRef( i1 );	// ha i1 és i2 azonos, akkor a ref-be másoljuk át a megadott adatokat
 							setRef( i2 );
@@ -696,8 +696,8 @@ int CContractPeople::sameSpouses( CString rowid1, CString rowid2 )
 	return -1;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Az iBy indexû emberrel helyettesíti az iDel indexû embert
-void CContractPeople::contract( UINT iBy, UINT iDel )
+// A vContract-ban gyûjti a törlendõ, megartanadó azonosítókat
+void CContractPeople::pushVContract( UINT iBy, UINT iDel )
 {
 	CString rowid	= vPeople.at( iDel ).rowid;
 	CString rowidBy	= vPeople.at(iBy).rowid;
@@ -1194,6 +1194,7 @@ BOOL CContractPeople::query2( CString command )
 	}
 	return TRUE;
 }
+/*
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString  getNameBD( CString name, CString birth, CString death )
 {
@@ -1208,6 +1209,6 @@ CString  getNameBD( CString name, CString birth, CString death )
 
 	return nameBD;
 }
-
+*/
 
 

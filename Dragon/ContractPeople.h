@@ -100,7 +100,7 @@ protected:
 	void listPeople();
 	int	 sameSpouses( CString spouse1, CString spouse2 );
 	int  identical( UINT i1, UINT i2 );
-	void contract( UINT i1, UINT i2 );
+	void pushVContract( UINT i1, UINT i2 );
 	void contractFull();
 	void deleteMarriages();
 	void setRef( int i ) ;

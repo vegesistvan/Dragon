@@ -1028,3 +1028,17 @@ int diffD( CString date1, CString date2, int* pYear )
 	}
 	return( date1.Compare( date2 ) );
 }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CString  getNameBD( CString name, CString birth, CString death )
+{
+	CString nameBD = name;
+
+	if( !birth.IsEmpty() && death.IsEmpty() )
+		nameBD.Format( L"%s (*%s)", name, birth );
+	else if( birth.IsEmpty() && !death.IsEmpty() )
+		nameBD.Format( L"%s (+%s)", name, death );
+	else if( !birth.IsEmpty() && !death.IsEmpty() )
+		nameBD.Format( L"%s (*%s +%s)", name, birth, death );
+
+	return nameBD;
+}

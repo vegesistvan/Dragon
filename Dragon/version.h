@@ -5,7 +5,7 @@
 // Z ha a funkció módosítása történt
 // W ha hibajavítás történt
 
-#define VERSION L"2.2.6.0"
+#define VERSION L"2.2.6.2"
 
 //#define VERSION L"2.2.3.0"
 

@@ -51,6 +51,7 @@ BEGIN_MESSAGE_MAP(CHtmlEditLines, CDialogEx)
 	ON_COMMAND(ID_LIST_LINES, &CHtmlEditLines::OnListLines)
 	ON_BN_CLICKED(IDC_MODIFY, &CHtmlEditLines::OnClickedModify)
 	ON_EN_CHANGE(IDC_EDIT, &CHtmlEditLines::OnChangeEdit)
+	ON_COMMAND(ID_INFO, &CHtmlEditLines::OnInfo)
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CHtmlEditLines::OnInitDialog()
@@ -58,31 +59,13 @@ BOOL CHtmlEditLines::OnInitDialog()
 	CDialogEx::OnInitDialog();
 	EASYSIZE_ADD( IDC_LIST,	ES_BORDER,	ES_BORDER,		ES_BORDER,		ES_KEEPSIZE,	0 );
 	EASYSIZE_ADD( IDC_EDIT,	ES_BORDER,	IDC_LIST,		ES_BORDER,		ES_BORDER,		0 );
+	EASYSIZE_ADD( IDC_STATIC_GYUJTO,	ES_BORDER,	ES_BORDER,		ES_BORDER,		ES_KEEPSIZE,	0 );
+	EASYSIZE_ADD( IDC_STATIC_EDITBOX,	ES_BORDER,	ES_BORDER,		ES_BORDER,		ES_KEEPSIZE,	0 );
 
+	EASYSIZE_ADD( IDC_MODIFY,	ES_KEEPSIZE,ES_KEEPSIZE,	ES_BORDER,		ES_BORDER,		0);
 	EASYSIZE_ADD( IDCANCEL,	ES_KEEPSIZE,ES_KEEPSIZE,	ES_BORDER,		ES_BORDER,		0);
 	EASYSIZE_INIT()
 
-/*	
-	int		nItem = 0;
-	CString parentsL;
-	CString line;
-	CString caption;
-	CString cLine;
-	CString htmlLine(L"");
-	CString command;
-	CString father_id;
-	CString mother_id;
-	CString grandpa_id;
-	CString linenumberP;
-	CString linenumberF;
-	CString linenumberGP;
-	CString lineGP;
-	CString lineF;
-	CString lineP;
-
-	CString linenumber;
-	std::vector<CString> vLinenumbers;
-*/
 	m_ListCtrl.KeepSortOrder(TRUE);
 	m_ListCtrl.SetExtendedStyle(m_ListCtrl.GetExtendedStyle()| LVS_EX_GRIDLINES );
 	
@@ -111,49 +94,6 @@ BOOL CHtmlEditLines::OnInitDialog()
 		return true;
 	}
 
-/*
-	if( !m_rowid.IsEmpty() )
-	{
-		m_ListCtrl.InsertColumn( 0,	L"",		LVCFMT_RIGHT,	 120,-1,COL_TEXT );
-		m_ListCtrl.InsertColumn( 1,	L"line#",	LVCFMT_RIGHT,	  80,-1,COL_NUM);
-		m_ListCtrl.InsertColumn( 2,	L"ga.line",	LVCFMT_LEFT,    1500,-1,COL_EDIT);
-
-		command.Format( L"SELECT linenumber, father_id, mother_id FROM people WHERE rowid ='%s'", m_rowid );
-		if( !theApp.query( command ) ) return false;
-		linenumberP = theApp.m_recordset->GetFieldString( 0 );
-		father_id	= theApp.m_recordset->GetFieldString( 1 );
-		mother_id	= theApp.m_recordset->GetFieldString( 2 );
-		
-		command.Format( L"SELECT linenumber FROM people WHERE rowid ='%s'", father_id );
-		if( !theApp.query( command ) ) return false;
-		linenumberF = theApp.m_recordset->GetFieldString( 0 );
-
-		command.Format( L"SELECT father_id FROM people WHERE rowid ='%s'", mother_id );
-		if( !theApp.query( command ) ) return false;
-		grandpa_id = theApp.m_recordset->GetFieldString( 0 );
-		command.Format( L"SELECT linenumber FROM people WHERE rowid ='%s'", grandpa_id );
-		if( !theApp.query( command ) ) return false;
-		linenumberGP = theApp.m_recordset->GetFieldString( 0 );
-
-		lineGP	= getHtmlLine( linenumberGP );
-		lineF	= getHtmlLine( linenumberF );
-		lineP	= getHtmlLine( linenumberP );
-
-		nItem = m_ListCtrl.InsertItem( 0, L"anyai nagyapa" );
-		m_ListCtrl.SetItemText( nItem, 1, linenumberGP );
-		m_ListCtrl.SetItemText( nItem, 2, lineGP );
-
-		nItem = m_ListCtrl.InsertItem( 1, L"apa" );
-		m_ListCtrl.SetItemText( nItem, 1, linenumberF );
-		m_ListCtrl.SetItemText( nItem, 2, lineF );
-
-		nItem = m_ListCtrl.InsertItem( 2, L"gyerek" );
-		m_ListCtrl.SetItemText( nItem, 1, linenumberP );
-		m_ListCtrl.SetItemText( nItem, 2, lineP );
-
-		m_title = L"Egy ember, annak apja és anyai nagyapja";
-	}
-*/
 	return TRUE;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -255,37 +195,36 @@ void CHtmlEditLines::children()
 {
 	if( m_rowid.IsEmpty() ) return;
 
-	SetWindowTextW( m_title );
+//	SetWindowTextW( m_title );
 
 	int nItem;
 	CString line;
 	CString linenumber;
-	CString sex_id;
 
 	m_ListCtrl.InsertColumn( 0,	L"",		LVCFMT_RIGHT,	 120,-1,COL_TEXT );
 	m_ListCtrl.InsertColumn( 1,	L"line#",	LVCFMT_RIGHT,	  80,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( 2,	L"ga.line",	LVCFMT_LEFT,    1500,-1,COL_EDIT);
 
-	m_command.Format( L"SELECT linenumber, sex_id FROM people WHERE rowid ='%s'", m_rowid );
+	m_command.Format( L"SELECT linenumber FROM people WHERE rowid ='%s'", m_rowid );
 	if( !theApp.query( m_command ) ) return;
-	sex_id		= theApp.m_recordset->GetFieldString( 1 );
+
+	if( !theApp.m_recordset->RecordsCount() )
+	{
+		str.Format( L"Nincs %s rowid-jû ember az adatbázisban!", m_rowid );
+		AfxMessageBox( str );
+		CDialog::OnCancel();
+		return;
+	}
+
 	linenumber	= theApp.m_recordset->GetFieldString( 0 );
 	line		= getHtmlLine( linenumber );
 	nItem = m_ListCtrl.InsertItem( 0, L"szülõk" );
 	m_ListCtrl.SetItemText( nItem, 1, linenumber );
 	m_ListCtrl.SetItemText( nItem, 2, line );
 
-
-	if( sex_id == L"1" )
-		m_command.Format( L"SELECT linenumber FROM people WHERE father_id ='%s' ORDER BY linenumber", m_rowid );
-	else if( sex_id == L"2" ) 
-		m_command.Format( L"SELECT linenumber FROM people WHERE mother_id ='%s' ORDER BY linenumber", m_rowid );
-	else
-	{
-		AfxMessageBox( L"A szülõ neme nem meghatározható!" );
-		return;
-	}
+	m_command.Format( L"SELECT linenumber FROM people WHERE father_id ='%s' OR mother_id='%s' ORDER BY linenumber", m_rowid, m_rowid  );
 	if( !theApp.query( m_command ) ) return;
+
 	for( INT i = 0; i < theApp.m_recordset->RecordsCount(); ++i, theApp.m_recordset->MoveNext() )
 	{
 		linenumber	= theApp.m_recordset->GetFieldString( 0 );
@@ -359,7 +298,7 @@ void CHtmlEditLines::fatherAndSiblings()
 {
 	if( m_rowid.IsEmpty() ) return;
 
-	SetWindowTextW( m_title );
+//	SetWindowTextW( m_title );
 
 	int nItem;
 	CString line;
@@ -512,5 +451,20 @@ void CHtmlEditLines::displayLines( )
 		if (wndP.Cancelled()) break;
 	}
 	wndP.DestroyWindow();
-	SetWindowTextW( m_title );
+//	SetWindowTextW( m_title );
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CHtmlEditLines::OnInfo()
+{
+	CString info = L"\
+A GA.html fájl kijelölt sorait a gyûjtõ ablakba olvassa be. A bal egérgombbal 2x ráklikkelve egy #line cellára, \
+a sort áthelyezhetjük a szerkesztõ ablakba.\r\n\r\n\
+A szerkesztõ ablakban módosíthatjuk a sort. A gyûjtõ ablakban lévõ sorokból Ctrl-C, Ctrl-V-vel éthelyezhetünk szövegrészeket \
+a szerkesztendõ sorba.\r\n\
+A gyûjtõ ablakban is módosítható a sor, de nem ajánlott, mert a \"Módosít\" gomb csak a szerkesztõ ablakban lévõ sort írja \
+vissza  a GA.htm fájlba.\r\n\r\n\
+A \"Módosít\" gomb ezután visszateszi a módosított sort a gyûjtõ ablakba. Ha szükséges, a fenti módon folytathatjuk a \
+szerkesztését egy másik sorral.\
+";
+	AfxMessageBox( info, MB_ICONINFORMATION );
 }

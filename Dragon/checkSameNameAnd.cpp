@@ -43,12 +43,12 @@ enum
 enum
 {
 	L_CNT = 0,
-	L_ROWID, 
 	L_LINENUMBER,
 	L_TABLENUMBER,
-	L_SOURCE,
 	L_UNITED,
 	L_GENERATION,
+	L_SOURCE,
+	L_ROWID, 
 	L_NAME,
 	L_BIRTH,
 	L_DEATH,
@@ -97,6 +97,8 @@ void CcheckSameNameAnd::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_LIST, m_ListCtrl);
+	DDX_Control(pDX, IDC_KERES, colorKeres);
+	DDX_Control(pDX, IDC_NEXT, colorNext);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CcheckSameNameAnd, CDialogEx)
@@ -113,6 +115,8 @@ BEGIN_MESSAGE_MAP(CcheckSameNameAnd, CDialogEx)
 	ON_COMMAND(ID_HTML_FATHERANDSIBLINGS, &CcheckSameNameAnd::OnHtmlFatherAndSiblings)
 	ON_COMMAND(ID_DB_EDIT, &CcheckSameNameAnd::OnDbEdit)
 
+	ON_STN_CLICKED(IDC_KERES, &CcheckSameNameAnd::OnClickedKeres)
+	ON_STN_CLICKED(IDC_NEXT, &CcheckSameNameAnd::OnClickedNext)
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CcheckSameNameAnd::OnInitDialog()
@@ -131,6 +135,9 @@ BOOL CcheckSameNameAnd::OnInitDialog()
 			return false;
 		}
 	}
+
+	colorNext.SetTextColor( theApp.m_colorClick );
+	colorKeres.SetTextColor( theApp.m_colorClick );
 
 	createColumns();
 	CString caption( L"");
@@ -607,23 +614,23 @@ void CcheckSameNameAnd::createColumns()
 
 	m_ListCtrl.SetExtendedStyle(m_ListCtrl.GetExtendedStyle()| LVS_EX_GRIDLINES );
 	m_ListCtrl.InsertColumn( L_CNT,			L"cnt",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( L_ROWID,		L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_LINENUMBER,	L"line#",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_TABLENUMBER,	L"table#",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( L_SOURCE,		L"S",			LVCFMT_RIGHT,	 20,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_UNITED,		L"U",			LVCFMT_LEFT,	 20,-1,COL_NUM );
 	m_ListCtrl.InsertColumn( L_GENERATION,	L"G",			LVCFMT_LEFT,	 20,-1,COL_NUM );
+	m_ListCtrl.InsertColumn( L_SOURCE,		L"s",			LVCFMT_RIGHT,	 20,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_ROWID,		L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_NAME,		L"név",			LVCFMT_LEFT,	200,-1,COL_TEXT );
 	m_ListCtrl.InsertColumn( L_BIRTH,		L"születés",	LVCFMT_LEFT,	 70,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_DEATH,		L"halál",		LVCFMT_LEFT,	 70,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( L_SF,			L"s",			LVCFMT_LEFT,	 70,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_SF,			L"s",			LVCFMT_LEFT,	 20,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_ROWIDF,		L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_FATHER,		L"apa",			LVCFMT_LEFT,	200,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( L_SM,			L"s",			LVCFMT_LEFT,	 70,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_SM,			L"s",			LVCFMT_LEFT,	 20,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_ROWIDM,		L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_MOTHER,		L"anya",		LVCFMT_LEFT,	200,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_SPOUSES,		L"házastársak",	LVCFMT_LEFT,	500,-1,COL_TEXT );
-	m_ListCtrl.InsertColumn( L_LINENUMBERF,	L"line#F",		LVCFMT_LEFT,	 60,-1,COL_NUM );
+	m_ListCtrl.InsertColumn( L_LINENUMBERF,	L"line#F",		LVCFMT_LEFT,	 60,-1,COL_HIDDEN );
 	m_ListCtrl.InsertColumn( L_LINENUMBERM,	L"line#M",		LVCFMT_LEFT,	 60,-1,COL_HIDDEN );
 
 }
@@ -843,6 +850,9 @@ void CcheckSameNameAnd::listSameVector()
 
 	CString	lineNumberPrev;
 
+	CString birth;
+	CString death;
+
 	CString father_id;
 	CString mother_id;
 	CString spouseId;
@@ -882,30 +892,39 @@ void CcheckSameNameAnd::listSameVector()
 			namePrint = name.Left(25);
 
 
-		m_command.Format( L"SELECT lineNumber, first_name, last_name, source FROM people WHERE rowid = '%s'", father_id );
+		m_command.Format( L"SELECT lineNumber, first_name, last_name, source, birth_date, death_date FROM people WHERE rowid = '%s'", father_id );
 		if( !query2( m_command ) ) return;
+
 		fatherName.Format( L"%s %s", m_recordset2->GetFieldString( 2 ), m_recordset2->GetFieldString( 1 ) );
 		fatherName.Trim();
-		if( fatherName.GetLength() > 25 )
-			fatherNamePrint = fatherName.Left( 22 ) + L"..."; 
-		else
-			fatherNamePrint = fatherName.Left(25);
+		birth = m_recordset2->GetFieldString( 4 );
+		death = m_recordset2->GetFieldString( 5 );
+		fatherNamePrint = getNameBD( fatherName, birth, death );
+
 		fatherSource	= m_recordset2->GetFieldString(3);
 		if( fatherSource.IsEmpty() ) fatherSource = " ";
 		lineNumberF		= m_recordset2->GetFieldString(0);
 
-		m_command.Format( L"SELECT lineNumber, first_name, last_name, source FROM people WHERE rowid = '%s'", mother_id );
+		m_command.Format( L"SELECT lineNumber, first_name, last_name, source, birth_date, death_date FROM people WHERE rowid = '%s'", mother_id );
 		if( !query2( m_command ) ) return;
+
 		motherName.Format( L"%s %s", m_recordset2->GetFieldString( 2 ), m_recordset2->GetFieldString( 1 ) );
 		motherName.Trim();
-		if( motherName.GetLength() > 25 )
-			motherNamePrint = motherName.Left( 22 ) + L"..."; 
-		else
-			motherNamePrint = motherName.Left(25);
+		birth = m_recordset2->GetFieldString( 4 );
+		death = m_recordset2->GetFieldString( 5 );
+		motherNamePrint = getNameBD( motherName, birth, death );
+
+	
+//		if( motherName.GetLength() > 25 )
+//			motherNamePrint = motherName.Left( 22 ) + L"..."; 
+//		else
+//			motherNamePrint = motherName.Left(25);
+
+
 		motherSource	= m_recordset2->GetFieldString(3);
 		if( motherSource.IsEmpty() ) motherSource = " ";
 		lineNumberM		= m_recordset2->GetFieldString(0);
-		motherName.Trim();
+//		motherName.Trim();
 
 
 		spouses = theApp.getSpouses( rowid, sex_id, &theApp.v_spouses, &sp );
@@ -931,7 +950,8 @@ void CcheckSameNameAnd::listSameVector()
 		else
 			fwprintf( fh1, L"%-15s ", deathDate.Left(25 ) );
 
-		if( i && fatherNamePrev != fatherName && !fatherNamePrint.IsEmpty() )
+//		if( i && fatherNamePrev != fatherName && !fatherNamePrint.IsEmpty() )
+		if( i && fatherNamePrev != fatherNamePrint && !fatherNamePrint.IsEmpty() )
 		{
 			fwprintf( fh1, L"<span style=\"background:yellow\">%s %-25s</span> ", fatherSource, fatherNamePrint );
 			col = col | 1 << L_FATHER;
@@ -940,7 +960,8 @@ void CcheckSameNameAnd::listSameVector()
 			fwprintf( fh1, L"%s %-25s ", fatherSource, fatherNamePrint );
 
 
-		if( i && motherNamePrev != motherName && !motherNamePrint.IsEmpty() )
+//		if( i && motherNamePrev != motherName && !motherNamePrint.IsEmpty() )
+		if( i && motherNamePrev != motherNamePrint && !motherNamePrint.IsEmpty() )
 		{
 			fwprintf( fh1, L"<span style=\"background:yellow\">%s %-25s</span> ", motherSource, motherNamePrint );
 			col = col | 1 << L_MOTHER;
@@ -992,8 +1013,8 @@ void CcheckSameNameAnd::listSameVector()
 
 		birthDatePrev = birthDate;
 		deathDatePrev = deathDate;
-		fatherNamePrev = fatherName;
-		motherNamePrev = motherName;
+		fatherNamePrev = fatherNamePrint;
+		motherNamePrev = motherNamePrint;
 
 		theApp.v_spouses2.clear();
 		for( UINT k=0; k < theApp.v_spouses.size(); ++ k )
@@ -1170,4 +1191,101 @@ void CcheckSameNameAnd::OnDbEdit()
 	CRelations dlg;
 	dlg.m_rowid = rowid;
 	dlg.DoModal();
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CcheckSameNameAnd::OnClickedKeres()
+{
+	keress( 0 );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CcheckSameNameAnd::OnClickedNext()
+{
+int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	if( nItem == -0 )
+	{
+		AfxMessageBox( L"Nincs kijelölve sor!" );
+		return;
+	}
+	keress( nItem + 1 );
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CcheckSameNameAnd::keress( int start )
+{
+	CString	search;
+	GetDlgItem( IDC_SEARCH )->GetWindowText( search );
+	if( search.IsEmpty() )
+	{
+		AfxMessageBox( L"Meg kell adni a keresendõ stringet!");
+		return;
+	}
+
+	CProgressWnd wndProgress(NULL, L"Folyik a keresés.." ); 
+	wndProgress.GoModal();
+	wndProgress.SetRange(0, m_ListCtrl.GetItemCount() );
+	wndProgress.SetPos(0);
+	wndProgress.SetStep(1);
+
+
+
+	int		itemCnt	= m_ListCtrl.GetItemCount();
+	int		length	= search.GetLength();
+	int		nItem;
+	int		topIndex = m_ListCtrl.GetTopIndex();
+	CString	str;
+
+	theApp.unselectAll( &m_ListCtrl );
+
+	for( nItem = start; nItem < itemCnt-1; ++nItem )
+	{
+		str = m_ListCtrl.GetItemText( nItem, L_NAME );
+		str = str.Left(length);						// az aktuális search string hosszával azonos hosszúság leválasztása
+		if( str == search )	break;
+		wndProgress.StepIt();
+		wndProgress.PeekAndPump();
+		if (wndProgress.Cancelled()) break;
+	}
+	wndProgress.DestroyWindow();
+
+	if( nItem < itemCnt-1 )			// megtalálta a keresett embert,. aki az nItem-1 sorban van
+	{
+		m_ListCtrl.EnsureVisible( nItem, FALSE );
+
+		if( nItem > topIndex )   // lefele megy, fel kell hozni a tábla tetejére a megtalált sort
+		{
+			int countPP = m_ListCtrl.GetCountPerPage();
+			int nItemEV	= nItem - 1 + countPP;			// alaphelyzet: a kijelölt sor az ablak tetején
+
+			if( nItemEV > itemCnt - 1 )					// már nem lehet az ablak tetejére hozni, mert nincs annyi adat
+				nItemEV = itemCnt - 1;
+
+			m_ListCtrl.EnsureVisible( nItemEV, FALSE );
+		}
+		m_ListCtrl.SetItemState( nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED );
+		Invalidate( false );
+	}
+	else
+	{
+		str.Format( L"%s nevû embert nem találtam!", search );
+		AfxMessageBox( str );
+	}
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////44
+BOOL CcheckSameNameAnd::PreTranslateMessage(MSG* pMsg)
+{
+	int x=(int)pMsg->wParam;
+
+    if( pMsg->message==WM_KEYDOWN)
+    {
+		switch( x )
+		{
+		case VK_RETURN:
+			GetDlgItem( IDC_SEARCH )->GetWindowTextW( str );
+			if( str.GetLength() ) 
+			OnClickedKeres();
+			break;
+		case VK_ESCAPE:
+			CDialogEx::OnCancel();
+		}
+	}
+	return CWnd::PreTranslateMessage(pMsg);
 }

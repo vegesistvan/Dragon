@@ -173,12 +173,12 @@ BEGIN_MESSAGE_MAP(CTablePeople, CDialogEx)
 	ON_COMMAND(ID_HTML_EDIT, &CTablePeople::OnHtmlEditLines)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CTablePeople::OnHtmlNotepad)	
 	ON_COMMAND(ID_HTML_CHILDREN, &CTablePeople::OnHtmlChildren)
-
+	ON_COMMAND(ID_3GENERATIONS, &CTablePeople::On3Generations )
 
 	ON_COMMAND(ID_EDIT_DELETE, &CTablePeople::OnEditDelete)
 	ON_COMMAND(ID_EDIT_UPDATE, &CTablePeople::OnEditUpdate)
 	ON_COMMAND(ID_EDIT_INSERT, &CTablePeople::OnEditInsert)
-	ON_COMMAND(ID_3GENERATIONS, &CTablePeople::On3Generations )
+
 
 
 	ON_COMMAND(ID_FILTER_FILE, &CTablePeople::OnFilterFile)
@@ -198,7 +198,7 @@ BEGIN_MESSAGE_MAP(CTablePeople, CDialogEx)
 	ON_COMMAND(ID_EXPORT_ALL, &CTablePeople::OnExportAll)
 ON_COMMAND(ID_FILTER_FOLYT, &CTablePeople::OnFilterFolyt)
 ON_WM_CLOSE()
-ON_COMMAND(ID_AZONOSEMBER_IDENT, &CTablePeople::OnAzonosemberIdent)
+ON_COMMAND(ID_AZONOSEMBER, &CTablePeople::OnAzonosemberIdent)
 ON_COMMAND(ID_GROUPBY_BIRTHPLACE, &CTablePeople::OnGroupbyBirthplace)
 ON_COMMAND(ID_GROUPBY_DEATHPLACE, &CTablePeople::OnGroupbyDeathplace)
 ON_COMMAND(ID_GROUPBY_FIRSTNAME, &CTablePeople::OnGroupbyFirstname)

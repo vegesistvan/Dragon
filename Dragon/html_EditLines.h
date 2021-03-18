@@ -32,6 +32,7 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	CListCtrlEx m_ListCtrl;
 	CString m_command;
+	CString str;
 	int		m_nItem;
 
 	CString m_line;
@@ -56,4 +57,5 @@ public:
 //	afx_msg void OnRclickList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnClickedModify();
 	afx_msg void OnChangeEdit();
+	afx_msg void OnInfo();
 };

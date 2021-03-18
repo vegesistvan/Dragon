@@ -52,23 +52,14 @@ U\tunited, az ember u számú bejegyzés összevonása.\r\n\
 G\tgeneráció, az ember generációs jele a GA fájlban.\r\n\
 S\taz ember elõfordulása a GA.html fájlban ( 1-2-3-4 )\r\n\
 \r\n\
-név\taz ember neve\r\n\
 rowid\ta bejegyzés azonosítója\r\n\
-születés\tszületési dátum\r\n\
-halál\thalálozás dátuma\r\n\
-\r\n\
-apa neve\r\n\
+név\taz ember neve (*születés +halálozás)\r\n\
 rowid\taz apa bejegyzésének azonosítója\r\n\
-születés\tszületési dátuma\r\n\
-halál\thalálozás dátuma\r\n\
-\r\n\
-anya neve\r\n\
+apa neve (*születés +halálozás)\r\n\
 rowid\taz anya bejegyzésének azonosítója\r\n\
-születés\tszületési dátuma\r\n\
-halál\thalálozás dátuma\r\n\
+anya neve (*születés +halálozás)\r\n\
 \r\n\
-rowid\taz elsõ házastárs azonosítója\r\n\
-házastársak felsorolása\r\n\
+házastársak felsorolása születési és halálozási dátumukkal\r\n\
 \r\n\
 Az azonosítás eredményét a sorok háttér színezése is kiemeli:\r\n\
 \r\n\
