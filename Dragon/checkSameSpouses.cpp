@@ -142,7 +142,8 @@ father_id,\
 mother_id,\
 united\
 ";
-
+	_lastname	= L"";
+	_firstname	= L"";
 
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -211,7 +212,7 @@ BOOL CCheckSameSpouses::OnInitDialog()
 		}
 	}
 
-	
+/*	
 	_info = L"\
 Azokat az embereket listázzuk, akiknek több azonos nevû házastársa van. Egy embernek természetesen lehet két \
 vagy akár több azonos nevû házastársa, azonban legtöbbször hibás adatokra hívja fel a figyelmet.\
@@ -230,14 +231,14 @@ U - a név alatt egyesített bejegyzések száma\n\
 G - generációs kód\n\
 s - az ember hierarchia száma (1-4)\
 ";
-/*
+
 	theApp.m_pszAppName = _tcsdup( L"Azonos nevû házastársakkal rendelkezõ emberek listája" );
 	if( (AfxMessageBox( _info, MB_ICONINFORMATION | MB_OKCANCEL )) == IDCANCEL ) 
 	{
 		OnCancel();
 		return false;
 	}
-*/
+
 	CCheckParam0 dlg;
 	dlg._caption = L"Azonos nevû házastársakkal rendelkezõ emberek listája";
 	dlg._info = _info;
@@ -261,9 +262,12 @@ s - az ember hierarchia száma (1-4)\
 		_first_name	= dlg1._firstname;
 		_last_name	= dlg1._lastname;
 	}
-
+*/
 	colorKeress.SetTextColor( theApp.m_colorClick );
 	colorNext.SetTextColor( theApp.m_colorClick );
+
+	_fullname.Format( L"%s %s", _lastname, _firstname );
+	_fullname.Trim();
 
 	CString caption( L"");
 	if( _fullname.IsEmpty() )
@@ -343,10 +347,10 @@ void CCheckSameSpouses::sameSpouses()
 #endif
 	if( _fullname.IsEmpty() )
 		m_command.Format( L"SELECT %s FROM people ORDER BY last_name, first_name", p_fields );
-	else if( _first_name.IsEmpty() )
-		m_command.Format( L"SELECT %s FROM people WHERE last_name LIKE '%s%c' ORDER BY last_name, first_name, source", p_fields, _last_name, '%' );
+	else if( _firstname.IsEmpty() )
+		m_command.Format( L"SELECT %s FROM people WHERE last_name LIKE '%s%c' ORDER BY last_name, first_name, source", p_fields, _lastname, '%' );
 	else
-		m_command.Format( L"SELECT %s FROM people WHERE last_name = '%s' AND first_name='%s' ORDER BY last_name, first_name, source", p_fields, _last_name, _first_name );
+		m_command.Format( L"SELECT %s FROM people WHERE last_name = '%s' AND first_name='%s' ORDER BY last_name, first_name, source", p_fields, _lastname, _firstname );
 	if( !query( m_command ) ) return;
 
 	theApp.v_Replace.clear();
@@ -386,10 +390,10 @@ cont:	wndP.StepIt();
 	{
 		if( _fullname.IsEmpty()  )
 			str = L"Nem találtam olyan embert, akinek több azonos nevû házastársa lenne!";
-		else if( _first_name.IsEmpty() )
-			str.Format( L"Nem találtam olyan '%s'-el kezdõdõ családnevû embert, akinek több azonos nevû házastársa lenne!", _last_name ); 
+		else if( _firstname.IsEmpty() )
+			str.Format( L"Nem találtam olyan '%s'-el kezdõdõ családnevû embert, akinek több azonos nevû házastársa lenne!", _lastname ); 
 		else
-			str.Format( L"Nem találtam olyan '%s %s' nevû embert, akinek több azonos nevû házastársa lenne!", _last_name, _first_name ); 
+			str.Format( L"Nem találtam olyan '%s %s' nevû embert, akinek több azonos nevû házastársa lenne!", _lastname, _firstname ); 
 		AfxMessageBox( str );
 
 		return;

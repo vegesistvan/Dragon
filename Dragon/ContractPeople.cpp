@@ -598,7 +598,7 @@ int CContractPeople::identical( UINT i1, UINT i2 )
 	if( ( g = same( r.death, a.death, b.death ) ) == -1 ) return false;
 	if( g == 1 ) ++m_match; 
 
-	if( ( g = same( r.father, a.father, b.father ) ) == -1 ) return false;		// egyedül az apa azonossága nem lesz elegendõ!!!
+	if( ( g = same( r.father, a.father, b.father ) ) == -1 ) return false;		// egyedül az apa nevének azonossága nem lesz elegendõ!!!
 //	if( g == 1 ) ++m_match;   
 
 	if( ( g = same( r.mother, a.mother, b.mother ) ) == -1 ) return false;
@@ -660,7 +660,8 @@ int CContractPeople::sameSpouses( CString rowid1, CString rowid2 )
 
 	CString dummy;
 
-	int g;
+	int retB;
+	int retD;
 	int cnt1 = 0;
 	int cnt2 = 0;
 
@@ -680,19 +681,21 @@ int CContractPeople::sameSpouses( CString rowid1, CString rowid2 )
 					{
 						birth1	= vSpouses.at(i).birth;
 						birth2	= vSpouses.at(j).birth;
-						if( ( g = same( dummy, birth1, birth2 ) ) == -1 ) continue;  // ellentmondás, ez nemlesz jó
+						if( ( retB = same( dummy, birth1, birth2 ) ) == -1 ) continue;  // ellentmondás
 
 						death1	= vSpouses.at(i).death;
 						death2	= vSpouses.at(j).death;
-						if( ( g = same( dummy, death1, death2 ) ) == -1 ) continue;	// ellentmondás, ez nem lesz jó
-
-						return 1; // ellemtmondás mentes, a házastrásakkal minden rendben van
+						if( ( retD = same( dummy, death1, death2 ) ) == -1 ) continue;	// ellentmondás
+						if( !retB && !retD ) 
+							continue;  // nincs megadva sem születés, sem halál: keress másik házastársat. Pusztán a név azonosság nem elég!!
+						else
+							return 1; // születés/halál megerõsíti az azonosságot
 					}
 				}
 			}
 		}
 	}
-	if( !cnt1 || !cnt2 ) return 0;			// egyiküknek vagy mindkettõjüknek nincs házastársa
+	if( !cnt1 || !cnt2 || (j == vSpouses.size()) ) return 0;			// egyiküknek vagy mindkettõjüknek nincs házastársa vagy a név azonsos, de nincs megerõsítés
 	return -1;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -889,7 +892,7 @@ void CContractPeople::listPeople()
 	SAMENAMES x;
 	CString ident;
 	std::sort( vPeople.begin(), vPeople.end(), sortByGroupStatusX );
-
+/*
 
 // list into HTML file
 	for( UINT i = 0; i < vPeople.size(); ++i )
@@ -947,7 +950,7 @@ x.rowidS, x.spouses\
 	}
 	else
 		fwprintf( fD, L"\n" );
-
+*/
 
 // list into text file
 	for( UINT i = 0; i < vPeople.size(); ++i )

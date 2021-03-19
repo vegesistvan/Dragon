@@ -87,6 +87,9 @@ neve, ami segíthet a probléma okának meghatározásban.\
 Alább választhatunk, hogy az összes embert vizsgáljuk-e, vagy csak azokat, akiknek a családneve a megadandó karakter sorozattal kezdõdõdik.\
 \r\n\
 ";
+
+	_lastname	= L"";
+	_firstname	= L"";
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CcheckSameNameAnd::~CcheckSameNameAnd()
@@ -117,6 +120,7 @@ BEGIN_MESSAGE_MAP(CcheckSameNameAnd, CDialogEx)
 
 	ON_STN_CLICKED(IDC_KERES, &CcheckSameNameAnd::OnClickedKeres)
 	ON_STN_CLICKED(IDC_NEXT, &CcheckSameNameAnd::OnClickedNext)
+	ON_COMMAND(ID_INFO, &CcheckSameNameAnd::OnInfo)
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CcheckSameNameAnd::OnInitDialog()
@@ -136,40 +140,87 @@ BOOL CcheckSameNameAnd::OnInitDialog()
 		}
 	}
 
-	colorNext.SetTextColor( theApp.m_colorClick );
-	colorKeres.SetTextColor( theApp.m_colorClick );
+	_fullname.Format( L"%s %s", _lastname, _firstname );
+	_fullname.Trim();
 
-	createColumns();
-	CString caption( L"");
+	CString caption;
 
-	_cnt = 0;
 	if( !and.Compare( L"birth" ) )
 	{
-		SameNameAndBirth();
-		caption = L"Azonos nevû és azonos születési idejû emberek";
+		if( _fullname.IsEmpty() )
+			caption = L"Azonos nevû és azonos születési idejû emberek bejegyzései";
+		else
+			caption.Format( L"%s nevû emberek bejegyzései, akiknek azonos a születési idejük", _fullname );
 	}
 	else if( !and.Compare( L"death" ) )
 	{
-		SameNameAndDeath();
-		caption = L"Azonos nevû és azonos halálozási idejû emberek";
+		if( _fullname.IsEmpty() )
+			caption = L"Azonos nevû és azonos halálozási idejû emberek bejegyzései";
+		else
+			caption.Format( L"%s nevû emberek, akiknek azonos a halálozási idejük", _fullname );
 	}
 	else if( !and.Compare( L"father" ) )
 	{
-		SameNameAndFather();
-		caption = L"Azonos nevû emberek, akiknek az apja is azonos";
+		if( _fullname.IsEmpty() )
+			caption = L"Azonos nevû emberek bejegyzései, akiknek az apja neve is azonos";
+		else
+			caption.Format( L"%s nevû emberek bejegyzései, akiknek az apja neve is azonos", _fullname );
 	}
 	else if( !and.Compare( L"mother" ) )
 	{
-		SameNameAndMother();
-		caption = L"Azonos nevû emberek, akiknek az anyja is azonos";
+		if( _fullname.IsEmpty() )
+			caption = L"Azonos nevû emberek bejegyzései, akiknek az anyja neve is azonos";
+		else
+			caption.Format( L"%s nevû emberek bejegyzései, akiknek az anyja neve is azonos", _fullname );
 	}
-	if( !_cnt ) OnCancel();
-
 
 	str.Format( L"%s (%s)", caption, theApp.m_databaseName );
 	SetWindowTextW( str );
 
-	
+	if( !_lastname.IsEmpty() )
+	{
+		if( _firstname.IsEmpty() )
+			m_command.Format( L"SELECT rowid, * FROM people WHERE last_name LIKE '%s%c' ORDER BY last_name, first_name, death_date, source", _lastname,'%' );
+		else 
+			m_command.Format( L"SELECT rowid, * FROM people WHERE last_name = '%s' AND first_name = '%s' ORDER BY last_name, first_name, death_date, source", _lastname, _firstname );
+	}
+	else
+		m_command = L"SELECT rowid,* FROM people ORDER BY last_name, first_name, death_date, source";
+
+// azonos nevû emberek indexeinek kigyûjtése a vSame vektorba
+	wndProgress.Create(NULL, L"Azonos nevû emberek..." ); 
+	wndProgress.GoModal();
+#ifndef _DEBUG
+	wndProgress.SetText( L"Emberek beolvasása folyik..." );
+#endif
+	if( !query( m_command ) ) return false;
+
+	wndProgress.SetRange(0, m_recordset->RecordsCount());
+	wndProgress.SetPos(0);
+	wndProgress.SetStep(1);
+#ifndef _DEBUG
+	wndProgress.SetText( L"Emberek azonosítása..." );
+#endif
+
+
+	colorNext.SetTextColor( theApp.m_colorClick );
+	colorKeres.SetTextColor( theApp.m_colorClick );
+
+	createColumns();
+
+	if( !and.Compare( L"birth" ) )
+		SameNameAndBirth();
+	else if( !and.Compare( L"death" ) )
+		SameNameAndDeath();
+	else if( !and.Compare( L"father" ) )
+		SameNameAndFather();
+	else if( !and.Compare( L"mother" ) )
+		SameNameAndMother();
+	if( !m_ListCtrl.GetItemCount() )
+	{
+		AfxMessageBox( L"Nem találtam a feltételeknek megfelelõ bejegyzéseket." );
+		OnCancel();
+	}
 	return TRUE;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -193,70 +244,10 @@ void CcheckSameNameAnd::OnSizing(UINT fwSide, LPRECT pRect)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CcheckSameNameAnd::SameNameAndMother()
 {
-	CString fileName( L"sameNameAndMother" );
-	CString title;
 
-	CString begin;
-
-	CString caption = L"Azonos nevû emberek, akiknek az anyjuk neve is megegyezik.";
-	CString info = L"\
-Azon azonos nevû emberek listája készül el, akiknek az anyjuk neve is azonos, de nem testvérek.\r\n\
-Valószínûtlen, hogy ilyen emberek lennének, bár nem kizárt. Az a valószínûbb, hogy adathiba van.\r\n\r\n\
-Az egyik lehetõség, hogy az emberünk és/vagy annak anyja neve hibás.\
-";
-	CCheckParam0 dlg;
-
-	dlg._caption	= caption;
-	dlg._info		= info + _extension;
-	if( dlg.DoModal() == IDCANCEL ) return;
-
-	if( dlg._all )
-	{
-		title = L"Azonos nevû emberek, akiknek azonos nevû anyjuk van";
-		m_command = L"SELECT rowid,* FROM people ORDER BY last_name, first_name, mother_id, source";
-	}
-	else
-	{
-		CGetLastFirst dlg1;
-		if( dlg1.DoModal() == IDCANCEL ) return;
-		_fullname	= dlg1._fullname;
-		_firstname	= dlg1._firstname;
-		_lastname	= dlg1._lastname;
-
-		if( _firstname.IsEmpty() )
-			m_command.Format( L"SELECT rowid, * FROM people WHERE last_name LIKE '%s%c' ORDER BY last_name, first_name, mother_id, source", _lastname,'%' );
-		else
-			m_command.Format( L"SELECT rowid, * FROM people WHERE last_name = '%s' AND first_name = '%s' ORDER BY last_name, first_name, mother_id, source", _lastname, _firstname );
-
-		title.Format( L"'%s' nevû emberek, akiknek azonos nevû anyjuk van", _fullname );
-		fileName += "_";
-		fileName += _fullname;
-	}
-
-	fileSpec = theApp.openHtmlFile( &fh1, fileName, L"w+" );
-	init( title );
-
-
-	CString lastName;
 	SAME same;
 	sameClear( &same );
 	vSame.clear();
-
-// azonos nevû emberek indexeinek kigyûjtése a vSame vektorba
-	CProgressWnd wndProgress(NULL, title ); 
-	wndProgress.GoModal();
-#ifndef _DEBUG
-	wndProgress.SetText( L"Emberek beolvasása folyik..." );
-#endif
-	if( !query( m_command ) ) return;
-
-
-	wndProgress.SetRange(0, m_recordset->RecordsCount());
-	wndProgress.SetPos(0);
-	wndProgress.SetStep(1);
-#ifndef _DEBUG
-	wndProgress.SetText( L"Emberek azonosítása..." );
-#endif
 	for( UINT i = 0; i < m_recordset->RecordsCount()-1; ++i, m_recordset->MoveNext() )
 	{
 		if( !sameNameParent( PEOPLE_MOTHER_ID ) )
@@ -264,7 +255,6 @@ Az egyik lehetõség, hogy az emberünk és/vagy annak anyja neve hibás.\
 			if( vSame.size() > 1 )
 			{
 				listSameVector();		// az eddig összegyûjtött azonos nevû emberek listázása, ha 1-nél több van
-				++_cnt;
 			}
 			vSame.clear();
 		}
@@ -276,20 +266,9 @@ Az egyik lehetõség, hogy az emberünk és/vagy annak anyja neve hibás.\
 		wndProgress.PeekAndPump();
 		if (wndProgress.Cancelled()) break;
 	}
-	if( vSame.size() > 1 )	listSameVector();
-			vSame.clear();
-
-	if( _cnt )
-	{
-		fwprintf( fh1, L"</pre>" );
-		fclose( fh1 );
-//		theApp.showHtmlFile( fileSpec );
-	}
-	else
-	{
-		fclose( fh1 );
-		AfxMessageBox( L"Nem találtam azonos nevû embereket, akiknek az anyjuk neve is azonos lett volna." );
-	}
+	wndProgress.DestroyWindow();
+	if( vSame.size() > 1 )
+		listSameVector();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -299,70 +278,9 @@ Az egyik lehetõség, hogy az emberünk és/vagy annak anyja neve hibás.\
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CcheckSameNameAnd::SameNameAndFather()
 {
-	CString fileName( L"sameNameAndFather" );
-	CString title;
-	CString begin;
-
-	CString caption = L"Azonos nevû emberek, akiknek az apjuk neve is megegyezik";
-
-	CString info = L"\
-Azon azonos nevû emberek listája készül el, akiknek az apjuk neve is azonos, de nem testvérek.\r\n\
-Valószínûtlen, hogy ilyen emberek lennének, bár nem kizárt. Az a valószínûbb, hogy adathiba van.\r\n\r\n\
-Az egyik lehetõség, hogy az emberünk és/vagy annak apja neve hibás.\
-";
-	
-	CCheckParam0 dlg;
-
-	dlg._caption	= caption;
-	dlg._info		= info + _extension;
-	if( dlg.DoModal() == IDCANCEL ) return;
-
-	if( dlg._all )
-	{
-		title = L"Azonos nevû emberek, akiknek azonos nevû apjuk van";
-		m_command = L"SELECT rowid,* FROM people ORDER BY last_name, first_name, father_id, source";
-	}
-	else
-	{
-		CGetLastFirst dlg1;
-		if( dlg1.DoModal() == IDCANCEL ) return;
-		_fullname	= dlg1._fullname;
-		_firstname	= dlg1._firstname;
-		_lastname	= dlg1._lastname;
-
-
-		if( _firstname.IsEmpty() )
-			m_command.Format( L"SELECT rowid, * FROM people WHERE last_name LIKE '%s%c' ORDER BY last_name, first_name, father_id, source", _lastname,'%' );
-		else
-			m_command.Format( L"SELECT rowid, * FROM people WHERE last_name = '%s' AND first_name = '%s' ORDER BY last_name, first_name, father_id, source", _lastname, _firstname );
-
-		title.Format( L"'%s' nevû emberek, akiknek azonos apjuk van", _fullname );
-		fileName += "_";
-		fileName += _fullname;
-	}
-
-	fileSpec = theApp.openHtmlFile( &fh1, fileName, L"w+" );
-	init( title );
-
-	CString lastName;
 	SAME same;
 	sameClear( &same );
 	vSame.clear();
-
-// azonos nevû emberek indexeinek kigyûjtése a vSame vektorba
-	CProgressWnd wndProgress(NULL, title ); 
-	wndProgress.GoModal();
-#ifndef _DEBUG
-	wndProgress.SetText( L"Emberek beolvasása folyik..." );
-#endif
-	if( !query( m_command ) ) return;
-
-	wndProgress.SetRange(0, m_recordset->RecordsCount());
-	wndProgress.SetPos(0);
-	wndProgress.SetStep(1);
-#ifndef _DEBUG
-	wndProgress.SetText( L"Emberek azonosítása..." );
-#endif
 
 	for( UINT i = 0; i < m_recordset->RecordsCount()-1; ++i, m_recordset->MoveNext() )
 	{
@@ -371,7 +289,6 @@ Az egyik lehetõség, hogy az emberünk és/vagy annak apja neve hibás.\
 			if( vSame.size() > 1 )	
 			{
 				listSameVector();		// az eddig összegyûjtött azonos nevû emberek listázása, ha 1-nél több van
-				++_cnt;
 			}
 			vSame.clear();
 		}
@@ -383,19 +300,9 @@ Az egyik lehetõség, hogy az emberünk és/vagy annak apja neve hibás.\
 		wndProgress.PeekAndPump();
 		if (wndProgress.Cancelled()) break;
 	}
-	if( vSame.size() > 1 ) listSameVector();
-		vSame.clear();
-
-	if( _cnt )
-	{
-		fwprintf( fh1, L"</pre>" );
-		fclose( fh1 );
-	}
-	else
-	{
-		fclose( fh1 );
-		AfxMessageBox( L"Nem találtam azonos nevû embereket, akiknek az apjuk neve is azonos lett volna." );
-	}
+	wndProgress.DestroyWindow();
+	if( vSame.size() > 1 )
+		listSameVector();
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -404,71 +311,9 @@ Az egyik lehetõség, hogy az emberünk és/vagy annak apja neve hibás.\
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CcheckSameNameAnd::SameNameAndDeath()
 {
-	CString fileName( L"sameNameAndDeath" );
-	CString title;
-	CString begin;
-
-	CString caption = L"Azonos nevû és azonos halálozási idejû emberek";
-
-	CString info = L"\
-Azon azonos nevû emberek listája készül el,akiknek a halálozási idejük is azonos.\r\n\
-Valószínûtlen, hogy ilyen emberek lennének, bár nem kizárt. Az a valószínûbb, hogy adathiba van.\r\n\r\n\
-Az egyik lehetõség, hogy az emberünk neve és/vagy annak halálozási dátuma hibás.\
-";
-
-	CCheckParam0 dlg;
-
-
-	dlg._caption	= caption;
-	dlg._info		= info + _extension;
-	if( dlg.DoModal() == IDCANCEL ) return;
-
-	if( dlg._all )
-	{
-		title = L"Azonos nevû és halálozási dátumú emberek";
-		m_command = L"SELECT rowid,* FROM people ORDER BY last_name, first_name, death_date, source";
-	}
-	else
-	{
-		CGetLastFirst dlg1;
-		if( dlg1.DoModal() == IDCANCEL ) return;
-		_fullname	= dlg1._fullname;
-		_firstname	= dlg1._firstname;
-		_lastname	= dlg1._lastname;
-
-		if( _firstname.IsEmpty() )
-			m_command.Format( L"SELECT rowid, * FROM people WHERE last_name LIKE '%s%c' ORDER BY last_name, first_name, death_date, source", _lastname,'%' );
-		else
-			m_command.Format( L"SELECT rowid, * FROM people WHERE last_name = '%s' AND first_name = '%s' ORDER BY last_name, first_name, death_date, source", _lastname, _firstname );
-
-		title.Format( L"'%s' nevû emberek, akiknek azonos a halálozási dátuma", _fullname );
-		fileName += "_";
-		fileName += begin;
-	}
-
-	fileSpec = theApp.openHtmlFile( &fh1, fileName, L"w+" );
-	init( title );
-
-	CString lastName;
 	SAME same;
 	sameClear( &same );
 	vSame.clear();
-
-	CProgressWnd wndProgress(NULL, title ); 
-	wndProgress.GoModal();
-#ifndef _DEBUG
-	wndProgress.SetText( L"Emberek beolvasása folyik..." );
-#endif
-
-	if( !query( m_command ) ) return;
-
-
-	wndProgress.SetRange(0, m_recordset->RecordsCount());
-	wndProgress.SetPos(0);
-	wndProgress.SetStep(1);
-#ifndef _DEBUG
-	wndProgress.SetText( L"Emberek azonosítása..." );
-#endif
 
 	// azonos nevû és halálozási dátumú emberek indexeinek kigyûjtése a vSame vektorba
 	for( UINT i = 0; i < m_recordset->RecordsCount()-1; ++i, m_recordset->MoveNext() )
@@ -478,7 +323,6 @@ Az egyik lehetõség, hogy az emberünk neve és/vagy annak halálozási dátuma hibás.
 			if( vSame.size() > 1 )
 			{
 				listSameVector();		// az eddig összegyûjtött azonos nevû emberek listázása, ha 1-nél több van
-				++_cnt;
 			}
 			vSame.clear();
 		}
@@ -490,19 +334,9 @@ Az egyik lehetõség, hogy az emberünk neve és/vagy annak halálozási dátuma hibás.
 		wndProgress.PeekAndPump();
 		if (wndProgress.Cancelled()) break;
 	}
-	if( vSame.size() > 1 ) listSameVector();
-	vSame.clear();
-
-	if( _cnt )
-	{
-		fwprintf( fh1, L"</pre>" );
-		fclose( fh1 );
-	}
-	else
-	{
-		fclose( fh1 );
-		AfxMessageBox( L"Nem találtam azonos nevû és azonos halálozási dátumú embert." );
-	}
+	wndProgress.DestroyWindow();
+	if( vSame.size() > 1 )
+		listSameVector();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -511,68 +345,9 @@ Az egyik lehetõség, hogy az emberünk neve és/vagy annak halálozási dátuma hibás.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CcheckSameNameAnd::SameNameAndBirth()
 {
-	CString fileName( L"sameNameAndBirth" );
-	CString title;
-	CString begin;
-	CString caption = L"Azonos nevû és azonos születési idejû emberek";
-	CString info = L"\
-Azon azonos nevû emberek listája készül el, akiknek a születési idejük is azonos.\r\n\
-Valószínûtlen, hogy ilyen emberek lennének, bár nem kizárt. Az a valószínûbb, hogy adathiba van.\r\n\r\n\
-Az egyik lehetõség, hogy az emberünk neve és/vagy annak születési dátuma hibás.\
-";
-	
-	CCheckParam0 dlg;
-
-	dlg._caption	= caption;
-	dlg._info		= info + _extension;
-	if( dlg.DoModal() == IDCANCEL ) return;
-
-	if( dlg._all )
-	{
-		title = L"Azonos nevû és születési dátumú emberek";
-		m_command = L"SELECT rowid,* FROM people ORDER BY last_name, first_name, birth_date, source";
-	}
-	else
-	{
-		CGetLastFirst dlg1;
-		if( dlg1.DoModal() == IDCANCEL ) OnCancel();
-		_fullname	= dlg1._fullname;
-		_firstname	= dlg1._firstname;
-		_lastname	= dlg1._lastname;
-
-
-		if( _firstname.IsEmpty() )
-			m_command.Format( L"SELECT rowid, * FROM people WHERE last_name LIKE '%s%c' ORDER BY last_name, first_name, birth_date, source", _lastname,'%' );
-		else
-			m_command.Format( L"SELECT rowid, * FROM people WHERE last_name = '%s' AND first_name = '%s' ORDER BY last_name, first_name, birth_date, source", _lastname, _firstname );
-
-		title.Format( L"'%s' nevû emberek, akiknek azonos a születési dátuma", _fullname );
-		fileName += "_";
-		fileName += _fullname;
-	}
-
-	fileSpec = theApp.openHtmlFile( &fh1, fileName, L"w+" );
-	init( title );
-
-	CString lastName;
 	SAME same;
 	sameClear( &same );
 	vSame.clear();
-
-// azonos nevû emberek indexeinek kigyûjtése a vSame vektorba
-	CProgressWnd wndProgress(NULL, title ); 
-	wndProgress.GoModal();
-#ifndef _DEBUG
-	wndProgress.SetText( L"Emberek beolvasása folyik..." );
-#endif
-	if( !query( m_command ) ) return;
-	wndProgress.SetRange(0, m_recordset->RecordsCount());
-	wndProgress.SetPos(0);
-	wndProgress.SetStep(1);
-#ifndef _DEBUG
-	wndProgress.SetText( L"Emberek azonosítása..." );
-#endif
-
 
 	for( UINT i = 0; i < m_recordset->RecordsCount()-1; ++i, m_recordset->MoveNext() )
 	{
@@ -581,7 +356,6 @@ Az egyik lehetõség, hogy az emberünk neve és/vagy annak születési dátuma hibás.\
 			if( vSame.size() > 1 )
 			{
 				listSameVector();		// az eddig összegyûjtött azonos nevû emberek listázása, ha 1-nél több van
-				++_cnt;
 			}
 			vSame.clear();
 		}
@@ -593,20 +367,9 @@ Az egyik lehetõség, hogy az emberünk neve és/vagy annak születési dátuma hibás.\
 		wndProgress.PeekAndPump();
 		if (wndProgress.Cancelled()) break;
 	}
-	if( vSame.size() > 1 )	listSameVector();
-	vSame.clear();
-
-
-	if( _cnt )
-	{
-		fwprintf( fh1, L"</pre>" );
-		fclose( fh1 );
-	}
-	else
-	{
-		fclose( fh1 );
-		AfxMessageBox( L"Nen találtam azonos nevû és azonos születési dátumú embert." );
-	}
+		wndProgress.DestroyWindow();
+	if( vSame.size() > 1 )
+		listSameVector();
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CcheckSameNameAnd::createColumns()
@@ -756,6 +519,7 @@ BOOL CcheckSameNameAnd::query4( CString command )
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 void CcheckSameNameAnd::init( CString title )
 {
 	CString explanation( "\
@@ -811,6 +575,7 @@ azonos emberek összevonását. Ebbõl az adatbázisból készített hasonló lista, már 
 
 
 }
+*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CcheckSameNameAnd::listSameVector()
 {
@@ -844,7 +609,9 @@ void CcheckSameNameAnd::listSameVector()
 	CString birthDatePrev( L"" );
 	CString deathDatePrev( L"" );
 	CString fatherNamePrev( L"" );
+	CString fatherNameP(L"");
 	CString motherNamePrev( L"" );
+	CString motherNameP(L'');
 	CString spousesPrev( L"" );
 	CString spouses2Prev( L"");
 
@@ -852,6 +619,19 @@ void CcheckSameNameAnd::listSameVector()
 
 	CString birth;
 	CString death;
+
+	CString birthF;
+	CString deathF;
+
+	CString birthM;
+	CString deathM;
+
+	CString birthFP(L"");
+	CString deathFP(L"");;
+
+	CString birthMP;
+	CString deathMP;
+
 
 	CString father_id;
 	CString mother_id;
@@ -864,7 +644,9 @@ void CcheckSameNameAnd::listSameVector()
 	int		cnt = 1;
 	int		sameName = 1;
 
-
+	int nSame;
+	int bSame;
+	int dSame;
 
 	int col;
 	for( UINT i = 0; i < vSame.size(); ++i )
@@ -897,9 +679,9 @@ void CcheckSameNameAnd::listSameVector()
 
 		fatherName.Format( L"%s %s", m_recordset2->GetFieldString( 2 ), m_recordset2->GetFieldString( 1 ) );
 		fatherName.Trim();
-		birth = m_recordset2->GetFieldString( 4 );
-		death = m_recordset2->GetFieldString( 5 );
-		fatherNamePrint = getNameBD( fatherName, birth, death );
+		birthF = m_recordset2->GetFieldString( 4 );
+		deathF = m_recordset2->GetFieldString( 5 );
+		fatherNamePrint = getNameBD( fatherName, birthF, deathF );
 
 		fatherSource	= m_recordset2->GetFieldString(3);
 		if( fatherSource.IsEmpty() ) fatherSource = " ";
@@ -910,78 +692,44 @@ void CcheckSameNameAnd::listSameVector()
 
 		motherName.Format( L"%s %s", m_recordset2->GetFieldString( 2 ), m_recordset2->GetFieldString( 1 ) );
 		motherName.Trim();
-		birth = m_recordset2->GetFieldString( 4 );
-		death = m_recordset2->GetFieldString( 5 );
-		motherNamePrint = getNameBD( motherName, birth, death );
-
-	
-//		if( motherName.GetLength() > 25 )
-//			motherNamePrint = motherName.Left( 22 ) + L"..."; 
-//		else
-//			motherNamePrint = motherName.Left(25);
-
+		birthM = m_recordset2->GetFieldString( 4 );
+		deathM = m_recordset2->GetFieldString( 5 );
+		motherNamePrint = getNameBD( motherName, birthM, deathM );
 
 		motherSource	= m_recordset2->GetFieldString(3);
 		if( motherSource.IsEmpty() ) motherSource = " ";
 		lineNumberM		= m_recordset2->GetFieldString(0);
-//		motherName.Trim();
-
 
 		spouses = theApp.getSpouses( rowid, sex_id, &theApp.v_spouses, &sp );
 		spouses2 = sp.spouses2;
 
 		
-		fwprintf( fh1, L"%5d %6s %6s %6s %1s %1s %1s %-25s ", cnt, rowid, lineNumber, tableNumber, source, united, generation, namePrint );
-
 		col = 0;
-		if( i && birthDatePrev != birthDate && !birthDate.IsEmpty() && !birthDatePrev.IsEmpty() )
+		if( i )
 		{
-			fwprintf( fh1, L"<span style=\"background:yellow\">%-15s</span> ", birthDate.Left(15) );
-			col = col | 1 << L_BIRTH;
-		}
-		else
-			fwprintf( fh1, L"%-15s ", birthDate.Left(25 ) );
+			if( birthDatePrev != birthDate && !birthDate.IsEmpty() && !birthDatePrev.IsEmpty() )
+				col = col | 1 << L_BIRTH;
 
-		if( i && deathDatePrev != deathDate && !deathDate.IsEmpty() )
-		{
-			fwprintf( fh1, L"<span style=\"background:yellow\">%-15s</span> ", deathDate.Left(15) );
-			col = col | 1 << L_DEATH;
-		}
-		else
-			fwprintf( fh1, L"%-15s ", deathDate.Left(25 ) );
+			if( deathDatePrev != deathDate && !deathDate.IsEmpty() && !deathDatePrev.IsEmpty() )
+				col = col | 1 << L_DEATH;
 
-//		if( i && fatherNamePrev != fatherName && !fatherNamePrint.IsEmpty() )
-		if( i && fatherNamePrev != fatherNamePrint && !fatherNamePrint.IsEmpty() )
-		{
-			fwprintf( fh1, L"<span style=\"background:yellow\">%s %-25s</span> ", fatherSource, fatherNamePrint );
-			col = col | 1 << L_FATHER;
-		}
-		else
-			fwprintf( fh1, L"%s %-25s ", fatherSource, fatherNamePrint );
+			nSame = same( L"", fatherName, fatherNameP );
+			bSame = same( L"", birthF, birthFP );
+			dSame = same( L"", deathF, birthF );
 
+			if( nSame == -1 || bSame == -1 || dSame == -1  )
+				col = col | 1 << L_FATHER;
 
-//		if( i && motherNamePrev != motherName && !motherNamePrint.IsEmpty() )
-		if( i && motherNamePrev != motherNamePrint && !motherNamePrint.IsEmpty() )
-		{
-			fwprintf( fh1, L"<span style=\"background:yellow\">%s %-25s</span> ", motherSource, motherNamePrint );
-			col = col | 1 << L_MOTHER;
-		}
-		else
-			fwprintf( fh1, L"%s %-25s ", motherSource, motherNamePrint );
+			nSame = same( L"", motherName, motherNameP );
+			bSame = same( L"", birthM, birthMP );
+			dSame = same( L"", deathM, birthM );
 
-		if( i && !sameSpouses() )
-		{
-			fwprintf( fh1, L"<span style=\"background:yellow\">%s</span>", spouses2 );
-			col = col | 1 << L_SPOUSES;
-		}
-		else
-			fwprintf( fh1, L"%s", spouses2 );
+			if( nSame == -1 || bSame == -1 || dSame == -1  )
+				col = col | 1 << L_MOTHER;
 		
-		fwprintf( fh1, L"\n" );
-	
-
-		
-	//	str.Format( L"%d", sameName );
+			if( i && !sameSpouses() )
+				col = col | 1 << L_SPOUSES;
+		}
 
 		str.Format( L"%d", cnt );
 		nItem = m_ListCtrl.InsertItem( nItem, str );
@@ -1011,10 +759,18 @@ void CcheckSameNameAnd::listSameVector()
 
 		++nItem;
 
-		birthDatePrev = birthDate;
-		deathDatePrev = deathDate;
-		fatherNamePrev = fatherNamePrint;
-		motherNamePrev = motherNamePrint;
+		birthDatePrev	= birthDate;
+		deathDatePrev	= deathDate;
+		birthFP			= birthF;
+		deathFP			= deathFP;
+		birthMP			= birthM;
+		deathMP			= deathMP;
+
+		fatherNamePrev	= fatherNamePrint;
+		motherNamePrev	= motherNamePrint;
+		motherNameP		= motherName;
+		fatherNameP		= fatherName;
+
 
 		theApp.v_spouses2.clear();
 		for( UINT k=0; k < theApp.v_spouses.size(); ++ k )
@@ -1032,7 +788,6 @@ void CcheckSameNameAnd::listSameVector()
 	nItem = m_ListCtrl.InsertItem( nItem, L"" );
 	++nItem;
 	++sameName;
-	fwprintf( fh1, L"<br>" );
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Az aktuális és az azt követõ rekordban lévõ ember neve+valamelyik szûlõjének azonosítója azonos-e?
@@ -1288,4 +1043,36 @@ BOOL CcheckSameNameAnd::PreTranslateMessage(MSG* pMsg)
 		}
 	}
 	return CWnd::PreTranslateMessage(pMsg);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CcheckSameNameAnd::OnInfo()
+{
+	CString info( "\
+Az azonos emberek bejegyzéseinek összevonása után maradhatnak az adatbázisban olyan bejegyzések, amelyekben a név azonos, sõt \
+van még további megegyezõ adat, pl. születési dátum, halálozási dátum, apja neve/születése/halála, anyja neve/születése/halála, \
+házastárs neve/születése/halála, de ellentmondó adatok is találhatók a bejegyzésekben, ezért nem kerültek összevonásra.\
+\r\n\r\n\
+Joggal merül fel a gyanú, hogy ilyenkor az adatbevitel vagy adatforrás hibája miatt vannak ellentmondó adatok. \
+De a megegyezõ adatok is lehetnek hibásak, ezért az azonosság gyanúja is lehet megalapozatlan.\
+\r\n\r\n\
+Azt kell eldöntenünk a lista alapján, hogy az egyezések vagy a különbségek hibásak vagy az eltérések nem is azért vannak, \
+mert valamelyik hibás, hanem valóban különbözõ, rokon vagy névrokon emberekrõl van szó? \
+\r\n\r\n\
+Ezt alistát tanácsos az azonos emberek összevonása után elkészíteni, hogy a valóban azonos emberek különbözõ bejegyzései már \
+ne terheljék a listát. Hiszen minket az eltérérések, a hibák érdekelnek. Egy adat hibájának, helyes értékének megállapítása embert próbáló feladat. \
+Ez a lista csak felhívja a figyelmet arra, hogy mely adatoknak kell utána nézni.\
+\r\n\r\n\
+A hibalistából kihagyjuk azokat az azonos nevû embereket akiknek bár az apja vagy anyja azonos volt, õk azonban testvérek voltak.\
+\r\n\r\n\
+Az 'S' oszlopban az ember szerepkódja van, az 'U' oszlopban lévõ szám pedig megmutatja, hogy hány embert vont össze az \
+egyesítési eljárás.\
+\r\n\r\n\
+A Ga.html fájlban javítani kell a megállapított hibákat, majd ezt a fájlt újra beolvasni az adatbázisba és megismételni az \
+azonos emberek összevonását. Ebbõl az adatbázisból készített hasonló lista, már nem fogja tartalmazni a javított tételeket.\
+\r\n\r\n\
+A hibák javításához az érintett sor/sorok kijelölése után a bal egérgomb klikkelésére legördülõ menübõl választható \
+funkciók nyújtanak segítséget.\
+");
+	theApp.m_pszAppName =_tcsdup( L"Bejegyzések, amelyekben a név és valami más azonos" );
+	AfxMessageBox( info, MB_ICONINFORMATION );
 }

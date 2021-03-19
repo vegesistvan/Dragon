@@ -20,8 +20,8 @@ public:
 	CListCtrlEx m_ListCtrl;
 
 	CString _fullname;
-	CString _last_name;
-	CString _first_name;
+	CString _lastname;
+	CString _firstname;
 
 	CString _birth;
 	CString _death;

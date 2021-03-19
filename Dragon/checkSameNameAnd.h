@@ -1,7 +1,7 @@
 #pragma once
 #include "listctrlex.h"
 #include "colorstatic.h"
-
+#include "ProgressWnd.h"
 
 // CcheckSameNameAnd dialog
 
@@ -27,20 +27,17 @@ protected:
 	CString _extension;
 	CString str;
 	CString m_command;
-	FILE* txt;
-	FILE* fh1;
 
-	int		_cnt;
 	int		nItem;
 
-	CString _fullname;
 	CString _lastname;
 	CString _firstname;
+	CString _fullname;
 
 	CString	_contractions;
 
+	CProgressWnd wndProgress; 
 	std::vector<SAME> vSame;
-
 
 
 	CSqliteDBRecordSet*	 m_recordset;
@@ -49,7 +46,8 @@ protected:
 	CSqliteDBRecordSet*	 m_recordset3;
 	CSqliteDBRecordSet*	 m_recordset4;
 
-
+	CColorStatic colorKeres;
+	CColorStatic colorNext;
 
 	void CcheckSameNameAnd::createColumns();
 	void CcheckSameNameAnd::fillTable();
@@ -64,20 +62,16 @@ protected:
 	BOOL CcheckSameNameAnd::sameSpouses();
 
 
+
+
 	void OnHtmlEditLines();
 	void OnHtmlNotepad();
 	void OnHtmlFamily();
 	void OnDbEdit();
 	void OnHtmlFatherAndSiblings();
 	void keress( int start );
-/*
-	void CcheckSameNameAnd::OnHtmlPeoplefather();
-	void CcheckSameNameAnd::OnHtmlEditLines();
-	void CcheckSameNameAnd::OnHtmlNotepad();
-	void OnEditNotpadParents();
-	void OnEdit2lines();
-*/
-	void CcheckSameNameAnd::init( CString title );
+
+//	void CcheckSameNameAnd::init( CString title );
 	void CcheckSameNameAnd::listSameVector();
 	
 
@@ -104,6 +98,6 @@ public:
 	afx_msg void OnFatherandsiblings();
 	afx_msg void OnClickedKeres();
 	afx_msg void OnClickedNext();
-	CColorStatic colorKeres;
-	CColorStatic colorNext;
+
+	afx_msg void OnInfo();
 };
