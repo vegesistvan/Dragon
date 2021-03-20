@@ -20,4 +20,6 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnInitDialog();
+	BOOL m_checkSpouse;
+	afx_msg void OnBnClickedOk();
 };

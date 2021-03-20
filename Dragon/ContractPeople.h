@@ -45,6 +45,8 @@ public:
 	virtual ~CContractPeople();
 	bool contractPeople();
 	int m_azonos;			// az egyesítéshez szükséges azonosságok száma
+	bool m_checkSpouse;
+
 protected:
 	CProgressWnd wndP; 
 

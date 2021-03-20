@@ -165,6 +165,13 @@ END_MESSAGE_MAP()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CContractPeople::contractPeople()
 {
+	CContractPeopleDlg dlg;
+
+	if( dlg.DoModal() == IDCANCEL )
+	{
+		return false;
+	}
+	m_checkSpouse = dlg.m_checkSpouse;
 
 	m_fileSpecTextU.Format( L"%s\\%s_UNITED.txt", theApp.m_databasePath, theApp.m_baseName );
 	if( !openFileSpec( &textU, m_fileSpecTextU, L"w+" ) ) return NULL;
@@ -172,6 +179,8 @@ bool CContractPeople::contractPeople()
 	m_fileSpecTextD.Format( L"%s\\%s_DIFFERENT.txt", theApp.m_databasePath, theApp.m_baseName );
 	if( !openFileSpec( &textD, m_fileSpecTextD, L"w+" ) ) return NULL;
 	
+	fwprintf( textU, L"checkSpouse = %d\n", m_checkSpouse );
+	fwprintf( textD, L"checkSpouse = %d\n", m_checkSpouse );
 
 	CString drive;
 	CString path;
@@ -687,7 +696,12 @@ int CContractPeople::sameSpouses( CString rowid1, CString rowid2 )
 						death2	= vSpouses.at(j).death;
 						if( ( retD = same( dummy, death1, death2 ) ) == -1 ) continue;	// ellentmondás
 						if( !retB && !retD ) 
-							continue;  // nincs megadva sem születés, sem halál: keress másik házastársat. Pusztán a név azonosság nem elég!!
+						{
+							if( m_checkSpouse )
+								continue;  // nincs megadva sem születés, sem halál: keress másik házastársat. Pusztán a név azonosság nem elég!!
+							else
+								return 1;	// nem kell a dátumoknak létezni és azonosnak lenni, elfogadjuk
+						}
 						else
 							return 1; // születés/halál megerõsíti az azonosságot
 					}

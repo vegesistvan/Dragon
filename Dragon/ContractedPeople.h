@@ -36,6 +36,7 @@ protected:
 	CString cLine;
 	CString m_command;
 	int m_azonos;
+	bool m_checkSpouse;
 	bool UNITED;
 
 	std::vector<TCHAR*> vPeople; 

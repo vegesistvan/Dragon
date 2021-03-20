@@ -117,32 +117,32 @@ BOOL CContractedPeople::OnInitDialog()
 
 	
 
-	GetDlgItem( IDC_CAPTION )->SetWindowTextW( m_fileSpec );
+//	GetDlgItem( IDC_CAPTION )->SetWindowTextW( m_fileSpec );
 //	SetWindowPos(&wndTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 	return true;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedPeople::OnInputDifferent()
 {
-	str.Format( L"Azonos nevû emberek bejegyzései, akik nem vonhatóak össze (adat-azonosságok megkövetelt száma: %d )", m_azonos );
 	inputFile( DIFFERENT_FILE );
 
 	UNITED = false;
 	menu.EnableMenuItem( ID_INPUT_UNITED, MF_BYCOMMAND | MF_ENABLED);
 	menu.EnableMenuItem( ID_INPUT_DIFFERENT, MF_BYCOMMAND | MF_GRAYED);
 
+	str.Format( L"Azonos nevû emberek bejegyzései, akik nem vonhatóak össze (adat-azonosságok megkövetelt száma: %d )", m_azonos );
 	SetWindowTextW( str );
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedPeople::OnInputUnited()
 {
-	str.Format( L"Azonos nevû emberek bejegyzései, amik részben összevonásra kerültek (adat-azonosságok megkövetelt száma: %d)", m_azonos );
 	inputFile( UNITED_FILE );
 
 	UNITED = true;
 	menu.EnableMenuItem( ID_INPUT_UNITED, MF_BYCOMMAND | MF_GRAYED);
 	menu.EnableMenuItem( ID_INPUT_DIFFERENT, MF_BYCOMMAND | MF_ENABLED);
 
+	str.Format( L"Azonos nevû emberek bejegyzései, amik részben összevonásra kerültek (adat-azonosságok megkövetelt száma: %d)", m_azonos );
 	SetWindowTextW( str );
 }
 
@@ -168,6 +168,10 @@ void CContractedPeople::inputFile( int type )
 
 	CStdioFile file( filespec, CFile::modeRead);   // input csv fájl
 	int fileLength = (int)file.GetLength();
+
+	file.ReadString( cLine );
+	m_checkSpouse = _wtoi( getLastWord( cLine ) );
+
 
 	CStringArray A;
 	int n;
@@ -207,7 +211,14 @@ void CContractedPeople::inputFile( int type )
 	m_ListCtrl.AttachDataset( &vPeople );
 
 	m_azonos = theApp.getUserVersion() && 0XFF;
-	GetDlgItem( IDC_CAPTION )->SetWindowTextW( filespec );
+
+	if( m_checkSpouse )
+		str = L"Az azonos nevû házastársak azonosságát meg kell erõsíteni születési/halálozási dátum létezése és azonossága.";
+	else
+		str = L"Az azonos nevû házastársak azonosságát nem kell megerõsíteni születési/halálozási dátum létezésének és azonosságának.";
+	GetDlgItem( IDC_CAPTION )->SetWindowTextW( str );
+
+//	GetDlgItem( IDC_CAPTION )->SetWindowTextW( filespec );
 	ShowWindow( SW_MAXIMIZE );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

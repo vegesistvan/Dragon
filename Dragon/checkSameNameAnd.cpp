@@ -861,14 +861,14 @@ void CcheckSameNameAnd::listSameVector()
 
 			nSame = same( L"", fatherName, fatherNameP );
 			bSame = same( L"", birthF, birthFP );
-			dSame = same( L"", deathF, birthF );
+			dSame = same( L"", deathF, deathFP );
 
 			if( nSame == -1 || bSame == -1 || dSame == -1  )
 				col = col | 1 << L_FATHER;
 
 			nSame = same( L"", motherName, motherNameP );
 			bSame = same( L"", birthM, birthMP );
-			dSame = same( L"", deathM, birthM );
+			dSame = same( L"", deathM, deathMP );
 
 			if( nSame == -1 || bSame == -1 || dSame == -1  )
 				col = col | 1 << L_MOTHER;
@@ -908,9 +908,9 @@ void CcheckSameNameAnd::listSameVector()
 		birthDatePrev	= birthDate;
 		deathDatePrev	= deathDate;
 		birthFP			= birthF;
-		deathFP			= deathFP;
+		deathFP			= deathF;
 		birthMP			= birthM;
-		deathMP			= deathMP;
+		deathMP			= deathM;
 
 		fatherNamePrev	= fatherNamePrint;
 		motherNamePrev	= motherNamePrint;
