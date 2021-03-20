@@ -177,31 +177,6 @@ BOOL CcheckSameNameAnd::OnInitDialog()
 	str.Format( L"%s (%s)", caption, theApp.m_databaseName );
 	SetWindowTextW( str );
 
-	if( !_lastname.IsEmpty() )
-	{
-		if( _firstname.IsEmpty() )
-			m_command.Format( L"SELECT rowid, * FROM people WHERE last_name LIKE '%s%c' ORDER BY last_name, first_name, death_date, source", _lastname,'%' );
-		else 
-			m_command.Format( L"SELECT rowid, * FROM people WHERE last_name = '%s' AND first_name = '%s' ORDER BY last_name, first_name, death_date, source", _lastname, _firstname );
-	}
-	else
-		m_command = L"SELECT rowid,* FROM people ORDER BY last_name, first_name, death_date, source";
-
-// azonos nevû emberek indexeinek kigyûjtése a vSame vektorba
-	wndProgress.Create(NULL, L"Azonos nevû emberek..." ); 
-	wndProgress.GoModal();
-#ifndef _DEBUG
-	wndProgress.SetText( L"Emberek beolvasása folyik..." );
-#endif
-	if( !query( m_command ) ) return false;
-
-	wndProgress.SetRange(0, m_recordset->RecordsCount());
-	wndProgress.SetPos(0);
-	wndProgress.SetStep(1);
-#ifndef _DEBUG
-	wndProgress.SetText( L"Emberek azonosítása..." );
-#endif
-
 
 	colorNext.SetTextColor( theApp.m_colorClick );
 	colorKeres.SetTextColor( theApp.m_colorClick );
@@ -245,6 +220,32 @@ void CcheckSameNameAnd::OnSizing(UINT fwSide, LPRECT pRect)
 void CcheckSameNameAnd::SameNameAndMother()
 {
 
+	if( !_lastname.IsEmpty() )
+	{
+		if( _firstname.IsEmpty() )
+			m_command.Format( L"SELECT rowid, * FROM people WHERE last_name LIKE '%s%c' ORDER BY last_name, first_name, mother_id, source", _lastname,'%' );
+		else 
+			m_command.Format( L"SELECT rowid, * FROM people WHERE last_name = '%s' AND first_name = '%s' ORDER BY last_name, first_name, mother_id, source", _lastname, _firstname );
+	}
+	else
+		m_command = L"SELECT rowid,* FROM people ORDER BY last_name, first_name, mother_id, source";
+
+// azonos nevû emberek indexeinek kigyûjtése a vSame vektorba
+	wndProgress.Create(NULL, L"Azonos nevû emberek..." ); 
+	wndProgress.GoModal();
+#ifndef _DEBUG
+	wndProgress.SetText( L"Emberek beolvasása folyik..." );
+#endif
+	if( !query( m_command ) ) return;
+
+	wndProgress.SetRange(0, m_recordset->RecordsCount());
+	wndProgress.SetPos(0);
+	wndProgress.SetStep(1);
+#ifndef _DEBUG
+	wndProgress.SetText( L"Emberek azonosítása..." );
+#endif
+
+
 	SAME same;
 	sameClear( &same );
 	vSame.clear();
@@ -278,6 +279,31 @@ void CcheckSameNameAnd::SameNameAndMother()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CcheckSameNameAnd::SameNameAndFather()
 {
+	if( !_lastname.IsEmpty() )
+	{
+		if( _firstname.IsEmpty() )
+			m_command.Format( L"SELECT rowid, * FROM people WHERE last_name LIKE '%s%c' ORDER BY last_name, first_name, father_id, source", _lastname,'%' );
+		else 
+			m_command.Format( L"SELECT rowid, * FROM people WHERE last_name = '%s' AND first_name = '%s' ORDER BY last_name, first_name, father_id, source", _lastname, _firstname );
+	}
+	else
+		m_command = L"SELECT rowid,* FROM people ORDER BY last_name, first_name, father_id, source";
+
+// azonos nevû emberek indexeinek kigyûjtése a vSame vektorba
+	wndProgress.Create(NULL, L"Azonos nevû emberek..." ); 
+	wndProgress.GoModal();
+#ifndef _DEBUG
+	wndProgress.SetText( L"Emberek beolvasása folyik..." );
+#endif
+	if( !query( m_command ) ) return;
+
+	wndProgress.SetRange(0, m_recordset->RecordsCount());
+	wndProgress.SetPos(0);
+	wndProgress.SetStep(1);
+#ifndef _DEBUG
+	wndProgress.SetText( L"Emberek azonosítása..." );
+#endif
+
 	SAME same;
 	sameClear( &same );
 	vSame.clear();
@@ -311,6 +337,32 @@ void CcheckSameNameAnd::SameNameAndFather()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CcheckSameNameAnd::SameNameAndDeath()
 {
+	if( !_lastname.IsEmpty() )
+	{
+		if( _firstname.IsEmpty() )
+			m_command.Format( L"SELECT rowid, * FROM people WHERE last_name LIKE '%s%c' ORDER BY last_name, first_name, death_date, source", _lastname,'%' );
+		else 
+			m_command.Format( L"SELECT rowid, * FROM people WHERE last_name = '%s' AND first_name = '%s' ORDER BY last_name, first_name, death_date, source", _lastname, _firstname );
+	}
+	else
+		m_command = L"SELECT rowid,* FROM people ORDER BY last_name, first_name, death_date, source";
+
+// azonos nevû emberek indexeinek kigyûjtése a vSame vektorba
+	wndProgress.Create(NULL, L"Azonos nevû emberek..." ); 
+	wndProgress.GoModal();
+#ifndef _DEBUG
+	wndProgress.SetText( L"Emberek beolvasása folyik..." );
+#endif
+	if( !query( m_command ) ) return;
+
+	wndProgress.SetRange(0, m_recordset->RecordsCount());
+	wndProgress.SetPos(0);
+	wndProgress.SetStep(1);
+#ifndef _DEBUG
+	wndProgress.SetText( L"Emberek azonosítása..." );
+#endif
+
+
 	SAME same;
 	sameClear( &same );
 	vSame.clear();
@@ -345,6 +397,32 @@ void CcheckSameNameAnd::SameNameAndDeath()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CcheckSameNameAnd::SameNameAndBirth()
 {
+	if( !_lastname.IsEmpty() )
+	{
+		if( _firstname.IsEmpty() )
+			m_command.Format( L"SELECT rowid, * FROM people WHERE last_name LIKE '%s%c' ORDER BY last_name, first_name, birth_date, source", _lastname,'%' );
+		else 
+			m_command.Format( L"SELECT rowid, * FROM people WHERE last_name = '%s' AND first_name = '%s' ORDER BY last_name, first_name, birth_date, source", _lastname, _firstname );
+	}
+	else
+		m_command = L"SELECT rowid,* FROM people ORDER BY last_name, first_name, birth_date, source";
+
+// azonos nevû emberek indexeinek kigyûjtése a vSame vektorba
+	wndProgress.Create(NULL, L"Azonos nevû emberek..." ); 
+	wndProgress.GoModal();
+#ifndef _DEBUG
+	wndProgress.SetText( L"Emberek beolvasása folyik..." );
+#endif
+	if( !query( m_command ) ) return;
+
+	wndProgress.SetRange(0, m_recordset->RecordsCount());
+	wndProgress.SetPos(0);
+	wndProgress.SetStep(1);
+#ifndef _DEBUG
+	wndProgress.SetText( L"Emberek azonosítása..." );
+#endif
+
+
 	SAME same;
 	sameClear( &same );
 	vSame.clear();
@@ -371,6 +449,74 @@ void CcheckSameNameAnd::SameNameAndBirth()
 	if( vSame.size() > 1 )
 		listSameVector();
 }
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Az aktuális és az azt követõ rekordban lévõ ember neve+valamelyik szûlõjének azonosítója azonos-e?
+// Ha a név vagy a szülõ nincs megadva, akkor nem vizsgálja, nem tekinti azonosnak
+// return TRUE, ha azons
+// return FALSE, ha nem azonos
+BOOL CcheckSameNameAnd::sameNameParent( int PARENT_ID )
+{
+	int		source1;
+	int		source2;
+
+	CString name;
+	CString name1;
+	CString name2;
+
+	CString rowidParent;
+
+	name.Format( L"%s%s", m_recordset->GetFieldString( PEOPLE_LAST_NAME ), m_recordset->GetFieldString( PEOPLE_FIRST_NAME ) );
+	rowidParent = m_recordset->GetFieldString( PARENT_ID );
+
+	if( !name.IsEmpty() && rowidParent != L"0" )
+	{
+		name1.Format( L"%s%s", name, rowidParent );
+		source1 = _wtoi( m_recordset->GetFieldString( PEOPLE_SOURCE ) );
+
+		m_recordset->MoveNext();
+		name2.Format( L"%s%s%s", m_recordset->GetFieldString( PEOPLE_LAST_NAME ), m_recordset->GetFieldString( PEOPLE_FIRST_NAME ), m_recordset->GetFieldString( PARENT_ID ) );
+		source2 = _wtoi( m_recordset->GetFieldString( PEOPLE_SOURCE ) );
+		m_recordset->MovePrevious();
+
+		// Ha azonos nevû leszármazottak0 apja vagy anyja is azonos, akkor azok testvérek lehetnek, akik közül az egyik már meghalt.
+		// Ezeket nem listázzuk.
+		if( source1 == 1 && source2 == 1 ) return FALSE;
+
+		if( !name1.Compare( name2 ) )
+			return TRUE;  //  azonos nevû emberek
+	}
+	return FALSE;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Az aktuális és az azt követõ rekordban lévõ ember neve+halálozási dátuma azonos-e?
+// Ha a név vagy a halálozási dátum nincs megadva, akkor nem vizsgálja, nem tekinti azonosnak
+// return TRUE, ha azons
+// return FALSE, ha nem azonos
+BOOL CcheckSameNameAnd::sameNameDate( int ID_DATE )
+{
+	CString name;
+	CString name1;
+	CString name2;
+	
+	CString date;
+	
+
+	name.Format( L"%s%s", m_recordset->GetFieldString( PEOPLE_LAST_NAME ), m_recordset->GetFieldString( PEOPLE_FIRST_NAME ) );
+	date = m_recordset->GetFieldString( ID_DATE );
+
+	if( !name.IsEmpty() && !date.IsEmpty() )
+	{
+		name1.Format( L"%s%s", name, date );
+
+		m_recordset->MoveNext();
+		name2.Format( L"%s%s%s", m_recordset->GetFieldString( PEOPLE_LAST_NAME ), m_recordset->GetFieldString( PEOPLE_FIRST_NAME ), m_recordset->GetFieldString( ID_DATE ) );
+		m_recordset->MovePrevious();
+
+		if( !name1.Compare( name2 ) ) return TRUE;  //  azonos nevû emberek
+	}
+	return FALSE;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CcheckSameNameAnd::createColumns()
 {
@@ -788,73 +934,6 @@ void CcheckSameNameAnd::listSameVector()
 	nItem = m_ListCtrl.InsertItem( nItem, L"" );
 	++nItem;
 	++sameName;
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Az aktuális és az azt követõ rekordban lévõ ember neve+valamelyik szûlõjének azonosítója azonos-e?
-// Ha a név vagy a szülõ nincs megadva, akkor nem vizsgálja, nem tekinti azonosnak
-// return TRUE, ha azons
-// return FALSE, ha nem azonos
-BOOL CcheckSameNameAnd::sameNameParent( int PARENT_ID )
-{
-	int		source1;
-	int		source2;
-
-	CString name;
-	CString name1;
-	CString name2;
-
-	CString rowidParent;
-
-	name.Format( L"%s%s", m_recordset->GetFieldString( PEOPLE_LAST_NAME ), m_recordset->GetFieldString( PEOPLE_FIRST_NAME ) );
-	rowidParent = m_recordset->GetFieldString( PARENT_ID );
-
-	if( !name.IsEmpty() && rowidParent != L"0" )
-	{
-		name1.Format( L"%s%s", name, rowidParent );
-		source1 = _wtoi( m_recordset->GetFieldString( PEOPLE_SOURCE ) );
-
-		m_recordset->MoveNext();
-		name2.Format( L"%s%s%s", m_recordset->GetFieldString( PEOPLE_LAST_NAME ), m_recordset->GetFieldString( PEOPLE_FIRST_NAME ), m_recordset->GetFieldString( PARENT_ID ) );
-		source2 = _wtoi( m_recordset->GetFieldString( PEOPLE_SOURCE ) );
-		m_recordset->MovePrevious();
-
-		// Ha azonos nevû leszármazottak0 apja vagy anyja is azonos, akkor azok testvérek lehetnek, akik közül az egyik már meghalt.
-		// Ezeket nem listázzuk.
-		if( source1 == 1 && source2 == 1 ) return FALSE;
-
-		if( !name1.Compare( name2 ) )
-			return TRUE;  //  azonos nevû emberek
-	}
-	return FALSE;
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Az aktuális és az azt követõ rekordban lévõ ember neve+halálozási dátuma azonos-e?
-// Ha a név vagy a halálozási dátum nincs megadva, akkor nem vizsgálja, nem tekinti azonosnak
-// return TRUE, ha azons
-// return FALSE, ha nem azonos
-BOOL CcheckSameNameAnd::sameNameDate( int ID_DATE )
-{
-	CString name;
-	CString name1;
-	CString name2;
-	
-	CString date;
-	
-
-	name.Format( L"%s%s", m_recordset->GetFieldString( PEOPLE_LAST_NAME ), m_recordset->GetFieldString( PEOPLE_FIRST_NAME ) );
-	date = m_recordset->GetFieldString( ID_DATE );
-
-	if( !name.IsEmpty() && !date.IsEmpty() )
-	{
-		name1.Format( L"%s%s", name, date );
-
-		m_recordset->MoveNext();
-		name2.Format( L"%s%s%s", m_recordset->GetFieldString( PEOPLE_LAST_NAME ), m_recordset->GetFieldString( PEOPLE_FIRST_NAME ), m_recordset->GetFieldString( ID_DATE ) );
-		m_recordset->MovePrevious();
-
-		if( !name1.Compare( name2 ) ) return TRUE;  //  azonos nevû emberek
-	}
-	return FALSE;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
