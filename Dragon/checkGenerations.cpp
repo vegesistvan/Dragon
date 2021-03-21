@@ -309,7 +309,7 @@ void CCheckGenerations::OnHtmlEditLines()
 	if( selectedCount == 1 )
 		title.Format( L"%s a ga.html fájlban (%s. sor)", m_ListCtrl.GetItemText( nItem, L_NAME ), m_ListCtrl.GetItemText( nItem, L_LINE )  );
 	else
-		title.Format( L"%d kijelölt ember a ga.html fájlban", selectedCount );
+		title.Format( L"%d kijelölt sor a ga.html fájlban", selectedCount );
 
 	theApp.htmlEditLines( &m_ListCtrl, L_LINE, title );
 

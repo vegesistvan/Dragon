@@ -96,10 +96,16 @@ LRESULT CUnknownFirstNames::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CUnknownFirstNames::OnHtmlEdit()
 {
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	CHtmlEditLine dlg;
-	dlg.m_linenumber	= m_ListCtrl.GetItemText( nItem, L_LINENUMBER );
-	dlg.DoModal();
+	CString title;
+	int selectedCount	= m_ListCtrl.GetSelectedCount();
+	int nItem			= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	if( selectedCount == 1 )
+		title.Format( L"%s a ga.html fájlban (%s. sor)", m_ListCtrl.GetItemText( nItem, L_NAME ), m_ListCtrl.GetItemText( nItem, L_LINENUMBER )  );
+	else
+		title.Format( L"%d kijelölt sor a ga.html fájlban", selectedCount );
+
+	theApp.htmlEditLines( &m_ListCtrl, L_LINENUMBER, title );
+
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CUnknownFirstNames::OnHtmlNotepad()
@@ -166,7 +172,7 @@ bool CUnknownFirstNames::findFirstNames()
 	CString first_name;
 	int sex_id;
 	int nItem = 0;
-	CProgressWnd wndP( NULL, L"Ismeretlen keresztnevek beolvasása... "); 
+	CProgressWnd wndP( NULL, L"Keresztnevek ellenõrzése... "); 
 	wndP.GoModal();
 	wndP.SetRange( 0, theApp.m_recordset->RecordsCount() -1 );
 	wndP.SetPos(0 );

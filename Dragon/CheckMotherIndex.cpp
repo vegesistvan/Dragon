@@ -322,7 +322,7 @@ void CCheckMotherIndex::OnHtmlEditLines()
 	CString title;
 	int selectedCount	= m_ListCtrl.GetSelectedCount();
 	int nItem			= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	title.Format( L"%d kijelölt ember a ga.html fájlban", selectedCount );
+	title.Format( L"%d kijelölt sor a ga.html fájlban", selectedCount );
 
 	theApp.htmlEditLines( &m_ListCtrl, L_LINENUMBER, title );
 }

@@ -118,7 +118,6 @@ void CDragonApp::editNotepad( CString lineNumber )
 {
 	CString	fileSpec;
 	fileSpec.Format( L"\"%s\" -n%s -alwaysOnTop -nosession", theApp.m_htmlFileSpec, lineNumber );
-	fileSpec.Format( L"\"%s\" -n%s -alwaysOnTop", theApp.m_htmlFileSpec, lineNumber );
 	ShellExecute(NULL,L"open",m_editorName, fileSpec, m_editorFolder,SW_SHOW);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -436,6 +435,7 @@ int CDragonApp::isFirstName( CString name )
 	name.Replace( '_', ' ' );
 	name.Replace( '?', ' ' );
 	name.Replace( ')', ' ' );
+	name.Replace( '(', ' ' );
 	name.Trim();
 	if( name.IsEmpty() ) return -1;
 

@@ -151,7 +151,7 @@ házastársak\n\n\
 	sWHITE.Format( L"%u", RGB(255,255,255) );
 
 	m_name = L"";				// ha csak egy embert akarunk vizsgálni, itt megadhatjuk a nevét
-	m_azonos	= 1;						// az azonos adatpárok elõírt száma
+	m_azonos	= 2;						// az azonos adatpárok elõírt száma
 	nItem		= 0;
 	m_loopMax   = 4;
 }
@@ -171,16 +171,17 @@ bool CContractPeople::contractPeople()
 	{
 		return false;
 	}
-	m_checkSpouse = dlg.m_checkSpouse;
+	m_azonos			= dlg.m_azonos;
 
-	m_fileSpecTextU.Format( L"%s\\%s_UNITED.txt", theApp.m_databasePath, theApp.m_baseName );
+	m_fileSpecTextU.Format( L"%s\\%s_UNITED%d.txt", theApp.m_databasePath, theApp.m_baseName, m_azonos );
 	if( !openFileSpec( &textU, m_fileSpecTextU, L"w+" ) ) return NULL;
 	
-	m_fileSpecTextD.Format( L"%s\\%s_DIFFERENT.txt", theApp.m_databasePath, theApp.m_baseName );
+	m_fileSpecTextD.Format( L"%s\\%s_DIFFERENT%d.txt", theApp.m_databasePath, theApp.m_baseName, m_azonos );
 	if( !openFileSpec( &textD, m_fileSpecTextD, L"w+" ) ) return NULL;
 	
-	fwprintf( textU, L"checkSpouse = %d\n", m_checkSpouse );
-	fwprintf( textD, L"checkSpouse = %d\n", m_checkSpouse );
+	fwprintf( textU, L"m_azonos = %d\n", m_azonos );
+	fwprintf( textD, L"m_azonos = %d\n", m_azonos );
+
 
 	CString drive;
 	CString path;
@@ -202,16 +203,16 @@ bool CContractPeople::contractPeople()
 
 		// az aktuáli sadatbázis fájlok másolása *P.db fájlba
 		splitFilespec( theApp.m_databaseSpec, &drive, &path,  &fname, &ext );
-		str.Format( L"%s:%s\\%sP.%s", drive, path, fname, ext );
+		str.Format( L"%s:%s\\%sP%d.%s", drive, path, fname, m_azonos, ext );
 		CopyFile( theApp.m_databaseSpec, str, false );
 		theApp.m_databaseSpec = str;
-		str.Format( L"%s:%s\\%sP_blob.%s", drive, path, fname, ext );
+		str.Format( L"%s:%s\\%sP%d_blob.%s", drive, path, fname, m_azonos, ext );
 		CopyFile( theApp.m_blobSpec, str, false );
 		theApp.openDatabase();
 
 		theApp.setStartTime();
-		openDifferent();			// html fájl
-		openUnited();				// html fájl
+//		openDifferent();			// html fájl
+//		openUnited();				// html fájl
 
 		vContract.clear();			// az összevont emberek 
 	
@@ -229,6 +230,7 @@ bool CContractPeople::contractPeople()
 			theApp.execute( L"VACUUM");
 		}
 
+		/*
 		if( m_loop == 1 )
 		{
 			theApp.insertIntoFiles( unitedSpec, UNITED1_HTML_FILE );
@@ -239,11 +241,11 @@ bool CContractPeople::contractPeople()
 			theApp.insertIntoFiles( unitedSpec, UNITED2_HTML_FILE );
 			theApp.insertIntoFiles( differentSpec, DIFFERENT2_HTML_FILE );
 		}
-
+		*/
 
 		if( !vContract.size() ) break;		// nincs összevont ember, vége a programnak
-		fclose( fU );
-		fclose( fD );
+//		fclose( fU );
+//		fclose( fD );
 
 		++m_loop;
 	}
@@ -252,8 +254,8 @@ bool CContractPeople::contractPeople()
 	theApp.insertIntoFiles( m_fileSpecTextU, UNITED_FILE );
 	theApp.insertIntoFiles( m_fileSpecTextD, DIFFERENT_FILE );
 
-	fclose( fU );
-	fclose( fD );
+//	fclose( fU );
+//	fclose( fD );
 	fclose( textU );
 	fclose( textD );
 	return true;
@@ -695,6 +697,23 @@ int CContractPeople::sameSpouses( CString rowid1, CString rowid2 )
 						death1	= vSpouses.at(i).death;
 						death2	= vSpouses.at(j).death;
 						if( ( retD = same( dummy, death1, death2 ) ) == -1 ) continue;	// ellentmondás
+
+						if( retB || retD )
+						{
+							++m_match;
+							return 1;
+						}
+						else
+							return 1;
+
+						/*
+						birth1	= vSpouses.at(i).birth;
+						birth2	= vSpouses.at(j).birth;
+						if( ( retB = same( dummy, birth1, birth2 ) ) == -1 ) continue;  // ellentmondás
+
+						death1	= vSpouses.at(i).death;
+						death2	= vSpouses.at(j).death;
+						if( ( retD = same( dummy, death1, death2 ) ) == -1 ) continue;	// ellentmondás
 						if( !retB && !retD ) 
 						{
 							if( m_checkSpouse )
@@ -704,6 +723,7 @@ int CContractPeople::sameSpouses( CString rowid1, CString rowid2 )
 						}
 						else
 							return 1; // születés/halál megerõsíti az azonosságot
+						*/
 					}
 				}
 			}
@@ -1097,6 +1117,7 @@ void CContractPeople::setRef( int i )
 		r.generation = a.generation;
 
 }
+/*
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractPeople::openUnited()
 {
@@ -1154,6 +1175,7 @@ L"rowid-házastársak---------------"\
 	fwprintf( fD, L"<font color='red'>%s</font><br>", columns );
 
 }
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractPeople::createHead( CString title  )
 {
@@ -1178,6 +1200,7 @@ L"Egyezések min. száma:",\
 m_azonos\
 );
 }
+*/
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CContractPeople::query( CString command )
 {

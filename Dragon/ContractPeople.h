@@ -61,11 +61,11 @@ protected:
 	int		nItem;
 	int		m_loop;
 	int		m_loopMax;
-	CString unitedSpec;			// egyesített bejegyzéseket listázó fájl
-	CString differentSpec;		// különbözü bejegyzéseket listázó fájl
+//	CString unitedSpec;			// egyesített bejegyzéseket listázó fájl
+//	CString differentSpec;		// különbözü bejegyzéseket listázó fájl
 	
-	FILE* fU;  
-	FILE* fD;  
+//	FILE* fU;  
+//	FILE* fD;  
 
 	FILE* textU;
 	FILE* textD;

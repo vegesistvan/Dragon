@@ -77,12 +77,23 @@ void CGaInput::processNameSubstr( CString nameSubstr, CString birthSubstr, CStri
 	bool volt = false;
 	int numOfFirstNames = 0;
 
+//	nameSubstr.Remove( '?' );
 	nameSubstr.Trim();
 	// parentIndex leszedése, ha van
 	int n = wordList(&A, nameSubstr, ' ', FALSE );
+		for( i = 0; i < n; ++i )
+	{
+		word = A[i];
+//		word.Replace( '?', ' ' );  // az egy szón belül a ? helyén maradjon space, hogy a Mária???Emese-féle neveket kezeni tudja!!
+		word.Trim();
+		A[i] = word;
+	}
+
+
 	for( i = 0; i < n; ++i )
 	{
 		word = A[i];
+//		word.Remove( '?' );
 		if( ( pos = word.Find( '/' ) ) != -1 )
 		{
 			str = word.Left( pos );
@@ -109,6 +120,7 @@ void CGaInput::processNameSubstr( CString nameSubstr, CString birthSubstr, CStri
 		word = A[i];
 		word.Replace( ',', ' ' );						// a név után lehet vesszõ !!
 		word.Replace( '?', ' ' );
+		
 		word.TrimRight();
 		
 		if( ( ret = theApp.isFirstName( word ) ) != -1 )			//  =Budaörs 1944.12.17 Richard Rostoczil Mária
@@ -135,6 +147,8 @@ void CGaInput::processNameSubstr( CString nameSubstr, CString birthSubstr, CStri
 	}
 	if( !volt )												// nem talált kersztnevet, baj van!!
 	{
+		nameSubstr.Remove( '?' );
+		nameSubstr.Trim();
 		any->last_name = getFirstWord( nameSubstr );
 		any->first_name = getLastWord( nameSubstr );
 		return;

@@ -114,11 +114,6 @@ BOOL CContractedPeople::OnInitDialog()
 
 	createColumns();
 	OnInputUnited();
-
-	
-
-//	GetDlgItem( IDC_CAPTION )->SetWindowTextW( m_fileSpec );
-//	SetWindowPos(&wndTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 	return true;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -160,9 +155,13 @@ void CContractedPeople::inputFile( int type )
 		{
 			CContractPeople cc;
 			if( !cc.contractPeople() )
-				CDialog::OnCancel();
+			{
+				CDialogEx::OnCancel();
+				return;
+			}
 		}
 		else
+//			return;
 			break;
 	}
 
@@ -170,8 +169,8 @@ void CContractedPeople::inputFile( int type )
 	int fileLength = (int)file.GetLength();
 
 	file.ReadString( cLine );
-	m_checkSpouse = _wtoi( getLastWord( cLine ) );
-
+	m_checkSpouse	= _wtoi( getLastWord( cLine ) );
+	m_azonos		= _wtoi( getLastWord( cLine ) );
 
 	CStringArray A;
 	int n;
@@ -210,15 +209,16 @@ void CContractedPeople::inputFile( int type )
 	m_ListCtrl.SetItemCountEx( vPeople.size() + 1  );
 	m_ListCtrl.AttachDataset( &vPeople );
 
-	m_azonos = theApp.getUserVersion() && 0XFF;
+//	m_azonos = theApp.getUserVersion() && 0XFF;
 
 	if( m_checkSpouse )
-		str = L"Az azonos nevû házastársak azonosságát meg kell erõsíteni születési/halálozási dátum létezése és azonossága.";
+		str = L"Az azonosság nevû házastársak azonosságát meg kell erõsíteni születési/halálozási dátum létezése és azonossága.";
 	else
-		str = L"Az azonos nevû házastársak azonosságát nem kell megerõsíteni születési/halálozási dátum létezésének és azonosságának.";
+		str = L"Az azonos nevû házastársak azonosságát születési/halálozási dátumuk nékül is elfogadtuk.";
+
+	str.Format( L"Az összevonáshoz megkövetelt egyezések száma: %d", m_azonos );
 	GetDlgItem( IDC_CAPTION )->SetWindowTextW( str );
 
-//	GetDlgItem( IDC_CAPTION )->SetWindowTextW( filespec );
 	ShowWindow( SW_MAXIMIZE );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -362,20 +362,14 @@ void CContractedPeople::createColumns()
 	
 	m_ListCtrl.InsertColumn( L_ROWID,			L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_NAME,			L"név",			LVCFMT_LEFT,	250,-1,COL_TEXT );
-//	m_ListCtrl.InsertColumn( L_BIRTH,			L"születés",	LVCFMT_LEFT,	 70,-1,COL_NUM);
-//	m_ListCtrl.InsertColumn( L_DEATH,			L"halálozás",	LVCFMT_LEFT,	 70,-1,COL_NUM);
 	
 	m_ListCtrl.InsertColumn( L_ROWIDF,			L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_FATHER,			L"apa",			LVCFMT_LEFT,	250,-1,COL_TEXT);
-//	m_ListCtrl.InsertColumn( L_BIRTHF,			L"születés",	LVCFMT_LEFT,	 70,-1,COL_NUM);
-//	m_ListCtrl.InsertColumn( L_DEATHF,			L"halál",		LVCFMT_LEFT,	 70,-1,COL_NUM);
+
 	m_ListCtrl.InsertColumn( L_ROWIDM,			L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
-	
 	m_ListCtrl.InsertColumn( L_MOTHER,			L"anya",		LVCFMT_LEFT,	250,-1,COL_TEXT);
-//	m_ListCtrl.InsertColumn( L_BIRTHM,			L"születés",	LVCFMT_LEFT,	 70,-1,COL_NUM);
-//	m_ListCtrl.InsertColumn( L_DEATHM,			L"halál",		LVCFMT_LEFT,	 70,-1,COL_NUM);
+
 	m_ListCtrl.InsertColumn( L_ROWIDS,			L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
-	
 	m_ListCtrl.InsertColumn( L_SPOUSES,			L"házastársak",	LVCFMT_LEFT,	500,-1,COL_TEXT );
 	m_ListCtrl.InsertColumn( L_LINEF,			L"line#F",		LVCFMT_LEFT,	 60,-1,COL_HIDDEN );
 }
@@ -494,20 +488,6 @@ void CContractedPeople::OnFilterByname()
 		name = name.Left( pos );
 	name.Trim();
 
-	/*
-	CGetString dlg;
-
-
-	name = theApp.GetProfileString( L"Settings", L"fullname", L"Thuránszky Pál" );
-	dlg.m_string = name;
-	dlg.m_caption.Format( L"Add meg a kívánt ember teljes nevét!" );
-	if( dlg.DoModal() == IDCANCEL ) return;
-
-	name = dlg.m_string;
-
-	theApp.WriteProfileStringW( L"Settings", L"fullname", name );
-*/
-
 	UINT i;
 	UINT j;
 	bool pushed = false;
@@ -571,26 +551,22 @@ void CContractedPeople::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedPeople::OnHtml1D()
 {
-//	getFileSpec( CONTRACTED_PEOPLE_HTML1, DIFFERENTTXT );
 	getFileSpec( DIFFERENT1_HTML_FILE );
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedPeople::OnHtml1U()
 {
-//	getFileSpec( CONTRACTED_PEOPLE_HTML1, UNITEDTXT );
 	getFileSpec( UNITED1_HTML_FILE );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedPeople::OnHtml2D()
 {
-//	getFileSpec( CONTRACTED_PEOPLE_HTML2, DIFFERENTTXT );
 	getFileSpec( DIFFERENT2_HTML_FILE );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedPeople::OnHtml2U()
 {
-//	getFileSpec( CONTRACTED_PEOPLE_HTML2, UNITEDTXT );
 	getFileSpec( UNITED2_HTML_FILE );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -638,7 +614,7 @@ void CContractedPeople::OnHtmlEditLines()
 	if( selectedCount == 1 )
 		title.Format( L"%s a ga.html fájlban (%s. sor)", m_ListCtrl.GetItemText( nItem, L_NAME ), m_ListCtrl.GetItemText( nItem, L_LINENUMBER )  );
 	else
-		title.Format( L"%d kijelölt ember a ga.html fájlban", selectedCount );
+		title.Format( L"%d kijelölt sor a ga.html fájlban", selectedCount );
 
 	theApp.htmlEditLines( &m_ListCtrl, L_LINENUMBER, title );
 }

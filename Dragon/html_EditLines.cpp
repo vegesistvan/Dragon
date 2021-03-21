@@ -48,7 +48,7 @@ BEGIN_MESSAGE_MAP(CHtmlEditLines, CDialogEx)
 	ON_WM_SIZE()
 	ON_WM_SIZING()
 //	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CHtmlEditLines::OnDblclkList)
-	ON_COMMAND(ID_LIST_LINES, &CHtmlEditLines::OnListLines)
+	ON_COMMAND(ID_LISTA, &CHtmlEditLines::OnListLines)
 	ON_BN_CLICKED(IDC_MODIFY, &CHtmlEditLines::OnClickedModify)
 	ON_EN_CHANGE(IDC_EDIT, &CHtmlEditLines::OnChangeEdit)
 	ON_COMMAND(ID_INFO, &CHtmlEditLines::OnInfo)
@@ -364,3 +364,10 @@ Ha szükséges, a fenti módon folytathatjuk a szerkesztését egy másik sorral.\
 	AfxMessageBox( info, MB_ICONINFORMATION );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CHtmlEditLines::OnLista()
+{
+
+
+
+
+}

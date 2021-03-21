@@ -56,4 +56,5 @@ public:
 	afx_msg void OnChangeEdit();
 	afx_msg void OnInfo();
 	afx_msg void OnClickList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnLista();
 };
