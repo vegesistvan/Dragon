@@ -1,8 +1,8 @@
 #pragma once
-
+#include "afxwin.h"
 #include "ProgressWnd.h"
 
-
+// CContractPeople dialog
 typedef struct
 {
 	UINT	cnt;			// számláló  
@@ -34,20 +34,26 @@ typedef struct
 	CString rowidS;				// spouse 
 	CString lineF;
 	CString nameBD;
+	CString wedding;
 }SAMENAMES;
 
-class CContractPeople : public CWnd
+class CContractPeople : public CDialogEx
 {
 	DECLARE_DYNAMIC(CContractPeople)
 
 public:
-	CContractPeople();
+	CContractPeople(CWnd* pParent = NULL);   // standard constructor
 	virtual ~CContractPeople();
-	bool contractPeople();
+
+	
+// Dialog Data
+	enum { IDD = IDD_CONTRACT_PEOPLE_DLG };
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+
+
 	int m_azonos;			// az egyesítéshez szükséges azonosságok száma
 	bool m_checkSpouse;
-
-protected:
 	CProgressWnd wndP; 
 
 	CString m_head;				// html fejléc
@@ -119,8 +125,14 @@ protected:
 	BOOL query( CString command );
 	BOOL query1( CString command );
 	BOOL query2( CString command );
-public:
+
+
+	bool contractPeople();
 	DECLARE_MESSAGE_MAP()
+public:
+	virtual BOOL OnInitDialog();
+
+	afx_msg void OnBnClickedOk();
+	afx_msg void OnBnClickedCancel();
+	CComboBox comboCtrl;
 };
-
-

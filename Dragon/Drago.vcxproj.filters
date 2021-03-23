@@ -668,10 +668,10 @@
     <ClCompile Include="ga_input_parameters.CPP">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CheckNames.cpp">
+    <ClCompile Include="checkNames.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CheckMotherIndex.cpp">
+    <ClCompile Include="checkMotherIndex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GA_ascendantsChain.cpp">

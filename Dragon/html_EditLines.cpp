@@ -175,15 +175,12 @@ void CHtmlEditLines::OnListLines()
 void CHtmlEditLines::OnClickedModify()
 {
 	GetDlgItem( IDC_EDIT )->GetWindowTextW( m_line );
-//	if( AfxMessageBox( L"Felülírod a ga.html fájl sorát ezzel a módosított sorral?", MB_YESNO ) == IDNO ) return;
 
 	theApp.saveHtmlLine( m_linenumber, m_line );
-
 
 	m_ListCtrl.SetItemText( m_nItem, 2, m_line );
 	GetDlgItem( IDC_MODIFY )->EnableWindow( FALSE );
 	GetDlgItem( IDC_EDIT )->SetWindowTextW( L"" );
-//	CDialogEx::OnOK();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CHtmlEditLines::OnChangeEdit()
@@ -195,7 +192,7 @@ void CHtmlEditLines::children()
 {
 	if( m_rowid.IsEmpty() ) return;
 
-//	SetWindowTextW( m_title );
+	SetWindowTextW( m_title );
 
 	int nItem;
 	CString line;
@@ -239,7 +236,7 @@ void CHtmlEditLines::fatherAndSiblings()
 {
 	if( m_rowid.IsEmpty() ) return;
 
-//	SetWindowTextW( m_title );
+	SetWindowTextW( m_title );
 
 	int nItem;
 	CString line;
@@ -346,7 +343,7 @@ void CHtmlEditLines::displayLines( )
 		if (wndP.Cancelled()) break;
 	}
 	wndP.DestroyWindow();
-//	SetWindowTextW( m_title );
+	SetWindowTextW( m_title );
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CHtmlEditLines::OnInfo()

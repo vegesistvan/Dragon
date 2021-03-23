@@ -94,6 +94,7 @@ protected:
 	CString m_knownAsTable;
 
 	int	m_spouseOrder;
+	int m_orderMother;
 
 	CString str;
 	CString m_command;
@@ -135,6 +136,7 @@ protected:
 	CString	getDescendant( CString cLine );
 	void	getMarriageSubstrings( CString cLine );
 	int		getMotherIndex( TCHAR generation, int n_mother_index );
+	int		getOrderMother( TCHAR generation, int orderMother );
 	BOOL	isName( CString str, NAME* name );
 	int		getOrderSpouse( std::vector<PEOPLE>* vp );
 	void	splitSpouseNameString( CString nameComment, NAME* name ); 

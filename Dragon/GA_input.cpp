@@ -8,7 +8,7 @@
 #include "ConnectCsaladTorzs.h"
 #include "InputErrors.h"
 #include "ProgressWnd.h"
-#include "UnknownFirstNames.h"
+#include "checkFirstNames.h"
 #include "CheckNames.h"
 #include "checkDateFormat.h"
 //
@@ -248,8 +248,8 @@ bool CGaInput::inputFile()
 			
 			splitLine( cLine );
 
-			fillOrderFather();  // apja hanyadik gyermeke ?
-			fillFatherMother();							// az apa-anya azonosítót beteszi a d struktúrába és 
+			fillOrderFather();		// apja hanyadik gyermeke ?
+			fillFatherMother();		// az apa-anya azonosítót beteszi a d struktúrába és 
 
 			insertEntries();
 			m_tableAncestry = FALSE;
@@ -262,6 +262,7 @@ bool CGaInput::inputFile()
 			gen.numOfSpouses		= v_marriages.size();				// házastársak száma
 			gen.parentIndex			= d.parentIndexCalc;				// anya-index  ( apja hanyadik feleségae az anyja )
 			gen.orderFather			= d.orderFather;					//új
+			gen.orderMother			= d.orderMother;
 			for( UINT i = 0; i < v_marriages.size(); ++i )
 			{
 				gen.spouse_id[i]	= v_marriages.at(i).rowid;			// beteszi az aktuális házastársak rowid-jeit
@@ -291,7 +292,7 @@ bool CGaInput::inputFile()
 	setDummyFather();
 	connectCsalad();
 
-	CUnknownFirstNames dlg;
+	CCheckFirstNames dlg;
 	dlg.DoModal();
 
 	CCheckNames dlgN;
@@ -419,21 +420,28 @@ void CGaInput::fillOrderFather( )
 		{
 			++v_orderFather.at(i).orderFather;
 			d.orderFather = v_orderFather.at(i).orderFather;
+
+			++v_orderFather.at(i).orderMother;
+			d.orderMother = v_orderFather.at(i).orderMother;
 		}
 		else												// új, magasabb gereráció
 		{
 			orderFather.gen				= d.generation;
 			orderFather.orderFather		= 1;
+			orderFather.orderMother		= 1;
 			v_orderFather.push_back( orderFather );
 			d.orderFather = 1;
+			d.orderMother = 1;
 		}
 	}
 	else
 	{
 		orderFather.gen				= d.generation;
 		orderFather.orderFather		= 1;
+		orderFather.orderMother		= 1;
 		v_orderFather.push_back( orderFather );
 		d.orderFather = 1;
+		d.orderMother = 1;
 	}
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -466,6 +474,8 @@ void CGaInput::fillFatherMother( )
 
 				if( d.parentIndexCalc  <= v_generations.at(i).numOfSpouses )
 					d.mother_id = v_generations.at(i).spouse_id[d.parentIndexCalc-1];
+				d.orderMother	= v_generations.at(i).orderMother;
+				++v_generations.at(i).orderMother;
 			}
 			else																// ha a nõk leszármazottait is nyilvántartjuk
 			{

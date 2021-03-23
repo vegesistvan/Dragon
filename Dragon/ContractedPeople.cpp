@@ -125,7 +125,7 @@ void CContractedPeople::OnInputDifferent()
 	menu.EnableMenuItem( ID_INPUT_UNITED, MF_BYCOMMAND | MF_ENABLED);
 	menu.EnableMenuItem( ID_INPUT_DIFFERENT, MF_BYCOMMAND | MF_GRAYED);
 
-	str.Format( L"Azonos nevû emberek bejegyzései, akik nem vonhatóak össze (adat-azonosságok megkövetelt száma: %d )", m_azonos );
+	str.Format( L"Azonos nevû emberek bejegyzései, akik nem vonhatóak össze (összevonáshoz elõírt adat-azonosságok száma: %d )", m_azonos );
 	SetWindowTextW( str );
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -137,7 +137,7 @@ void CContractedPeople::OnInputUnited()
 	menu.EnableMenuItem( ID_INPUT_UNITED, MF_BYCOMMAND | MF_GRAYED);
 	menu.EnableMenuItem( ID_INPUT_DIFFERENT, MF_BYCOMMAND | MF_ENABLED);
 
-	str.Format( L"Azonos nevû emberek bejegyzései, amik részben összevonásra kerültek (adat-azonosságok megkövetelt száma: %d)", m_azonos );
+	str.Format( L"Azonos nevû emberek bejegyzései, amik részben összevonásra kerültek (összevonáshoz elõírt adat-azonosságok száma: %d)", m_azonos );
 	SetWindowTextW( str );
 }
 
@@ -153,15 +153,14 @@ void CContractedPeople::inputFile( int type )
 		filespec = theApp.m_recordset->GetFieldString( 0 );
 		if( filespec.IsEmpty() || _waccess( filespec, 0 ) )
 		{
-			CContractPeople cc;
-			if( !cc.contractPeople() )
+			CContractPeople dlg;
+			if( dlg.DoModal() == IDCANCEL )
 			{
 				CDialogEx::OnCancel();
 				return;
 			}
 		}
 		else
-//			return;
 			break;
 	}
 
@@ -169,7 +168,6 @@ void CContractedPeople::inputFile( int type )
 	int fileLength = (int)file.GetLength();
 
 	file.ReadString( cLine );
-	m_checkSpouse	= _wtoi( getLastWord( cLine ) );
 	m_azonos		= _wtoi( getLastWord( cLine ) );
 
 	CStringArray A;
@@ -211,13 +209,8 @@ void CContractedPeople::inputFile( int type )
 
 //	m_azonos = theApp.getUserVersion() && 0XFF;
 
-	if( m_checkSpouse )
-		str = L"Az azonosság nevû házastársak azonosságát meg kell erõsíteni születési/halálozási dátum létezése és azonossága.";
-	else
-		str = L"Az azonos nevû házastársak azonosságát születési/halálozási dátumuk nékül is elfogadtuk.";
-
-	str.Format( L"Az összevonáshoz megkövetelt egyezések száma: %d", m_azonos );
-	GetDlgItem( IDC_CAPTION )->SetWindowTextW( str );
+//	str.Format( L"Az összevonáshoz megkövetelt egyezések száma: %d", m_azonos );
+//	GetDlgItem( IDC_CAPTION )->SetWindowTextW( str );
 
 	ShowWindow( SW_MAXIMIZE );
 }
@@ -611,10 +604,15 @@ void CContractedPeople::OnHtmlEditLines()
 	CString title;
 	int selectedCount	= m_ListCtrl.GetSelectedCount();
 	int nItem			= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	CString name;
+	CString nameS;
+	name = m_ListCtrl.GetItemText( nItem, L_NAME );
+	nameS = m_ListCtrl.GetItemText( nItem, L_SPOUSES );
 	if( selectedCount == 1 )
-		title.Format( L"%s a ga.html fájlban (%s. sor)", m_ListCtrl.GetItemText( nItem, L_NAME ), m_ListCtrl.GetItemText( nItem, L_LINENUMBER )  );
+		title.Format( L"%s-%s a ga.html fájlban (%s. sor)", name, nameS, m_ListCtrl.GetItemText( nItem, L_LINENUMBER )  );
 	else
-		title.Format( L"%d kijelölt sor a ga.html fájlban", selectedCount );
+		title.Format( L"%s-%s és mások a ga.html fájlban (%s. sor)", name, nameS, m_ListCtrl.GetItemText( nItem, L_LINENUMBER )  );
+
 
 	theApp.htmlEditLines( &m_ListCtrl, L_LINENUMBER, title );
 }

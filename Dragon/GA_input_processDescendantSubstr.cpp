@@ -72,8 +72,7 @@ void CGaInput::processDescendantSubstring( CString cLine )
 	// parentIndex-t kell kiírni gyerekhez a leszármazotti listánál ( 0-t nem kell )
 	// parentIndexCalc-t pedig minden gyereknél meg van adva, az  anya meghatározásához használjuk
 	d.parentIndexCalc	= getParent2Index( generation, d.parentIndex );		// a felülírt index
-
-
+//	d.orderMother		= m_orderMother;
 
 }
 
@@ -87,13 +86,14 @@ void CGaInput::processDescendantSubstring( CString cLine )
 // Ha nem talál azono sgenerációt, akkor mother_indexbe 1-et tesz.
 // A vParent2Index vektorban gyûjti a táblában lévõ generációk utolsó parentIndex-ét, ami a leszármazott keresztneve után van megadva. (/n)
 // Ha nincs megadva a leszármazott neve után index, akkor 1-et tesz bele
-int CGaInput::getParent2Index( TCHAR generation, int n_mother_index )
+int CGaInput::getParent2Index( TCHAR generation, int motherIndex )
 {
 	PARENT2INDEX mx;
 	
-	int parentIndex = n_mother_index;
+	int parentIndex = motherIndex;
+	m_orderMother = 1;
 
-	if( n_mother_index == 0 )   // ha a /n nincs megadva, akkor megnézi hogy volt-e már korábban ez a generáció?
+	if( motherIndex == 0 )   // ha a /n nincs megadva, akkor megnézi hogy volt-e már korábban ez a generáció?
 	{
 		int i;
 		for( i= vParent2Index.size() - 1; i >= 0; i--)		// visszafele keresi a legutóbbi azonos generációt
@@ -101,12 +101,53 @@ int CGaInput::getParent2Index( TCHAR generation, int n_mother_index )
 			if( vParent2Index.at(i).generation == generation )
 			{
 				parentIndex = vParent2Index.at(i).parentIndex;  // ha talált, akkor azt használja
+				if( parentIndex == motherIndex )
+				{
+					m_orderMother = vParent2Index.at(i).orderMother;  // ha talált, akkor azt használja
+					++vParent2Index.at(i).orderMother;
+				}
+				else
+					
+				break;
+			}
+		}
+
+		if( i == -1 )														// ha nem talált, akkor 1
+		{
+			parentIndex = 1;
+			m_orderMother = 1;
+		}
+		else
+			++vParent2Index.at(i).orderMother = 1;
+	}
+
+	mx.generation	= generation;									// az adott generáció utolsó indexe
+	mx.parentIndex = parentIndex;									// elteszi az aktuális beállítást
+	mx.orderMother	= 1;
+	vParent2Index.push_back( mx );
+	return parentIndex;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int CGaInput::getOrderMother( TCHAR generation, int parentIndex )
+{
+	PARENT2INDEX mx;
+	int orderMother = 1;
+
+	if( parentIndex == 0 )   // ha a /n nincs megadva, akkor megnézi hogy volt-e már korábban ez a generáció?
+	{
+		int i;
+		for( i= vParent2Index.size() - 1; i >= 0; i--)		// visszafele keresi a legutóbbi azonos generációt
+		{
+			if( vParent2Index.at(i).generation == generation )
+			{
+				parentIndex = vParent2Index.at(i).parentIndex;  // ha talált, akkor azt használja
+				orderMother = vParent2Index.at(i).orderMother;
 				break;
 			}
 		}
 		if( i == -1 )														// ha nem talált, akkor 1
 		{
-			parentIndex = 1;
+			orderMother = 1;
 		}
 	}
 
@@ -115,3 +156,4 @@ int CGaInput::getParent2Index( TCHAR generation, int n_mother_index )
 	vParent2Index.push_back( mx );
 	return parentIndex;
 }
+

@@ -103,6 +103,7 @@ typedef struct
 	int		parentIndex;
 	int		descendant_sex_id;
 	int		orderFather;
+	int		orderMother;
 	int		numOfSpouses;
 	CString known_as;
 } GENERATIONS;
@@ -336,6 +337,7 @@ typedef struct
 {
 	TCHAR gen;
 	int	orderFather;
+	int orderMother;
 }ORDERFATHER;
 
 

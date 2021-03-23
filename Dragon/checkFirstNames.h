@@ -2,15 +2,15 @@
 #include "listctrlex.h"
 
 
-class CUnknownFirstNames : public CDialogEx
+class CCheckFirstNames : public CDialogEx
 {
-	DECLARE_DYNAMIC(CUnknownFirstNames)
+	DECLARE_DYNAMIC(CCheckFirstNames)
 
 public:
-	CUnknownFirstNames(CWnd* pParent = NULL);   // standard constructor
-	virtual ~CUnknownFirstNames();
+	CCheckFirstNames(CWnd* pParent = NULL);   // standard constructor
+	virtual ~CCheckFirstNames();
 
-	enum { IDD = IDD_UNKNOWNFIRSTNAMES };
+	enum { IDD = IDD_CHECK_FIRSTNAMES };
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support

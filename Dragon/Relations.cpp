@@ -680,6 +680,10 @@ void CRelations::gyerekek( CString rowid, int sex_id )
 	CString birth;
 	CString death;
 	CString comment;
+	CString motherIndex;
+	CString motherIndexPrev(L"");
+	int		orderMother = 0;
+
 
 
 	CString condition;
@@ -704,11 +708,19 @@ void CRelations::gyerekek( CString rowid, int sex_id )
 
 		nItem = m_ListCtrlC.InsertItem( i, lineNumber );
 		str.Format( L"%d", i + 1 );
+		motherIndex	= m_recordset->GetFieldString( PEOPLE_MOTHER_INDEX2 );
+		if( motherIndex != motherIndexPrev )
+			orderMother = 1;
+		else
+			++orderMother;
+		motherIndexPrev = motherIndex;
+
 		m_ListCtrlC.SetItemText( nItem, LISTC_NUMBER, str );
 		m_ListCtrlC.SetItemText( nItem, LISTC_ROWID, rowidC );
 		m_ListCtrlC.SetItemText( nItem, LISTC_ORDERFATHER, m_recordset->GetFieldString( PEOPLE_ORDERFATHER ) );
-		m_ListCtrlC.SetItemText( nItem, LISTC_ORDERMOTHER, m_recordset->GetFieldString( PEOPLE_ORDERMOTHER ) );
-		m_ListCtrlC.SetItemText( nItem, LISTC_MOTHER_INDEX, m_recordset->GetFieldString( PEOPLE_MOTHER_INDEX ) );
+		str.Format( L"%d", orderMother );
+		m_ListCtrlC.SetItemText( nItem, LISTC_ORDERMOTHER, str );
+		m_ListCtrlC.SetItemText( nItem, LISTC_MOTHER_INDEX, motherIndex );
 		m_ListCtrlC.SetItemText( nItem, LISTC_NAME, name );
 		m_ListCtrlC.SetItemText( nItem, LISTC_BIRTH, birth );
 		m_ListCtrlC.SetItemText( nItem, LISTC_DEATH, death );

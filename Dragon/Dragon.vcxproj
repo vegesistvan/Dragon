@@ -185,25 +185,24 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="about.h" />
-    <ClInclude Include="CheckFamilyDates.h" />
-    <ClInclude Include="CheckGenerations.h" />
+    <ClInclude Include="checkFamilyDates.h" />
+    <ClInclude Include="checkGenerations.h" />
     <ClInclude Include="checkIntegrity.h" />
-    <ClInclude Include="ContractPeople.h" />
     <ClInclude Include="ContractCouples.h" />
     <ClInclude Include="ContractedCouples.h" />
     <ClInclude Include="ContractedPeople.h" />
-    <ClInclude Include="ContractPeopleDlg.h" />
+    <ClInclude Include="ContractPeople.h" />
     <ClInclude Include="EditComment.h" />
     <ClInclude Include="EditMarriage.h" />
     <ClInclude Include="EditPeople.h" />
-    <ClInclude Include="CheckFamilyDatesStart.h" />
+    <ClInclude Include="checkFamilyDatesStart.h" />
     <ClInclude Include="html_Edit2Lines.h" />
     <ClInclude Include="FatherMother.h" />
     <ClInclude Include="GedcomOut.h" />
     <ClInclude Include="GA_ascendantsChain.h" />
     <ClInclude Include="build_defs.h" />
-    <ClInclude Include="CheckMotherIndex.h" />
-    <ClInclude Include="CheckNames.h" />
+    <ClInclude Include="checkMotherIndex.h" />
+    <ClInclude Include="checkNames.h" />
     <ClInclude Include="checkParam0.h" />
     <ClInclude Include="checkParentChild.h" />
     <ClInclude Include="checkFatherDeath.h" />
@@ -296,7 +295,7 @@
     <ClInclude Include="Table_marriages.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="SameParams.h" />
-    <ClInclude Include="UnknownFirstNames.h" />
+    <ClInclude Include="checkFirstNames.h" />
     <ClInclude Include="utilities.h" />
     <ClInclude Include="version.h" />
     <ClInclude Include="version_num.h" />
@@ -304,18 +303,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="about.cpp" />
-    <ClCompile Include="CheckFamilyDates.cpp" />
-    <ClCompile Include="CheckGenerations.cpp" />
+    <ClCompile Include="checkFamilyDates.cpp" />
+    <ClCompile Include="checkGenerations.cpp" />
     <ClCompile Include="checkIntegrity.cpp" />
-    <ClCompile Include="ContractPeople.cpp" />
     <ClCompile Include="ContractCouples.cpp" />
     <ClCompile Include="ContractedCouples.cpp" />
     <ClCompile Include="ContractedPeople.cpp" />
-    <ClCompile Include="ContractPeopleDlg.cpp" />
+    <ClCompile Include="ContractPeople.cpp" />
     <ClCompile Include="EditComment.cpp" />
     <ClCompile Include="EditMarriage.cpp" />
     <ClCompile Include="EditPeople.cpp" />
-    <ClCompile Include="CheckFamilyDatesStart.cpp" />
+    <ClCompile Include="checkFamilyDatesStart.cpp" />
     <ClCompile Include="GA_input_processPeople.cpp" />
     <ClCompile Include="html_Edit2Lines.cpp" />
     <ClCompile Include="FatherMother.cpp" />
@@ -325,8 +323,8 @@
     <ClCompile Include="GedcomOut.cpp" />
     <ClCompile Include="app_export.cpp" />
     <ClCompile Include="GA_ascendantsChain.cpp" />
-    <ClCompile Include="CheckMotherIndex.cpp" />
-    <ClCompile Include="CheckNames.cpp" />
+    <ClCompile Include="checkMotherIndex.cpp" />
+    <ClCompile Include="checkNames.cpp" />
     <ClCompile Include="checkParam0.cpp" />
     <ClCompile Include="checkParentChild.cpp" />
     <ClCompile Include="checkFatherDeath.cpp" />
@@ -426,7 +424,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="SameParams.cpp" />
-    <ClCompile Include="UnknownFirstNames.cpp" />
+    <ClCompile Include="checkFirstNames.cpp" />
     <ClCompile Include="utilities.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -49,6 +49,7 @@ typedef struct
 {
 	TCHAR	generation;
 	int		parentIndex;
+	int		orderMother;
 }PARENT2INDEX;
 
 

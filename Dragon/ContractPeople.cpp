@@ -1,13 +1,17 @@
-// Contract.cpp : implementation file
+// ContractPeopleDlg.cpp : implementation file
 //
 
 #include "stdafx.h"
 #include "Dragon.h"
-#include "ContractPeople.h"
+#include "ContractedPeople.h"
+#include "afxdialogex.h"
 #include "utilities.h"
 #include "ProgressWnd.h"
-#include "ContractPeopleDlg.h"
+#include "ContractPeople.h"
 #include <algorithm>
+
+// CContractPeople dialog
+
 // lekérdezett mezõk a people táblából
 enum
 {
@@ -49,9 +53,7 @@ enum
 	S_LINEF,
 	COLUMNSCOUNT,
 };
-
-//CString  getNameBD( CString name, CString birth, CString death );
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool sortBySourceX(const SAMENAMES &v1, const SAMENAMES &v2) 
 {
 	return( v1.source < v2.source );
@@ -76,10 +78,11 @@ bool sortByGroupStatusX(const SAMENAMES &v1, const SAMENAMES &v2)
 	}
 	return true;
 }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-IMPLEMENT_DYNAMIC(CContractPeople, CWnd)
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CContractPeople::CContractPeople()
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+IMPLEMENT_DYNAMIC(CContractPeople, CDialogEx)
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CContractPeople::CContractPeople(CWnd* pParent /*=NULL*/)
+	: CDialogEx(CContractPeople::IDD, pParent)
 {
 	m_recordset		= new CSqliteDBRecordSet;
 	m_recordset1	= new CSqliteDBRecordSet;
@@ -101,42 +104,6 @@ death_date,\
 father_id,\
 mother_id\
 ";
-
-
-
-	m_description1 = L"\
-Az oszlopok jelentése:\n\n\
-gr       - group, az azonos nevû embercsoprton belül azonosnak éréklelt alcsoportok sorszáma.\n\
-mt       - match, az azonosnak talált adatpárok száma\n\
-gp       - groupP, korábban a gp csoporthoz tartozott, de elvette, mert több azonosság van ezzel a bejegyzéssel\n\
-st       - status, az azonosítás eredménye: -1 azonos, azaz egyesített, majd törölt, 0: változatlanul hagyott, 1: ez az egyesített bejegyzés.\n\
-";
-
-	m_description2 = L"\
-line     - a bejegyzés sorszáma a GA html fájlban.\n\
-u        - united, az ember u számú bejegyzés összevonása.\n\
-G        - generáció, az ember generációs jele a GA fájlban.\n\
-S        - az enber elõfordulása a GA.html fájlban ( 1-2-3-4 )\n\
-rowid    - a bejegyzés azonosítója\n\
-név      - az ember neve\n\
-születés - születési dátum\n\
-halál    - halálozás dátuma\n\
-apa      - neve, majd adatai\n\
-anya     - neve, majd adatai\n\
-házastársak\n\n\
-";
-
-	m_colors.Add( L"bisque" );
-	m_colors.Add( L"aquamarine" );		//127,255,212
-	m_colors.Add( L"yellow" );			//255,255,0
-	m_colors.Add( L"deepskyblue" );		//0,191,255
-	m_colors.Add( L"greenyellow" );		//173,255,47
-	m_colors.Add( L"thistle" );			//216,191,216
-	m_colors.Add( L"hotpink" );			//255,105,180
-	m_colors.Add( L"lightyellow" );		//255,255,224
-	m_colors.Add( L"aqua" );			//0,255,255
-	m_colors.Add( L"lightGray" );		//211,211,211
-
 	m_rgb[0] = RGB( 255, 255, 255 );
 	m_rgb[1] = RGB( 127, 255, 212 );
 	m_rgb[2] = RGB( 255, 255, 0 );
@@ -155,24 +122,68 @@ házastársak\n\n\
 	nItem		= 0;
 	m_loopMax   = 4;
 }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CContractPeople::~CContractPeople()
 {
 }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BEGIN_MESSAGE_MAP(CContractPeople, CWnd)
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractPeople::DoDataExchange(CDataExchange* pDX)
+{
+	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_COMBO, comboCtrl);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BEGIN_MESSAGE_MAP(CContractPeople, CDialogEx)
+	ON_BN_CLICKED(IDOK, &CContractPeople::OnBnClickedOk)
+	ON_BN_CLICKED(IDCANCEL, &CContractPeople::OnBnClickedCancel)
 END_MESSAGE_MAP()
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BOOL CContractPeople::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+	CString info;
+	info = L"Azoknak a bejegyzéseknek az összevonását lehet elvégezni, amelyekben azon túl, hogy a nevek azonosak, \
+egyik személyes adatukban sem különböznek, sõt az alább felsorolt adatok közül legalább az elõírt számú adat \
+mindkét bejegyzésben ismert és egyforma, ami valószínûsíti, hogy a bejegyzések azonos emberre vonatkoznak.\
+\r\n\r\n\
+Sajnos ezek a kritériumok sem garantálják 100%-osan, hogy valóban azonos személyhez tartoznak a bejegyzések.\
+\r\n\r\n\
+Ha mindkét bejegyzés rangja 1, akkor azokat nem vonjuk össze, hiszen ugyanaz az ember nem fordulhat elõ kétszer \
+leszármazottként.\
+\r\n\r\n\
+A megkövetelt adatazonosságok default száma 2, ez ajánlott. Csak kisérleti célból van meg annak lehetõsége, \
+hogy ezen változtassuk.\
+\r\n\r\n\
+Az adat-azonosság számának növelése szûkíti az összevont bejegyzések körét, de csökkenti a megalapozatlan összevonásokat.\
+";
+
+	GetDlgItem( IDC_INFO )->SetWindowTextW( info );
+
+	comboCtrl.AddString( L"1" );
+	comboCtrl.AddString( L"2" );
+	comboCtrl.AddString( L"3" );
+	comboCtrl.AddString( L"4" );
+	comboCtrl.SetCurSel( 1 );
+
+
+	return TRUE;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractPeople::OnBnClickedOk()
+{
+	m_azonos = comboCtrl.GetCurSel() + 1;
+	contractPeople();
+	CDialogEx::OnCancel();
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CContractPeople::OnBnClickedCancel()
+{
+	CDialogEx::OnCancel();
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CContractPeople::contractPeople()
 {
-	CContractPeopleDlg dlg;
-
-	if( dlg.DoModal() == IDCANCEL )
-	{
-		return false;
-	}
-	m_azonos			= dlg.m_azonos;
-
 	m_fileSpecTextU.Format( L"%s\\%s_UNITED%d.txt", theApp.m_databasePath, theApp.m_baseName, m_azonos );
 	if( !openFileSpec( &textU, m_fileSpecTextU, L"w+" ) ) return NULL;
 	
@@ -203,6 +214,7 @@ bool CContractPeople::contractPeople()
 
 		// az aktuáli sadatbázis fájlok másolása *P.db fájlba
 		splitFilespec( theApp.m_databaseSpec, &drive, &path,  &fname, &ext );
+		if( m_loop > 1 )fname = fname.Left( fname.GetLength() - 1);
 		str.Format( L"%s:%s\\%sP%d.%s", drive, path, fname, m_azonos, ext );
 		CopyFile( theApp.m_databaseSpec, str, false );
 		theApp.m_databaseSpec = str;
@@ -352,6 +364,7 @@ bool CContractPeople::putPeople( CString name, UINT i )
 	CString father_id;
 	CString birth;
 	CString death;
+	CString wedding;
 	CString lfname;
 
 	int z;
@@ -402,14 +415,15 @@ bool CContractPeople::putPeople( CString name, UINT i )
 	vpeople.deathM	= m_recordset1->GetFieldString( 3 );
 	
 	if( vpeople.sex_id == L"1" )
-		m_command.Format( L"SELECT spouse2_id FROM marriages WHERE spouse1_id = '%s'", rowid );
+		m_command.Format( L"SELECT spouse2_id, date FROM marriages WHERE spouse1_id = '%s'", rowid );
 	else
-		m_command.Format( L"SELECT spouse1_id FROM marriages WHERE spouse2_id = '%s'", rowid );
+		m_command.Format( L"SELECT spouse1_id, date FROM marriages WHERE spouse2_id = '%s'", rowid );
 	if( !query1( m_command ) ) return false;
 
 	for( UINT i = 0; i < m_recordset1->RecordsCount(); ++i )
 	{
-		spouse_id = m_recordset1->GetFieldString( 0 );
+		wedding		= m_recordset1->GetFieldString( 1 );
+		spouse_id	= m_recordset1->GetFieldString( 0 );
 		m_command.Format( L"SELECT last_name, first_name, birth_date, death_date FROM people WHERE rowid = '%s'", spouse_id );
 		if( !query2( m_command ) ) return false;
 		birth = m_recordset2->GetFieldString( 2 );
@@ -424,8 +438,9 @@ bool CContractPeople::putPeople( CString name, UINT i )
 		vspouses.name	= lfname;
 		vspouses.nameBD	= nameBD;
 
-		vspouses.birth = m_recordset2->GetFieldString(2);
-		vspouses.death = m_recordset2->GetFieldString(3);
+		vspouses.wedding	= wedding;
+		vspouses.birth		= m_recordset2->GetFieldString(2);
+		vspouses.death		= m_recordset2->GetFieldString(3);
 		vSpouses.push_back( vspouses );
 		m_recordset1->MoveNext();
 	}
@@ -663,6 +678,9 @@ int CContractPeople::sameSpouses( CString rowid1, CString rowid2 )
 	CString name1;
 	CString name2;
 
+	CString wedding1;
+	CString wedding2;
+
 	CString birth1;
 	CString birth2;
 
@@ -673,6 +691,7 @@ int CContractPeople::sameSpouses( CString rowid1, CString rowid2 )
 
 	int retB;
 	int retD;
+	int retW;
 	int cnt1 = 0;
 	int cnt2 = 0;
 
@@ -690,6 +709,11 @@ int CContractPeople::sameSpouses( CString rowid1, CString rowid2 )
 					name2 = vSpouses.at(j).name;
 					if( name1 == name2 )
 					{
+						wedding1 = vSpouses.at(i).wedding;
+						wedding2 = vSpouses.at(j).wedding;
+						if( ( retW = same( dummy, wedding1, wedding2 ) ) == -1 ) continue;  // ellentmondás
+						if( retW ) ++m_match;
+
 						birth1	= vSpouses.at(i).birth;
 						birth2	= vSpouses.at(j).birth;
 						if( ( retB = same( dummy, birth1, birth2 ) ) == -1 ) continue;  // ellentmondás
@@ -705,25 +729,6 @@ int CContractPeople::sameSpouses( CString rowid1, CString rowid2 )
 						}
 						else
 							return 1;
-
-						/*
-						birth1	= vSpouses.at(i).birth;
-						birth2	= vSpouses.at(j).birth;
-						if( ( retB = same( dummy, birth1, birth2 ) ) == -1 ) continue;  // ellentmondás
-
-						death1	= vSpouses.at(i).death;
-						death2	= vSpouses.at(j).death;
-						if( ( retD = same( dummy, death1, death2 ) ) == -1 ) continue;	// ellentmondás
-						if( !retB && !retD ) 
-						{
-							if( m_checkSpouse )
-								continue;  // nincs megadva sem születés, sem halál: keress másik házastársat. Pusztán a név azonosság nem elég!!
-							else
-								return 1;	// nem kell a dátumoknak létezni és azonosnak lenni, elfogadjuk
-						}
-						else
-							return 1; // születés/halál megerõsíti az azonosságot
-						*/
 					}
 				}
 			}
@@ -1250,5 +1255,6 @@ CString  getNameBD( CString name, CString birth, CString death )
 	return nameBD;
 }
 */
+
 
 

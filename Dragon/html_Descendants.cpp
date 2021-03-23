@@ -234,7 +234,7 @@ void CDescendant::fillTable( )
 			if( !str.Compare( L"0" ) ) str.Empty();
 			m_ListCtrl.SetItemText( nItem, PS_MOTHER_INDEX, str );
 
-				str.Format( L"%d", split.d.parentIndexCalc );
+			str.Format( L"%d", split.d.parentIndexCalc );
 			if( !str.Compare( L"0" ) ) str.Empty();
 			m_ListCtrl.SetItemText( nItem, PS_MINDEX_CALC, str );
 

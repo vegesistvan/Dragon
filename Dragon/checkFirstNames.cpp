@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 #include "Dragon.h"
-#include "UnknownFirstNames.h"
+#include "checkFirstNames.h"
 #include "afxdialogex.h"
 #include "ProgressWnd.h"
 #include "utilities.h"
@@ -11,7 +11,7 @@
 #include "html_EditLine.h"
 #include "ProgressWnd.h"
 #include "Relations.h"
-// CUnknownFirstNames dialog
+// CCheckFirstNames dialog
 
 enum
 {
@@ -21,10 +21,10 @@ enum
 	L_COLUMNSCOUNT,
 };
 
-IMPLEMENT_DYNAMIC(CUnknownFirstNames, CDialogEx)
+IMPLEMENT_DYNAMIC(CCheckFirstNames, CDialogEx)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CUnknownFirstNames::CUnknownFirstNames(CWnd* pParent /*=NULL*/)
-	: CDialogEx(CUnknownFirstNames::IDD, pParent)
+CCheckFirstNames::CCheckFirstNames(CWnd* pParent /*=NULL*/)
+	: CDialogEx(CCheckFirstNames::IDD, pParent)
 {
 
 	m_info = L"\
@@ -41,29 +41,29 @@ Ha név helyesen van írva, csak nincs a nyilvántartásban, akkor beírhatjuk azt fé
 ";
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CUnknownFirstNames::~CUnknownFirstNames()
+CCheckFirstNames::~CCheckFirstNames()
 {
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CUnknownFirstNames::DoDataExchange(CDataExchange* pDX)
+void CCheckFirstNames::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_LIST, m_ListCtrl);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BEGIN_MESSAGE_MAP(CUnknownFirstNames, CDialogEx)
+BEGIN_MESSAGE_MAP(CCheckFirstNames, CDialogEx)
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_HTML_EDIT, &CUnknownFirstNames::OnHtmlEdit)
-	ON_COMMAND(ID_HTML_NOTEPAD, &CUnknownFirstNames::OnHtmlNotepad)
-	ON_COMMAND(ID_DB_EDIT, &CUnknownFirstNames::OnDbEdit)
-	ON_COMMAND(ID_SAVE_AS_MAN, &CUnknownFirstNames::OnSaveAsMen )
-	ON_COMMAND(ID_SAVE_AS_WOMAN, &CUnknownFirstNames::OnSaveAsWomen )
-	ON_COMMAND(ID_SAVE_AS_BISEX, &CUnknownFirstNames::OnSaveAsBisex )
-	ON_COMMAND(ID_LISTA, &CUnknownFirstNames::OnLista)
-	ON_COMMAND(ID_INFO, &CUnknownFirstNames::OnInfo)
+	ON_COMMAND(ID_HTML_EDIT, &CCheckFirstNames::OnHtmlEdit)
+	ON_COMMAND(ID_HTML_NOTEPAD, &CCheckFirstNames::OnHtmlNotepad)
+	ON_COMMAND(ID_DB_EDIT, &CCheckFirstNames::OnDbEdit)
+	ON_COMMAND(ID_SAVE_AS_MAN, &CCheckFirstNames::OnSaveAsMen )
+	ON_COMMAND(ID_SAVE_AS_WOMAN, &CCheckFirstNames::OnSaveAsWomen )
+	ON_COMMAND(ID_SAVE_AS_BISEX, &CCheckFirstNames::OnSaveAsBisex )
+	ON_COMMAND(ID_LISTA, &CCheckFirstNames::OnLista)
+	ON_COMMAND(ID_INFO, &CCheckFirstNames::OnInfo)
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CUnknownFirstNames::OnInitDialog()
+BOOL CCheckFirstNames::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
@@ -76,10 +76,15 @@ BOOL CUnknownFirstNames::OnInitDialog()
 	
 
 	findFirstNames();
+	if( !m_ListCtrl.GetItemCount())
+	{
+		AfxMessageBox( L"Minden keresztnév szerepel a név-adatbázisban.", MB_ICONINFORMATION );
+		OnCancel();
+	}
 	return TRUE;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-LRESULT CUnknownFirstNames::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
+LRESULT CCheckFirstNames::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 {
 	CPoint* point=(CPoint*) lParam;
     CMenu	Menu;
@@ -94,7 +99,7 @@ LRESULT CUnknownFirstNames::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 	return TRUE;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CUnknownFirstNames::OnHtmlEdit()
+void CCheckFirstNames::OnHtmlEdit()
 {
 	CString title;
 	int selectedCount	= m_ListCtrl.GetSelectedCount();
@@ -108,7 +113,7 @@ void CUnknownFirstNames::OnHtmlEdit()
 
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CUnknownFirstNames::OnHtmlNotepad()
+void CCheckFirstNames::OnHtmlNotepad()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
 	CString lineNumber = m_ListCtrl.GetItemText( nItem, L_LINENUMBER );
@@ -116,7 +121,7 @@ void CUnknownFirstNames::OnHtmlNotepad()
 		theApp.editNotepad( lineNumber.Trim() );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CUnknownFirstNames::OnDbEdit()
+void CCheckFirstNames::OnDbEdit()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
 	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
@@ -125,28 +130,28 @@ void CUnknownFirstNames::OnDbEdit()
 	dlg.DoModal();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CUnknownFirstNames::OnSaveAsMen()
+void CCheckFirstNames::OnSaveAsMen()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
 	CString name = m_ListCtrl.GetItemText( nItem, L_NAME );
 	insertName( name, 1 );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CUnknownFirstNames::OnSaveAsWomen()
+void CCheckFirstNames::OnSaveAsWomen()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
 	CString name = m_ListCtrl.GetItemText( nItem, L_NAME );
 	insertName( name, 2 );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CUnknownFirstNames::OnSaveAsBisex()
+void CCheckFirstNames::OnSaveAsBisex()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
 	CString name = m_ListCtrl.GetItemText( nItem, L_NAME );
 	insertName( name, 0 );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CUnknownFirstNames::insertName( CString name, int sex_id )
+bool CCheckFirstNames::insertName( CString name, int sex_id )
 {
 	m_command.Format( L"SELECT rowid FROM firstnames WHERE first_name = '%s'", name );
 	if( !theApp.querySystem( m_command ) ) return false;
@@ -162,7 +167,7 @@ bool CUnknownFirstNames::insertName( CString name, int sex_id )
 	return true;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CUnknownFirstNames::findFirstNames()
+bool CCheckFirstNames::findFirstNames()
 {
 	m_command.Format( L"SELECT rowid, linenumber, first_name FROM people ORDER BY first_name" );
 	if( !theApp.query( m_command ) ) return false;
@@ -170,8 +175,9 @@ bool CUnknownFirstNames::findFirstNames()
 	CString rowid;
 	CString linenumber;
 	CString first_name;
-	int sex_id;
 	int nItem = 0;
+	int sex_id;
+
 	CProgressWnd wndP( NULL, L"Keresztnevek ellenõrzése... "); 
 	wndP.GoModal();
 	wndP.SetRange( 0, theApp.m_recordset->RecordsCount() -1 );
@@ -194,12 +200,10 @@ bool CUnknownFirstNames::findFirstNames()
 		if (wndP.Cancelled()) break;
 	}
 	wndP.DestroyWindow();
-	if( nItem == 0 )
-		OnCancel();
 	return true;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CUnknownFirstNames::OnLista()
+void CCheckFirstNames::OnLista()
 {
 	CString	logFile(L"unknownfirstnames"); 
 	CString	title(L"Ismeretlen keresznevek");;
@@ -207,7 +211,7 @@ void CUnknownFirstNames::OnLista()
 	theApp.exportAll( logFile, title, &m_ListCtrl );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CUnknownFirstNames::OnInfo()
+void CCheckFirstNames::OnInfo()
 {
 	theApp.m_pszAppName = _tcsdup( L"Ismeretlen keresztnevek" );
 	AfxMessageBox( m_info, MB_ICONINFORMATION );

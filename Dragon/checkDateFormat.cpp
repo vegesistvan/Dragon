@@ -78,6 +78,9 @@ hogy az adatbázisban vagy a GA.html fájlban módosítsuk a hibás dátumot.\
 	createColumns();
 	fillTable();
 
+	if( !m_ListCtrl.GetItemCount() )
+		OnCancel();
+
 	return TRUE;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -13,7 +13,7 @@
 #include "CheckGenerations.h"
 #include "ContractedPeople.h"
 #include "CheckFamilyDates.h"
-#include "UnknownFirstNames.h"
+#include "checkFirstNames.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -701,6 +701,6 @@ void CDragonApp::OnFamilyDates()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonApp::OnUnknownFirstnames()
 {
-	CUnknownFirstNames dlg;
+	CCheckFirstNames dlg;
 	dlg.DoModal();
 }
