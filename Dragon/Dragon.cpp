@@ -240,6 +240,7 @@ BOOL CDragonApp::openDatabase()
 	CProgressWnd pWin(NULL, str ); 
 	pWin.GoModal();
 
+	int userVersion;
 	COpenDatabase open;
 
 	open.m_databaseSpec		= m_databaseSpec;
@@ -265,6 +266,9 @@ BOOL CDragonApp::openDatabase()
 	if( _waccess( m_workingDirectory, 0 ) )
 		_wmkdir( m_workingDirectory );
 
+	userVersion		= getUserVersion(); 
+	m_loop			= userVersion >> 16;
+	m_azonos		= userVersion & 0X0000FFFF;
 
 	m_inputMode = getInputMode();
 	if( m_inputMode.IsEmpty() )

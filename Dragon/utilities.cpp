@@ -1029,16 +1029,30 @@ int diffD( CString date1, CString date2, int* pYear )
 	return( date1.Compare( date2 ) );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString  getNameBD( CString name, CString birth, CString death )
+CString  getNameBD( CString name, CString birth, CString death, CString wedding )
 {
 	CString nameBD = name;
 
-	if( !birth.IsEmpty() && death.IsEmpty() )
-		nameBD.Format( L"%s (*%s)", name, birth );
-	else if( birth.IsEmpty() && !death.IsEmpty() )
-		nameBD.Format( L"%s (+%s)", name, death );
-	else if( !birth.IsEmpty() && !death.IsEmpty() )
-		nameBD.Format( L"%s (*%s +%s)", name, birth, death );
+	if( wedding.IsEmpty() )
+	{
+		if( !birth.IsEmpty() && death.IsEmpty() )
+			nameBD.Format( L"%s (*%s)", name, birth );
+		else if( birth.IsEmpty() && !death.IsEmpty()  )
+			nameBD.Format( L"%s (+%s)", name, death );
+		else if( !birth.IsEmpty() && !death.IsEmpty() )
+			nameBD.Format( L"%s (*%s +%s)", name, birth, death );
+	}
+	else
+	{
+		if( !birth.IsEmpty() && death.IsEmpty() )
+			nameBD.Format( L"%s (*%s =%s)", name, birth, wedding );
+		else if( birth.IsEmpty() && !death.IsEmpty()  )
+			nameBD.Format( L"%s (+%s =%s)", name, death, wedding);
+		else if( !birth.IsEmpty() && !death.IsEmpty() )
+			nameBD.Format( L"%s (*%s +%s =%s)", name, birth, death, wedding );
+	}
+
+
 
 	return nameBD;
 }

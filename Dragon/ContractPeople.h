@@ -45,7 +45,9 @@ public:
 	CContractPeople(CWnd* pParent = NULL);   // standard constructor
 	virtual ~CContractPeople();
 
-	
+	CString m_fileSpecTextU;
+	CString m_fileSpecTextD;
+
 // Dialog Data
 	enum { IDD = IDD_CONTRACT_PEOPLE_DLG };
 protected:
@@ -76,11 +78,12 @@ protected:
 	FILE* textU;
 	FILE* textD;
 
-	CString m_fileSpecTextU;
-	CString m_fileSpecTextD;
+//	CString m_fileSpecTextU;
+	
 	CString sWHITE;
 
 	bool	m_contracted;		// jelzi, hogy vannak összevont bejegyzések a vPeople vektorban
+	bool	m_spouseName;
 	
 	std::vector<SAMENAMES> vPeople;
 	std::vector<SAMENAMES> vSpouses;
@@ -106,7 +109,8 @@ protected:
 	void processPeopleNew();
 	void processPeople();
 	void listPeople();
-	int	 sameSpouses( CString spouse1, CString spouse2 );
+	int	 sameSpouses( CString source, CString spouse1, CString spouse2 );
+	int	 howMany( CString spouse );
 	int  identical( UINT i1, UINT i2 );
 	void pushVContract( UINT i1, UINT i2 );
 	void contractFull();
@@ -114,7 +118,7 @@ protected:
 	void setRef( int i ) ;
 	void resetRef();
 	void emptyLine( FILE* fl, int loop );
-
+	void checkEmptyCouples( int group );
 	void openUnited( );
 
 	void openDifferent();

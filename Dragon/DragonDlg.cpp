@@ -343,6 +343,7 @@ void CDragonDlg::mainTitle( )
 	UINT userVersion = theApp.getUserVersion();
 
 	caption.Format( L"Dragon v. %s - %s || Családok nyilvántartása || adatbázis: %s (%d-%d) || %s ||", BUILT, PLATFORM, theApp.m_databaseSpec, userVersion && 0XFF, userVersion >> 16, theApp.m_inputMode );
+	caption.Format( L"Dragon v. %s - %s || Családok nyilvántartása || adatbázis: %s (%d-%d) || %s ||", BUILT, PLATFORM, theApp.m_databaseSpec, theApp.m_loop, theApp.m_azonos, theApp.m_inputMode );
 	SetWindowText( caption );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -497,7 +498,10 @@ void CDragonDlg::OnMenuGahtml()
 	SetMenu(NULL);
 	::DestroyMenu(GetMenu()->GetSafeHmenu());
 	CMenu menu;
-	menu.LoadMenuW(IDR_MAIN_GAHTML );
+//	if( theApp.b_contracted )
+//		menu.LoadMenuW(IDR_MAIN_GA_CONTRACTED );
+//	else
+		menu.LoadMenuW(IDR_MAIN_GAHTML );
 	SetMenu(&menu);
 
 	if( wcscmp( theApp.m_username, L"végesistvan" ) )

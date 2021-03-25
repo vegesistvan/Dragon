@@ -827,7 +827,7 @@ void CcheckSameNameAnd::listSameVector()
 		fatherName.Trim();
 		birthF = m_recordset2->GetFieldString( 4 );
 		deathF = m_recordset2->GetFieldString( 5 );
-		fatherNamePrint = getNameBD( fatherName, birthF, deathF );
+		fatherNamePrint = getNameBD( fatherName, birthF, deathF, L"" );
 
 		fatherSource	= m_recordset2->GetFieldString(3);
 		if( fatherSource.IsEmpty() ) fatherSource = " ";
@@ -840,7 +840,7 @@ void CcheckSameNameAnd::listSameVector()
 		motherName.Trim();
 		birthM = m_recordset2->GetFieldString( 4 );
 		deathM = m_recordset2->GetFieldString( 5 );
-		motherNamePrint = getNameBD( motherName, birthM, deathM );
+		motherNamePrint = getNameBD( motherName, birthM, deathM, L"" );
 
 		motherSource	= m_recordset2->GetFieldString(3);
 		if( motherSource.IsEmpty() ) motherSource = " ";
@@ -873,8 +873,13 @@ void CcheckSameNameAnd::listSameVector()
 			if( nSame == -1 || bSame == -1 || dSame == -1  )
 				col = col | 1 << L_MOTHER;
 		
+			if( spouses2 != spouses2Prev )
+				col = col | 1 << L_SPOUSES;
+
+			/*
 			if( i && !sameSpouses() )
 				col = col | 1 << L_SPOUSES;
+				*/
 		}
 
 		str.Format( L"%d", cnt );
@@ -958,6 +963,8 @@ BOOL CcheckSameNameAnd::sameSpouses()
 			}
 		}
 	}
+
+
 	return FALSE;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

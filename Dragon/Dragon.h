@@ -163,6 +163,8 @@ public:
 	CString		m_blobName;
 
 
+	int		m_loop;
+	int		m_azonos;
 
 	const static COLORREF	m_colorClick = LIGHTBLUE;
 	const static COLORREF	m_colorWarning = RED;

@@ -62,11 +62,12 @@ public:
 	afx_msg void OnInputDifferent();
 	afx_msg void OnInputUnited();
 	afx_msg void OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult);
+/*	
 	afx_msg void OnHtml1D();
 	afx_msg void OnHtml1U();
 	afx_msg void OnHtml2D();
 	afx_msg void OnHtml2U();
-
+*/
 	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
 	afx_msg	void OnHtmlEditLines();
 	afx_msg void OnHtmlNotepad();

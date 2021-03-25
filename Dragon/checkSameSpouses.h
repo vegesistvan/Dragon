@@ -44,7 +44,7 @@ protected:
 	CString	_contractions;
 	CString fileSpec;
 
-	FILE* fh1;
+//	FILE* fh1;
 	int nItem;
 	int	m_cnt;
 
@@ -85,7 +85,7 @@ protected:
 	void fillSameSpouses();
 
 	void htmlHeader( CString title );
-	void printHtml();
+	void listBlock();
 	
 	BOOL query( CString command );
 	BOOL query1( CString command );
@@ -117,7 +117,6 @@ public:
 	afx_msg void OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnHtml();
 	afx_msg void OnInfo();
-	afx_msg void OnSpousesDiff();
 	afx_msg void OnClickedKeress();
 	afx_msg void OnClickedNext();
 

@@ -332,8 +332,8 @@ int CDragonApp::getUserVersion()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonApp::setUserVersion( int user_version )
 {
-	int volt = getUserVersion();
-	user_version |= getUserVersion();
+//	int volt = getUserVersion();
+//	user_version |= getUserVersion();
 	m_command.Format(L"PRAGMA user_version=%d", user_version );
 	if( !theApp.execute( m_command ) ) return;
 }
@@ -777,6 +777,8 @@ CString CDragonApp::getSpouses( CString rowid, CString sex_id, std::vector<SPOUS
 	CString spouse2;
 	CString names( L"" );
 	CString names2(L"");
+	CString wedding;
+	
 	SPOUSES nameid;
 	CString firstName;
 	CString lastName;
@@ -795,6 +797,7 @@ CString CDragonApp::getSpouses( CString rowid, CString sex_id, std::vector<SPOUS
 	
 	for( UINT i = 0; i < theApp.m_recordset1->RecordsCount(); ++i, theApp.m_recordset1->MoveNext() )
 	{
+		wedding = theApp.m_recordset1->GetFieldString( MARRIAGES_DATE );
 
 		if( sex_id == L"1" )
 			spouse_id = theApp.m_recordset1->GetFieldString( MARRIAGES_SPOUSE2_ID );
@@ -821,8 +824,9 @@ CString CDragonApp::getSpouses( CString rowid, CString sex_id, std::vector<SPOUS
 		nameid.id	= spouse_id;
 		nameid.name	= spouse;
 		nameid.name2 = spouse2;	
-		nameid.birth_date = birthDate;
-		nameid.death_date = deathDate;
+		nameid.wedding = wedding;
+		nameid.birth = birthDate;
+		nameid.death = deathDate;
 		vektor->push_back( nameid );
 	}
 	std::sort( vektor->begin(), vektor->end(), sortByName );
@@ -831,7 +835,7 @@ CString CDragonApp::getSpouses( CString rowid, CString sex_id, std::vector<SPOUS
 	for( UINT i = 0; i < vektor->size(); ++i )
 	{
 		names += vektor->at(i).name;
-		names2 += getNameBD( vektor->at(i).name, vektor->at(i).birth_date, vektor->at(i).death_date );
+		names2 += getNameBD( vektor->at(i).name, vektor->at(i).birth, vektor->at(i).death, vektor->at(i).wedding );
 		names += L", ";
 		names2 += L",";
 	}

@@ -200,10 +200,13 @@ BOOL CInfoDb::OnInitDialog()
 	GetDlgItem( IDC_MODIFIED )->SetWindowTextW( mtime );
 	GetDlgItem( IDC_ACCESSED )->SetWindowTextW( atime );
 
-	int iterationCount = theApp.getUserVersion();
-	str.Format( L"%d", iterationCount );
-	GetDlgItem( IDC_ITERATIONS_COUNT )->SetWindowTextW( str );
-
+	int userVersion = theApp.getUserVersion();
+	int loopNumber = userVersion >> 16;
+	int azonos		= userVersion & 0X0000FFFF;
+	str.Format( L"%d", loopNumber );
+	GetDlgItem( IDC_ITERATIONS_NUMBER )->SetWindowTextW( str );
+	str.Format( L"%d", azonos );
+	GetDlgItem( IDC_CRITERIONS_NUMBER )->SetWindowTextW( str );
 
 	if( CFile::GetStatus( theApp.m_blobSpec, status) )
 	{

@@ -76,11 +76,12 @@ BEGIN_MESSAGE_MAP(CContractedPeople, CDialogEx)
 	ON_COMMAND(ID_INPUT_UNITED, &CContractedPeople::OnInputUnited)
 	ON_COMMAND(ID_INPUT_DIFFERENT, &CContractedPeople::OnInputDifferent)
 
+/*
 	ON_COMMAND(ID_HTML_1_D, &CContractedPeople::OnHtml1D)
 	ON_COMMAND(ID_HTML_1_U, &CContractedPeople::OnHtml1U)
 	ON_COMMAND(ID_HTML_2_D, &CContractedPeople::OnHtml2D)
 	ON_COMMAND(ID_HTML_2_U, &CContractedPeople::OnHtml2U)
-
+*/
 	// IDR_DROPDOWN_HTML funkciók	
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
 	ON_COMMAND(ID_HTML_EDIT, &CContractedPeople::OnHtmlEditLines)
@@ -146,22 +147,21 @@ void CContractedPeople::inputFile( int type )
 {
 	CString filespec;
 
-	while( true )
+	m_command.Format( L"SELECT filespec FROM filespec WHERE type=%d", type );
+	if( !theApp.query( m_command ) );
+	filespec = theApp.m_recordset->GetFieldString( 0 );
+	if( filespec.IsEmpty() || _waccess( filespec, 0 ) )
 	{
-		m_command.Format( L"SELECT filespec FROM filespec WHERE type=%d", type );
-		if( !theApp.query( m_command ) );
-		filespec = theApp.m_recordset->GetFieldString( 0 );
-		if( filespec.IsEmpty() || _waccess( filespec, 0 ) )
+		CContractPeople dlg;
+		if( dlg.DoModal() == IDCANCEL )
 		{
-			CContractPeople dlg;
-			if( dlg.DoModal() == IDCANCEL )
-			{
-				CDialogEx::OnCancel();
-				return;
-			}
+			CDialogEx::OnCancel();
+			return;
 		}
+		if( type == UNITED_FILE )
+			filespec = dlg.m_fileSpecTextU;
 		else
-			break;
+			filespec = dlg.m_fileSpecTextD;
 	}
 
 	CStdioFile file( filespec, CFile::modeRead);   // input csv fájl
@@ -343,10 +343,10 @@ void CContractedPeople::createColumns()
 	
 	m_ListCtrl.InsertColumn( L_CNT,				L"xyz",			LVCFMT_RIGHT,	 30,-1,COL_HIDDEN);
 	m_ListCtrl.InsertColumn( L_LOOP,			L"loop",		LVCFMT_RIGHT,	 30,-1,COL_NUM);
-	m_ListCtrl.InsertColumn( L_GROUP,			L"gr",			LVCFMT_RIGHT,	 30,-1,COL_HIDDEN);
+	m_ListCtrl.InsertColumn( L_GROUP,			L"gr",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_MATCH,			L"m#",			LVCFMT_RIGHT,	 30,-1,COL_HIDDEN);
-	m_ListCtrl.InsertColumn( L_GROUP2,			L"gr2",			LVCFMT_RIGHT,	 30,-1,COL_HIDDEN);
-	m_ListCtrl.InsertColumn( L_STATUS,			L"st",			LVCFMT_RIGHT,	 30,-1,COL_HIDDEN);
+	m_ListCtrl.InsertColumn( L_GROUP2,			L"gr2",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_STATUS,			L"st",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_RGBCOLOR,		L"color",		LVCFMT_RIGHT,	 30,-1,COL_HIDDEN);
 	m_ListCtrl.InsertColumn( L_LINENUMBER,		L"line#",		LVCFMT_RIGHT,	 50,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_UNITED,			L"U",			LVCFMT_LEFT,	 20,-1,COL_NUM );
@@ -389,13 +389,11 @@ void CContractedPeople::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
 		nItem	= pLVCD->nmcd.dwItemSpec;
 		nCol	= pLVCD->iSubItem;
 
-//		if( UNITED )
-//		{
-			if( vFiltered.size() )
-				pLVCD->clrTextBk = _wtoi( vFiltered.at( nItem*L_COLUMNSCOUNT + L_RGBCOLOR ) );
-			else
-				pLVCD->clrTextBk = _wtoi( vPeople.at( nItem*L_COLUMNSCOUNT + L_RGBCOLOR ) );
-//		}
+		if( vFiltered.size() )
+			pLVCD->clrTextBk = _wtoi( vFiltered.at( nItem*L_COLUMNSCOUNT + L_RGBCOLOR ) );
+		else
+			pLVCD->clrTextBk = _wtoi( vPeople.at( nItem*L_COLUMNSCOUNT + L_RGBCOLOR ) );
+
 		*pResult = CDRF_DODEFAULT;
 		break;
 	}
@@ -541,6 +539,7 @@ void CContractedPeople::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
 
 	*pResult = 0;
 }
+/*
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedPeople::OnHtml1D()
 {
@@ -576,6 +575,7 @@ void CContractedPeople::getFileSpec( int type )
 	}
 	theApp.showHtmlFile( filespec );
 }
+*/
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

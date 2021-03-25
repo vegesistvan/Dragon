@@ -116,8 +116,9 @@ typedef struct
 	CString name;
 	CString name2;
 	CString id;
-	CString birth_date;
-	CString death_date;
+	CString wedding;
+	CString birth;
+	CString death;
 }SPOUSES;
 
 typedef struct
@@ -156,6 +157,7 @@ typedef struct
 	CString spouse;
 	CString birthDate;
 	CString deathDate;
+	CString wedding;
 	CString father;
 	CString mother;
 	CString sourceF;
