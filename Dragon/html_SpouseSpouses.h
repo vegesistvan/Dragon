@@ -35,7 +35,7 @@ protected:
 	void CSpouseSpouses::fillTable( );
 
 	void CSpouseSpouses::menu();
-	virtual void PostNcDestroy();
+//	virtual void PostNcDestroy();
 
 	void OnHtmlEdit();
 	void OnHtmlNotepad();

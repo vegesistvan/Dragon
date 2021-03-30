@@ -47,6 +47,14 @@ void CDragonDlg::OnGaTables()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnDescendantFile()
 {
+	CDescendant dlg;
+	dlg.m_familyNumber	= 0;
+	dlg.m_tableNumber	= 0;
+	dlg.m_lineNumber	= 0;
+	dlg.m_tableName		= L"";
+	dlg.DoModal();
+
+/*
 	if( !m_pDescendantsF )
 	{
 		m_pDescendantsF = new CDescendant(this);
@@ -63,14 +71,33 @@ void CDragonDlg::OnDescendantFile()
 		m_pDescendantsF->ShowWindow(SW_RESTORE);
 		m_pDescendantsF->SetForegroundWindow();
 	}
+*/
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnDescendantTable()
 {
-	CSelectTableName dlg;
+	CSelectTableName dlgT;
 	int tableNumber;
 	CString tableName;
 
+	tableNumber = theApp.GetProfileInt(	L"Settings", L"tableNumber", 0 );
+	if( dlgT.DoModal() == IDCANCEL ) 
+	{
+		return;
+	}
+	tableNumber = dlgT.m_tableNumberSelected;
+	tableName	= dlgT.m_tableNameSelected;
+	theApp.WriteProfileInt( L"Settings", L"tableNumber", tableNumber  );
+
+	CDescendant dlg;
+	dlg.m_familyNumber	= 0;
+	dlg.m_tableNumber	= tableNumber;
+	dlg.m_lineNumber	= 0;
+	dlg.m_tableName		= tableName;
+	dlg.DoModal();
+
+
+/*
 	if( !m_pDescendantsT )
 	{
 		tableNumber = theApp.GetProfileInt(	L"Settings", L"tableNumber", 0 );
@@ -96,13 +123,31 @@ void CDragonDlg::OnDescendantTable()
 		m_pDescendantsT->SetForegroundWindow();
 		m_pDescendantsT->ShowWindow(SW_RESTORE);
 	}
+*/
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnDescendantLine()
 {
-	CGetString dlg;
+	CGetString dlgL;
 	int lineNumber;
+	
+	lineNumber = theApp.GetProfileInt(	L"Settings", L"lineNumber", 0 );
+	dlgL.m_string.Format( L"%d", lineNumber ); 
 
+	dlgL.m_caption.Format( L"Add meg a %s fájlban lévõ sor sorszámát!", theApp.m_htmlFileName );
+	if( dlgL.DoModal() == IDCANCEL ) return;
+	
+	lineNumber = _wtoi( dlgL.m_string );
+	theApp.WriteProfileInt( L"Settings", L"lineNumber", lineNumber  );
+
+	CDescendant dlg;
+	dlg.m_familyNumber	= 0;
+	dlg.m_tableNumber	= 0;
+	dlg.m_lineNumber		= lineNumber;
+	dlg.m_tableName		= L"";
+	dlg.DoModal();
+
+/*
 	if( !m_pDescendantsL )
 	{
 		lineNumber = theApp.GetProfileInt(	L"Settings", L"lineNumber", 0 );
@@ -131,10 +176,19 @@ void CDragonDlg::OnDescendantLine()
 		m_pDescendantsL->SetForegroundWindow();		// ha az ablak másik ablak alatt van
 		m_pDescendantsL->ShowWindow( SW_RESTORE);		// ha az ablakot "bezártok" vagy levittük a toolbarra
 	}
+*/
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnMarriagesFile()
 {
+	CMarriages dlg;
+	dlg.m_familyNumber	= 0;
+	dlg.m_tableNumber	= 0;
+	dlg.m_lineNumber	= 0;
+	dlg.m_tableName		= L"";
+	dlg.DoModal();
+
+/*
 	if( !m_pMarriagesF )
 	{
 		m_pMarriagesF = new CMarriages(this);
@@ -153,14 +207,32 @@ void CDragonDlg::OnMarriagesFile()
 		m_pMarriagesF->SetForegroundWindow();
 		m_pMarriagesF->ShowWindow(SW_RESTORE);
 	}
+*/
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnMarriagesTable()
 {
-	CSelectTableName dlg;
+	CSelectTableName dlgT;
 	int tableNumber;
 	CString tableName;
 
+
+	tableNumber = theApp.GetProfileInt(	L"Settings", L"tableNumber", 0 );
+	if( dlgT.DoModal() == IDCANCEL ) return;
+
+	tableNumber = dlgT.m_tableNumberSelected;
+	tableName	= dlgT.m_tableNameSelected;
+	theApp.WriteProfileInt( L"Settings", L"tableNumber", tableNumber  );
+
+
+	CMarriages dlg;
+	dlg.m_familyNumber	= 0;
+	dlg.m_tableNumber	= tableNumber;
+	dlg.m_lineNumber	= 0;
+	dlg.m_tableName		= tableName;
+	dlg.DoModal();
+
+/*
 	if( !m_pMarriagesT )
 	{
 		tableNumber = theApp.GetProfileInt(	L"Settings", L"tableNumber", 0 );
@@ -188,14 +260,33 @@ void CDragonDlg::OnMarriagesTable()
 		m_pMarriagesT->SetForegroundWindow();
 		m_pMarriagesT->ShowWindow(SW_RESTORE);
 	}
+*/
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnMarriagesLine()
 {
-	CGetString dlg;
+	CGetString dlgL;
 	int lineNumber;
 
+	lineNumber = theApp.GetProfileInt(	L"Settings", L"lineNumber", 0 );
+	dlgL.m_string.Format( L"%d", lineNumber ); 
+
+	dlgL.m_caption.Format( L"Add meg a %s fájlban lévõ sor sorszámát!", theApp.m_htmlFileName );
+	if( dlgL.DoModal() == IDCANCEL ) return;
+
+	lineNumber = _wtoi( dlgL.m_string );
+	theApp.WriteProfileInt( L"Settings", L"lineNumber", lineNumber  );
+
+
+	CMarriages dlg;
+	dlg.m_familyNumber	= 0;
+	dlg.m_tableNumber	= 0;
+	dlg.m_lineNumber	= lineNumber;
+	dlg.DoModal();
+
+
+/*	
 	if( !m_pMarriagesL )
 	{
 		lineNumber = theApp.GetProfileInt(	L"Settings", L"lineNumber", 0 );
@@ -224,10 +315,20 @@ void CDragonDlg::OnMarriagesLine()
 		m_pMarriagesL->SetForegroundWindow();		// ha az ablak másik ablak alatt van
 		m_pMarriagesL->ShowWindow( SW_RESTORE);		// ha az ablakot "bezártok" vagy levittük a toolbarra
 	}
+*/
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnSpousesFile()
 {
+	CHtmlSpouses dlg;
+	
+	dlg.m_familyNumber	= 0;
+	dlg.m_tableNumber	= 0;
+	dlg.m_lineNumber		= 0;
+	dlg.m_tableName	= L"";
+	dlg.DoModal();
+	
+/*
 	if( !m_pSpousesF )
 	{
 		m_pSpousesF = new CHtmlSpouses(this);
@@ -244,15 +345,34 @@ void CDragonDlg::OnSpousesFile()
 		m_pSpousesF->ShowWindow(SW_RESTORE);
 		m_pSpousesF->SetForegroundWindow();
 	}
+*/
 	
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnSpousesTable()
 {
-	CSelectTableName dlg;
+	CSelectTableName dlgT;
 	int tableNumber;
 	CString tableName;
 
+	tableNumber = theApp.GetProfileInt(	L"Settings", L"tableNumber", 0 );
+	if( dlgT.DoModal() == IDCANCEL ) return;
+	
+	tableNumber = dlgT.m_tableNumberSelected;
+	tableName	= dlgT.m_tableNameSelected;
+	theApp.WriteProfileInt( L"Settings", L"tableNumber", tableNumber  );
+
+
+	CHtmlSpouses dlg;
+	
+	dlg.m_familyNumber	= 0;
+	dlg.m_tableNumber	= tableNumber;
+	dlg.m_lineNumber	= 0;
+	dlg.m_tableName		= tableName;
+	dlg.DoModal();
+
+
+/*
 	if( !m_pSpousesT )
 	{
 		tableNumber = theApp.GetProfileInt(	L"Settings", L"tableNumber", 0 );
@@ -278,13 +398,33 @@ void CDragonDlg::OnSpousesTable()
 		m_pSpousesT->SetForegroundWindow();
 		m_pSpousesT->ShowWindow(SW_RESTORE);
 	}
+*/
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnSpousesLine()
 {
-	CGetString dlg;
+	CGetString dlgL;
 	int lineNumber;
 
+	lineNumber = theApp.GetProfileInt(	L"Settings", L"lineNumber", 0 );
+	dlgL.m_string.Format( L"%d", lineNumber ); 
+
+	dlgL.m_caption.Format( L"Add meg a %s fájlban lévõ sor sorszámát!", theApp.m_htmlFileName );
+	if( dlgL.DoModal() == IDCANCEL ) return;
+
+	lineNumber = _wtoi( dlgL.m_string );
+	theApp.WriteProfileInt( L"Settings", L"lineNumber", lineNumber  );
+
+
+	CHtmlSpouses dlg;
+	
+	dlg.m_familyNumber	= 0;
+	dlg.m_tableNumber	= 0;
+	dlg.m_lineNumber	= lineNumber;
+	dlg.m_tableName		= L"";
+	dlg.DoModal();
+
+/*
 	if( !m_pSpousesL )
 	{
 		lineNumber = theApp.GetProfileInt(	L"Settings", L"lineNumber", 0 );
@@ -313,11 +453,19 @@ void CDragonDlg::OnSpousesLine()
 		m_pSpousesL->SetForegroundWindow();		// ha az ablak másik ablak alatt van
 		m_pSpousesL->ShowWindow( SW_RESTORE);		// ha az ablakot "bezártok" vagy levittük a toolbarra
 	}
+*/
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnSsFile()
 {
+	CSpouseSpouses dlg;
+	dlg.m_familyNumber	= 0;
+	dlg.m_tableNumber	= 0;
+	dlg.m_lineNumber		= 0;
+	dlg.DoModal();
+
+/*
 	if( !m_pSsF )
 	{
 		m_pSsF = new CSpouseSpouses(this);
@@ -333,14 +481,30 @@ void CDragonDlg::OnSsFile()
 		m_pSsF->ShowWindow(SW_RESTORE);
 		m_pSsF->SetForegroundWindow();
 	}
+*/
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnSsTable()
 {
-	CSelectTableName dlg;
+	CSelectTableName dlgT;
 	int tableNumber;
 	CString tableName;
 
+	tableNumber = theApp.GetProfileInt(	L"Settings", L"tableNumber", 0 );
+	if( dlgT.DoModal() == IDCANCEL ) return;
+	tableNumber = dlgT.m_tableNumberSelected;
+	tableName	= dlgT.m_tableNameSelected;
+	theApp.WriteProfileInt( L"Settings", L"tableNumber", tableNumber  );
+
+
+	CSpouseSpouses dlg;
+	dlg.m_familyNumber	= 0;
+	dlg.m_tableNumber	= tableNumber;
+	dlg.m_lineNumber	= 0;
+	dlg.m_tableName		= tableName;
+	dlg.DoModal();
+
+/*
 	if( !m_pSsT )
 	{
 		tableNumber = theApp.GetProfileInt(	L"Settings", L"tableNumber", 0 );
@@ -366,12 +530,31 @@ void CDragonDlg::OnSsTable()
 		m_pSsT->SetForegroundWindow();
 		m_pSsT->ShowWindow(SW_RESTORE);
 	}
+*/
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnSsLine()
 {
-	CGetString dlg;
+	CGetString dlgL;
 	int lineNumber;
+
+
+	lineNumber = theApp.GetProfileInt(	L"Settings", L"lineNumber", 0 );
+	dlgL.m_string.Format( L"%d", lineNumber ); 
+	dlgL.m_caption.Format( L"Add meg a %s fájlban lévõ sor sorszámát!", theApp.m_htmlFileName );
+	if( dlgL.DoModal() == IDCANCEL ) return;
+
+	lineNumber = _wtoi( dlgL.m_string );
+	theApp.WriteProfileInt( L"Settings", L"lineNumber", lineNumber  );
+
+	CSpouseSpouses dlg;
+	dlg.m_familyNumber	= 0;
+	dlg.m_tableNumber	= 0;
+	dlg.m_lineNumber	= lineNumber;
+	dlg.DoModal();
+
+
+/*
 
 	if( !m_pSsL )
 	{
@@ -400,4 +583,5 @@ void CDragonDlg::OnSsLine()
 		m_pSsL->SetForegroundWindow();		// ha az ablak másik ablak alatt van
 		m_pSsL->ShowWindow( SW_RESTORE);		// ha az ablakot "bezártok" vagy levittük a toolbarra
 	}
+*/
 }

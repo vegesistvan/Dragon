@@ -109,7 +109,7 @@ protected:
 	std::vector<TCHAR*> vList;
 	std::vector<TCHAR*> vListFiltered;
 
-	UINT	m_rgb[10];
+	UINT	m_rgb[11];
 	UINT	m_colorWife;
 
 	HUSBAND h;

@@ -442,6 +442,7 @@ void CMarriages::OnNewtable()
 		OnMarriagesFile();
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 void CMarriages::PostNcDestroy()
 {
 	CDialog::PostNcDestroy();
@@ -453,10 +454,19 @@ void CMarriages::PostNcDestroy()
 	}
 	delete this;
 }
+*/
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CMarriages::OnMarriagesFile()
 {
+	CMarriages dlg;
+	dlg.m_familyNumber	= 0;
+	dlg.m_tableNumber	= 0;
+	dlg.m_lineNumber	= 0;
+	dlg.m_tableName		= L"";
+	dlg.DoModal();
+
+/*
 	CDragonDlg dlg;
 	if( !dlg.m_pMarriagesF )
 	{
@@ -476,6 +486,7 @@ void CMarriages::OnMarriagesFile()
 		dlg.m_pMarriagesF->SetForegroundWindow();
 		dlg.m_pMarriagesF->ShowWindow(SW_RESTORE);
 	}
+*/
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CMarriages::OnMarriagesTable()
@@ -483,7 +494,23 @@ void CMarriages::OnMarriagesTable()
 	CSelectTableName dlgT;
 	int tableNumber;
 	CString tableName;
+	tableNumber = theApp.GetProfileInt(	L"Settings", L"tableNumber", 0 );
 
+	if( dlgT.DoModal() == IDCANCEL ) return;
+	tableNumber = dlgT.m_tableNumberSelected;
+	tableName	= dlgT.m_tableNameSelected;
+	theApp.WriteProfileInt( L"Settings", L"tableNumber", tableNumber  );
+
+	CMarriages dlg;
+	dlg.m_familyNumber	= 0;
+	dlg.m_tableNumber	= 0;
+	dlg.m_lineNumber	= 0;
+	dlg.m_tableName		= L"";
+	dlg.DoModal();
+
+
+
+/*
 	CDragonDlg dlg;
 	if( !dlg.m_pMarriagesT )
 	{
@@ -512,6 +539,7 @@ void CMarriages::OnMarriagesTable()
 		dlg.m_pMarriagesT->SetForegroundWindow();
 		dlg.m_pMarriagesT->ShowWindow(SW_RESTORE);
 	}
+*/
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -519,7 +547,23 @@ void CMarriages::OnMarriagesLine()
 {
 	CGetString dlgL;
 	int lineNumber;
+	lineNumber = theApp.GetProfileInt(	L"Settings", L"lineNumber", 0 );
+	dlgL.m_string.Format( L"%d", lineNumber ); 
 
+	dlgL.m_caption.Format( L"Add meg a %s fájlban lévõ sor sorszámát!", theApp.m_htmlFileName );
+	if( dlgL.DoModal() == IDCANCEL ) return;
+
+	lineNumber = _wtoi( dlgL.m_string );
+	theApp.WriteProfileInt( L"Settings", L"lineNumber", lineNumber  );
+
+
+	CMarriages dlg;
+	dlg.m_familyNumber	= 0;
+	dlg.m_tableNumber	= 0;
+	dlg.m_lineNumber	= lineNumber;
+	dlg.DoModal();
+
+/*
 	CDragonDlg dlg;
 	if( !dlg.m_pMarriagesL )
 	{
@@ -549,6 +593,7 @@ void CMarriages::OnMarriagesLine()
 		dlg.m_pMarriagesL->SetForegroundWindow();		// ha az ablak másik ablak alatt van
 		dlg.m_pMarriagesL->ShowWindow( SW_RESTORE);		// ha az ablakot "bezártok" vagy levittük a toolbarra
 	}
+*/
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -41,7 +41,7 @@ protected:
 	void	fillTable( );
 	
 	BOOL PreTranslateMessage(MSG* pMsg);
-	virtual void PostNcDestroy();
+//	virtual void PostNcDestroy();
 
 	void CMarriages::OnMarriagesFile();
 	void CMarriages::OnMarriagesTable();

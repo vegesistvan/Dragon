@@ -31,7 +31,7 @@ protected:
 
 	void CDescendant::listHtmlLine();
 	void CDescendant::fillTable( );
-	virtual void PostNcDestroy();
+//	virtual void PostNcDestroy();
 	void OnHtmlEdit();
 	void OnHtmlNotepad();
 	CListCtrlEx m_ListCtrl;

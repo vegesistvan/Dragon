@@ -327,7 +327,10 @@ int CDragonApp::getUserVersion()
 {
 	m_command.Format( L"PRAGMA %s", L"user_version" );
 	if( !query( m_command ) ) return 0;
-	return( _wtoi( m_recordset->GetFieldString( 0 ) ) );
+	int userVersion = _wtoi( m_recordset->GetFieldString( 0 ) );
+	m_loop		= userVersion >> 16;
+	m_azonos	= userVersion & 0X0000FFFF;
+	return( userVersion );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonApp::setUserVersion( int user_version )
@@ -338,6 +341,7 @@ void CDragonApp::setUserVersion( int user_version )
 	if( !theApp.execute( m_command ) ) return;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 // a rowid emberre történõ hivatkozásokat kicseréli rowidBy-ra és magát a rowid-t törli
 // 
 void CDragonApp::replaceBy( CString rowid, CString rowidBy, CString sex_id, int source )
@@ -391,6 +395,7 @@ void CDragonApp::replaceBy( CString rowid, CString rowidBy, CString sex_id, int 
 	m_command.Format( L"UPDATE people SET united='%d', spouse='%d', spouseparent='%d', spousespouse='%d' WHERE rowid ='%s'",united, spouse, spouseparent, spousespouse, rowidBy );
 	if( !theApp.execute( m_command ) ) return;
 }
+*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonApp::saveInfo( CString rowid, CString rowidBy )
 {

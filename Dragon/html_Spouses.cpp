@@ -452,6 +452,7 @@ void CHtmlSpouses::menu()
 }
 */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 void CHtmlSpouses::PostNcDestroy()
 {
 	CDialog::PostNcDestroy();
@@ -463,3 +464,4 @@ void CHtmlSpouses::PostNcDestroy()
 	}
 	delete this;
 }
+*/

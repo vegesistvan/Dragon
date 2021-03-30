@@ -45,7 +45,7 @@
 #else 
 #define PLATFORM L"32 bites"
 #endif
-
+/*
 // fájl típusok a 'filespec' táblában
 enum
 {
@@ -57,6 +57,20 @@ enum
 	DIFFERENT_FILE,
 	DIFFERENT1_HTML_FILE,
 	DIFFERENT2_HTML_FILE,
+	COUPLESU_TEXT_FILE,
+	COUPLESD_TEXT_FILE,
+	COUPLESU1_HTML_FILE,
+	COUPLESU2_HTML_FILE,
+	COUPLESD1_HTML_FILE,
+	COUPLESD2_HTML_FILE,
+};
+*/
+enum
+{
+	GA_HTML = 0,
+	GEDCOM_FILE, 
+	UNITED_FILE,
+	DIFFERENT_FILE,
 	COUPLESU_TEXT_FILE,
 	COUPLESD_TEXT_FILE,
 	COUPLESU1_HTML_FILE,
@@ -235,7 +249,7 @@ public:
 	void	setUserVersion( int user_version );
 	bool	insertIntoFiles( CString fileSpec, int type );
 // Implementation
-	void	replaceBy( CString rowid, CString rowidBy, CString sex_id, int source );
+//	void	replaceBy( CString rowid, CString rowidBy, CString sex_id, int source );
 //	void CDragonApp::replaceBy( CString rowid, CString rowidBy, CString rowidS1, CString rowidS2, CString sex_id, int source );
 //	void CDragonApp::replaceBy( CString rowid, CString rowidBy, CString rowidM_I, CString sex_id, int source );
 	BOOL	question( CString caption, CString question );

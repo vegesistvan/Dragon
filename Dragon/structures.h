@@ -224,5 +224,6 @@ typedef struct
 	CString rowid;
 	CString rowidBy;
 	CString sex_id;
-	int		source;
+	int		sourceBy;
+	int		sourceDel;
 }CONTRACT;

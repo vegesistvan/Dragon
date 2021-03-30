@@ -2,8 +2,6 @@
 #include "Dragon.h"
 #include "DragonDlg.h"
 #include "afxdialogex.h"
-//#include "Relations.h"
-//#include "about.h"
 #include "SelectOne.h"
 #include "SelectedFiles.h"
 #include "GetString.h"
@@ -155,15 +153,3 @@ void CDragonDlg::OnInputGahtmlFromline()
 	mainTitle();
 	ChangeMenu();
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-void CDragonDlg::OnFromtable()
-{
-
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragonDlg::OnFromfamily()
-{
-
-}
-*/

@@ -85,7 +85,7 @@ protected:
 	void	enableMenu( BOOL flag );
 	void CTableMarriages::azonosMarriages( int list );
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
-	virtual void PostNcDestroy();
+//	virtual void PostNcDestroy();
 
 
 	std::vector<SPOUSE11>	vSpouse1;

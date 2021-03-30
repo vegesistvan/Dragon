@@ -93,6 +93,7 @@ void CDragonDlg::DoDataExchange(CDataExchange* pDX)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CDragonDlg, CDialogEx)
 
+ON_MESSAGE(WM_MAIN_TITLE, OnMainTitle )
 ON_MESSAGE(WM_SET_COLUMN_COLOR, OnSetColumnColor)
 ON_MESSAGE(WM_CLICKED_COLUMN, OnColumnSorted)
 
@@ -192,21 +193,21 @@ BOOL CDragonDlg::OnInitDialog()
 
 	// modless dialogs
 
-	m_pIndividuals	= NULL;
-	m_pMarriages	= NULL;
-	m_pFamilies		= NULL;
+//	m_pIndividuals	= NULL;
+//	m_pMarriages	= NULL;
+//	m_pFamilies		= NULL;
 
-	m_pMarriagesF	= NULL;
-	m_pMarriagesT	= NULL;
-	m_pMarriagesL	= NULL;
+//	m_pMarriagesF	= NULL;
+//	m_pMarriagesT	= NULL;
+//	m_pMarriagesL	= NULL;
 
-	m_pDescendantsF	= NULL;
-	m_pDescendantsT	= NULL;
-	m_pDescendantsL	= NULL;
+//	m_pDescendantsF	= NULL;
+//	m_pDescendantsT	= NULL;
+//	m_pDescendantsL	= NULL;
 
-	m_pSpousesF	= NULL;
-	m_pSpousesT	= NULL;
-	m_pSpousesL	= NULL;
+//	m_pSpousesF	= NULL;
+//	m_pSpousesT	= NULL;
+//	m_pSpousesL	= NULL;
 
 	mainTitle();
 
@@ -219,9 +220,10 @@ BOOL CDragonDlg::OnInitDialog()
 	int x = ( theApp._w - bmpWidth )/2;
 	int y = ( theApp._h - bmpHeight )/2;
 
-//	SetWindowPos( &wndBottom, x,y, bmpWidth + 16, bmpHeight + 60, SWP_NOREDRAW|SWP_NOACTIVATE | SWP_NOZORDER);
-	SetWindowPos( &wndBottom, x,y, bmpWidth + 16, bmpHeight + 60, SWP_NOREDRAW|SWP_NOACTIVATE );
 //	SetWindowPos( HWND_BOTTOM, x,y, bmpWidth + 16, bmpHeight + 60, SWP_NOREDRAW|SWP_NOACTIVATE | SWP_NOZORDER);
+//	SetWindowPos( &wndBottom, x,y, bmpWidth + 16, bmpHeight + 60, SWP_NOREDRAW|SWP_NOACTIVATE | SWP_NOZORDER);
+	SetWindowPos( &wndBottom, x,y, bmpWidth + 16, bmpHeight + 60, SWP_NOREDRAW|SWP_HIDEWINDOW );
+
 
 //	ShowWindow( SW_MAXIMIZE );
 	
@@ -337,12 +339,18 @@ void CDragonDlg::OnSelectedFiles()
 
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+LRESULT CDragonDlg::OnMainTitle(WPARAM wParam, LPARAM lParam)
+{
+	mainTitle();
+	return true;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::mainTitle( )
 {
 	CString caption;
 	UINT userVersion = theApp.getUserVersion();
 
-	caption.Format( L"Dragon v. %s - %s || Családok nyilvántartása || adatbázis: %s (%d-%d) || %s ||", BUILT, PLATFORM, theApp.m_databaseSpec, userVersion && 0XFF, userVersion >> 16, theApp.m_inputMode );
+//	caption.Format( L"Dragon v. %s - %s || Családok nyilvántartása || adatbázis: %s (%d-%d) || %s ||", BUILT, PLATFORM, theApp.m_databaseSpec, userVersion && 0XFF, userVersion >> 16, theApp.m_inputMode );
 	caption.Format( L"Dragon v. %s - %s || Családok nyilvántartása || adatbázis: %s (%d-%d) || %s ||", BUILT, PLATFORM, theApp.m_databaseSpec, theApp.m_loop, theApp.m_azonos, theApp.m_inputMode );
 	SetWindowText( caption );
 }
@@ -382,22 +390,28 @@ void CDragonDlg::OnDatabaseInformation()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnDisplayIndividuals()
 {
-	if( m_pIndividuals != NULL )
-	{
-		m_pIndividuals->ShowWindow(SW_RESTORE);		// néha kell!!
-		m_pIndividuals->SetForegroundWindow();
-	}
-	else
+	CTablePeople dlg;
+
+	dlg.DoModal();
+
+/*
+	if( m_pIndividuals == NULL )
 	{
 		m_pIndividuals = new CTablePeople(this);
-//		m_pIndividuals->Create(CTablePeople::IDD,GetDesktopWindow());
 		m_pIndividuals->Create( IDD_TABLE_PEOPLE,GetDesktopWindow());
-		m_pIndividuals->ShowWindow(SW_SHOW);
 	}
+//	m_pMarriages->SetForegroundWindow();
+	m_pIndividuals->ShowWindow(SW_MAXIMIZE);
+*/
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnDisplayMarriages()
 {
+	CTableMarriages dlg;
+
+	dlg.DoModal();
+
+/*
 	if( m_pMarriages )
 	{
 		m_pMarriages->ShowWindow(SW_RESTORE);
@@ -409,6 +423,7 @@ void CDragonDlg::OnDisplayMarriages()
 		m_pMarriages->Create(CTableMarriages::IDD,GetDesktopWindow());
 		m_pMarriages->ShowWindow(SW_SHOW);
 	}
+*/
 }
 /*
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -445,13 +460,14 @@ void CDragonDlg::OnDisplayFilestable()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnOpenDb()
 {
+/*
 	if( m_pIndividuals != NULL )
 		m_pIndividuals->OnClose();
 	if( m_pMarriages )
 		m_pMarriages->OnClose();
 //	if( m_pFamilies )
 //		m_pFamilies->OnClose();
-
+*/
 	if( !theApp.selectDatabase() ) return;
 	
 	while( !theApp.openDatabase() )
@@ -701,7 +717,7 @@ void CDragonDlg::OnGedcomInput()
 	CGedcomIn ged;
 	if( !ged.gedcomInput() ) return;
 
-	m_pIndividuals = NULL;
+//	m_pIndividuals = NULL;
 	OnDisplayIndividuals();
 	mainTitle();
 	ChangeMenu();
@@ -878,25 +894,25 @@ void CDragonDlg::OnClose()
 {
 	if( AfxMessageBox( L"Tényleg be akarod zárni a programot?", MB_YESNO ) == IDNO ) return;
 
-	if( m_pIndividuals != NULL )	m_pIndividuals->CloseWindow();
-	if( m_pMarriages != NULL )		m_pMarriages->CloseWindow();
-	if( m_pMarriagesF  != NULL )	m_pMarriagesF->CloseWindow();
-	if( m_pMarriagesT  != NULL )	m_pMarriagesT->CloseWindow();
-	if( m_pMarriagesL  != NULL )	m_pMarriagesL->CloseWindow();
+//	if( m_pIndividuals != NULL )	m_pIndividuals->CloseWindow();
+//	if( m_pMarriages != NULL )		m_pMarriages->CloseWindow();
+//	if( m_pMarriagesF  != NULL )	m_pMarriagesF->CloseWindow();
+//	if( m_pMarriagesT  != NULL )	m_pMarriagesT->CloseWindow();
+//	if( m_pMarriagesL  != NULL )	m_pMarriagesL->CloseWindow();
 
-	if( m_pFamilies  != NULL )		m_pFamilies->CloseWindow();
+//	if( m_pFamilies  != NULL )		m_pFamilies->CloseWindow();
 
-	if( m_pDescendantsF != NULL )	m_pDescendantsF->CloseWindow();
-	if( m_pDescendantsT != NULL )	m_pDescendantsT->CloseWindow();
-	if( m_pDescendantsL != NULL )	m_pDescendantsL->CloseWindow();
+//	if( m_pDescendantsF != NULL )	m_pDescendantsF->CloseWindow();
+//	if( m_pDescendantsT != NULL )	m_pDescendantsT->CloseWindow();
+//	if( m_pDescendantsL != NULL )	m_pDescendantsL->CloseWindow();
 
-	if( m_pSpousesF != NULL )		m_pSpousesF->CloseWindow();
-	if( m_pSpousesT != NULL )		m_pSpousesT->CloseWindow();
-	if( m_pSpousesL != NULL )		m_pSpousesL->CloseWindow();
+//	if( m_pSpousesF != NULL )		m_pSpousesF->CloseWindow();
+//	if( m_pSpousesT != NULL )		m_pSpousesT->CloseWindow();
+//	if( m_pSpousesL != NULL )		m_pSpousesL->CloseWindow();
 
-	if( m_pSsF != NULL )			m_pSsF->CloseWindow();
-	if( m_pSsT != NULL )			m_pSsT->CloseWindow();
-	if( m_pSsL != NULL )			m_pSsL->CloseWindow();
+//	if( m_pSsF != NULL )			m_pSsF->CloseWindow();
+//	if( m_pSsT != NULL )			m_pSsT->CloseWindow();
+//	if( m_pSsL != NULL )			m_pSsL->CloseWindow();
 
 	CDialogEx::OnClose();
 }

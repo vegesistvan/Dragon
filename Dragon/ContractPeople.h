@@ -94,8 +94,8 @@ protected:
 	SAMENAMES r;				// referencia adatok az összehasonlításnál
 	
 	CStringArray m_colors;
-	UINT	m_rgb[10];
-	
+	UINT	m_rgb[13];
+	CWnd* m_dlg;
 
 	CSqliteDBRecordSet*	 m_recordset;
 	CSqliteDBRecordSet*	 m_recordset1;

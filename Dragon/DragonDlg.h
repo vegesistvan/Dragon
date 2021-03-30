@@ -288,25 +288,25 @@ public:
 
 
 //modeless dialog boxes////////////////
-	CTablePeople* m_pIndividuals;
-	CTableMarriages* m_pMarriages;
-	CCheckFamilyDates* m_pFamilies;
+//	CTablePeople* m_pIndividuals;
+//	CTableMarriages* m_pMarriages;
+//	CCheckFamilyDates* m_pFamilies;
 
-	CDescendant* m_pDescendantsF;
-	CDescendant* m_pDescendantsT;
-	CDescendant* m_pDescendantsL;
+//	CDescendant* m_pDescendantsF;
+//	CDescendant* m_pDescendantsT;
+//	CDescendant* m_pDescendantsL;
 
-	CMarriages* m_pMarriagesF;
-	CMarriages* m_pMarriagesT;
-	CMarriages* m_pMarriagesL;
+//	CMarriages* m_pMarriagesF;
+//	CMarriages* m_pMarriagesT;
+//	CMarriages* m_pMarriagesL;
 
-	CHtmlSpouses* m_pSpousesF;
-	CHtmlSpouses* m_pSpousesT;
-	CHtmlSpouses* m_pSpousesL;
+//	CHtmlSpouses* m_pSpousesF;
+//	CHtmlSpouses* m_pSpousesT;
+//	CHtmlSpouses* m_pSpousesL;
 
-	CSpouseSpouses* m_pSsF;
-	CSpouseSpouses* m_pSsT;
-	CSpouseSpouses* m_pSsL;
+//	CSpouseSpouses* m_pSsF;
+//	CSpouseSpouses* m_pSsT;
+//	CSpouseSpouses* m_pSsL;
 	
 
 
@@ -420,6 +420,6 @@ public:
 	afx_msg void OnAppExit();
 	afx_msg void OnContractedCouples();
 	afx_msg void OnContractedPeople();
-
+	afx_msg LRESULT OnMainTitle(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnDisplayFamilies();
 };

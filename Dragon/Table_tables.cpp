@@ -70,7 +70,7 @@ BEGIN_MESSAGE_MAP(CTableTables, CDialogEx)
 	ON_COMMAND(ID_FILTER_FAMILY, &CTableTables::OnFilterFamily)
 	ON_BN_CLICKED(IDOK, &CTableTables::OnBnClickedOk)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CTableTables::OnDblclkList)
-	ON_COMMAND(ID_GALINE, &CTableTables::OnGaline)
+//	ON_COMMAND(ID_GALINE, &CTableTables::OnGaline)
 	ON_COMMAND(ID_GAHTML, &CTableTables::OnGahtml)
 
 	ON_COMMAND(ID_DESCENDANTS_TABLE, &CTableTables::OnDescendantsTable)
@@ -464,12 +464,14 @@ void CTableTables::OnBnClickedOk()
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 void CTableTables::OnGaline()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
 	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	T_LINENUMBER ) );
 	theApp.listHtmlLine( lineNumber );
 }
+*/
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTableTables::OnGahtml()
 {

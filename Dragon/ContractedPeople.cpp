@@ -345,7 +345,7 @@ void CContractedPeople::createColumns()
 	m_ListCtrl.InsertColumn( L_LOOP,			L"loop",		LVCFMT_RIGHT,	 30,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_GROUP,			L"gr",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_MATCH,			L"m#",			LVCFMT_RIGHT,	 30,-1,COL_HIDDEN);
-	m_ListCtrl.InsertColumn( L_GROUP2,			L"gr2",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
+	m_ListCtrl.InsertColumn( L_GROUP2,			L"gr2",			LVCFMT_RIGHT,	 30,-1,COL_HIDDEN);
 	m_ListCtrl.InsertColumn( L_STATUS,			L"st",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_RGBCOLOR,		L"color",		LVCFMT_RIGHT,	 30,-1,COL_HIDDEN);
 	m_ListCtrl.InsertColumn( L_LINENUMBER,		L"line#",		LVCFMT_RIGHT,	 50,-1,COL_NUM);
@@ -407,7 +407,7 @@ void CContractedPeople::OnInfo()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedPeople::OnFilterAll()
 {
-	if( m_contracted )
+	if( UNITED )
 		str = L"Azonos nevû emberek, akik között összevonások történtek";
 	else
 		str = L"Nem összevonható azonos nevû emberek";
@@ -452,7 +452,7 @@ void CContractedPeople::filter( int iter )
 			}
 		}
 	}
-	if( m_contracted )
+	if( UNITED )
 		str.Format( L"Azonos nevû emberek, akik között összevonások történtek az %d. ciklusban", iter );
 	else
 		str.Format( L"A nem összevonható azonos nevû emberek az %d. ciklusban", iter );
@@ -501,7 +501,7 @@ void CContractedPeople::OnFilterByname()
 		}
 	}
 
-	if( m_contracted )
+	if( UNITED )
 		str.Format( L"%s nevû emberek, akik között összevonások történtek", name );
 	else
 		str.Format( L"%s nevû emeberek, akik nem lettek összevonva", name );

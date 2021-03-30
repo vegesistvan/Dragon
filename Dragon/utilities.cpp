@@ -511,17 +511,16 @@ int isDate( CStringArray* A, int i, CString* datum )
 // a dátum eõtt álló 'kb' ill. a dátum után álló 'után','körül','kb' a dátum része!
 BOOL isDateOK( CString datum )
 {
+	if( datum.IsEmpty() ) return true;
 	CString date;
 	CString modifier;
 
 	date = getFirstWord( datum );
-	if( isNumeric( date ) )
+	if( checkDate( date ) )
 	{
 		modifier = getSecondWord( datum );
 		if( modifier.IsEmpty() || modifier == L"után" || modifier == L"körül" || modifier == L"kb" )
 			return TRUE ;
-		else
-			return FALSE;
 	}
 	return FALSE;
 }
@@ -535,11 +534,6 @@ BOOL isValidBrace( CString brace )
 	if( brace.Find( L"fia" )	!= -1 )	return TRUE;
 	return FALSE;
 }
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString date2date( CString date )
 {
@@ -1050,6 +1044,8 @@ CString  getNameBD( CString name, CString birth, CString death, CString wedding 
 			nameBD.Format( L"%s (+%s =%s)", name, death, wedding);
 		else if( !birth.IsEmpty() && !death.IsEmpty() )
 			nameBD.Format( L"%s (*%s +%s =%s)", name, birth, death, wedding );
+		else if( birth.IsEmpty() && death.IsEmpty() )
+			nameBD.Format( L"%s =%s", name, wedding );
 	}
 
 

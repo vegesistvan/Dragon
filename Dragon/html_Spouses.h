@@ -37,7 +37,7 @@ protected:
 	void CHtmlSpouses::listHtmlLine();
 	void CHtmlSpouses::fillTable( );
 	BOOL PreTranslateMessage(MSG* pMsg);
-	virtual void PostNcDestroy();
+//	virtual void PostNcDestroy();
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnInitDialog();

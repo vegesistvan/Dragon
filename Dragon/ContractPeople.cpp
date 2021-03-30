@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "Dragon.h"
+#include "DragonDlg.h"
 #include "ContractedPeople.h"
 #include "afxdialogex.h"
 #include "utilities.h"
@@ -104,20 +105,42 @@ death_date,\
 father_id,\
 mother_id\
 ";
+/*
 	m_rgb[0] = RGB( 255, 255, 255 );
-	m_rgb[1] = RGB( 156, 194, 232  ); //m_rgb[1] = RGB( 127, 255, 212 );
-	m_rgb[2] = RGB( 255, 255, 0 );
-	m_rgb[3] = RGB( 0, 191, 255 );
-	m_rgb[4] = RGB( 173, 255, 47 );
-	m_rgb[5] = RGB( 216,191,216 );
-	m_rgb[6] = RGB( 255, 105,180 );
-	m_rgb[7] = RGB( 185, 247, 158 ); 
-	m_rgb[8] = RGB( 246, 252,192 );
-	m_rgb[9] = RGB( 127, 255, 212 );
+	m_rgb[1] = RGB( 185, 247, 158 ); 
+	m_rgb[2] = RGB( 156, 194, 232 ); 
+	m_rgb[3] = RGB( 255, 255,   0 );
+	m_rgb[4] = RGB(   0, 191, 255 );
+	m_rgb[5] = RGB( 173, 255,  47 );
+	m_rgb[6] = RGB( 216, 191, 216 );
+	m_rgb[7] = RGB( 255, 105, 180 );
+	m_rgb[8] = RGB( 255, 255, 255 );
+	m_rgb[9] = RGB( 246, 252, 192 );
+	m_rgb[10]= RGB( 186, 197, 253 );
+*/
+
+	m_rgb[0] = WHITE;					// egyedülálló
+	m_rgb[1] = YELLOW; 
+	m_rgb[2] = LIGHTGREEN; 
+	m_rgb[3] = RGB( 129, 190, 250 );
+	m_rgb[4] = LIGHTRED;
+	m_rgb[5] = RGB( 173, 255,  47 );
+	m_rgb[6] = RGB( 216, 191, 216 );
+	m_rgb[7] = RGB( 255, 105, 180 );
+	m_rgb[8] = RGB(  0,  255, 255);
+	m_rgb[9] = RGB( 246, 252, 192 );
+	m_rgb[10]= RGB( 111, 188, 243 );
+	m_rgb[11]= RGB( 216, 191, 216 );
+	m_rgb[12]= RGB( 198, 198, 205 );	// szürke, törlendõ
+
+
+
 
 	sWHITE.Format( L"%u", RGB(255,255,255) );
 
-	m_name = L"";				// ha csak egy embert akarunk vizsgálni, itt megadhatjuk a nevét
+	m_name = L"";
+//	m_name = L"Abaffy István";				// ha csak egy embert akarunk vizsgálni, itt megadhatjuk a nevét
+
 	m_azonos	= 2;						// az azonos adatpárok elõírt száma
 	nItem		= 0;
 	m_loopMax   = 4;
@@ -223,6 +246,13 @@ bool CContractPeople::contractPeople()
 		CopyFile( theApp.m_blobSpec, str, false );
 		theApp.openDatabase();
 
+		userVersion = m_loop << 16;
+		userVersion |= m_azonos;
+		theApp.setUserVersion( userVersion );
+
+		GetParent()->SendMessage(WM_MAIN_TITLE, (WPARAM)NULL, (LPARAM)NULL);
+
+
 		theApp.setStartTime();
 //		openDifferent();			// html fájl
 //		openUnited();				// html fájl
@@ -232,9 +262,7 @@ bool CContractPeople::contractPeople()
 
 		if( !core() ) return false;
 
-		userVersion = m_loop << 16;
-		userVersion |= m_azonos;
-		theApp.setUserVersion( userVersion );
+		
 
 		if( vContract.size() > 200 )
 		{
@@ -435,7 +463,7 @@ bool CContractPeople::putPeople( CString name, UINT i )
 		nameBD = getNameBD( lfname, birth, death, wedding );
 
 		spouses += nameBD.Trim();
-		spouses += L",";
+		spouses += L", ";
 
 		vspouses.rowid	= rowid;		// a férj azonosítója!!!
 		vspouses.name	= lfname;
@@ -448,7 +476,7 @@ bool CContractPeople::putPeople( CString name, UINT i )
 		m_recordset1->MoveNext();
 	}
 	if( m_recordset1->RecordsCount() )
-		spouses = spouses.Left( spouses.GetLength() - 1); 
+		spouses = spouses.Left( spouses.GetLength() - 2); 
 	vpeople.spouses = spouses;
 	if( spouse_id == L"0" ) spouse_id.Empty();
 	vpeople.rowidS	= spouse_id;
@@ -498,8 +526,6 @@ void CContractPeople::processPeople()
 	CString rowid1;
 	CString rowid2;
 
-	if( vPeople.at(0).name == L"Abhortis Erzsébet" )
-		z = 1;
 	m_contracted = false;
 	resetRef();
 	std::sort( vPeople.begin(), vPeople.end(), sortBySourceX );
@@ -603,7 +629,7 @@ if( (i1 == 95921 && i2 == 141743 ) || (i1 == 141743 && i2 == 95921 ) )
 			}
 		}
 	}
-//	checkEmptyCouples( group );
+	checkEmptyCouples( group );
 	listPeople();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -611,10 +637,10 @@ if( (i1 == 95921 && i2 == 141743 ) || (i1 == 141743 && i2 == 95921 ) )
 // azonos nevû status == 1, source == 1 bejegyzés. Ha van, akkor ezeket összevonja.
 void CContractPeople::checkEmptyCouples( int group )
 {
-	return;
 	UINT i;
 	UINT j;
 	UINT k;
+	int cnt;
 	SAMENAMES a;
 	SAMENAMES b;
 	CString spouses;
@@ -622,31 +648,38 @@ void CContractPeople::checkEmptyCouples( int group )
 
 	for( i = 0; i < vPeople.size(); ++i )
 	{
+		if( vPeople.at(i).spouses.IsEmpty() ) continue;
+
 		a = vPeople.at(i);
-		if( a.source == L"1" && a.status != -1 )
+		if( a.source == L"1" && a.status != -1 )  // NEM TÖRLENDÕ, DE HÁT EGYIK SEM AZ??
 		{
 			for( j = 0; j < vPeople.size(); ++j )
 			{
+				if( vPeople.at(j).spouses.IsEmpty() ) continue;
 				b = vPeople.at(j);
-				if( ( b.source == L"3" || b.source == L"4" ) && b.status == 0 && \
+				// még sehova sme tartozó 3. és 4. rangú üres bejegyzések ( merthogy ezeket márt átnézte és nem volt találat )
+//				if( ( b.source == L"3" || b.source == L"4" ) && b.status == 0 && 
+				if( b.source != L"1" && b.status == 0 && \
 							b.birth.IsEmpty() && b.death.IsEmpty() && \
 							b.father.IsEmpty() && b.birthF.IsEmpty() && b.deathF.IsEmpty() && \
-							b.mother.IsEmpty() && b.birthM.IsEmpty() && b.deathM.IsEmpty() ) 
+							b.mother.IsEmpty() && b.birthM.IsEmpty() && b.deathM.IsEmpty() )
 				{
+					// az 1. rangú bejegyzés házastársai között megtalálható a 3./4. rangú bejegyzése házastársa
 					if( (a.spouses.Find( b.spouses )) != -1  )
 					{
-						if( ( howMany( b.spouses ) ) > 1 )
-							break;
-						a.status = 1;
-						if( a.group == 0 )
+						if( ( cnt = howMany( b.spouses ) ) > 1 )	// ha azono snéven több 1. rangó bejegyzés van, akkor nem egyesít
+							break;							// tovább, mert nem lehet tudni, hogy melyikhez tartozik
+						a.status = 1;						// megtartandó megerõsítése
+						if( a.group == 0 )					// ha még nem tartozott csoportba, akkor hozzárendeli a group-hoz
 						{
 							a.group = group;
-							vPeople.at(i).status = 1;
+							vPeople.at(i).status = 1;		// az 1. rangó bejegyzés is csoport lesz
 							vPeople.at(i).group = a.group;
+							++vPeople.at(i).match;
 							++group;
 						}
 
-						vPeople.at(j).status	= -1;
+						vPeople.at(j).status	= -1;		// a 3./4. rangú bejegyzés törlendõ
 						vPeople.at(j).group		= a.group;
 						vPeople.at(j).match		= 1;
 						pushVContract( i, j );
@@ -688,6 +721,9 @@ int CContractPeople::identical( UINT i1, UINT i2 )
 	CString rowid1 = a.rowid;
 	CString rowid2 = b.rowid;
 
+
+	if( rowid1 == L"89293" && rowid2 == L"250918" )
+		g = 1;
 	m_match = 0;
 	if( ( g = same( r.birth, a.birth, b.birth ) ) == -1 ) return false;
 	if( g == 1 ) ++m_match;
@@ -788,15 +824,11 @@ int CContractPeople::sameSpouses( CString source, CString rowid1, CString rowid2
 				{
 					++cnt2;
 					name1 = vSpouses.at(i).name;
+					if( name1 == L"Farkas Erzsébet" )
+						z = 1;
 					name2 = vSpouses.at(j).name;
 					if( name1 == name2 )
 					{
-						
-						wedding1 = vSpouses.at(i).wedding;
-						wedding2 = vSpouses.at(j).wedding;
-						if( ( retW = same( dummy, wedding1, wedding2 ) ) == -1 ) return -1;  //continue;  // ellentmondás
-						if( retW ) ++m_match;
-						
 						birth1	= vSpouses.at(i).birth;
 						birth2	= vSpouses.at(j).birth;
 						if( ( retB = same( dummy, birth1, birth2 ) ) == -1 ) return -1; //continue;  // ellentmondás
@@ -806,6 +838,12 @@ int CContractPeople::sameSpouses( CString source, CString rowid1, CString rowid2
 						death2	= vSpouses.at(j).death;
 						if( ( retD = same( dummy, death1, death2 ) ) == -1 ) return -1; //continue;	// ellentmondás
 						if( retD ) ++m_match;
+// ezt ki lehetne hagyni, és akkor az 1. rendû bejegyzés esküvõi dátuma maradna érvényes
+						wedding1 = vSpouses.at(i).wedding;
+						wedding2 = vSpouses.at(j).wedding;
+						if( ( retW = same( dummy, wedding1, wedding2 ) ) == -1 ) return -1;  //continue;  // ellentmondás
+						if( retW ) ++m_match;
+
 						return 1;
 					}
 				}
@@ -822,7 +860,8 @@ void CContractPeople::pushVContract( UINT iBy, UINT iDel )
 	CString rowid	= vPeople.at( iDel ).rowid;
 	CString rowidBy	= vPeople.at(iBy).rowid;
 	CString sex_id	= vPeople.at(iDel).sex_id;
-	int		source	= _wtoi( vPeople.at(iBy).source );
+	int		sourceBy	= _wtoi( vPeople.at(iBy).source );
+	int		sourceDel	= _wtoi( vPeople.at(iDel).source );
 	CONTRACT vcontract;
 
 
@@ -830,7 +869,8 @@ void CContractPeople::pushVContract( UINT iBy, UINT iDel )
 	vcontract.rowid		= rowid;
 	vcontract.rowidBy	= rowidBy;
 	vcontract.sex_id	= sex_id;
-	vcontract.source	= source;
+	vcontract.sourceBy	= sourceBy;
+	vcontract.sourceDel	= sourceDel;
 	vContract.push_back( vcontract );
 
 	m_contracted = true;		// csak a csoportra jelzi, hogy volt összevonás, az annak megfelleõ fájlba kell listázni
@@ -841,7 +881,8 @@ void CContractPeople::contractFull()
 	CString rowid;
 	CString rowidBy;
 	CString sex_id;
-	int		source;
+	int		sourceBy;
+	int		sourceDel;
 
 
 	int united;	
@@ -892,7 +933,7 @@ void CContractPeople::contractFull()
 		rowid	= vContract.at(i).rowid;
 		rowidBy = vContract.at(i).rowidBy;
 		sex_id	= vContract.at(i).sex_id;
-		source	= vContract.at(i).source;
+		sourceDel	= vContract.at(i).sourceDel;
 
 		m_command.Format( L"DELETE FROM people WHERE rowid ='%s'", rowid );
 		if( !theApp.execute( m_command ) ) return;
@@ -915,14 +956,15 @@ void CContractPeople::contractFull()
 // az egyesítések számát 1-el növeli
 	m_command.Format( L"SELECT united, spouse, spouseparent, spousespouse FROM people WHERE rowid='%s'", rowidBy );
 	if( !query1( m_command ) ) return;
-	united			= _wtoi( m_recordset1->GetFieldString( 0 ) ) + 1;
+	united			= _wtoi( m_recordset1->GetFieldString( 0 ) );
 	spouse			= _wtoi( m_recordset1->GetFieldString( 1 ) );
 	spouseparent	= _wtoi( m_recordset1->GetFieldString( 2 ) );
 	spousespouse	= _wtoi( m_recordset1->GetFieldString( 3 ) );
 
 	
+	++united;
 
-	switch( source )
+	switch( sourceDel )
 	{
 	case 2:
 		++spouse;
@@ -931,9 +973,6 @@ void CContractPeople::contractFull()
 		++spouseparent;
 		break;
 	case 4:
-		++spouseparent;
-		break;
-	case 5:
 		++spousespouse;
 		break;
 	}
@@ -1021,10 +1060,10 @@ void CContractPeople::listPeople()
 			colorIndex = 0;					// egyedi, nem csinálunk vele semmit - fehér
 			break;
 		case 1:
-			colorIndex = x.group % 10;		// megtartanadó -váltakozó színes
+			colorIndex = x.group % 12;		// megtartanadó -váltakozó színes
 			break;
 		case -1:
-			colorIndex = 9;					// törlendõ - szürke
+			colorIndex = 12;					// törlendõ - szürke
 			break;
 		}
 

@@ -212,7 +212,6 @@
     <ClInclude Include="checkDateFormat.h" />
     <ClInclude Include="checkSameNameAnd.h" />
     <ClInclude Include="Help.h" />
-    <ClInclude Include="InputErrors.h" />
     <ClInclude Include="checkSpouseAge.h" />
     <ClInclude Include="checkSpousesDiff.h" />
     <ClInclude Include="checkSpousesSex.h" />
@@ -230,7 +229,6 @@
     <ClInclude Include="Date.h" />
     <ClInclude Include="EditFirstName.h" />
     <ClInclude Include="EditTable.h" />
-    <ClInclude Include="FirstLetter.h" />
     <ClInclude Include="html_EditLine.h" />
     <ClInclude Include="html_EditLines.h" />
     <ClInclude Include="html_Brackets.h" />
@@ -336,7 +334,6 @@
     <ClCompile Include="gedcomTagTable.cpp" />
     <ClCompile Include="Help.cpp" />
     <ClCompile Include="Info_db.cpp" />
-    <ClCompile Include="InputErrors.cpp" />
     <ClCompile Include="checkSpouseAge.cpp" />
     <ClCompile Include="checkSpousesDiff.cpp" />
     <ClCompile Include="checkSpousesSex.cpp" />
@@ -354,7 +351,6 @@
     <ClCompile Include="Date.cpp" />
     <ClCompile Include="EditFirstName.cpp" />
     <ClCompile Include="EditTable.cpp" />
-    <ClCompile Include="FirstLetter.cpp" />
     <ClCompile Include="html.cpp" />
     <ClCompile Include="html_EditLine.cpp" />
     <ClCompile Include="html_EditLines.cpp" />

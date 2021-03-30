@@ -119,7 +119,7 @@ public:
 	afx_msg void OnGroupbyFirstname();
 	afx_msg void OnGroupbyLastname();
 	afx_msg void OnGroupbyTitolo();
-	virtual void PostNcDestroy();
+//	virtual void PostNcDestroy();
 	afx_msg void OnFilterDescendants();
 	afx_msg void OnFilterFathers();
 	afx_msg void OnFilterMothers();
@@ -136,7 +136,7 @@ public:
 	afx_msg void OnAscendants();
 	afx_msg void OnAscendantsChain();
 	afx_msg void OnInputManual();
-	afx_msg void OnNcDestroy();
+//	afx_msg void OnNcDestroy();
 	afx_msg LRESULT OnUpdateRecord( WPARAM wParam, LPARAM lParam);
 	afx_msg void OnIndividualDescendants();
 	afx_msg void OnGedcomOutput();
@@ -150,11 +150,11 @@ public:
 	afx_msg void OnHtmlNotepad();
 	afx_msg void OnHtmlNotepadParents();
 	afx_msg void OnHtmlFatherAndSiblings();
-	afx_msg void OnDbEdit();
 
 	afx_msg void OnEditDelete();
 	afx_msg void OnEditUpdate();
 	afx_msg void OnEditInsert();
 	afx_msg void On3Generations();
 	afx_msg void OnHtmlChildren();
+	afx_msg void OnInfo();
 };

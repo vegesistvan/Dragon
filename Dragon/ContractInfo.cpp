@@ -20,24 +20,29 @@ CContractInfo::CContractInfo(CWnd* pParent /*=NULL*/)
 	m_info = L"\
 Az alábbi adatokat vizsgáljuk az azonos nevû emberek azonosságának eldöntéséhez:\r\n\
 \r\n\
-1. születési dátuma\r\n\
-2. halálozási dátuma\r\n\
-3. apa neve\r\n\
-4. apa születési dátuma\r\n\
-5. apa halálozási dátuma\r\n\
-6. anya neve\r\n\
-7. anya születési dátuma\r\n\
-8. anya halálozási dátuma\r\n\
-9. házastárs neve\r\n\
+ 1. születési dátuma\r\n\
+ 2. halálozási dátuma\r\n\
+ 3. apa neve\r\n\
+ 4. apa születési dátuma\r\n\
+ 5. apa halálozási dátuma\r\n\
+ 6. anya neve\r\n\
+ 7. anya születési dátuma\r\n\
+ 8. anya halálozási dátuma\r\n\
+ 9. házastárs neve\r\n\
+10. házastárs születési dátuma\r\n\
+11. házastárs halálozási dátuma\r\n\
+12. esküvõ dátuma\r\n\
 \r\n\
 Ha két bejegyzés fenti adatokpárjai között akár egy ellentmondás van, akkor nyilvánvalóan nem azonos személy bejegyzéseirõl van szó.\r\n\
-Ha nincs ellentmondás, akkor 1 adatpár létezése és egyezése elegendõ az azonosság megállapításához, de az nem lehet az apa neve. Tehát \
-ha két bejegyzésnél csak az apa neve azonos, és semmi más, akkor ezeket a bejegyzéseket nem vonja össza. Az a tapasztalat, \
-hogy ez nem megbízható összevonásokhoz vezethet.\r\n\
+Ha nincs ellentmondás, akkor 2 adatpár létezését és egyezéseét követeljük meg az azonosság megállapításához.\r\n\
 Leszármazottakat akkor sem egyesítünk, ha mindenben megfelelel az összevonási kritériumoknak, mert leszármazottként \n\
 csak egyszer szerepelhet egy ember.\r\n\
 Több házastárs esetén az azonosításhoz elegendõ, ha egy azonos nevû házastárs szerepel mindkét bejegyzésben.\r\n\
 A kettõs keresztnevekbõl csak az elsõ használjuk az összehasonlításhoz.\r\n\
+\r\n\
+Ha van olyan 2., 3. vagy 4. rendû bejegyzés, amelyben csak a név van megadva, és az megegyezik egy 1. rendû bejegyzés \
+nevével valamint házastársaik neve is azonos, továbbá az ilyen 1. rendû bejegyzésbõl csak egy létezik, akkor azokat a \
+bejegyzéseket összevonjuk, annak ellenére, hogy nincs legalább 2 azonos adata. Hiszen nem is lehet, mert a néven kívül nincs más adat megadva.\r\n\
 \r\n\
 Az adathibák nyilván egyesítési hibákhoz vezetnek, valójában különbözõ emberekhez tartozó bejegyzésket tévesen \
 egyesítünk, vagy azonos emberek bejegyzéseinek összevonása elmarad. Ezért az egyesítés elõtt minden hibát \
@@ -59,7 +64,8 @@ apa neve (*születés +halálozás)\r\n\
 rowid\taz anya bejegyzésének azonosítója\r\n\
 anya neve (*születés +halálozás)\r\n\
 \r\n\
-házastársak felsorolása születési és halálozási dátumukkal\r\n\
+rowid\t az elsõ házastárs azonosítója\r\n\
+házastársak felsorolása születési és halálozási dátumukkal valamint az esküvõ dátumával\r\n\
 \r\n\
 Az azonosítás eredményét a sorok háttér színezése is kiemeli:\r\n\
 \r\n\

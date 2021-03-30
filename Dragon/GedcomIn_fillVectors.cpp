@@ -574,8 +574,6 @@ bool extract( CString cLine, GEDLINE* lxtv )
 	n = wordList( &A, cLine, ' ', FALSE );
 	if( n == 1 ) return false;
 
-//	if( !isNumeric( A[0] ) ) return false;
-	
 	int level = _wtoi( A[0] );
 	if( level < 0 || level > 99 ) return false;
 	lxtv->level	=  level;

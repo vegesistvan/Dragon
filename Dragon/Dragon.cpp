@@ -33,6 +33,7 @@ ON_COMMAND(ID_CHECK_INEGRITY, &CDragonApp::OnCheckIntegrity)
 ON_COMMAND(ID_CHECK_GENERATIONS, &CDragonApp::OnCheckGenerations)
 ON_COMMAND(ID_FAMILYDATES, &CDragonApp::OnFamilyDates)
 ON_COMMAND(ID_UNKNOWN_FIRSTNAMES, &CDragonApp::OnUnknownFirstnames)
+
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CDragonApp::CDragonApp()
@@ -320,7 +321,7 @@ CString CDragonApp::getInputMode()
 	CString filename;
 	CString ext;
 	CString linenumber(L"");
-
+	/*
 	if( !query( L"SELECT count() FROM people" ) ) return FALSE;
 	m_cntPeople = _wtoi( m_recordset->GetFieldString( 0 ) );
 	if( !m_cntPeople ) 
@@ -336,9 +337,9 @@ CString CDragonApp::getInputMode()
 		else
 			m_inputMode = MANUAL;
 	}
+	*/
 
-
-	/*
+	
 
 
 	if( !query( L"SELECT count() FROM people" ) ) return FALSE;
@@ -370,7 +371,7 @@ CString CDragonApp::getInputMode()
 			}
 		}
 	}
-	*/
+	
 	return m_inputMode;
 
 }

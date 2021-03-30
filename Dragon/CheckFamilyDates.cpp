@@ -242,7 +242,7 @@ BEGIN_MESSAGE_MAP(CCheckFamilyDates, CDialogEx)
 	ON_COMMAND(ID_HTML_NOTEPAD_PARENTS, &CCheckFamilyDates::OnHtmlNotepadParents)
 	ON_COMMAND(ID_HTML_FATHERANDSIBLINGS, &CCheckFamilyDates::OnHtmlFatherAndSiblings)
 	ON_COMMAND(ID_DB_EDIT, &CCheckFamilyDates::OnDbEdit)
-	ON_COMMAND(ID_EDIT_3GENERATIONS, &CCheckFamilyDates::On3Generations )
+	ON_COMMAND(ID_3GENERATIONS, &CCheckFamilyDates::On3Generations )
 	ON_COMMAND(ID_EDIT_DATABASE, &CCheckFamilyDates::OnEditDatabase )
 	ON_COMMAND(ID_HTML_CHILDREN, &CCheckFamilyDates::OnHtmlChildren)
 
@@ -1358,9 +1358,9 @@ void CCheckFamilyDates::On3Generations()
 	CRelations dlg;
 	dlg.m_rowid = rowid;
 
-	ShowWindow( SW_HIDE );
+//	ShowWindow( SW_HIDE );
 	dlg.DoModal();
-	ShowWindow( SW_RESTORE );
+//	ShowWindow( SW_RESTORE );
 
 }	
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1389,9 +1389,9 @@ void CCheckFamilyDates::OnEditDatabase()
 	dlg.m_rowid	= m_ListCtrl.GetItemText( nItem, L_ROWID );
 	dlg.m_caption.Format( L"%s szerkesztése", name );
 
-	ShowWindow( SW_HIDE );
+//	ShowWindow( SW_HIDE );
 	dlg.DoModal();	
-	ShowWindow( SW_RESTORE );
+//	ShowWindow( SW_RESTORE );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

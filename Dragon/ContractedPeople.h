@@ -16,7 +16,6 @@ public:
 	enum { IDD = IDD_CONTRACTED_PEOPLE };
 
 	CString m_filter;
-	BOOL    m_contracted;
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	void createColumns();
