@@ -29,6 +29,7 @@ public:
 	CString _mother;
 	CString _spouses;
 
+	bool m_wedding;
 
 protected:
 
@@ -41,10 +42,9 @@ protected:
 	CString str;
 	CString m_command;
 	CString m_explanation;
-	CString	_contractions;
-	CString fileSpec;
+//	CString fileSpec;
+	CString m_caption;
 
-//	FILE* fh1;
 	int nItem;
 	int	m_cnt;
 

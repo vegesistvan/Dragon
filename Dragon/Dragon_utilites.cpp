@@ -428,7 +428,7 @@ CString CDragonApp::contractions()
 	return( contr.Left( contr.GetLength() - 1 ) );
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// A _,-,? és ) karaktereket leszedi, a maradékot szétszedi. Csak az elsõ szó létezését vizsgálja 
+// A _,-,? és ) karaktereket leszedi, a maradékot szétszedi.
 // return:
 // -1 nem keresztnév
 // 0 biszex
@@ -444,52 +444,33 @@ int CDragonApp::isFirstName( CString name )
 	name.Trim();
 	if( name.IsEmpty() ) return -1;
 
+	std::vector<int> vSexId;
+
 	CStringArray A;
+	int sex_id;
 	int i;
 	int n = wordList( &A, name, ' ', FALSE );
-// többszörös keresztnevek minden tagját megvizsgálja, az utolso sex_id-ját adja vissza
+// többszörös keresztnevek minden tagját megvizsgálja
 	for( i = 0; i < n; ++i )
 	{
 		m_command.Format( L"SELECT rowid, sex_id FROM firstnames WHERE first_name='%s'", A[i] );
-		if( !theApp.querySystem( m_command ) )	return -1;
-		if( !theApp.m_recordsetSystem->RecordsCount() ) break;
+		if( !querySystem( m_command ) )	return -1;
+		if( !m_recordsetSystem->RecordsCount() ) return -1;				// nincs ilyen keresztnév
+
+		sex_id =_wtoi( m_recordsetSystem->GetFieldString( 1 ) );
+		vSexId.push_back( sex_id ); 
 	}
-	if( i == n )
-		return _wtoi( theApp.m_recordsetSystem->GetFieldString( 1 ) );		// megvan az adatbázisban, visszadja a sex-et
-	return -1;		// nincs sex
-
-/////////////////////////////////
-/*
-	name.Replace( ')', ' ' );
-	name.Replace( '?', ' ' );
-	name.Trim();
-	if( name.IsEmpty() ) return -1;
-
-	int z;
-	int pos;
-	int i;
-	int n;
-	CStringArray A;
-
-	if( (pos = name.Find( '_' ) ) != -1 )
-		n = wordList( &A, name, '_', FALSE );
-	else if( (pos = name.Find( '-' ) ) != -1 )
-		n = wordList( &A, name, '-', FALSE );
-	else
-		n = wordList( &A, name, ' ', FALSE );
-
-
-
-	if( n > 1 && A[1] == L"Nep" )
-		z = 1;
-
-	m_command.Format( L"SELECT rowid, sex_id FROM firstnames WHERE first_name='%s'", A[0] );
-	if( !theApp.querySystem( m_command ) )	return -1;
-	if( theApp.m_recordsetSystem->RecordsCount() )
-		return _wtoi( theApp.m_recordsetSystem->GetFieldString( 1 ) );
-	else
-		return -1;
-*/
+	if( vSexId.size() == 1 ) return vSexId.at(0);			// csak egy keresztnév van
+	for( i = 0; i < vSexId.size()-1; ++ i )
+	{
+		if( vSexId.at(i) != vSexId.at( i + 1 ) )			// a két sex_id nem azonos
+		{
+			if( vSexId.at(i) == 0 ) return vSexId.at(i+1);	// ha az elsõ 0 és a második nemnulla, akkor a második jó
+			if( vSexId.at(i+1) == 0 ) return vSexId.at(i);	// ha a második 0 és az elsõ nemnulla, akkor az elsõ jó
+			return 0;										// egyébként bisex
+		}
+	}
+	return vSexId.at(0);									// minden sexid azonos
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int CDragonApp::getNumberOfDb( std::vector<CString>* vE )

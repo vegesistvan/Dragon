@@ -422,4 +422,5 @@ public:
 	afx_msg void OnContractedPeople();
 	afx_msg LRESULT OnMainTitle(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnDisplayFamilies();
+	afx_msg void OnCheckWeddingDate();
 };

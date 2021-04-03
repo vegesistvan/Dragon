@@ -63,8 +63,8 @@ void CGaInput::processDescendantSubstring( CString cLine )
 	// Ez akkor jó pl. ha Farkas Jánost kellene szétbontani, ahol Farkas kerszetnév is lehet
 	str.Format( L"XXXX %s", cLine );
 	cLine = str.Trim();
-	
-	processPeopleStr( cLine, &d, &desc );
+
+	processPeopleStr( cLine, &d );
 	d.titolo = m_tableHeader.titolo;
 	d.last_name = m_tableHeader.familyName;
 	

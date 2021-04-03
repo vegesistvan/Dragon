@@ -71,12 +71,11 @@ void CGaInput::processMarriageSubstrings()
 		v_marriages.at(i).place = w.place;
 		v_marriages.at(i).date	= w.date;
 
-		SUBSTRING sub;
-// a people blokk felbontása
-		processPeopleStr( peopleSubstr, &s, &sub );
-		v_marriages.at(i).nameSubstr	= sub.name;
-		v_marriages.at(i).birthSubstr	= sub.birth;
-		v_marriages.at(i).deathSubstr	= sub.death;
+		processPeopleStr( peopleSubstr, &s );
+
+		v_marriages.at(i).nameSubstr	= m_nameSubstr;
+		v_marriages.at(i).birthSubstr	= m_birthSubstr;
+		v_marriages.at(i).deathSubstr	= m_deathSubstr;
 		v_marriages.at(i).sex_id		= checkSex( s.sex_id );
 		v_marriages.at(i).title			= s.title;
 		v_marriages.at(i).titolo		= s.titolo;
@@ -142,48 +141,44 @@ void CGaInput::processMarriageSubstrings()
 		if( !father.IsEmpty() )
 
 		{
-		str.Format( L"%s %s %s", v_marriages.at(i).titolo, v_marriages.at(i).last_name, father );
-		str.Format( L"XXX %s",  father );
-		str.Trim();
+			str.Format( L"%s %s %s", v_marriages.at(i).titolo, v_marriages.at(i).last_name, father );
+			str.Format( L"XXX %s",  father );
+			str.Trim();
 			
-		PEOPLE	spf;
-		SUBSTRING sub;
-		processPeopleStr( str, &spf, &sub );
-
-		v_marriages.at(i).sex_idF		= spf.sex_id;
-		v_marriages.at(i).titleF		= spf.title;
-		v_marriages.at(i).titoloF		= v_marriages.at(i).titolo;
-		v_marriages.at(i).firstNameF	= spf.first_name;
-		v_marriages.at(i).lastNameF		= v_marriages.at(i).last_name;
-		v_marriages.at(i).posteriorF	= spf.posterior;
-		v_marriages.at(i).birthPlaceF	= spf.birth_place;
-		v_marriages.at(i).birthDateF	= spf.birth_date;
-		v_marriages.at(i).deathPlaceF	= spf.death_place;
-		v_marriages.at(i).deathDateF	= spf.death_date;
-		v_marriages.at(i).commentF		= spf.comment;
+			PEOPLE	spf;
+			processPeopleStr( str, &spf );
+			v_marriages.at(i).sex_idF		= spf.sex_id;
+			v_marriages.at(i).titleF		= spf.title;
+			v_marriages.at(i).titoloF		= v_marriages.at(i).titolo;
+			v_marriages.at(i).firstNameF	= spf.first_name;
+			v_marriages.at(i).lastNameF		= v_marriages.at(i).last_name;
+			v_marriages.at(i).posteriorF	= spf.posterior;
+			v_marriages.at(i).birthPlaceF	= spf.birth_place;
+			v_marriages.at(i).birthDateF	= spf.birth_date;
+			v_marriages.at(i).deathPlaceF	= spf.death_place;
+			v_marriages.at(i).deathDateF	= spf.death_date;
+			v_marriages.at(i).commentF		= spf.comment;
 		}
 
 		if( !mother.IsEmpty() )
 		{
-
-		PEOPLE	spm;
-		SUBSTRING sub;
-		processPeopleStr( mother, &spm, &sub );
-		v_marriages.at(i).sex_idM		= spm.sex_id;
-		v_marriages.at(i).titleM		= spm.title;
-		v_marriages.at(i).titoloM		= spm.titolo;
-		v_marriages.at(i).firstNameM	= spm.first_name;
-		v_marriages.at(i).lastNameM		= spm.last_name;
-		v_marriages.at(i).posteriorM	= spm.posterior;
-		v_marriages.at(i).birthPlaceM	= spm.birth_place;
-		v_marriages.at(i).birthDateM	= spm.birth_date;
-		v_marriages.at(i).deathPlaceM	= spm.death_place;
-		v_marriages.at(i).deathDateM	= spm.death_date;
-		v_marriages.at(i).commentM		= spm.comment;
-
+			PEOPLE	spm;
+			processPeopleStr( mother, &spm );
+			v_marriages.at(i).sex_idM		= spm.sex_id;
+			v_marriages.at(i).titleM		= spm.title;
+			v_marriages.at(i).titoloM		= spm.titolo;
+			v_marriages.at(i).firstNameM	= spm.first_name;
+			v_marriages.at(i).lastNameM		= spm.last_name;
+			v_marriages.at(i).posteriorM	= spm.posterior;
+			v_marriages.at(i).birthPlaceM	= spm.birth_place;
+			v_marriages.at(i).birthDateM	= spm.birth_date;
+			v_marriages.at(i).deathPlaceM	= spm.death_place;
+			v_marriages.at(i).deathDateM	= spm.death_date;
+			v_marriages.at(i).commentM		= spm.comment;
 		}
 // házastárs további házastársainak feldolgozása
-// 2f. Gaiger György, 3f. Nicky Sándor
+
+		// 2f. Gaiger György, 3f. Nicky Sándor
 		if( moreSpouses.IsEmpty() ) continue;
 
 
@@ -413,7 +408,7 @@ void CGaInput::processSpousesSpouses( CString spouses,  std::vector<PEOPLE> *v_p
 	int posComma = 0;
 
 	v_p->clear();
-	SUBSTRING sub;
+
 	while( true )
 	{
 		if( (pos = spouses.Find( L"f.", pos2 ) ) == -1 )  break;	// a házastársdnak nincs több házastársa
@@ -433,7 +428,7 @@ void CGaInput::processSpousesSpouses( CString spouses,  std::vector<PEOPLE> *v_p
 				
 			}
 		}
-		processPeopleStr( spouse,  &people, &sub );
+		processPeopleStr( spouse,  &people );
 		people.parentIndex = order;   // a házastárs házastársának nincs megadva az anyja, ezért a parentIndex-et a házasság sorszámára használjuk
 		v_p->push_back( people );
 	};

@@ -177,6 +177,7 @@ ON_COMMAND(ID_APP_EXIT, &CDragonDlg::OnAppExit)
 ON_COMMAND(ID_CONTRACTEDCOUPLES, &CDragonDlg::OnContractedCouples)
 ON_COMMAND(ID_CONTRACT_PEOPLE, &CDragonDlg::OnContractedPeople)
 ON_COMMAND(ID_DISPLAY_FAMILIES, &CDragonDlg::OnDisplayFamilies)
+ON_COMMAND(ID_CHECK_WEDDINGDATE, &CDragonDlg::OnCheckWeddingDate)
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CDragonDlg::OnInitDialog()
@@ -863,6 +864,7 @@ void CDragonDlg::OnSamenameandspouse()
 void CDragonDlg::OnCheckSameSpouseName()
 {
 	CCheckSameSpouses dlg;
+	dlg.m_wedding = false;
 	dlg.DoModal();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -964,4 +966,11 @@ Tehát ez nem egy hibalista, csak egy kimutatás a html fájlban megadott család->t
 */
 	CConnectCsalad conn;
 	conn.connectCsalad( FALSE );
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDragonDlg::OnCheckWeddingDate()
+{
+	CCheckSameSpouses dlg;
+	dlg.m_wedding = true;
+	dlg.DoModal();
 }

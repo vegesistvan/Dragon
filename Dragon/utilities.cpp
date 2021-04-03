@@ -212,6 +212,20 @@ CString getSecondWord( CString str )
 	}
 	return( str.Mid( pos1+1, pos2-pos1-1 ) );
 }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CString getTwoWords( CString str )
+{
+	CString out;
+	int pos1;
+	int pos2;
+	str.Trim();
+	if( ( pos1 = str.Find( ' ' ) ) == -1 ) return L"";			// csak legfeljebb 1 szó van benne;
+	if( ( pos2 = str.Find( ' ', pos1+1 ) ) == -1 )
+	{
+		return( str );			// csak 2 szó van benne
+	}
+	return( str.Left( pos2 ) );
+}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL isNumeric( CString word )
 {
@@ -1045,7 +1059,7 @@ CString  getNameBD( CString name, CString birth, CString death, CString wedding 
 		else if( !birth.IsEmpty() && !death.IsEmpty() )
 			nameBD.Format( L"%s (*%s +%s =%s)", name, birth, death, wedding );
 		else if( birth.IsEmpty() && death.IsEmpty() )
-			nameBD.Format( L"%s =%s", name, wedding );
+			nameBD.Format( L"%s (=%s)", name, wedding );
 	}
 
 

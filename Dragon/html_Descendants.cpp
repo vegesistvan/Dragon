@@ -219,11 +219,17 @@ void CDescendant::fillTable( )
 			m_ListCtrl.SetItemText( nItem, PS_TABLENUMBER, str );
 
 			m_ListCtrl.SetItemText( nItem, PS_PEOPLE, split.m_descendant );
-
+/*
 			m_ListCtrl.SetItemText( nItem, PS_NAME_STR, split.desc.name );
 			m_ListCtrl.SetItemText( nItem, PS_BIRTH_STR, split.desc.birth );
 			m_ListCtrl.SetItemText( nItem, PS_DEATH_STR, split.desc.death );
 			m_ListCtrl.SetItemText( nItem, PS_COMMENT, split.d.comment );
+*/
+			m_ListCtrl.SetItemText( nItem, PS_NAME_STR, split.m_nameSubstr );
+			m_ListCtrl.SetItemText( nItem, PS_BIRTH_STR, split.m_birthSubstr );
+			m_ListCtrl.SetItemText( nItem, PS_DEATH_STR, split.m_deathSubstr );
+			m_ListCtrl.SetItemText( nItem, PS_COMMENT, split.d.comment );
+
 
 			m_ListCtrl.SetItemText( nItem, PS_TITOLO, split.m_titolo );
 			m_ListCtrl.SetItemText( nItem, PS_TITLE, split.d.title );

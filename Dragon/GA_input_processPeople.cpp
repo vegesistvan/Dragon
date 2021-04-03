@@ -4,39 +4,48 @@
 #include "utilities.h"
 #include "GA_input.h"
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CGaInput::processPeopleStr( CString cLine,  PEOPLE* any, SUBSTRING *subs )
+// Ez a függvény bontjha fel az 1-4. rangú bejegyzések személyes adatait
+// bejegyzés
+// 1. rangú: az egész sor a generációs kód nélkül, elé téve az XXXX dummy családnevet
+// 2. rangú: az esküvõ adataitól megtisztított substring
+// 3. rangú: a teljes sor, apa estén elé téve az XXX dummy családnevet
+// 4. rangú: a sor elején lévõ N. utáni substring
+//
+// Ílymódon kaptt string egységesen kezelhetõ.
+// name[*birth] [+death] [comment]
+//
+// A szétszedett adatrokat az "any" struktõúrába teszi el. 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CGaInput::processPeopleStr( CString cLine,  PEOPLE* any )
 {
 	if( cLine.IsEmpty() ) return;
-
 
 	PLACE_DATE_BLOCK bb;
 	PLACE_DATE_BLOCK db;
 	int		pos;
 
-	CString nameSubstr;
-	CString birthSubstr;
-	CString deathSubstr;
+	m_nameSubstr.Empty();
+	m_birthSubstr.Empty();
+	m_deathSubstr.Empty();
+
+	cLine.Trim();
 
 	if( (pos = cLine.Find('+') ) != - 1 )
 	{
-		deathSubstr	= cLine.Mid( pos + 1 );				// halálozási blokk
+		m_deathSubstr	= cLine.Mid( pos + 1 );		// halálozási blokk
 		cLine = cLine.Left( pos );
 	}
 	if( (pos = cLine.Find('*') ) != - 1 )
 	{
-		birthSubstr = cLine.Mid( pos + 1);				// születési blokk
+		m_birthSubstr = cLine.Mid( pos + 1);		// születési blokk
 		cLine = cLine.Left( pos );
 	}
-	nameSubstr = cLine.Trim();	// név blokk
+	m_nameSubstr = cLine;
 
-	subs->name	= nameSubstr;
-	subs->birth	= birthSubstr;
-	subs->death	= deathSubstr;
-	
-	
-	processNameSubstr( nameSubstr, birthSubstr, deathSubstr,  any );
-	processPlaceDateComment( birthSubstr, &bb );
-	processPlaceDateComment( deathSubstr, &db );
+//	processNameSubstr( m_nameSubstr, m_birthSubstr, m_deathSubstr,  any );
+	processNameSubstr( any );
+	processPlaceDateComment( m_birthSubstr, &bb );
+	processPlaceDateComment( m_deathSubstr, &db );
 
 	any->birth_place	= bb.place;
 	any->birth_date		= bb.date;
@@ -47,7 +56,6 @@ void CGaInput::processPeopleStr( CString cLine,  PEOPLE* any, SUBSTRING *subs )
 	any->death_date		= db.date;
 	if( !db.comment.IsEmpty() )
 		any->comment = db.comment;
-	subs->description	= db.comment;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // name [[,] [posterior][comment]] szétszedése elemeire
@@ -57,9 +65,9 @@ void CGaInput::processPeopleStr( CString cLine,  PEOPLE* any, SUBSTRING *subs )
 // 'name,' vagy 
 //	a balról-jobbra elsõ keresztnév, amit nem keresztnév követ
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CGaInput::processNameSubstr( CString nameSubstr, CString birthSubstr, CString deathSubstr,  PEOPLE* any )
+void CGaInput::processNameSubstr( PEOPLE* any )
 {
-	if( nameSubstr.IsEmpty() ) return;
+	if( m_nameSubstr.IsEmpty() ) return;
 
 	CStringArray A;
 	int i;
@@ -77,10 +85,8 @@ void CGaInput::processNameSubstr( CString nameSubstr, CString birthSubstr, CStri
 	bool volt = false;
 	int numOfFirstNames = 0;
 
-//	nameSubstr.Remove( '?' );
-	nameSubstr.Trim();
 	// parentIndex leszedése, ha van
-	int n = wordList(&A, nameSubstr, ' ', FALSE );
+	int n = wordList(&A, m_nameSubstr, ' ', FALSE );
 		for( i = 0; i < n; ++i )
 	{
 		word = A[i];
@@ -111,7 +117,7 @@ void CGaInput::processNameSubstr( CString nameSubstr, CString birthSubstr, CStri
 	// [titolo][title][családnév][keresztnév][posterior][leírás]
 
 	// [leírás] azonosítása
-	if( nameSubstr == L"Palásthy Judit 1689" )
+	if( m_nameSubstr == L"Palásthy Judit 1689" )
 		z = 1;
 
 	// megkeresi a név és az esetleges comment elválasztó indexét, ami az utolsó keresztnevet követõ nemkeresztnévnél van
@@ -147,10 +153,10 @@ void CGaInput::processNameSubstr( CString nameSubstr, CString birthSubstr, CStri
 	}
 	if( !volt )												// nem talált kersztnevet, baj van!!
 	{
-		nameSubstr.Remove( '?' );
-		nameSubstr.Trim();
-		any->last_name = getFirstWord( nameSubstr );
-		any->first_name = getLastWord( nameSubstr );
+		m_nameSubstr.Remove( '?' );
+		m_nameSubstr.Trim();
+		any->last_name = getFirstWord( m_nameSubstr );
+		any->first_name = getLastWord( m_nameSubstr );
 		return;
 	}
 	// i az elválasztó index a név és comment( posterior) között
@@ -158,7 +164,7 @@ void CGaInput::processNameSubstr( CString nameSubstr, CString birthSubstr, CStri
 	any->sex_id = sex_id;
 	posterior = packWords( &A, i, n-i );
 	posterior.Trim();
-	if( !birthSubstr.IsEmpty() || !deathSubstr.IsEmpty() && !iswdigit( posterior.GetAt(0) ) )
+	if( !m_birthSubstr.IsEmpty() || !m_deathSubstr.IsEmpty() && !iswdigit( posterior.GetAt(0) ) )
 		any->posterior = posterior;
 	else
 		any->comment = posterior;
@@ -331,11 +337,6 @@ void CGaInput::processPlaceDateComment( CString placeDateComment, PLACE_DATE_BLO
 				ns->date = datum;
 			}
 			ns->place = place;
-
-//			ns->place	= packWords( &A, 0, i );			// dátum elõtt 'place'  (ha van)
-			
-
-//			ns->date	= datum;
 			if( (i+ret) < n )
 			{
 				if( A[i+ret] == L"éves" || A[i+ret] == L"napos" )	// x éves || x napos

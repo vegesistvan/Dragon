@@ -1,21 +1,13 @@
-// TableSameSpouse.cpp : implementation file
+// CheckWeddingDate.cpp : implementation file
 //
 
 #include "stdafx.h"
 #include "Dragon.h"
-#include "checkSameSpouses.h"
+#include "CheckWeddingDate.h"
 #include "afxdialogex.h"
-#include "html_EditLines.h"
-#include "Relations.h"
-#include "CheckParam0.h"
-#include <algorithm>
-#include "GetLastFirst.h"
 #include "ProgressWnd.h"
 #include "utilities.h"
-#include "html_Edit2Lines.h"
-#include "EditPeople.h"
-bool sortBySpouses(const MORESPOUSES &v1, const MORESPOUSES &v2);
-bool sortBySource(const MORESPOUSES &v1, const MORESPOUSES &v2);
+#include <algorithm>
 
 enum
 {
@@ -33,6 +25,7 @@ enum
 	P_MOTHER_ID,
 	P_UNITED,
 };
+
 
 
 // ListCtrl oszlopok
@@ -60,13 +53,16 @@ enum
 	L_BIRTH_M,
 	L_DEATH_M,
 	L_LINENUMBERF,
+	L_COLUMNSCOUNT,
 };
 
-// CCheckSameSpouses dialog
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-IMPLEMENT_DYNAMIC(CCheckSameSpouses, CDialogEx)
-CCheckSameSpouses::CCheckSameSpouses(CWnd* pParent /*=NULL*/)
-	: CDialogEx(CCheckSameSpouses::IDD, pParent)
+bool sortBySpousesW(const MORESPOUSES &v1, const MORESPOUSES &v2);
+bool sortBySourceW(const MORESPOUSES &v1, const MORESPOUSES &v2);
+
+IMPLEMENT_DYNAMIC(CCheckWeddingDate, CDialogEx)
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CCheckWeddingDate::CCheckWeddingDate(CWnd* pParent /*=NULL*/)
+	: CDialogEx(CCheckWeddingDate::IDD, pParent)
 {
 	m_recordset		= new CSqliteDBRecordSet;
 	m_recordset1	= new CSqliteDBRecordSet;
@@ -74,35 +70,7 @@ CCheckSameSpouses::CCheckSameSpouses(CWnd* pParent /*=NULL*/)
 	m_recordset3	= new CSqliteDBRecordSet;
 	m_recordset4	= new CSqliteDBRecordSet;
 
-	m_explanation = L"Egy emberenek természetesen lehet két vagy akár több azonos nevû házastársa, \
-sokszor azonban hibás adatokra hívja fel a figyelmet.\
-\r\n\r\n\
-Egy embernek 2 okból lehet azonos nevû házastársa:\
-\r\n\r\n\
-1. Valóban volt azonos nevû házastársa. Ebben az esetben várható, hogy a házastárs személyes adatai különböznek.\
-\r\n\r\n\
-2. Valójában nem volt azonos nevû házastársa, csak annak több bejegyzése volt, és nem tudtuk összevonni azokat \
-valemelyik személyes adatának különbözõsége miatt.\
-\r\n\r\n\
-Mindkét esetben a házastársak valamely személyes adata különbözik, tehát nekünk kell eldönteni, hogy a fenti 2 eset közül \
-melyikkel állunk szembe.\
-\r\n\r\n\
-Emberünket az azonos nevû házastársai követik születési, halálozási, házasságkötési dátumukkal valamint apjuk, anyjuk nevével, \
-sárgával kiemelve az eltérõ személyes adatot.\
-\r\n\r\n\
-Ha az azonos emberek összevonása elõtt készítjük el a listát, akkor csak olyankor fordulhat elõ több azonos nevû házaspár, \
-ha azok egyetlen leszármazotti sorban vannak megadva házastársként, tehát valóban több azonos nevû házastársa volt emberünknek.\
-\r\n\r\n\
-Az azonos emberek bejegyzéseinek összevonása megsokszorozhatja a több azonos nevû házaspárok számát, \
-ugyanis ha emberünk azonossá lett egy vagy több más azonos nevû emberrel, akkor ezek összevonásra kerültek, \
-de azonos nevû házastársaik nem feltétlenül teljesítik az összevonási kritériumot, ezért õk bár azonos nevûek, \
-mégis különbözõ emberként maradnak az adatbázisban.\
-\r\n\r\n\
-Az 'S' oszlopban az ember szerepkódja van, az 'U' oszlopban lévõ szám pedig megmutatja, hogy hány embert vont össze az \
-egyesítési eljárás.\
-";
-
-	p_fields = L"\
+		p_fields = L"\
 rowid,\
 first_name,\
 last_name,\
@@ -120,150 +88,56 @@ united\
 	_lastname	= L"";
 	_firstname	= L"";
 
+//	_lastname = "Baditz";
+//	_firstname = "Zsigmond";
+
+	_contractions = theApp.contractions();
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CCheckSameSpouses::~CCheckSameSpouses()
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CCheckWeddingDate::~CCheckWeddingDate()
 {
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSameSpouses::DoDataExchange(CDataExchange* pDX)
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckWeddingDate::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_LIST, m_ListCtrl);
-	DDX_Text(pDX, IDC_SEARCH, m_search);
-	DDX_Control(pDX, IDC_KERESS, colorKeress);
+	DDX_Control(pDX, IDC_KERES, colorKeres);
 	DDX_Control(pDX, IDC_NEXT, colorNext);
+	DDX_Control(pDX, IDC_LIST, m_ListCtrl);
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BEGIN_MESSAGE_MAP(CCheckSameSpouses, CDialogEx)
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BEGIN_MESSAGE_MAP(CCheckWeddingDate, CDialogEx)
 	ON_WM_SIZE()
 	ON_WM_SIZING()
-	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST, &CCheckSameSpouses::OnCustomdrawList)
-	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CCheckSameSpouses::OnDblclkList)
-//	ON_COMMAND(ID_HTML, &CCheckSameSpouses::OnHtml)
-	ON_COMMAND(ID_INFO, &CCheckSameSpouses::OnInfo)
-	ON_STN_CLICKED(IDC_KERESS, &CCheckSameSpouses::OnClickedKeress)
-	ON_STN_CLICKED(IDC_NEXT, &CCheckSameSpouses::OnClickedNext)
-	
-
-	// IDR_DROPDOWN_HTML funkciók	
-	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_HTML_EDIT, &CCheckSameSpouses::OnHtmlEditLines)
-	ON_COMMAND(ID_HTML_NOTEPAD, &CCheckSameSpouses::OnHtmlNotepad)
-	ON_COMMAND(ID_HTML_NOTEPAD_PARENTS, &CCheckSameSpouses::OnHtmlNotepadParents)
-	ON_COMMAND(ID_HTML_FATHERANDSIBLINGS, &CCheckSameSpouses::OnHtmlFatherAndSiblings)
-	ON_COMMAND(ID_HTML_CHILDREN, &CCheckSameSpouses::OnHtmlChildren)
-	ON_COMMAND(ID_DB_EDIT, &CCheckSameSpouses::OnDbEdit)
-	ON_COMMAND(ID_3GENERATIONS, &CCheckSameSpouses::On3Generations )
-
+	ON_STN_CLICKED(IDC_KERES, &CCheckWeddingDate::OnClickedKeres)
+	ON_STN_CLICKED(IDC_NEXT, &CCheckWeddingDate::OnClickedNext)
+	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST, &CCheckWeddingDate::OnCustomdrawList)
 END_MESSAGE_MAP()
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSameSpouses::OnSize(UINT nType, int cx, int cy)
-{
-	CDialogEx::OnSize(nType, cx, cy);
-	EASYSIZE_RESIZE()
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSameSpouses::OnSizing(UINT fwSide, LPRECT pRect)
-{
-	CDialogEx::OnSizing(fwSide, pRect);
-	EASYSIZE_MINSIZE(430,314,fwSide,pRect); 
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CCheckSameSpouses::OnInitDialog()
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BOOL CCheckWeddingDate::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 	EASYSIZE_ADD( IDC_LIST,	ES_BORDER,	ES_BORDER,		ES_BORDER,		ES_BORDER,	0 );
+//	EASYSIZE_ADD( IDC_CAPTION,	ES_BORDER,	ES_BORDER,	ES_BORDER,		ES_KEEPSIZE,	0 );
 	EASYSIZE_INIT();
+	
+	theApp.m_pszAppName = _tcsdup( L"Azonos nevû házastársak-különbözõ esküvõi dátumok" );
 
-	if( m_wedding )
-	{
-			theApp.m_pszAppName = _tcsdup( L"Azonos nevû házastársak, különbözõ esküvõi dátumok" );
-	}
-	else
-	{
-		theApp.m_pszAppName = _tcsdup( L"Azonos nevû házastársakkal rendelkezõ emberek listája" );
-	}
-/*
-	int iter = theApp.getUserVersion();
-	CString attention = L"Ezt a mûveletet az azonos emberek összevonása után érdemes alkalmazni, hogy csak a gyanús eseteket tartalmazza.\nAkarod, hogy mégis elkészítsük a listát?";
-	if( !iter )
-	{
-		if( AfxMessageBox( attention, MB_YESNO ) == IDNO ) 
-		{
-			OnCancel();
-			return false;
-		}
-	}
-*/
-/*	
-	_info = L"\
-Azokat az embereket listázzuk, akiknek több azonos nevû házastársa van. Egy embernek természetesen lehet két \
-vagy akár több azonos nevû házastársa, azonban legtöbbször hibás adatokra hívja fel a figyelmet.\
-\r\n\
-Két vagy több azonos nevû házastárs személyes adatai közötti különbségeket sárga színnel emeli ki a program.\
-\r\n\r\n\
-Ha az azonos emberek összevonása elõtt készítjük el a listát, akkor csak olyankor fordulhat elõ több azonos nevû házaspár, \
-ha azok egyetlen leszármazotti sorban vannak megadva házastársként.\
-\r\n\
-Az azonos emberek összevonása megsokszorozhatja az ilyen eseteket, ugyanis ha emberünk azonossá lett egy vagy több más azonos \
-nevû emberrel, akkor ezek összevonásra kerültek, de azonos nevû házastársaik nem feltétlenül teljesítik az összevonási \
-kritériumot, ezért õk bár azonos nevûek, mégis különbözõ emberként maradnak az adatbázisban.\
-\r\n\r\n\
-A magától érthetõdõ oszlopneveken túl az alábbiak vannak:\n\
-U - a név alatt egyesített bejegyzések száma\n\
-G - generációs kód\n\
-s - az ember hierarchia száma (1-4)\
-";
-
-	theApp.m_pszAppName = _tcsdup( L"Azonos nevû házastársakkal rendelkezõ emberek listája" );
-	if( (AfxMessageBox( _info, MB_ICONINFORMATION | MB_OKCANCEL )) == IDCANCEL ) 
-	{
-		OnCancel();
-		return false;
-	}
-
-	CCheckParam0 dlg;
-	dlg._caption = L"Azonos nevû házastársakkal rendelkezõ emberek listája";
-	dlg._info = _info;
-	if( dlg.DoModal() == IDCANCEL )
-	{
-		OnCancel();
-		return TRUE;
-	}
-
-	_fullname.Empty();
-	if( !dlg._all )
-	{
-		CGetLastFirst dlg1;
-		if( dlg1.DoModal() == IDCANCEL )
-		{
-			OnCancel();
-			return false;
-		}
-
-		_fullname	= dlg1._fullname;
-		_first_name	= dlg1._firstname;
-		_last_name	= dlg1._lastname;
-	}
-*/
-	colorKeress.SetTextColor( theApp.m_colorClick );
+	colorKeres.SetTextColor( theApp.m_colorClick );
 	colorNext.SetTextColor( theApp.m_colorClick );
 
 	_fullname.Format( L"%s %s", _lastname, _firstname );
 	_fullname.Trim();
 
+	CString caption( L"");
 	if( _fullname.IsEmpty() )
 	{
-		if( m_wedding )
-			m_caption = L"Azonos nevû házaspárok, különbözõ esküvõi dátumok";
-		else
-			m_caption = L"Emberek, akiknek több azonos nevû házastársa van.";
+		caption = L"Azonos nevû házastársak, különbözõ esküvõi dátumok";
 	}
 	else
-		m_caption.Format( L"%s nevû emberek, akinknek több azonos nevû házastársa van.", _fullname );
+		caption.Format( L"%s nevû emberek, akinknek több azonos nevû házastársa van, de különbözõ esküvõi dátumok.", _fullname );
 
-	SetWindowTextW( m_caption ),
+	SetWindowTextW( caption ),
 
 	createColumns();
 	nItem = 0;
@@ -272,12 +146,12 @@ s - az ember hierarchia száma (1-4)\
 
 	if( !m_cnt ) OnCancel();
 
+
 	return TRUE;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSameSpouses::createColumns()
+void CCheckWeddingDate::createColumns()
 {
-
 	m_ListCtrl.SetExtendedStyle(m_ListCtrl.GetExtendedStyle()| LVS_EX_GRIDLINES );
 	m_ListCtrl.InsertColumn( L_CNT,			L"cnt",			LVCFMT_RIGHT,	 30,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_LINENUMBER,	L"line#",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
@@ -303,10 +177,12 @@ void CCheckSameSpouses::createColumns()
 	m_ListCtrl.InsertColumn( L_LINENUMBERF,	L"line#F",		LVCFMT_RIGHT,	 60,-1,COL_HIDDEN );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSameSpouses::sameSpouses()
+void CCheckWeddingDate::sameSpouses()
 {
 	CString fileName;
 	CString first_name1;
+	CString title( L"Emberek, akiknek több azonos nevû házastársuk van de különbözõ esküvõi dátummal..." ); 
+
 	CString	sex_id;
 	CString spouse2;
 	CString rowidS;
@@ -314,10 +190,13 @@ void CCheckSameSpouses::sameSpouses()
 	CString firstNameS;
 	CString fatherId;
 	CString motherId;
+
+
 	UINT i;
+
 	MORESPOUSES vspouse;
 
-	CProgressWnd wndP(NULL, m_caption ); 
+	CProgressWnd wndP(NULL, title ); 
 	wndP.GoModal();
 
 #ifndef _DEBUG
@@ -349,7 +228,7 @@ void CCheckSameSpouses::sameSpouses()
 		vSpouses.clear();
 		fillSpouses( rowid, sex_id );			// összes házastárs begyûjtése
 		if( vSpouses.size() < 2  ) goto cont;	// ga csak egy házastárs volt, akkor az nem érdekel
-		fillSameSpouses();						// az azono snevû házaspárok kiszedése
+		fillSameSpouses();						// az azonos nevû házaspárok kiszedése
 		if( vSameSpouses.size() )				// ha voltak azonos nevõ házaspárok
 		{
 			same();
@@ -360,8 +239,11 @@ cont:	wndP.StepIt();
 		if (wndP.Cancelled()) break;
 	}
 
+//	fwprintf( fh1, L"</pre>" );
+//	fclose( fh1 );
 	wndP.DestroyWindow();
 
+//	fclose( fh1 );
 	if( !m_cnt )
 	{
 		if( _fullname.IsEmpty()  )
@@ -378,7 +260,7 @@ cont:	wndP.StepIt();
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // rowid emebr összes házastársának összegyûjtése 
-void CCheckSameSpouses::fillSpouses( CString rowid, CString sex_id )
+void CCheckWeddingDate::fillSpouses( CString rowid, CString sex_id )
 {
 	CString rowidM;			// rowid marriage
 	CString rowidS;			// rowid sopouse;
@@ -390,7 +272,9 @@ void CCheckSameSpouses::fillSpouses( CString rowid, CString sex_id )
 	CString first_name;
 	MORESPOUSES vspouse;
 	CString wedding;
-	
+	CString wedding1;
+	CString wedding2;
+	UINT j;
 
 	if( sex_id == L"1" )
 	{
@@ -403,9 +287,26 @@ void CCheckSameSpouses::fillSpouses( CString rowid, CString sex_id )
 	if( !query1( m_command ) ) return;
 
 	if( m_recordset1->RecordsCount() < 2 ) return;
+/*
+	// ha az esküvõi dátum nem különbözik, akkor kihagyja
+	for( j = 0; j < m_recordset1->RecordsCount()-1; ++j, m_recordset1->MoveNext() )
+	{
+		wedding1 = m_recordset1->GetFieldString( 2 );
+		wedding1.Trim();
+		if( wedding1.IsEmpty() ) return;
+		m_recordset1->MoveNext();
+		wedding2 = m_recordset1->GetFieldString( 2 );
+		wedding2.Trim();
+		if( wedding2.IsEmpty() ) return;
+		if( wedding1 != wedding2 ) break;
+		m_recordset1->MovePrevious();
+	}
+	if( j == m_recordset1->RecordsCount()-1 ) return;
+
 
 	// házastársak lekérdezése és vSpouses vektorba gyûjtése
-	
+	m_recordset1->MoveFirst();
+*/
 	for( UINT j = 0; j < m_recordset1->RecordsCount(); ++j, m_recordset1->MoveNext() )
 	{
 		
@@ -476,9 +377,9 @@ void CCheckSameSpouses::fillSpouses( CString rowid, CString sex_id )
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Az azonos nevû házastársak átrakása a vSmaeSpouses vektorba
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSameSpouses::fillSameSpouses( )
+void CCheckWeddingDate::fillSameSpouses( )
 {
-	std::sort( vSpouses.begin(), vSpouses.end(), sortBySpouses );
+	std::sort( vSpouses.begin(), vSpouses.end(), sortBySpousesW );
 	MORESPOUSES vspouse;
 	BOOL FIRST	= TRUE;
 
@@ -486,7 +387,6 @@ void CCheckSameSpouses::fillSameSpouses( )
 	CString spouse2;
 	CString wedding1;
 	CString wedding2;
-
 	vSameSpouses.clear();
 	for( UINT j = 1; j < vSpouses.size(); ++j )
 	{
@@ -499,17 +399,14 @@ void CCheckSameSpouses::fillSameSpouses( )
 		if( !vSpouses.at(j-1).spouse.Compare( vSpouses.at(j).spouse ) )		// ha az egymás utáni  házastársak neve
 		{																	// azonos, akkor beteszi a VSameSpouses
 
-			if( m_wedding )
-			{
-				// ha az esküvõi dátum nem különbözik, akkor kihagyja
-				wedding1 = vSpouses.at(j-1).wedding;
-				if( wedding1.IsEmpty() ) continue;
-				wedding2 = vSpouses.at(j).wedding;
-				if( wedding2.IsEmpty() ) continue;
-				if( wedding1 == wedding2 ) continue;
-			}
+			// ha az esküvõi dátum nem különbözik, akkor kihagyja
+			wedding1 = vSpouses.at(j-1).wedding;
+			if( wedding1.IsEmpty() ) continue;
+			wedding2 = vSpouses.at(j).wedding;
+			if( wedding2.IsEmpty() ) continue;
+			if( wedding1 == wedding2 ) continue;
 
-			if( FIRST )   // az elsõ házaspár														// vektorba
+			if( FIRST )   // az alany										// vektorba
 			{  
 				vspouse.rowidM		= vSpouses.at(j-1).rowidM; 
 				vspouse.birthDate	= vSpouses.at(j-1).birthDate;
@@ -581,7 +478,7 @@ void CCheckSameSpouses::fillSameSpouses( )
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Az ember adatai, majd kiírása aházastársakkal együtt
-void CCheckSameSpouses::same()
+void CCheckWeddingDate::same()
 {
 	// az ember adatai
 
@@ -622,15 +519,14 @@ void CCheckSameSpouses::same()
 	birthDateM	= m_recordset1->GetFieldString( 4 );
 	deathDateM	= m_recordset1->GetFieldString( 5 );
 
-	std::sort( vSameSpouses.begin(), vSameSpouses.end(), sortBySource );
+	std::sort( vSameSpouses.begin(), vSameSpouses.end(), sortBySourceW );
 	listBlock();
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void CCheckSameSpouses::listBlock()
+void CCheckWeddingDate::listBlock()
 {
 	CString birthDate0;
 	CString deathDate0;
@@ -835,15 +731,30 @@ vSameSpouses.at(0).deathDateM\
 
 // birthDate
 		if( birthDate0.IsEmpty() || birthDateJ.IsEmpty() )
+		{
 			++empty;
+		}
 		if( !birthDate0.IsEmpty() && !birthDateJ.IsEmpty() && birthDate0 != birthDateJ )
+		{
+//			fwprintf( fh1, L"<span style=\"background:yellow\">%-15s</span> ", birthDateJ );
 			col = col | 1 << L_BIRTH;
+		}
+//		else
+//			fwprintf( fh1, L"%-15s ", birthDateJ );
+
 
 // deathDate
 		if( deathDate0.IsEmpty() || birthDateJ.IsEmpty() )
+		{
 			++empty;
+		}
 		if( !deathDate0.IsEmpty() && !deathDateJ.IsEmpty() && deathDate0 != deathDateJ )
+		{
+//			fwprintf( fh1, L"<span style=\"background:yellow\">%-15s</span> ", deathDateJ );
 			col = col | 1 << L_DEATH;
+		}
+//		else
+//			fwprintf( fh1, L"%-15s ", deathDateJ );
 
 		// wedding
 		if( !wedding0.IsEmpty() && !wedding.IsEmpty() && wedding0 != wedding )
@@ -852,42 +763,96 @@ vSameSpouses.at(0).deathDateM\
 		}
 
 
+
+
+// mother source
+
+//		fwprintf( fh1, L"%s ", sourceFJ );
 // father
 		if( father0.IsEmpty() || fatherJ.IsEmpty() )
+		{
 			++empty;
+		}
 		if( !father0.IsEmpty()&& !fatherJ.IsEmpty() && father0 !=  fatherJ )
+		{
+//			fwprintf( fh1, L"<span style=\"background:yellow\">%-25s</span> ", fatherJ );
 			col = col | 1 << L_FATHER;
+		}
+//		else
+//			fwprintf( fh1, L"%-25s ", fatherJ );
 
 // father birthdate
 		if( birthDateF0.IsEmpty() || birthDateFJ.IsEmpty() )
+		{
 			++empty;
+		}
 		if( !birthDateF0.IsEmpty() && !birthDateFJ.IsEmpty() && birthDateF0 != birthDateFJ )
+		{
+//			fwprintf( fh1, L"<span style=\"background:yellow\">%-15s</span> ", birthDateFJ );
 			col = col | 1 << L_BIRTH_F;
+		}
+//		else
+//			fwprintf( fh1, L"%-15s ", birthDateFJ );
 
 
 // father deathdate
 		if( deathDateF0.IsEmpty() || deathDateFJ.IsEmpty() )
+		{
 			++empty;
+		}
 		if( !deathDateF0.IsEmpty() && !deathDateFJ.IsEmpty() && deathDateF0 != deathDateFJ )
+		{
+//			fwprintf( fh1, L"<span style=\"background:yellow\">%-15s</span> ", deathDateFJ );
 			col = col | 1 << L_DEATH_F;
+		}
+//		else
+//			fwprintf( fh1, L"%-15s ", deathDateFJ );
 
+
+// mother source
+
+//		fwprintf( fh1, L"%s ", sourceMJ );
 // mother
 		if( mother0.IsEmpty() || motherJ.IsEmpty() )
+		{
 			++empty;
+		}
 		if( !mother0.IsEmpty() && !motherJ.IsEmpty() && mother0 !=  motherJ )
+		{
+//			fwprintf( fh1, L"<span style=\"background:yellow\">%-25s</span> ", motherJ );
 			col = col | 1 << L_MOTHER;
+		}
+//		else
+//			fwprintf( fh1, L"%-25s ", motherJ );
 
 // mother birthdate
 		if( birthDateM0.IsEmpty() || birthDateMJ.IsEmpty() )
+		{
 			++empty;
+		}
 		if( !birthDateM0.IsEmpty() && !birthDateMJ.IsEmpty() && birthDateM0 != birthDateMJ )
+		{
+//			fwprintf( fh1, L"<span style=\"background:yellow\">%-15s</span> ", birthDateMJ );
 			col = col | 1 << L_BIRTH_M;
+		}
+//		else
+//			fwprintf( fh1, L"%-15s ", birthDateMJ );
 
 // mother deathdate
 		if( deathDateM0.IsEmpty() || deathDateMJ.IsEmpty() )
+		{
 			++empty;
+		}
 		if( !deathDateM0.IsEmpty() && !deathDateMJ.IsEmpty() &&  deathDateM0 != deathDateMJ )
+		{
+//			fwprintf( fh1, L"<span style=\"background:yellow\">%-15s</span> ", deathDateMJ );
 			col = col | 1 << L_DEATH_M;
+		}
+//		else
+//			fwprintf( fh1, L"%-15s ", deathDateMJ );
+
+
+//		fwprintf( fh1, L"<br>" );
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 		nItem = m_ListCtrl.InsertItem( nItem, L"" );
@@ -926,7 +891,7 @@ vSameSpouses.at(0).deathDateM\
 	++nItem;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSameSpouses::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
+void CCheckWeddingDate::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	NMLVCUSTOMDRAW* pLVCD = reinterpret_cast<NMLVCUSTOMDRAW*>( pNMHDR );
 	
@@ -964,12 +929,12 @@ void CCheckSameSpouses::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
 	}
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool sortBySpouses(const MORESPOUSES &v1, const MORESPOUSES &v2) 
+bool sortBySpousesW(const MORESPOUSES &v1, const MORESPOUSES &v2) 
 { 
     return( v1.spouse < v2.spouse ); 
 } 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool sortBySource(const MORESPOUSES &v1, const MORESPOUSES &v2) 
+bool sortBySourceW(const MORESPOUSES &v1, const MORESPOUSES &v2) 
 { 
     return( v1.source < v2.source ); 
 } 
@@ -977,7 +942,7 @@ bool sortBySource(const MORESPOUSES &v1, const MORESPOUSES &v2)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CCheckSameSpouses::query( CString command )
+BOOL CCheckWeddingDate::query( CString command )
 {
 	if( m_recordset->Query(command,theApp.mainDB))
 	{
@@ -988,7 +953,7 @@ BOOL CCheckSameSpouses::query( CString command )
 	return TRUE;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CCheckSameSpouses::query1( CString command )
+BOOL CCheckWeddingDate::query1( CString command )
 {
 	if( m_recordset1->Query(command,theApp.mainDB))
 	{
@@ -999,7 +964,7 @@ BOOL CCheckSameSpouses::query1( CString command )
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CCheckSameSpouses::query2( CString command )
+BOOL CCheckWeddingDate::query2( CString command )
 {
 	if( m_recordset2->Query(command,theApp.mainDB))
 	{
@@ -1010,7 +975,7 @@ BOOL CCheckSameSpouses::query2( CString command )
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CCheckSameSpouses::query3( CString command )
+BOOL CCheckWeddingDate::query3( CString command )
 {
 	if( m_recordset3->Query(command,theApp.mainDB))
 	{
@@ -1021,7 +986,7 @@ BOOL CCheckSameSpouses::query3( CString command )
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CCheckSameSpouses::query4( CString command )
+BOOL CCheckWeddingDate::query4( CString command )
 {
 	if( m_recordset4->Query(command,theApp.mainDB))
 	{
@@ -1031,18 +996,45 @@ BOOL CCheckSameSpouses::query4( CString command )
 	}
 	return TRUE;
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSameSpouses::OnInfo()
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckWeddingDate::OnSize(UINT nType, int cx, int cy)
 {
-	AfxMessageBox( m_explanation, MB_ICONINFORMATION );
+	CDialogEx::OnSize(nType, cx, cy);
+	EASYSIZE_RESIZE()
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSameSpouses::OnClickedKeress()
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckWeddingDate::OnSizing(UINT fwSide, LPRECT pRect)
+{
+	CDialogEx::OnSizing(fwSide, pRect);
+	EASYSIZE_MINSIZE(430,314,fwSide,pRect); 
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BOOL CCheckWeddingDate::PreTranslateMessage(MSG* pMsg)
+{
+	int x=(int)pMsg->wParam;
+
+    if( pMsg->message==WM_KEYDOWN)
+    {
+		switch( x )
+		{
+		case VK_RETURN:
+			GetDlgItem( IDC_SEARCH )->GetWindowTextW( str );
+			if( str.GetLength() ) 
+			OnClickedKeres();
+			break;
+		case VK_ESCAPE:
+			CDialogEx::OnCancel();
+		}
+	}
+	return CWnd::PreTranslateMessage(pMsg);
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckWeddingDate::OnClickedKeres()
 {
 	keress( 0 );
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSameSpouses::OnClickedNext()
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckWeddingDate::OnClickedNext()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
 	if( nItem == -0 )
@@ -1052,8 +1044,8 @@ void CCheckSameSpouses::OnClickedNext()
 	}
 	keress( nItem + 1 );
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSameSpouses::keress( int start )
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CCheckWeddingDate::keress( int start )
 {
 	CString	search;
 	GetDlgItem( IDC_SEARCH )->GetWindowText( search );
@@ -1112,144 +1104,4 @@ void CCheckSameSpouses::keress( int start )
 		str.Format( L"%s nevû embert nem találtam!", search );
 		AfxMessageBox( str );
 	}
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////44
-BOOL CCheckSameSpouses::PreTranslateMessage(MSG* pMsg)
-{
-	int x=(int)pMsg->wParam;
-
-    if( pMsg->message==WM_KEYDOWN)
-    {
-		switch( x )
-		{
-		case VK_RETURN:
-			GetDlgItem( IDC_SEARCH )->GetWindowTextW( str );
-			if( str.GetLength() ) 
-			OnClickedKeress();
-			break;
-		case VK_ESCAPE:
-			CDialogEx::OnCancel();
-		}
-	}
-	return CWnd::PreTranslateMessage(pMsg);
-}
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSameSpouses::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-
-	CRelations dlg;
-	int nItem = pNMItemActivate->iItem;
-//	int nItem		= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	CString rowid	= m_ListCtrl.GetItemText( nItem, L_ROWID );
-
-	dlg.nItem		= nItem;
-	dlg.m_rowid		= rowid;
-	if( dlg.DoModal() == IDCANCEL ) return;
-
-	*pResult = 0;
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-LRESULT CCheckSameSpouses:: OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
-{
-	CPoint* point=(CPoint*) lParam;
-    CMenu	Menu;
-	CMenu*	pPopup;
-
-
-	if(Menu.LoadMenu( IDR_DROPDOWN_HTML ))
-    {
-		pPopup = Menu.GetSubMenu(0);
-		if(m_ListCtrl.GetNextItem(-1,LVNI_SELECTED) < 0 )
-		{
-			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
-			pPopup->EnableMenuItem(ID_HTML_EDIT, MF_BYCOMMAND | MF_GRAYED);
-		}
-		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
-    }
-	return TRUE;
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSameSpouses::OnHtmlEditLines()
-{
-	CString title;
-	int selectedCount	= m_ListCtrl.GetSelectedCount();
-	int nItem			= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	if( selectedCount == 1 )
-		title.Format( L"%s a ga.html fájlban (%s. sor)", m_ListCtrl.GetItemText( nItem, L_NAME ), m_ListCtrl.GetItemText( nItem, L_LINENUMBER )  );
-	else
-		title.Format( L"%d kijelölt sor a ga.html fájlban", selectedCount );
-
-	theApp.htmlEditLines( &m_ListCtrl, L_LINENUMBER, title );
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSameSpouses::OnHtmlNotepad()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	CString lineNumber = m_ListCtrl.GetItemText( nItem,	L_LINENUMBER );
-	if( !lineNumber.IsEmpty() ) 
-		theApp.editNotepad( lineNumber );
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSameSpouses::OnHtmlNotepadParents()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
-	CString rowid = m_ListCtrl.GetItemText( nItem, L_ROWID );
-
-	theApp.HtmlNotepadParents( rowid );
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSameSpouses::OnHtmlFatherAndSiblings()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
-
-	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
-	CHtmlEditLines dlg;
-	dlg.m_title.Format( L"%s szülei és testvérei", m_ListCtrl.GetItemText( nItem, L_NAME ) );
-	dlg.m_type	= L"F_SIBLINGS";
-	dlg.m_rowid = rowid;
-	dlg.DoModal();
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSameSpouses::OnHtmlChildren()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
-
-	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
-	CHtmlEditLines dlg;
-	dlg.m_title.Format( L"%s és gyermekei", m_ListCtrl.GetItemText( nItem, L_NAME ) );
-	dlg.m_type	= L"F_CHILDREN";
-	dlg.m_rowid = rowid;
-	dlg.DoModal();
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSameSpouses::OnDbEdit()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
-	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
-
-	CEditPeople dlg;
-	dlg.m_caption.Format( L"%s adatainak szerkesztése", m_ListCtrl.GetItemText( nItem, L_NAME ) );
-	dlg.m_rowid = rowid;
-
-	ShowWindow( SW_HIDE );
-	dlg.DoModal();
-	ShowWindow( SW_RESTORE );
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCheckSameSpouses::On3Generations()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
-	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
-	CRelations dlg;
-	dlg.m_rowid = rowid;
-	dlg.DoModal();
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-
+/*
 typedef struct
 {
 	CString name;
@@ -8,7 +8,7 @@ typedef struct
 	CString death;
 	CString description;
 }SUBSTRING;
-
+*/
 typedef struct
 {
 	CString text;

@@ -675,8 +675,7 @@ void CContractedPeople::On3Generations()
 	CRelations dlg;
 	dlg.m_rowid = rowid;
 
-	ShowWindow( SW_HIDE );
 	dlg.DoModal();
-	ShowWindow( SW_RESTORE );
+//	ShowWindow( SW_RESTORE );
 
 }

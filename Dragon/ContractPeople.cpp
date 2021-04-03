@@ -105,19 +105,6 @@ death_date,\
 father_id,\
 mother_id\
 ";
-/*
-	m_rgb[0] = RGB( 255, 255, 255 );
-	m_rgb[1] = RGB( 185, 247, 158 ); 
-	m_rgb[2] = RGB( 156, 194, 232 ); 
-	m_rgb[3] = RGB( 255, 255,   0 );
-	m_rgb[4] = RGB(   0, 191, 255 );
-	m_rgb[5] = RGB( 173, 255,  47 );
-	m_rgb[6] = RGB( 216, 191, 216 );
-	m_rgb[7] = RGB( 255, 105, 180 );
-	m_rgb[8] = RGB( 255, 255, 255 );
-	m_rgb[9] = RGB( 246, 252, 192 );
-	m_rgb[10]= RGB( 186, 197, 253 );
-*/
 
 	m_rgb[0] = WHITE;					// egyedülálló
 	m_rgb[1] = YELLOW; 
@@ -139,7 +126,7 @@ mother_id\
 	sWHITE.Format( L"%u", RGB(255,255,255) );
 
 	m_name = L"";
-//	m_name = L"Abaffy István";				// ha csak egy embert akarunk vizsgálni, itt megadhatjuk a nevét
+//	m_name = L"Bittó György";				// ha csak egy embert akarunk vizsgálni, itt megadhatjuk a nevét
 
 	m_azonos	= 2;						// az azonos adatpárok elõírt száma
 	nItem		= 0;
@@ -217,20 +204,18 @@ bool CContractPeople::contractPeople()
 	fwprintf( textU, L"m_azonos = %d\n", m_azonos );
 	fwprintf( textD, L"m_azonos = %d\n", m_azonos );
 
-
+	UINT userVersion;
 	CString drive;
 	CString path;
 	CString fname;
 	CString ext;
-	TCHAR* old;
-	TCHAR* renamed;
+//	TCHAR* old;
+//	TCHAR* renamed;
 
 	m_loop = 1;		// ciklus számláló
-
 	wndP.Create( NULL, L"" );
 	wndP.GoModal();
-	UINT userVersion;
-	tableLines.clear();
+//	tableLines.clear();
 	while( m_loop <= m_loopMax )
 	{
 		str.Format( L"Azonos emberek bejegyzéseinek összevonása. (%d. ciklus)", m_loop );
@@ -246,61 +231,31 @@ bool CContractPeople::contractPeople()
 		CopyFile( theApp.m_blobSpec, str, false );
 		theApp.openDatabase();
 
-		userVersion = m_loop << 16;
+		userVersion = m_loop << 16;   // userVersion = loop|m_azonos;
 		userVersion |= m_azonos;
 		theApp.setUserVersion( userVersion );
 
+		// az új adatbázis nevének kiírása a dlg ablak címében!
 		GetParent()->SendMessage(WM_MAIN_TITLE, (WPARAM)NULL, (LPARAM)NULL);
 
-
-		theApp.setStartTime();
-//		openDifferent();			// html fájl
-//		openUnited();				// html fájl
-
 		vContract.clear();			// az összevont emberek 
-	
-
 		if( !core() ) return false;
-
-		
-
-		if( vContract.size() > 200 )
-		{
-#ifndef _DEBUG
-			str.Format( L"(5/5) Adatbázis tömörítése" ); 
-			wndP.SetText( str );
-#endif
-			theApp.execute( L"VACUUM");
-		}
-
-		/*
-		if( m_loop == 1 )
-		{
-			theApp.insertIntoFiles( unitedSpec, UNITED1_HTML_FILE );
-			theApp.insertIntoFiles( differentSpec, DIFFERENT1_HTML_FILE );
-		}
-		if( m_loop == 2 )
-		{
-			theApp.insertIntoFiles( unitedSpec, UNITED2_HTML_FILE );
-			theApp.insertIntoFiles( differentSpec, DIFFERENT2_HTML_FILE );
-		}
-		*/
+	
+		theApp.insertIntoFiles( m_fileSpecTextU, UNITED_FILE );
+		theApp.insertIntoFiles( m_fileSpecTextD, DIFFERENT_FILE );
 
 		if( !vContract.size() ) break;		// nincs összevont ember, vége a programnak
-//		fclose( fU );
-//		fclose( fD );
-
 		++m_loop;
 	}
 	wndP.DestroyWindow();
-
-	theApp.insertIntoFiles( m_fileSpecTextU, UNITED_FILE );
-	theApp.insertIntoFiles( m_fileSpecTextD, DIFFERENT_FILE );
-
-//	fclose( fU );
-//	fclose( fD );
 	fclose( textU );
 	fclose( textD );
+
+#ifndef _DEBUG
+	str.Format( L"(5/5) Adatbázis tömörítése" ); 
+	wndP.SetText( str );
+#endif
+	theApp.execute( L"VACUUM");
 	return true;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -629,13 +584,14 @@ if( (i1 == 95921 && i2 == 141743 ) || (i1 == 141743 && i2 == 95921 ) )
 			}
 		}
 	}
-	checkEmptyCouples( group );
+	group = checkEmptyCouples( group );
+	checkEmptyCouples2( group );
 	listPeople();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Ellenõrzi a status == 1, source==3 típusú bejegyzéseket, amelyekben semmi más adat nincs, hogy van-e egyetlen 
 // azonos nevû status == 1, source == 1 bejegyzés. Ha van, akkor ezeket összevonja.
-void CContractPeople::checkEmptyCouples( int group )
+int CContractPeople::checkEmptyCouples( int group )
 {
 	UINT i;
 	UINT j;
@@ -664,8 +620,9 @@ void CContractPeople::checkEmptyCouples( int group )
 							b.father.IsEmpty() && b.birthF.IsEmpty() && b.deathF.IsEmpty() && \
 							b.mother.IsEmpty() && b.birthM.IsEmpty() && b.deathM.IsEmpty() )
 				{
+					spouses = getTwoWords( b.spouses );
 					// az 1. rangú bejegyzés házastársai között megtalálható a 3./4. rangú bejegyzése házastársa
-					if( (a.spouses.Find( b.spouses )) != -1  )
+					if( (a.spouses.Find( spouses )) != -1  )
 					{
 						if( ( cnt = howMany( b.spouses ) ) > 1 )	// ha azono snéven több 1. rangó bejegyzés van, akkor nem egyesít
 							break;							// tovább, mert nem lehet tudni, hogy melyikhez tartozik
@@ -688,6 +645,65 @@ void CContractPeople::checkEmptyCouples( int group )
 			}
 		}
 	}
+	return group;
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Ellenõrzi a status == 1, source==3 típusú bejegyzéseket, amelyekben semmi más adat nincs, hogy van-e egyetlen 
+int CContractPeople::checkEmptyCouples2( int group )
+{
+	UINT i;
+	UINT j;
+	UINT k;
+	int cnt;
+	SAMENAMES a;
+	SAMENAMES b;
+	CString spouses;
+
+
+	for( i = 0; i < vPeople.size(); ++i )
+	{
+		if( vPeople.at(i).spouses.IsEmpty() ) continue;
+
+		a = vPeople.at(i);
+		if( a.source == L"2" && a.status != -1 )  // NEM TÖRLENDÕ, DE HÁT EGYIK SEM AZ??
+		{
+			for( j = 0; j < vPeople.size(); ++j )
+			{
+				if( vPeople.at(j).spouses.IsEmpty() ) continue;
+				b = vPeople.at(j);
+				// még sehova sme tartozó 3. és 4. rangú üres bejegyzések ( merthogy ezeket márt átnézte és nem volt találat )
+//				if( ( b.source == L"3" || b.source == L"4" ) && b.status == 0 && 
+				if( b.source == L"3" && b.status == 0 && \
+							b.birth.IsEmpty() && b.death.IsEmpty() && \
+							b.father.IsEmpty() && b.birthF.IsEmpty() && b.deathF.IsEmpty() && \
+							b.mother.IsEmpty() && b.birthM.IsEmpty() && b.deathM.IsEmpty() )
+				{
+					spouses = getTwoWords( b.spouses );
+					// az 1. rangú bejegyzés házastársai között megtalálható a 3./4. rangú bejegyzése házastársa
+					if( (a.spouses.Find( spouses )) != -1  )
+					{
+//						if( ( cnt = howMany( b.spouses ) ) > 1 )	// ha azono snéven több 1. rangó bejegyzés van, akkor nem egyesít
+//							break;							// tovább, mert nem lehet tudni, hogy melyikhez tartozik
+						a.status = 1;						// megtartandó megerõsítése
+						if( a.group == 0 )					// ha még nem tartozott csoportba, akkor hozzárendeli a group-hoz
+						{
+							a.group = group;
+							vPeople.at(i).status = 1;		// a 2. rangó bejegyzés is csoport lesz
+							vPeople.at(i).group = a.group;
+							++vPeople.at(i).match;
+							++group;
+						}
+
+						vPeople.at(j).status	= -1;		// a 3./4. rangú bejegyzés törlendõ
+						vPeople.at(j).group		= a.group;
+						vPeople.at(j).match		= 1;
+						pushVContract( i, j );
+					}
+				}
+			}
+		}
+	}
+	return group;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int CContractPeople::howMany( CString spouse )
@@ -722,7 +738,7 @@ int CContractPeople::identical( UINT i1, UINT i2 )
 	CString rowid2 = b.rowid;
 
 
-	if( rowid1 == L"89293" && rowid2 == L"250918" )
+	if( rowid1 == L"275899" && rowid2 == L"280579" )
 		g = 1;
 	m_match = 0;
 	if( ( g = same( r.birth, a.birth, b.birth ) ) == -1 ) return false;
@@ -752,13 +768,6 @@ int CContractPeople::identical( UINT i1, UINT i2 )
 		if( ( g = same( r.deathM, a.deathM, b.deathM ) ) == -1 ) return false;
 		if( g == 1 ) ++m_match; 
 	}
-/*
-	if( mF && mM )			// csak akkor kapjon jópontot, ha az apa és az anya neve is azonos
-	{
-		++m_match;
-		++m_match;
-	}
-*/
 	
 	if( ( g = sameSpouses( a.source, a.rowid, b.rowid ) ) == -1 ) return false;
 	if( g == 1 ) ++m_match; 
@@ -1180,90 +1189,6 @@ void CContractPeople::setRef( int i )
 		r.generation = a.generation;
 
 }
-/*
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CContractPeople::openUnited()
-{
-	CString fileName;
-	fileName.Format( L"peopleUnited_%d", m_loop );
-	unitedSpec = theApp.openHtmlFile( &fU, fileName, L"w+" );
-
-	createHead( L"AZONOS NEVÛ EMBEREK, AKIK AZONOSAK IS, EZÉRT BEJEGYZÉSEIK ÖSSZEVONHATÓAK" );
-	fwprintf( fU, m_head );
-	fwprintf( fU, m_description1 );
-	fwprintf( fU, m_description2 );
-	str = L"A szürke hátterû bejegyzéseket egyesítettük a zöld hátterû bejegyzéssel.\n\
-Ha egy azonos nevû csoportban több különbözõ egyesítés lehetséges, akkor azok a 'g'-group oszlopba található számmal vannak meglülönböztetve.\n\n";
-	fwprintf( fU, str );
-
-	CString columns;
-	columns.Format( L"\
-%2s %2s %2s %2s \
-%9s %2s %1s %1s    \
-%s %s %s %s",\
-L"gr",L"mt",L"gp",L"st",\
-L"line", L"u", L"G", L"S",\
-L"név----------------------------- rowid születés---- halál------- ",\
-L"apa----------------------------- rowid születés---- halál------- ",\
-L"anya---------------------------- rowid születés---- halál------- ",\
-L"rowid-házastársak---------------"\
-);
-
-
-	fwprintf( fU, L"<font color='red'>%s</font><br>", columns );
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CContractPeople::openDifferent()
-{
-	CString fileName;
-	fileName.Format( L"peopleDifferent_%d", m_loop );
-	differentSpec = theApp.openHtmlFile( &fD, fileName, L"w+" );
-
-	createHead( L"AZONOS NEVÛ EMBEREK, AKIK KÜLÖNBÖZNEK EGYMÁSTÓ" );
-	fwprintf( fD, m_head );
-	fwprintf( fD, m_description2 );
-
-
-	CString columns;
-	columns.Format( L"\
-%9s %2s %1s %1s    \
-%s %s %s %s",\
-L"line", L"u", L"G", L"S",\
-L"név----------------------------- rowid születés---- halál------- ",\
-L"apa----------------------------- rowid születés---- halál------- ",\
-L"anya---------------------------- rowid születés---- halál------- ",\
-L"rowid-házastársak---------------"\
-);
-
-	fwprintf( fD, L"<font color='red'>%s</font><br>", columns );
-
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CContractPeople::createHead( CString title  )
-{
-	m_head.Format( L"\
-<HEAD>\n\
-<style>\n\
-</style>\n\
-</HEAD>\n\
-<BODY>\n\
-<center>%s</center><br><br>\n\n\
-<pre>\n\
-%-21s %s<br>\
-%-21s %s<br>\
-%-21s %d<br><br>\
-",
-title,\
-L"Adatbázis:",\
-theApp.m_databaseSpec,\
-L"Lista készült:",\
-theApp.getPresentDateTime(),\
-L"Egyezések min. száma:",\
-m_azonos\
-);
-}
-*/
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CContractPeople::query( CString command )
 {

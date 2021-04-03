@@ -89,7 +89,7 @@ protected:
 	std::vector<SAMENAMES> vSpouses;
 
 	std::vector<CONTRACT> vContract;
-	std::vector<TCHAR*> tableLines; 
+//	std::vector<TCHAR*> tableLines; 
 
 	SAMENAMES r;				// referencia adatok az összehasonlításnál
 	
@@ -118,7 +118,8 @@ protected:
 	void setRef( int i ) ;
 	void resetRef();
 	void emptyLine( FILE* fl, int loop );
-	void checkEmptyCouples( int group );
+	int checkEmptyCouples( int group );
+	int checkEmptyCouples2( int group );
 	void openUnited( );
 
 	void openDifferent();

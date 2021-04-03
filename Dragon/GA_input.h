@@ -32,9 +32,14 @@ public:
 	PEOPLE sm;		// a leszármazott házastársa anyjának adatai				vector lesz belõle
 	PEOPLE ss;		// a leszármazott házastársa további házastársának adatai	vector lesz belõle, az s vector indexét megõrizni!
 
+	// a szétszedett sor módosított substringjei
+	CString m_nameSubstr;
+	CString m_birthSubstr;
+	CString m_deathSubstr;
+
 	// elsõ foku substringek
 	CString	m_descendant;
-	SUBSTRING desc;			// descendant substrings
+//	SUBSTRING desc;			// descendant substrings
 
 	TABLEHEADER m_tableHeader;
 	std::vector<MARRIAGES>		v_marriages;		// leszármazott házasságai
@@ -51,7 +56,7 @@ public:
 	void	insertTableHeader();
 	void	processMarriageSubstrings();
 	void	processPlaceDateComment( CString placeDateComment, PLACE_DATE_BLOCK* ns );
-	void	processPeopleStr( CString cLine,  PEOPLE* any, SUBSTRING* sub );
+	void	processPeopleStr( CString cLine,  PEOPLE* any );
 	void	processDescendantSubstring( CString cLine );
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -77,6 +82,8 @@ protected:
 	void	clearAll();
 	void	clearPeople( PEOPLE *p);
 	void	clearTableHeader( TABLEHEADER* tableHeader);
+
+	
 
 	MARRIAGE_INSERT d_s;
 	MARRIAGE_INSERT s_ss;
@@ -160,7 +167,8 @@ protected:
 
 
 	void	processPeopleString( int who,  CString cLine, PEOPLE * p );
-	void	processNameSubstr( CString nameSubstr, CString birthSubstr, CString deathSubstr,  PEOPLE* any );
+//	void	processNameSubstr( CString nameSubstr, CString birthSubstr, CString deathSubstr,  PEOPLE* any );
+	void	processNameSubstr( PEOPLE* any );
 	CString processWedding( CString cLine, PLACE_DATE_BLOCK* w );
 
 	void	processSpousesSpouses( CString spouses,  std::vector<PEOPLE> *v_p );

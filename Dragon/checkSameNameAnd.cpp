@@ -58,6 +58,7 @@ enum
 	L_SM,
 	L_ROWIDM,
 	L_MOTHER,
+	L_ROWIDS,
 	L_SPOUSES,
 	L_LINENUMBERF,
 	L_LINENUMBERM,
@@ -538,6 +539,7 @@ void CcheckSameNameAnd::createColumns()
 	m_ListCtrl.InsertColumn( L_SM,			L"s",			LVCFMT_LEFT,	 20,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_ROWIDM,		L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_MOTHER,		L"anya",		LVCFMT_LEFT,	200,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( L_ROWIDS,		L"rowid",		LVCFMT_RIGHT,	 60,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( L_SPOUSES,		L"házastársak",	LVCFMT_LEFT,	500,-1,COL_TEXT );
 	m_ListCtrl.InsertColumn( L_LINENUMBERF,	L"line#F",		LVCFMT_LEFT,	 60,-1,COL_HIDDEN );
 	m_ListCtrl.InsertColumn( L_LINENUMBERM,	L"line#M",		LVCFMT_LEFT,	 60,-1,COL_HIDDEN );
@@ -849,7 +851,10 @@ void CcheckSameNameAnd::listSameVector()
 		spouses = theApp.getSpouses( rowid, sex_id, &theApp.v_spouses, &sp );
 		spouses2 = sp.spouses2;
 
-		
+		if( theApp.v_spouses.size() )
+			spouseId = theApp.v_spouses.at(0).id;
+		else
+			spouseId.Empty();
 		col = 0;
 		if( i )
 		{
@@ -901,6 +906,7 @@ void CcheckSameNameAnd::listSameVector()
 		m_ListCtrl.SetItemText( nItem, L_SM, motherSource );
 		m_ListCtrl.SetItemText( nItem, L_ROWIDM, mother_id );
 		m_ListCtrl.SetItemText( nItem, L_MOTHER, motherNamePrint );
+		m_ListCtrl.SetItemText( nItem, L_ROWIDS, spouseId );
 		m_ListCtrl.SetItemText( nItem, L_SPOUSES,spouses2 );
 		m_ListCtrl.SetItemText( nItem, L_LINENUMBERF, lineNumberF );
 		m_ListCtrl.SetItemText( nItem, L_LINENUMBERM, lineNumberM );

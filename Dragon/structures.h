@@ -26,15 +26,7 @@ typedef struct
 	int		primaryPic;
 }PHOTOS;
 
-/*
-typedef struct
-{
-	CString filename;
-	CString fileSpec;
-	CString ext;
-	u_int64	size;
-}BLOBSTAT;
-*/
+
 typedef struct FAMS
 {
 	int	indi;
