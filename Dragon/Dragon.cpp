@@ -707,5 +707,6 @@ void CDragonApp::OnFamilyDates()
 void CDragonApp::OnUnknownFirstnames()
 {
 	CCheckFirstNames dlg;
+	dlg.m_message = true;
 	dlg.DoModal();
 }

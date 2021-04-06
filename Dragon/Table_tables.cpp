@@ -68,7 +68,7 @@ BEGIN_MESSAGE_MAP(CTableTables, CDialogEx)
 	ON_COMMAND(ID_EXPORT_SELECTED, &CTableTables::OnExportSelected)
 	ON_COMMAND(ID_UNFILTER, &CTableTables::OnUnfilter)
 	ON_COMMAND(ID_FILTER_FAMILY, &CTableTables::OnFilterFamily)
-	ON_BN_CLICKED(IDOK, &CTableTables::OnBnClickedOk)
+//	ON_BN_CLICKED(IDOK, &CTableTables::OnBnClickedOk)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CTableTables::OnDblclkList)
 //	ON_COMMAND(ID_GALINE, &CTableTables::OnGaline)
 	ON_COMMAND(ID_GAHTML, &CTableTables::OnGahtml)
@@ -85,8 +85,8 @@ BOOL CTableTables::OnInitDialog()
 	CDialogEx::OnInitDialog();
 	EASYSIZE_ADD( IDC_LIST,	ES_BORDER,	ES_BORDER,		ES_BORDER,		ES_BORDER,	0 );
 	EASYSIZE_ADD( IDC_CAPTION,	ES_BORDER,	ES_BORDER,	ES_BORDER,		ES_KEEPSIZE,	0 );
-	EASYSIZE_ADD( IDOK,		ES_BORDER,	ES_KEEPSIZE,	ES_KEEPSIZE,	ES_BORDER,	0 );
-	EASYSIZE_ADD( IDCANCEL,	ES_BORDER,	ES_KEEPSIZE,	ES_KEEPSIZE,	ES_BORDER,	0 );
+//	EASYSIZE_ADD( IDOK,		ES_BORDER,	ES_KEEPSIZE,	ES_KEEPSIZE,	ES_BORDER,	0 );
+//	EASYSIZE_ADD( IDCANCEL,	ES_BORDER,	ES_KEEPSIZE,	ES_KEEPSIZE,	ES_BORDER,	0 );
 
 	EASYSIZE_INIT()
 
@@ -107,9 +107,10 @@ BOOL CTableTables::OnInitDialog()
 	m_ListCtrl.InsertColumn( T_FAMILYNAME,	L"családnév",	LVCFMT_LEFT,	150,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( T_TABLENUMBERROMAN,L"roman#",	LVCFMT_RIGHT,	 60,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( T_FOLYT,		L"folyt",		LVCFMT_LEFT,	100,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( T_TORZS,		L"törzs",		LVCFMT_LEFT,	100,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( T_TITOLO,		L"elõnév",		LVCFMT_LEFT,	200,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( T_COMMENT,		L"megj.",		LVCFMT_LEFT,	150,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( T_TORZS,		L"törzs",		LVCFMT_LEFT,	100,-1,COL_TEXT);
+
 	m_ListCtrl.InsertColumn( T_ARM,			L"ág",			LVCFMT_LEFT,	100,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( T_JOINT,		L"kapcs",		LVCFMT_LEFT,	 40,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( T_NEWFAMILIES,	L"új családok",	LVCFMT_LEFT,	100,-1,COL_TEXT);
@@ -172,8 +173,10 @@ void CTableTables::setRow( int nItem )
 	m_ListCtrl.SetItemText( nItem, T_FAMILYNAME,		theApp.m_recordset->GetFieldString( TABLES_FAMILY_NAME ));
 	m_ListCtrl.SetItemText( nItem, T_TITOLO,			theApp.m_recordset->GetFieldString( TABLES_TITOLO ));
 	m_ListCtrl.SetItemText( nItem, T_TABLENUMBERROMAN,	theApp.m_recordset->GetFieldString( TABLES_TABLENUMBERROMAN ) );
-	m_ListCtrl.SetItemText( nItem, T_COMMENT,			theApp.m_recordset->GetFieldString( TABLES_COMMENT ) );
+	m_ListCtrl.SetItemText( nItem, T_FOLYT,				theApp.m_recordset->GetFieldString( TABLES_FOLYT ) );
 	m_ListCtrl.SetItemText( nItem, T_TORZS,				theApp.m_recordset->GetFieldString( TABLES_TORZS ) );
+	m_ListCtrl.SetItemText( nItem, T_COMMENT,			theApp.m_recordset->GetFieldString( TABLES_COMMENT ) );
+	
 	m_ListCtrl.SetItemText( nItem, T_ARM,				theApp.m_recordset->GetFieldString( TABLES_ARM ) );
 	int joint = _wtoi( theApp.m_recordset->GetFieldString( TABLES_JOINT ) );
 	if( !joint )
@@ -181,7 +184,7 @@ void CTableTables::setRow( int nItem )
 	m_ListCtrl.SetItemText( nItem, T_NEWFAMILIES,		theApp.m_recordset->GetFieldString( TABLES_NEWFAMILIES ) );
 	m_ListCtrl.SetItemText( nItem, T_KNOWN_AS,			theApp.m_recordset->GetFieldString( TABLES_KNOWN_AS ) );
 	m_ListCtrl.SetItemText( nItem, T_ALIAS,				theApp.m_recordset->GetFieldString( TABLES_ALIAS ) );
-	m_ListCtrl.SetItemText( nItem, T_FOLYT,				theApp.m_recordset->GetFieldString( TABLES_FOLYT ) );
+
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
@@ -368,10 +371,10 @@ void CTableTables::OnFilterName()
 void CTableTables::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	if( !m_select )
+//	if( !m_select )
 		OnEditUpdate();
-	else
-		OnBnClickedOk();
+//	else
+//		OnBnClickedOk();
 	*pResult = 0;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -424,6 +427,7 @@ void CTableTables::OnPrivatDescendantsTable()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 void CTableTables::OnBnClickedOk()
 {
 	int	n = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
@@ -462,7 +466,7 @@ void CTableTables::OnBnClickedOk()
 	}
 	CDialogEx::OnOK();
 }
-
+*/
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
 void CTableTables::OnGaline()

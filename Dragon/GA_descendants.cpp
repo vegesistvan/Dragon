@@ -1,5 +1,9 @@
 // GaDescendants2.cpp : implementation file
 //
+// Ha nõk leszármazottait is listázzuk, akkor némely esetben olyan hatalmas leszármazotti lista keletkezne, ami 
+// olyan hatást kelt, hogy legagyna a program. Lehet, hogy le is fagy, vagyis a html fájl összetört sorokat tartalmaz,
+// kezelhetetlen az egész
+
 
 #include "stdafx.h"
 #include "Dragon.h"
@@ -46,8 +50,9 @@ CGaDescendants::CGaDescendants(CWnd* pParent /*=NULL*/)
 	,m_code(FALSE)			// ANSI vagy UTF8 kódrendszer
 	,m_numbering(2)			// milyen számozási rendszer legyen (0,1,2) 
 	,m_checkFamily(TRUE)	// %%% családnév,elõnév kiemelése
+	, m_spaces(FALSE)
 {
-
+	
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CGaDescendants::~CGaDescendants()
@@ -68,6 +73,7 @@ void CGaDescendants::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO_BGRD, m_ComboBgrd);
 	DDX_Check(pDX, IDC_CHECK_FAMILY, m_checkFamily);
 	DDX_Control(pDX, IDC_SZLUHA, m_szluhaCtrl);
+	DDX_Radio(pDX, IDC_RADIO_LIST, m_spaces);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CGaDescendants, CDialogEx)
@@ -87,6 +93,7 @@ BEGIN_MESSAGE_MAP(CGaDescendants, CDialogEx)
 	ON_BN_CLICKED(IDOK, &CGaDescendants::OnBnClickedOk)
 	ON_BN_CLICKED(IDC_CHECK_FAMILY, &CGaDescendants::OnClickedCheckFamily)
 	ON_BN_CLICKED(IDC_CHECK_LASTNAME, &CGaDescendants::OnClickedCheckLastname)
+	ON_BN_CLICKED(IDC_RADIO_LIST, &CGaDescendants::OnClickedRadioList)
 END_MESSAGE_MAP()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Bemenet:
@@ -347,6 +354,10 @@ void CGaDescendants::descendants()
 {
 	CString rowid;
 	int ix = 0;
+	int linenumberMax = 100;
+	int linenumber = 0;
+	int generationsMax = 25;
+	m_gen = 0;
 
 	// az elsõ emeber a treePeople, treeTables-ben kerül betöltésre 
 
@@ -354,7 +365,20 @@ void CGaDescendants::descendants()
 	{
 		if( !vDesc.at(ix).hidden	)	
 		{
+			if( m_gen > generationsMax )
+//			if( linenumber > linenumberMax )
+			{
+				if( !m_spaces )
+				{
+					for( int i =0; i < cnt_ol; ++i )
+						fwprintf( fl, L"%s\n", m_tag2 );
+				}
+				str.Format( L"<br><br><font color='red'>%d-nál több generációt írt ki, már kezelhetetlen, ezért abbahoagyom!!!</font>", linenumberMax );
+				print( str );
+				break;
+			}
 			printGAline();	// a vDesc tetején lévõ leszármazottat kinyomttajuk  m_genPrev-et beállítja
+			++linenumber;
 		}
 		
 		if( vDesc.at(ix).sex_id == WOMAN && !m_woman )		// ha nõ a leszármazott és annak a gyerekeit nem akarjuk listázni
@@ -503,6 +527,15 @@ void CGaDescendants::OnRadioDefault()		// default szín beállítása
 	m_ComboBgrd.SetCurSel( 0 );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CGaDescendants::OnClickedRadioList()
+{
+	if( m_numbering != 0 ) 
+	{
+		m_spaces = !m_spaces;
+	}
+	UpdateData(TOSCREEN);
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaDescendants::OnClickedCheckWoman()
 {
 	m_woman	= !m_woman;				// ha a nõk cgyerekeit is listázni akarjuk, akkor a táblákat is össze kell kötni!!
@@ -533,14 +566,20 @@ void CGaDescendants::OnClickedCheckLastname()
 void CGaDescendants::OnClickedSzluha()
 {
 	m_numbering = 0;
+	GetDlgItem( IDC_RADIO_LIST )->EnableWindow( false );
+	GetDlgItem( IDC_RADIO_SPACES )->EnableWindow( false );
 }
 void CGaDescendants::OnVillers()
 {
 	m_numbering = 1;
+	GetDlgItem( IDC_RADIO_LIST )->EnableWindow( true );
+	GetDlgItem( IDC_RADIO_SPACES )->EnableWindow( true );
 }
 void CGaDescendants::OnTupigny()
 {
 	m_numbering = 2;
+	GetDlgItem( IDC_RADIO_LIST )->EnableWindow( true );
+	GetDlgItem( IDC_RADIO_SPACES )->EnableWindow( true );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaDescendants::OnBnClickedOk()
@@ -554,7 +593,8 @@ void CGaDescendants::OnBnClickedOk()
 	m_colorBgrnd = szin[m_ixBgrd].rgb;
 
 	if( m_woman ) m_connect = true;
-	
+
+	OnCancel();
 	if( m_rowid1.IsEmpty() )
 		treeTables();
 	else

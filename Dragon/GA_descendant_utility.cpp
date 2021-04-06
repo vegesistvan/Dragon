@@ -73,14 +73,21 @@ BOOL CGaDescendants::openHtml( CString file, CString title, UINT colorBgrnd )
 	CString today;
 	today = theApp.getPresentDateTime();
 
+	if( m_woman )
+		str = L"igen";
+	else
+		str = L"nem";
+
+
 	CString header;
 	header.Format( L"\n\
 <pre>\n\
-Program:   %s\n\
-Adatbázis: %s\n\
-Készült:   %s\n\
+Program:            %s\n\
+Adatbázis:          %s\n\
+Készült:            %s\n\
+Nõk leszármazottai: %s\n\
 </pre>\n\n\
-", L"Dragon version " VERSION, theApp.m_databaseName, today );
+", L"Dragon version " VERSION, theApp.m_databaseSpec, today, str );
 
 	
 //	CString style;
@@ -88,6 +95,8 @@ Készült:   %s\n\
 
 	CString body;
 	body.Format( L"<body bgcolor=\"%06x\">", colorBgrnd );
+
+//	body = L"<body font-family: Avenir Next, Calibri, Verdana, sans-serif>";
 
 	m_htmlFile.Format(L"%s\\%s_%s.html",theApp.m_workingDirectory,file, getTimeTag() );
 	if( !openFileSpec( &fl, m_htmlFile, L"w+" ) ) return false;
@@ -102,6 +111,8 @@ Készült:   %s\n\
 	print( body );
 	print( header );
 	print( title );
+	if( m_spaces )
+		print( L"<pre>" );
 	return TRUE;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -123,6 +134,7 @@ void CGaDescendants::createStyle()
 	{
 	fwprintf( fl, L"ul {\n" );
 	fwprintf( fl, L"display: block;\n" );
+	fwprintf( fl, L"max-width: 200%;\n" );
 //	fwprintf( fl, L"list-style-type: square;\n" );
 	fwprintf( fl, L"list-style-type: none;\n" );
 	fwprintf( fl, L"margin-top: 0 em;\n" );

@@ -722,7 +722,8 @@ void CDragonApp::OnPrivatFolyt()
 	int		pos;
 
 	CString cLine;
-
+	CString folyt;
+	CString tableRoman;
 
 	theApp.m_inputCode = GetInputCode( theApp.m_htmlFileSpec );
 	CStdioFile file( theApp.m_htmlFileSpec, CFile::modeRead); 
@@ -742,11 +743,15 @@ void CDragonApp::OnPrivatFolyt()
 		wndProgress.PeekAndPump();
 		if (wndProgress.Cancelled()) break;
 
-		if(  cLine.Find( L"%%% folyt" ) != -1 )
+		if( ( pos = cLine.Find( L"%%% folyt" )) != -1 )
 		{
+			folyt = cLine.Mid( pos );
+			str = cLine.Mid( pos + 10 );
+			tableRoman = getFirstWord( str );
 //			str = cleanCline2( cLine );
 			str = cleanCline( cLine );
-			fwprintf( theApp.fl, L"%s\n", str );
+			//fwprintf( theApp.fl, L"%s\n", str );
+			fwprintf( theApp.fl, L"%-30s %s\n", folyt.Left(30), tableRoman );
 		}
 	}
 	file.Close();

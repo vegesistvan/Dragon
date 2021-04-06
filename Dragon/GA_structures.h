@@ -106,6 +106,7 @@ typedef struct
 	int		orderMother;
 	int		numOfSpouses;
 	CString known_as;
+	CString familyName;
 } GENERATIONS;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -338,6 +339,7 @@ typedef struct
 	TCHAR gen;
 	int	orderFather;
 	int orderMother;
+	CString familyname;
 }ORDERFATHER;
 
 
@@ -370,21 +372,23 @@ typedef struct
 
 typedef struct
 {
-	int		familyNumber;
-	int		tableNumber;
-	int		lineNumber;
-	CString tableHeader;
-	CString percent;
-	CString familyName;
-	CString titolo;
-	CString alias;
-	CString tableRoman;
-	CString comment;
-	CString torzs;
+	int		familyNumber;	// család sorszáma ( 1- N )
+	int		tableNumber;	// tábla sorszáam ( 1- N)
+	int		lineNumber;		// a tábla sor sorzsáam
+	int		tableNumber1;
+	CString tableRoman;		// a tábla római száma a családon belül
+	CString tableHeader;	// a teljes tábla sor
+	CString percent;		// %%% vagy %%
+	CString familyName;		// a tableHeaddr-bõl kivett családnév
+	CString titolo;			// a tableHeaderbõl kivett elõnév
+	CString alias;			// a tableHeaderbõl kivett alias
 	CString known_as;
+	CString comment;		// a tableHeaderbõl kivett comment
+
+	CString torzs;
 	CString arm;
 	int		joint;
-	CString folyt;
+	CString folyt;			// a táblában elõforduló folyt sorok hivatkozásai vesszõvel elválasztva ( csak információ)
 }TABLEHEADER;
 
 

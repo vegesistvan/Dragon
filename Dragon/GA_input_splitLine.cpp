@@ -21,41 +21,31 @@ void CGaInput::splitLine( CString cLine)
 	processMarriageSubstrings();						// a v_marriages vektor substringjeit felbontja, az értékekekt magába a vektorba teszi
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Leszedi a sor végérõl az elágazás jelzését, amit megtisztítva az 'm_folyt' változóba tesz;
+// Leszedi a sor végérõl az elágazás jelzését, amit megtisztítva a d.folyt változóba tesz;
 // A megtisztított sort visszadja.
-//
-// lehetséges folyt végzõdések?
-// )_%%%_folyt_I
-// [%%% folyt II]
-// folyt III
 CString CGaInput::getBranch( CString cLine )
 {
 	int pos;
-	CString tableRoman;
-	CString ch;
-	CString tmp = cLine.Right( 20 );
 	CString folyt;
-	CString root;
 
-	m_folyt.Empty();
-	if( ( pos = cLine.Find( L"folyt" ) ) != -1 )
+	if( ( pos = cLine.Find( L"%%% folyt" ) ) != -1 )
 	{
-		tableRoman = cLine.Mid( pos + 6 );
-		tableRoman.Replace( '.', ' ' );
-		tableRoman.Replace( ',', ' ' );
-		tableRoman.Replace( '?', ' ' );
-		tableRoman.Trim();
-		m_folyt = tableRoman;
-		folyt += m_folyt+L",";
-		if( v_tableHeader.size() > 0 )
-			v_tableHeader.at( v_tableHeader.size() -1 ).folyt += folyt;
-		cLine = cLine.Left( pos - 4 );				// lehagyja a %%% jeleket
-		cLine.Trim();
+		str		= cLine.Mid( pos + 10 );
+		folyt	= getFirstWord( str );   // lehet a romanNumber után még valami feljegyzés!!
+		d.folyt	= folyt;
+
+		folyt += L",";
+		m_tableHeader.folyt += folyt;
+		//v_tableHeader.at( v_tableHeader.size() -1 ).folyt += folyt;  // gyûjti a táblában elõforduló folyt számokat
+
+		cLine = cLine.Left( pos-1 );				// lehagyja a %%% jeleket
+		
 	}
-	
+
+
 	int pos1;
 	int pos2;
-
+	CString root;
 	
 	while( (pos2 = cLine.ReverseFind( ']' ) ) != -1 )
 	{

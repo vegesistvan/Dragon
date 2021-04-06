@@ -17,7 +17,10 @@ void CGaDescendants::printGAline()
 //	rowid = vDesc.at(ix).rowid;
 	queryPeople( rowid, &p );
 
-	printBegining();	// html kódok és generáció elkészítése; 
+	if( m_spaces )
+		printBegining2();	// html kódok és generáció elkészítése; 
+	else
+		printBegining();	// html kódok és generáció elkészítése; 
 	printDescendant();
 	printMarriages(); 
 
@@ -35,10 +38,22 @@ void CGaDescendants::printGAline()
 		str.Format( L"<font color='blue'> %c%c%c folyt %s</font>", '%','%','%', p.folyt );
 		print( str );
 	}
-
-//	if( !p.known_as.IsEmpty() ) fwprintf( fl, L"\n%c %s", '%', p.known_as );
-	fwprintf( fl, L"\n" );
 	fflush( fl );
+
+	if( !p.known_as.IsEmpty() )
+	{
+		if( !m_spaces )
+			str.Format( L"<ul><font color='blue'> %c %s</font>", '%', p.known_as );
+		else
+		{
+			tab();
+			str.Format( L"<font color='blue'> %c %s</font>", '%', p.known_as );
+		}
+		print( str );
+		fflush( fl );
+	}
+
+
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // A genráció változástól függû behuzás és genrációs kód nyomtatása az m_sytax értékétõl függõen
@@ -49,6 +64,7 @@ void CGaDescendants::printBegining()
 	int ix = vDesc.size() -1;
 
 	UINT	generation	= vDesc.at(ix).gen;
+	m_gen = generation;
 	TCHAR	gen			= TCHAR('A') + TCHAR(generation);	// a generációs karakter-jel ( A,B,C,D.....);
 
 	// a generációnak megfelelõ sor-kihúzás, visszatolás
@@ -99,13 +115,60 @@ void CGaDescendants::printBegining()
 		str.Format( L"%s%c-%d&diams;", tags, gen, vSerial.at( generation ) );
 	print( str );
 }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CGaDescendants::tab()
+{
+	fwprintf( fl, L"<br>%*s", m_gen*4, L" " );
+//	fwprintf( fl, L"<br>%*s", m_gen, L"\t" );
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// A genráció változástól függû behuzás és genrációs kód nyomtatása az m_sytax értékétõl függõen
+void CGaDescendants::printBegining2()
+{
+	CString tags;
+	bool ul = false;
+	int ix = vDesc.size() -1;
+
+	UINT	generation	= vDesc.at(ix).gen;
+	m_gen = vDesc.at(ix).gen;
+
+	TCHAR	gen			= TCHAR('A') + TCHAR(generation);	// a generációs karakter-jel ( A,B,C,D.....);
+
+	CString family;
+	CString familyName = getLastname( &p );
+
+	
+	if( m_checkFamily )
+	{
+		if( m_familyName != familyName )
+		{
+			family = getFamilyName( familyName );			// a tables táblából visszadja a tableHeader értékét 
+			fwprintf( fl, L"<br>" );
+			tab();
+			str.Format( L"<b>%s %s</b><br>", L"%%%", family );
+			print( str );
+		}
+		m_familyName = familyName;
+	}
+	tab();
+
+
+	if( m_numbering == SZLUHA )
+		str.Format( L"%c&diams;",  gen );			// gedcom és kézi bevitelnél nincs generáció, ezt úgy kell beletenni!!
+	else if( m_numbering == VIL )
+		str.Format( L"%c%d&diams;", gen, vDesc.at(ix).children );
+	else if( m_numbering == TUP )
+		str.Format( L"%c-%d&diams;", gen, vSerial.at( generation ) );
+	print( str );
+}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CGaDescendants::getFamilyName( CString family )
 {
 	CString titolo;
 	CString familyName;
 
-	familyName = p.last_name.MakeUpper();
+	familyName = p.last_name;
+	familyName.MakeUpper();
 	titolo = p.titolo;
 
 	if( titolo.IsEmpty() )
@@ -127,7 +190,7 @@ void CGaDescendants::printDescendant()
 		cLine.Format( L"%s %s",  getLastname( &p ), getFirstname( &p )); //attrib[m_ixName].code1, p.first_name, attrib[m_ixName].code2 ); 
 	else
 		cLine.Format( L"%s", getFirstname( &p )); //attrib[m_ixName].code1, p.first_name, attrib[m_ixName].code2 ); 
-	
+	cLine.TrimRight();
 // ha apjának több felkesége volt,a felség sorszámának kiírása
 
 	if( vDesc.at(ix).numOfMothers > 1 )
@@ -180,26 +243,24 @@ void CGaDescendants::printDescendant()
 	}
 	cLine.Trim();
 
-	if( !p.known_as.IsEmpty() )
-	{
-		cLine += L" % ";
-		cLine += p.known_as;
-	}
+
 
 
 	CString csalad;
 	if( !p.csalad.IsEmpty() )
 	{
-		cLine += L" [";
-		cLine += p.csalad;
-		cLine += L" család]";
+		str.Format( L"<font color='blue'>[%s család]</font>", p.csalad );
+		cLine += str;
+//		cLine += L" [";
+//		cLine += p.csalad;
+//		cLine += L" család]";
 	}
-
-//	if( m_code == UTF8 ) cLine =  UnicodeToUtf8( cLine );
-//	fwprintf( fl, L"%s", cLine );
 	print( cLine );
 	fflush( fl );
 	m_genPrev = vDesc.at(ix).gen;
+
+
+	
 	
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -354,7 +415,7 @@ void CGaDescendants::printSpRelatives()
 			{
 				spouseSpouse = getLastFirst( &ss );
 				if( parents.GetLength() )
-					parents += L", ";
+					parents += L",";
 				else
 					parents = L"(";
 
@@ -464,7 +525,7 @@ CString CGaDescendants::getPlaceDateBlock( CString place, CString date, TCHAR je
 		{
 			block += date;
 		}
-		block.TrimRight();
+		block.Trim();
 		
 	}
 	return block;
@@ -472,8 +533,9 @@ CString CGaDescendants::getPlaceDateBlock( CString place, CString date, TCHAR je
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CGaDescendants::getCommentBlock( CString comment )
 {
+	if( comment.IsEmpty() ) return L"";
+
 	CString block = attrib[m_ixComment].code1;
-	block += L" ";
 	block += comment.Trim();
 	block += attrib[m_ixComment].code2;
 	return block;

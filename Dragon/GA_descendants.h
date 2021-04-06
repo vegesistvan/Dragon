@@ -30,18 +30,20 @@ public:
 	enum { IDD = IDD_GA_DESCENDANTS };
 	BOOL m_join;
 	BOOL m_limited;
-	BOOL _woman;				// nõk leszármazottait is kistázza-e
+//	BOOL _woman;				// nõk leszármazottait is kistázza-e
 
 
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
+
 	CString str;
 	CString m_command;
 	CString m_htmlFile;
 	CString cLine;
 
+	UINT m_gen;
 	UINT m_genPrev;
 	int		cnt_ol;
 	UINT	m_ixBgrd;
@@ -53,6 +55,7 @@ protected:
 	int		m_sex_id;
 	CString m_mother_index;
 	CString m_familyName;
+
 
 	int		m_parentindexLast;
 	BOOL	m_checkFamily;
@@ -101,9 +104,11 @@ protected:
 	CString getNextChildRowid( UINT ix );
 	void descendants();
 
+	void tab();
 	void print( CString str );
 	void printGAline();
 	void printBegining();
+	void printBegining2();
 	void printDescendant();
 	void printMarriages();
 	void printMarriage( CString place, CString date, int i, int numberOfSpouses );
@@ -159,5 +164,7 @@ public:
 	afx_msg void OnVillers();
 	afx_msg void OnClickedCheckFamily();
 	afx_msg void OnClickedCheckLastname();
+	BOOL m_spaces;
+	afx_msg void OnClickedRadioList();
 };
 #endif // !defined(AFX_DESCENDANT_H__930379D8_BDD1_4973_93FF_041F3F3811E4__INCLUDED_)

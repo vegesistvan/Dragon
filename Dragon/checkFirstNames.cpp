@@ -76,7 +76,7 @@ BOOL CCheckFirstNames::OnInitDialog()
 	
 
 	findFirstNames();
-	if( !m_ListCtrl.GetItemCount())
+	if( !m_ListCtrl.GetItemCount() && m_message )
 	{
 		AfxMessageBox( L"Minden keresztnév szerepel a név-adatbázisban.", MB_ICONINFORMATION );
 		OnCancel();

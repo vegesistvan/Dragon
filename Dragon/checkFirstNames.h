@@ -11,7 +11,7 @@ public:
 	virtual ~CCheckFirstNames();
 
 	enum { IDD = IDD_CHECK_FIRSTNAMES };
-
+	bool m_message;
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	CListCtrlEx m_ListCtrl;

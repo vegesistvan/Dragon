@@ -16,8 +16,8 @@
 
 // I. szint
 // 'folyt' levétel
-// [] levétel
-// G genrációs karakter levétele
+// [...család] és [..család õse]levétel
+// G generációs karakter levétele
 // descendantString és vMarriageStrings( marriageString ) szétválasztása
 //
 // II. szint: rövidebb substringek
@@ -171,7 +171,8 @@ bool CGaInput::inputFile()
 	if( !query( m_command ) ) return false;
 	m_rowid = _wtoi( m_recordset.GetFieldString(0) );  // m_rowid az utoljára insertált people rowid-ja
 
-	clearTableHeader( &m_tableHeader);  // ha nem táblát, hanem leszármazotti listát olvasunk be, akkor ez kell
+
+	clearTableHeader();  // ha nem táblát, hanem leszármazotti listát olvasunk be, akkor ez kell
 	v_tableHeader.clear();
 
 	theApp.m_cntPeople		= 0;
@@ -183,6 +184,8 @@ bool CGaInput::inputFile()
 	if( !rollFile( &file ) ) return false;		// eltekeri a fájlt a kívánt pozicióba, 
 												// ami beállítja az m_lineNumber, m_tableNumber, ill. m_familyNUmber értékeket.
 
+	m_tableNumber1 = 0;
+
 	CProgressWnd wndP(NULL, caption );
 	wndP.GoModal();
 	wndP.SetRange(0, fileLength );
@@ -190,7 +193,9 @@ bool CGaInput::inputFile()
 	wndP.SetStep(1);
 
 	CString cLine;
+	CString known_as;
 	bool kilepett = false;
+	m_tableHeader.tableHeader.Empty();
 	if( !theApp.execute( L"BEGIN" ) ) return false;			// Ha nme itt lenne, hanem az insertEntries-ben, akkor nagyon lassú lenne!!!
 	while(file.ReadString(cLine)) 
 	{
@@ -215,24 +220,29 @@ bool CGaInput::inputFile()
 				if( m_familyNumber >= m_rollToFamily ) break;
 			}
 
-			processTableHeader( cLine );			// ez beállítja az m_tableNuber-t és az m_familyNumbert-t
+			if( !m_tableHeader.tableHeader.IsEmpty() )
+				v_tableHeader.push_back( m_tableHeader );
+		
+			splitTableHeader( cLine );				// m_familyName-et beállítja
+			++m_tableNumber1;						// 1-tõl egyesével nõ a tableNumber, föhggetlenül attól, hoyg hanyadikat olvassuk be!!
 			v_generations.clear();					// új táblánál újrakezdi a generációkat
 			v_orderFather.clear();					// új tábla
 			vParent2Index.clear();
-			m_known_as.Empty();						// új táblánál megszûnik a known_as
 			m_tableAncestry = TRUE;					// az új tábla elsõ embere lesz a tábla õse
 		}
-		else if( cLine.Left(2) == L"% " )			// known_as  % N új sorban van!! A tableHeader beolvasása után egy külön sorban olvashatjuk be!!
+		else if( cLine.Left(2) == L"% " )			// %known_as A tableHeader/leszármazott beolvasása után egy külön sorban olvashatjuk be!!
 		{
-			if( m_tableAncestry && v_tableHeader.size() )
-				v_tableHeader.at( v_tableHeader.size()-1).known_as = cLine;  // az utolsó tableHeader-be beteszi a % N-t!
-
-			m_known_as = getSecondWord( cLine );
-			m_known_as.Replace( ',', ' ' );			// % Aba, aaaaa
-			m_known_as.Trim() ;
-			if( m_known_as == L"N;" ) continue;
-			m_familyName	= m_known_as;
-			updatePreviousDescendant( cLine );	// az elõzõ decendant know_as mezejébe updatei a "% nev"-et
+			if( m_tableAncestry )					// fejlécet követi
+				m_tableHeader.known_as = cLine;
+			else									// leszármazottat követi
+			{
+				m_known_as = getSecondWord( cLine );
+				m_known_as.Replace( ',', ' ' );			// % Aba, aaaaa
+				m_known_as.Trim() ;
+				if( m_known_as == L"N;" ) continue;
+				m_familyName = m_known_as;
+				updatePreviousDescendant( m_known_as );	// az elõzõ decendant know_as mezejébe updatei a "% nev"-et
+			}
 		}
 		else			// descendant line
 		{
@@ -263,6 +273,13 @@ bool CGaInput::inputFile()
 			gen.parentIndex			= d.parentIndexCalc;				// anya-index  ( apja hanyadik feleségae az anyja )
 			gen.orderFather			= d.orderFather;					//új
 			gen.orderMother			= d.orderMother;
+			gen.familyName			= m_familyName;
+			if( v_marriages.size() > 10 )
+			{
+				str.Format( L"%d házastárs nem fér el a v_generation vektorban!!", v_generations.size() );
+				AfxMessageBox( str, MB_ICONERROR );
+				break;
+			}
 			for( UINT i = 0; i < v_marriages.size(); ++i )
 			{
 				gen.spouse_id[i]	= v_marriages.at(i).rowid;			// beteszi az aktuális házastársak rowid-jeit
@@ -286,6 +303,8 @@ bool CGaInput::inputFile()
 	if( kilepett ) return false;
 	
 	theApp.insertIntoFiles( theApp.m_htmlFileSpec, GA_HTML );
+
+	v_tableHeader.push_back( m_tableHeader );
 	insertTableHeader();
 
 	connectBranches();
@@ -293,9 +312,11 @@ bool CGaInput::inputFile()
 	connectCsalad();
 
 	CCheckFirstNames dlg;
+	dlg.m_message = false;
 	dlg.DoModal();
 
 	CCheckNames dlgN;
+	dlgN.m_message = false;
 	dlgN.DoModal();
 
 	CDateFormat dlgD;
@@ -400,12 +421,16 @@ int CGaInput::rollFile( CStdioFile* file )
 void CGaInput::fillOrderFather( )
 {
 	int i;
+	int z;
 	TCHAR gen;
 	ORDERFATHER orderFather;
+	
+	if( d.generation == 'D' )
+		str = d.first_name;
 
 	if( v_orderFather.size() )
 	{
-		for( i = v_orderFather.size()-1; i >= 0; --i )		// hátulról elõre töröl minden magasabb generációt
+		for( i = v_orderFather.size()-1; i >= 0; --i )		// hátulról visszafele töröl minden magasabb generációt
 		{
 			gen = v_orderFather.at(i).gen;					// a jelenleginél nagyobb ( késõbbi ) generációkat eldobja
 			if( i && ( gen > d.generation )  )
@@ -419,26 +444,30 @@ void CGaInput::fillOrderFather( )
 		if( gen == d.generation  )							// az elõzõ ciklusban megtalálta a generációt
 		{
 			++v_orderFather.at(i).orderFather;
-			d.orderFather = v_orderFather.at(i).orderFather;
-
+			d.orderFather	= v_orderFather.at(i).orderFather;
+			m_familyName	= v_orderFather.at(i).familyname;
 			++v_orderFather.at(i).orderMother;
 			d.orderMother = v_orderFather.at(i).orderMother;
+			if( gen == 'D' )
+				str = d.first_name;
 		}
 		else												// új, magasabb gereráció
 		{
 			orderFather.gen				= d.generation;
 			orderFather.orderFather		= 1;
 			orderFather.orderMother		= 1;
+			orderFather.familyname		= m_familyName;
 			v_orderFather.push_back( orderFather );
 			d.orderFather = 1;
 			d.orderMother = 1;
 		}
 	}
-	else
+	else   
 	{
 		orderFather.gen				= d.generation;
 		orderFather.orderFather		= 1;
 		orderFather.orderMother		= 1;
+		orderFather.familyname		= m_familyName;
 		v_orderFather.push_back( orderFather );
 		d.orderFather = 1;
 		d.orderMother = 1;
@@ -540,7 +569,7 @@ void CGaInput::connectBranches()
 		familyNumber	= m_recordset.GetFieldString( 1 );
 		folyt			= m_recordset.GetFieldString( 2 );
 
-		// csak a degugoláshoz kell 
+		// csak a debugoláshoz kell 
 		lastName = m_recordset.GetFieldString( 3 );
 		firstName = m_recordset.GetFieldString( 4 );
 
@@ -644,15 +673,15 @@ BOOL CGaInput::query3( CString command )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// A %N jelet az elõzõ ember comment mezejéhez hozzáteszi
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CGaInput::updatePreviousDescendant( CString cLine )
+void CGaInput::updatePreviousDescendant( CString known_as )
 {
-	CString known_as;
-	int		pos;
-	known_as = getWord( cLine, 2, &pos );
+
+//	CString known_as = cLine;
+	
+//	int		pos;
+//	known_as = getWord( cLine, 2, &pos );
 
 	m_command.Format( L"UPDATE people SET known_as='%s' WHERE rowid ='%s'", known_as, m_rowidLastDescendant );
+	m_command.Format( L"UPDATE people SET last_name = '%s', known_as='%s' WHERE rowid ='%s'", known_as, known_as, m_rowidLastDescendant );
 	if( !theApp.execute( m_command ) ) return;
 }

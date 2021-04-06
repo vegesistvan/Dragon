@@ -18,9 +18,12 @@ void CGaInput::insertTableHeader()
 {
 	CString tableHeader;
 	CString values;
+	CString folyt;
 	if( !theApp.execute( L"BEGIN" ) ) return;
 	for( UINT i = 0; i < v_tableHeader.size(); ++i )
 	{
+		folyt = v_tableHeader.at(i).folyt;
+		folyt = folyt.Left( folyt.GetLength() -1 );
 		tableHeader = v_tableHeader.at(i).tableHeader;
 		if( !v_tableHeader.at(i).known_as.IsEmpty() )
 		{
@@ -32,7 +35,7 @@ void CGaInput::insertTableHeader()
 		m_fileNumber,
 		v_tableHeader.at(i).familyNumber,
 		v_tableHeader.at(i).lineNumber,
-		tableHeader,									//v_tableHeader.at(i).tableHeader,
+		tableHeader,									//v_tableHeader.at(i).tableHeader + known_as
 		v_tableHeader.at(i).percent,
 		v_tableHeader.at(i).familyName,
 		v_tableHeader.at(i).alias,
@@ -43,7 +46,8 @@ void CGaInput::insertTableHeader()
 		v_tableHeader.at(i).known_as,
 		v_tableHeader.at(i).arm,
 		v_tableHeader.at(i).joint,
-		v_tableHeader.at(i).folyt);
+		folyt
+		);
 		m_command.Format( L"INSERT INTO tables ( %s ) VALUES ( %s )", m_fieldsT, values );
 		if( !theApp.execute( m_command ) ) return;
 
@@ -266,12 +270,17 @@ CString CGaInput::insertAny( PEOPLE* p )
 		other_names.TrimRight();
 	}
 	CString values;
+
+
+	
+	int tableNumber = v_tableHeader.size();
+//	v_tableHeader.size()
 	values.Format( L"\
 '%d','%d','%d','%d','%d','%d','%d','%d','%d',\
 '%c','%d','%s','%s','%s','%s','%s','%s','%s', '%s',\
 '%s','%s','%s','%s','%s','%d','%d','%s','%d',\
 '%s','%s','%d','%d', '%s', '%d', '%d'",
-m_fileNumber, m_tableHeader.familyNumber,v_tableHeader.size(),m_lineNumber,p->source,1,0,0,0,\
+m_fileNumber, m_tableHeader.familyNumber,m_tableNumber1,m_lineNumber,p->source,1,0,0,0,\
 p->generation,p->sex_id,p->title,p->titolo,p->first_name.Trim(),last_name, p->posterior, other_names,p->birth_place,p->birth_date,\
 p->death_place,p->death_date,p->comment,p->father_id,p->mother_id,p->parentIndex,p->parentIndexCalc,p->folyt,p->tableAncestry,
 p->tableRoman,p->arm,p->orderFather,p->orderMother,p->csalad,p->gap, numOfMarriages );

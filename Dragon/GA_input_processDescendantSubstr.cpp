@@ -39,7 +39,7 @@ void CGaInput::processDescendantSubstring( CString cLine )
 
 	cLine = cLine.Mid(2);						// G és szóköz leszedése
 	d.generation		= generation;
-	if( generation == '%' )
+	if( generation == '%' )						// ez mi????????
 	{
 		d.generation = generation;
 		d.last_name = cLine.Trim();
@@ -55,7 +55,6 @@ void CGaInput::processDescendantSubstring( CString cLine )
 // Megjelölöli minden tábla ösével azonos generációt, hogy a connectBranches() mindegyiket beállíthassa az õt hívó másik táblában lévõ 
 // szülökre.
 
-	d.folyt			= m_folyt;
 	d.tableAncestry	= m_tableAncestry;
 	d.source		= 1;
 
@@ -66,8 +65,9 @@ void CGaInput::processDescendantSubstring( CString cLine )
 
 	processPeopleStr( cLine, &d );
 	d.titolo = m_tableHeader.titolo;
-	d.last_name = m_tableHeader.familyName;
-	
+//	d.last_name = m_tableHeader.familyName;
+	d.last_name = m_familyName;
+
 	// a parentIndex csak ott van megadva, ahol változás történt, az ezt követõ gyerekek értelemszerûen ugyanannak az anyának a gyerekei.
 	// parentIndex-t kell kiírni gyerekhez a leszármazotti listánál ( 0-t nem kell )
 	// parentIndexCalc-t pedig minden gyereknél meg van adva, az  anya meghatározásához használjuk

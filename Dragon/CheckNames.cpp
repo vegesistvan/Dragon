@@ -99,7 +99,8 @@ ill. 'A sor a Notepad-ben' funkciókat. Bármelyikban javíthatjuk a ga.html fájl m
 
 
 	theApp.m_inputCode = GetInputCode( theApp.m_htmlFileSpec );
-	gafile.Open( theApp.m_htmlFileSpec, CFile::modeRead );
+
+//	gafile.Open( theApp.m_htmlFileSpec, CFile::modeRead );
 
 
 
@@ -144,12 +145,11 @@ ill. 'A sor a Notepad-ben' funkciókat. Bármelyikban javíthatjuk a ga.html fájl m
 		m_ListCtrl.SetColumnWidth(i,LVSCW_AUTOSIZE_USEHEADER);
 	wndP.DestroyWindow();
 
-	if( !nItem )
+	if( !nItem  && m_message )
 	{
 		AfxMessageBox( L"Minden ember család és keresztneve meg van adva!" );
 		OnCancel();
 	}
-	gafile.Close();
 	return TRUE;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -164,31 +164,6 @@ void CCheckNames::OnSizing(UINT fwSide, LPRECT pRect)
 	EASYSIZE_MINSIZE(430,314,fwSide,pRect); 
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-CString CCheckNames::getHtmlLine( CString lineNumberS )
-{
-	int lineNumber = _wtoi( lineNumberS );
-	int cnt;
-
-	cnt = lineNumber - m_lineNumberPrev;
-	if( cnt < 0 )
-		return cLine;
-
-	for( int i = 0; i < cnt; ++i )
-		gafile.ReadString( cLine );		// átugrik cnt sort
-	gafile.ReadString( cLine );			// beolvassa a kért sort
-	cLine.Trim();
-	if( theApp.m_inputCode == UTF8 || theApp.m_inputCode == UTF8BOM  ) cLine = Utf8ToAnsi( cLine );
-
-
-	m_lineNumberPrev = lineNumber + 1;
-
-	cLine = cleanHtmlLine( cLine );
-	return cLine;
-}
-*/
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CCheckNames::cleanHtmlLine( CString cLine )
 {
 	CString htmlLine = cLine;

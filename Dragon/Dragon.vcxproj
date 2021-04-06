@@ -394,7 +394,7 @@
     <ClCompile Include="GA_input.cpp" />
     <ClCompile Include="GA_input_splitLine.cpp" />
     <ClCompile Include="GA_input_insert.cpp" />
-    <ClCompile Include="GA_input_TableHeader.cpp" />
+    <ClCompile Include="GA_input_splitTableHeader.cpp" />
     <ClCompile Include="Table_GaTables.cpp" />
     <ClCompile Include="Table_files.cpp" />
     <ClCompile Include="Table_html.cpp" />

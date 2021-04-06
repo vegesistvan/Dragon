@@ -16,6 +16,7 @@ public:
 // Dialog Data
 	enum { IDD = IDD_CHECK_NAMES };
 
+	bool m_message;
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 

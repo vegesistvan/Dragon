@@ -5,16 +5,6 @@
 #include "GA_input.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Egy tábla-fejet beolvas az m_tableHeader strukturába és azt a v_tableHeader vectorban gyûjti
-//
-int CGaInput::processTableHeader( CString cLine )
-{
-	splitTableHeader( cLine );
-	v_tableHeader.push_back( m_tableHeader );
-
-	return 1;
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cLine: %%[%]nnnnnnn(, titolo) (tableNumber) [ág][törzs: mmmmmmmm ] ///comment
 //
 // nnnnnnnnnnn: familyName
@@ -32,8 +22,7 @@ int CGaInput::processTableHeader( CString cLine )
 // TABLE.comment		// ha van tableNumber és van nmég utána valami
 // TABLE.torzs			// mmmmmmmmmm			// rögtön az elején le kell venni
 // TABLE.arm
-
-// ezt azért tarjuk meg, mert ha htm-bõl készítünk táblázatot, akkor nem szükséges a V_tableHeader-be írni.
+// TABLE.knownAs		// a tableHeader-t követõ % knownAs sor
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaInput::splitTableHeader( CString cLine )  
 {
@@ -50,7 +39,7 @@ void CGaInput::splitTableHeader( CString cLine )
 	int pos1;
 	int	pos2;
 
-	clearTableHeader( &m_tableHeader);
+	clearTableHeader();
 	++m_tableNumber;
 
 	m_tableHeader.tableHeader	= cLine;
@@ -199,22 +188,21 @@ void CGaInput::splitTableHeader( CString cLine )
 
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CGaInput::clearTableHeader( TABLEHEADER* tableHeader)
+void CGaInput::clearTableHeader()
 {
-	tableHeader->arm.Empty();
-	tableHeader->comment.Empty();
-	tableHeader->familyName.Empty();
-	tableHeader->alias.Empty();
-	tableHeader->familyNumber = 0;
-	tableHeader->folyt.Empty();
-	tableHeader->joint = 0;
-	tableHeader->known_as.Empty();
-	tableHeader->lineNumber = 0;
-	tableHeader->percent.Empty();
-	tableHeader->torzs.Empty();
-	tableHeader->tableHeader.Empty();
-	tableHeader->tableNumber = 0;
-	tableHeader->tableRoman.Empty();
-	tableHeader->titolo.Empty();
+	m_tableHeader.arm.Empty();
+	m_tableHeader.comment.Empty();
+	m_tableHeader.familyName.Empty();
+	m_tableHeader.alias.Empty();
+	m_tableHeader.familyNumber = 0;
+	m_tableHeader.folyt.Empty();
+	m_tableHeader.joint = 0;
+	m_tableHeader.known_as.Empty();
+	m_tableHeader.lineNumber = 0;
+	m_tableHeader.percent.Empty();
+	m_tableHeader.torzs.Empty();
+	m_tableHeader.tableHeader.Empty();
+	m_tableHeader.tableNumber = 0;
+	m_tableHeader.tableRoman.Empty();
+	m_tableHeader.titolo.Empty();
 }

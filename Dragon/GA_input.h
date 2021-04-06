@@ -9,8 +9,49 @@ public:
 	CGaInput(void);
 	~CGaInput(void);
 
-	int		m_tableAncestry;			// a táblák elsõ emberét, az õst jelzi ha TRUE; 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////// F E L B O N T Á S H O Z   H A S Z N Á L T   V Á L T O Z Ó K ,  S T R I U K T U R Á K ,  V E K T O R O K ////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	std::vector<GENERATIONS>	v_generations;
+	std::vector<ORDERFATHER>	v_orderFather;
+	std::vector<PARENT2INDEX>	vParent2Index;
+
+	TABLEHEADER m_tableHeader;
+	std::vector<TABLEHEADER>	v_tableHeader;
+
+// sorok szétszedése
+	CString m_known_as;
+	CString	m_generationFirst; // egy tábla õsének generációja ( az elágazások összekapcsolásához kell )
+	int		m_rowid;	// az utoljára insertált ember azonosítója. Azért számoljuk és nem visszakérdezzük a SELECT 'last_insert_rowid'-val
+						// mert ez magszakítaná a BEGIN_COMMIT tranzakciót és nagyon lelassulna a beolvasás!!!
+						// Az m_rowid-ra egyébként azért van szükség, hogy a házastársak rowid-párjait gyûjtsük és a marriages-táblában mrgõrizzük.
+						// Valamint a szülõk rowid-ját is megõrizzük a people tábláan!!
+//	CString	m_rowid_table;
+	CString	m_rowidLastDescendant;
+
+
+	// elsõ foku substringek
+	CString	m_descendant;
+	std::vector<MARRIAGES>		v_marriages;		// leszármazott házasságai
+	std::vector<SPOUSESPOUSES>	v_spouseSpouses;	// házastársak további házastársai	
+
+
+	// a szétszedett sor módosított substringjei
+	CString m_nameSubstr;
+	CString m_birthSubstr;
+	CString m_deathSubstr;
+
+	PEOPLE d;		// a leszármazott adatai
+	PEOPLE s;		// a leszármazott házastársának adatai						vector lesz belõle (v_spouse)
+	PEOPLE sf;		// a leszármazott házastársa apjának adatai					vector lesz belõle
+	PEOPLE sm;		// a leszármazott házastársa anyjának adatai				vector lesz belõle
+	PEOPLE ss;		// a leszármazott házastársa további házastársának adatai	vector lesz belõle, az s vector indexét megõrizni!
+
+
+
+	int		m_tableAncestry;			// a táblák elsõ emberét, az õst jelzi ha TRUE;
 
 	int m_rollToTable;
 	int m_rollToFamily;
@@ -26,29 +67,12 @@ public:
 	int		m_tableNumber;
 	int		m_lineNumber;
 
-	PEOPLE d;		// a leszármazott adatai
-	PEOPLE s;		// a leszármazott házastársának adatai						vector lesz belõle (v_spouse)
-	PEOPLE sf;		// a leszármazott házastársa apjának adatai					vector lesz belõle
-	PEOPLE sm;		// a leszármazott házastársa anyjának adatai				vector lesz belõle
-	PEOPLE ss;		// a leszármazott házastársa további házastársának adatai	vector lesz belõle, az s vector indexét megõrizni!
 
-	// a szétszedett sor módosított substringjei
-	CString m_nameSubstr;
-	CString m_birthSubstr;
-	CString m_deathSubstr;
-
-	// elsõ foku substringek
-	CString	m_descendant;
-//	SUBSTRING desc;			// descendant substrings
-
-	TABLEHEADER m_tableHeader;
-	std::vector<MARRIAGES>		v_marriages;		// leszármazott házasságai
-	std::vector<SPOUSESPOUSES>	v_spouseSpouses;	// házastársak további házastársai	
+	
 
 	void	insertEntries();
 	bool	inputFile();
 	void	splitLine( CString cLine);
-	int		processTableHeader( CString cLine );
 	void	splitTableHeader( CString cLine ); 
 	int		rollFile( CStdioFile* file );
 
@@ -81,7 +105,7 @@ protected:
 
 	void	clearAll();
 	void	clearPeople( PEOPLE *p);
-	void	clearTableHeader( TABLEHEADER* tableHeader);
+	void	clearTableHeader();
 
 	
 
@@ -99,6 +123,7 @@ protected:
 	
 
 	CString m_knownAsTable;
+	int		m_tableNumber1;
 
 	int	m_spouseOrder;
 	int m_orderMother;
@@ -110,26 +135,7 @@ protected:
 	CString m_fileSpec;
 
 
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////// F E L B O N T Á S H O Z   H A S Z N Á L T   V Á L T O Z Ó K ,  S T R I U K T U R Á K ,  V E K T O R O K ////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// egy sor felbontása
-	CString	m_folyt;			// a sor végérõl leszedett folyt utáni római szám
-	CString m_known_as;
-	CString	m_generationFirst; // egy tábla õsének generációja ( az elágazások összekapcsolásához kell )
-	int		m_rowid;	// az utoljára insertált ember azonosítója. Azért számoljuk és nem visszakérdezzük a SELECT 'last_insert_rowid'-val
-						// mert ez magszakítaná a BEGIN_COMMIT tranzakciót és nagyon lelassulna a beolvasás!!!
-						// Az m_rowid-ra egyébként azért van szükség, hogy a házastársak rowid-párjait gyûjtsük és a marriages-táblában mrgõrizzük.
-						// Valamint a szülõk rowid-ját is megõrizzük a people tábláan!!
-//	CString	m_rowid_table;
-	CString	m_rowidLastDescendant;
 
-	std::vector<TABLEHEADER> v_tableHeader;
-	std::vector<GENERATIONS> v_generations;
-	std::vector<ORDERFATHER> v_orderFather;
-	std::vector<PARENT2INDEX> vParent2Index;
-	
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

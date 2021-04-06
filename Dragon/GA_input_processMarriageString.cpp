@@ -388,7 +388,8 @@ int CGaInput::getSpouseOrder( std::vector<PEOPLE>* vp )
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
+// HÁZASTÁRS TOVÁBBI HÁZASTÁRSAI
+
 // 2f. Zahutrecky Éva 1771
 // 3f. Mnisek Szaniszló 1602 néhai lengyel
 // 2f.Gaiger György, 3f. Niczky Sándor	
@@ -416,10 +417,9 @@ void CGaInput::processSpousesSpouses( CString spouses,  std::vector<PEOPLE> *v_p
  		order = _wtoi( spouses.Mid( pos-1, 1 ) );
 		if( (posComma = spouses.Find( ',', posComma+1 ) ) != -1 )	// , is van, több házastárs is lesz
 			spouse = spouses.Mid( pos+3, posComma - pos - 3 );
-		else
-		{
+		else	
+		{													// ha nincs vesszõ a házastársak között, csak az nf.
 			spouse = spouses.Mid( pos+3 );
-		// ha nincs vesszõ a házastársak között, csak az nf.
 			if( (pos3 = spouse.Find( L"f." ) ) != -1 )
 			{
 				spouses = spouse.Mid( pos3 -1 );
@@ -429,7 +429,7 @@ void CGaInput::processSpousesSpouses( CString spouses,  std::vector<PEOPLE> *v_p
 			}
 		}
 		processPeopleStr( spouse,  &people );
-		people.parentIndex = order;   // a házastárs házastársának nincs megadva az anyja, ezért a parentIndex-et a házasság sorszámára használjuk
+		people.parentIndex = order; // a házastárs házastársának nincs megadva az anyja, ezért a parentIndex-et a házasság sorszámára használjuk
 		v_p->push_back( people );
 	};
 }
