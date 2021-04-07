@@ -89,21 +89,29 @@ void CGaDescendants::printBegining()
 	
 
 	CString family;
-	CString familyName = getLastname( &p );
+//	CString familyName = getColoredString( p.last_name, m_ixName );
 
 
 	if( m_checkFamily )
 	{
-		if( m_familyName != familyName )
+		if( m_familyName != p.last_name )
 		{
-			family = getFamilyName( familyName );			// a tables táblából visszadja a tableHeader értékét 
-			if( ul )
+			family = getFamilyName();			// a tables táblából visszadja a tableHeader értékét 
+/*			if( ul )
 				str.Format( L"\n\n<p><b>%s %s</b><p>\n\n", L"%%%", family );
 			else
 				str.Format( L"\n\n<p><b>%s %s</b><p>\n\n", L"%%", family );
+*/
+
+			if( ul )
+				str.Format( L"\n\n<p>%s %s</p>\n\n", L"%%%", family );
+			else
+				str.Format( L"\n\n<p>%s %s</p>\n\n", L"%%", family );
+			str = getColoredString( str, m_ixFamily );
+
 			print( str );
 		}
-		m_familyName = familyName;
+		m_familyName = p.last_name;
 	}
 
 	
@@ -135,20 +143,20 @@ void CGaDescendants::printBegining2()
 	TCHAR	gen			= TCHAR('A') + TCHAR(generation);	// a generációs karakter-jel ( A,B,C,D.....);
 
 	CString family;
-	CString familyName = getLastname( &p );
 
-	
 	if( m_checkFamily )
 	{
-		if( m_familyName != familyName )
+		if( m_familyName != p.last_name )
 		{
-			family = getFamilyName( familyName );			// a tables táblából visszadja a tableHeader értékét 
+			family = getFamilyName();			// a tables táblából visszadja a tableHeader értékét 
 			fwprintf( fl, L"<br>" );
 			tab();
-			str.Format( L"<b>%s %s</b><br>", L"%%%", family );
+//			str.Format( L"<b>%s %s</b><br>", L"%%%", family );
+			str.Format( L"%s %s\n", L"%%%", family );
+			str = getColoredString( str, m_ixFamily );
 			print( str );
 		}
-		m_familyName = familyName;
+		m_familyName = p.last_name;
 	}
 	tab();
 
@@ -162,7 +170,7 @@ void CGaDescendants::printBegining2()
 	print( str );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CGaDescendants::getFamilyName( CString family )
+CString CGaDescendants::getFamilyName()
 {
 	CString titolo;
 	CString familyName;
@@ -182,14 +190,13 @@ CString CGaDescendants::getFamilyName( CString family )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaDescendants::printDescendant()
 {
-//	CString rowid = vDesc.at( vDesc.size()-1).rowid;
 
 	int ix = vDesc.size() -1;
 // leszármazott neve
 	if( m_CheckLastName )
-		cLine.Format( L"%s %s",  getLastname( &p ), getFirstname( &p )); //attrib[m_ixName].code1, p.first_name, attrib[m_ixName].code2 ); 
+		cLine.Format( L"%s %s",  getColoredString( p.last_name, m_ixName ), getColoredString( p.first_name, m_ixName )); 
 	else
-		cLine.Format( L"%s", getFirstname( &p )); //attrib[m_ixName].code1, p.first_name, attrib[m_ixName].code2 ); 
+		cLine.Format( L"%s", getColoredString( p.first_name, m_ixName ));
 	cLine.TrimRight();
 // ha apjának több felkesége volt,a felség sorszámának kiírása
 
@@ -223,45 +230,40 @@ void CGaDescendants::printDescendant()
 	
 	if( m_numbering == SZLUHA || m_numbering == TUP )
 	{
-		str = getPlaceDateBlock( p.birth_place, p.birth_date, '*' );
+		str = getPlaceDateBlock( p.birth_place, p.birth_date, L"*" );
 		if( !str.IsEmpty() )
 			cLine.Format( L"%s %s", (CString)cLine, str );
 
-		str = getPlaceDateBlock( p.death_place, p.death_date, '+' );
+		str = getPlaceDateBlock( p.death_place, p.death_date, L"+" );
 		if( !str.IsEmpty() )
 			cLine.Format( L"%s %s", (CString)cLine, str );
 
-		str = getCommentBlock( p.comment );
+//		str = getCommentBlock( p.comment );
+		str = getColoredString( p.comment, m_ixComment );
 		if( !str.IsEmpty() )
 			cLine.Format( L"%s %s", (CString)cLine, str );
 	}
 	else if( m_numbering == VIL )
 	{
-		cLine += getPlaceDateBlock( p.birth_place, p.birth_date, '*' );
-		cLine += getPlaceDateBlock( p.death_place, p.death_date, '+' );
-		cLine += getCommentBlock( p.comment );
+		str = getPlaceDateBlock( p.birth_place, p.birth_date, L"*" );
+		if( !str.IsEmpty() )
+			cLine.Format( L"%s %s", (CString)cLine, str );
+
+		str = getPlaceDateBlock( p.death_place, p.death_date, L"+" );
+		if( !str.IsEmpty() )
+			cLine.Format( L"%s %s", (CString)cLine, str );
 	}
 	cLine.Trim();
-
-
-
 
 	CString csalad;
 	if( !p.csalad.IsEmpty() )
 	{
 		str.Format( L"<font color='blue'>[%s család]</font>", p.csalad );
 		cLine += str;
-//		cLine += L" [";
-//		cLine += p.csalad;
-//		cLine += L" család]";
 	}
 	print( cLine );
 	fflush( fl );
 	m_genPrev = vDesc.at(ix).gen;
-
-
-	
-	
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaDescendants::printMarriages()
@@ -305,18 +307,12 @@ void CGaDescendants::printMarriage( CString place, CString date, int i, int numb
 {
 	CString marriage;
 
-//	if( m_unordered == UNORDERED )
-//		fwprintf( fl, L";" );
-
-	marriage = attrib[m_ixSpec].code1;
 	if( numberOfSpouses > 1  )
-	{
 		str.Format( L" %d=", i+1 );
-		marriage += str;
-	}
 	else
-		marriage += L" =";
-	marriage += attrib[m_ixSpec].code2;
+		str = L" =";
+
+	marriage = getColoredString( str, m_ixSpec );
 
 
 	if( !place.IsEmpty() )
@@ -341,9 +337,19 @@ void CGaDescendants::printSpouse()
 	CString spouse;
 
 	spouse = getFullname( &s );
-	spouse += getPlaceDateBlock( s.birth_place, s.birth_date, '*' );
-	spouse += getPlaceDateBlock( s.death_place, s.death_date, '+' );
-	spouse += getCommentBlock( s.comment );
+	str = getPlaceDateBlock( s.birth_place, s.birth_date, L"*" );
+	if( !str.IsEmpty() )
+		spouse.Format( L"%s %s", (CString)spouse, str );
+
+	str = getPlaceDateBlock( s.death_place, s.death_date, L"+" );
+	if( !str.IsEmpty() )
+		spouse.Format( L"%s %s", (CString)spouse, str );
+
+//	str = getCommentBlock( s.comment );
+	str = getColoredString( s.comment, m_ixComment );
+	if( !str.IsEmpty() )
+		spouse.Format( L"%s %s", (CString)spouse, str );
+
 
 //	if( m_code == UTF8 ) spouse =  UnicodeToUtf8( spouse );
 //	fwprintf( fl, L"%s", spouse );
@@ -366,7 +372,7 @@ void CGaDescendants::printSpRelatives()
 	if( !s.father_id.IsEmpty() && s.father_id != L"0" )
 	{
 		queryPeople( s.father_id, &sf );
-		father = getFirstname( &sf );
+		father = getColoredString( sf.first_name, m_ixName );
 	}
 	if( !s.mother_id.IsEmpty() && s.mother_id != L"0" )
 	{
@@ -433,25 +439,12 @@ void CGaDescendants::printSpRelatives()
 	fflush( fl );
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CGaDescendants::getLastname( PPEOPLE* p )
+CString CGaDescendants::getColoredString( CString str, int index )
 {
-	CString lastname = attrib[m_ixName].code1;
-	lastname += p->last_name;
-	lastname += attrib[m_ixName].code2;
-	return lastname;
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CGaDescendants::getFirstname( PPEOPLE* p )
-{
-	CString firstname(L"");
-
-	if( !p->first_name.IsEmpty() )
-	{
-		firstname = attrib[m_ixName].code1;
-		firstname += p->first_name;
-		firstname += attrib[m_ixName].code2;
-	}
-	return firstname;
+	CString colored(L"");
+	if( !str.IsEmpty() )
+		colored.Format( L"%s%s%s", attrib[index].code1, str, attrib[index].code2 );
+	return colored;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CGaDescendants::getLastFirst( PPEOPLE* p )
@@ -498,24 +491,23 @@ CString CGaDescendants::getFullname( PPEOPLE* p )
 		fullname += p->first_name;
 		fullname += L" ";
 	}
-	fullname.Trim();
-	fullname += attrib[m_ixName].code2;
 	if( !p->posterior.IsEmpty() )
 	{
-		fullname += L" ";
 		fullname += p->posterior;
 	}
+	fullname.Trim();
+	fullname += attrib[m_ixName].code2;
 	return( fullname.Trim() );
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CGaDescendants::getPlaceDateBlock( CString place, CString date, TCHAR jel )
+CString CGaDescendants::getPlaceDateBlock( CString place, CString date, CString jel )
 {
 	
 	CString block(L"");
 
 	if( !place.IsEmpty() || !date.IsEmpty() )
 	{
-		block.Format( L"%s %c%s", attrib[ m_ixSpec ].code1, jel, attrib[m_ixSpec].code2 );
+		block = getColoredString( jel, m_ixSpec );
 		if( !place.IsEmpty() )
 		{
 			block += place;

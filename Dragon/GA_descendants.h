@@ -117,18 +117,19 @@ protected:
 
 	void createStyle();
 
-	CString getLastname( PPEOPLE* p );
-	CString getFirstname( PPEOPLE* p );
+	CString getColoredString( CString str, int index );
+
 	CString getLastFirst( PPEOPLE* p );
 	CString getFullname( PPEOPLE* p );
-	CString getPlaceDateBlock( CString place, CString date, TCHAR jel );
+	CString getPlaceDateBlock( CString place, CString date, CString jel );
 	CString getCommentBlock( CString comment );
 
-	CString getFamilyName( CString family );
+	CString getFamilyName();
 
 	int	m_ixName;
 	int	m_ixSpec;
 	int	m_ixComment;
+	int	m_ixFamily;
 
 	BOOL m_CheckLastName;
 	
@@ -166,5 +167,8 @@ public:
 	afx_msg void OnClickedCheckLastname();
 	BOOL m_spaces;
 	afx_msg void OnClickedRadioList();
+	afx_msg void OnClickedButtonDefault();
+//	CString m_ComboFamily;
+	CComboBox m_ComboFamily;
 };
 #endif // !defined(AFX_DESCENDANT_H__930379D8_BDD1_4973_93FF_041F3F3811E4__INCLUDED_)

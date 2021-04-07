@@ -21,8 +21,8 @@ const ATTRIB attrib[] =
 	L" ",			L"",						L"",
 	L"félkövér",	L"<b>",						L"</b>",
 	L"dõlt",		L"<i>",						L"</i>",
-	L"kék'",		L"<font color='blue'>",		L"</font>",
-	L"piros'",		L"<font color='red'>",		L"</font>",
+	L"kék",			L"<font color='blue'>",		L"</font>",
+	L"piros",		L"<font color='red'>",		L"</font>",
 };
 
 typedef struct

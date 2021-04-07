@@ -42,7 +42,8 @@ CGaDescendants::CGaDescendants(CWnd* pParent /*=NULL*/)
 	,m_ixName( 1 )			// név bold
 	,m_ixSpec( 0 )			// speciális karakterek (*+=) bold
 	,m_ixComment( 2 )		// comment bold
-	
+	,m_ixFamily( 3 )
+
 	,m_rowid1(L"")			// a leszármazott rowid-ja
 	,m_name(L"")			// leszármazott õs neve
 	,m_tableNumber(L"")		// tablenumber, ha a táblázat leszármazotti listáját kérjük
@@ -50,7 +51,7 @@ CGaDescendants::CGaDescendants(CWnd* pParent /*=NULL*/)
 	,m_code(FALSE)			// ANSI vagy UTF8 kódrendszer
 	,m_numbering(2)			// milyen számozási rendszer legyen (0,1,2) 
 	,m_checkFamily(TRUE)	// %%% családnév,elõnév kiemelése
-	, m_spaces(FALSE)
+	,m_spaces(TRUE)
 {
 	
 }
@@ -62,18 +63,24 @@ CGaDescendants::~CGaDescendants()
 void CGaDescendants::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_COMBO_SPEC, m_ComboSpec);
+
 	DDX_Check(pDX, IDC_CHECK_CONNECT, m_connect);
 	DDX_Check(pDX, IDC_CHECK_WOMAN, m_woman);
+
 	DDX_Control(pDX, IDC_COMBO_COMMENT, m_ComboComm);
 	DDX_Control(pDX, IDC_COMBO_NAME, m_ComboName);
+	DDX_Control(pDX, IDC_COMBO_SPEC, m_ComboSpec);
+	DDX_Control(pDX, IDC_COMBO_FAMILY, m_ComboFamily);
+	DDX_Control(pDX, IDC_COMBO_BGRD, m_ComboBgrd);
+
 	DDX_Radio(pDX, IDC_RADIO_CLEAR, m_setCombo);
 	DDX_Check(pDX, IDC_CHECK_LASTNAME, m_CheckLastName);
 	DDX_Radio(pDX, IDC_ANSI, m_code);
-	DDX_Control(pDX, IDC_COMBO_BGRD, m_ComboBgrd);
+
 	DDX_Check(pDX, IDC_CHECK_FAMILY, m_checkFamily);
 	DDX_Control(pDX, IDC_SZLUHA, m_szluhaCtrl);
 	DDX_Radio(pDX, IDC_RADIO_LIST, m_spaces);
+	
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CGaDescendants, CDialogEx)
@@ -94,6 +101,7 @@ BEGIN_MESSAGE_MAP(CGaDescendants, CDialogEx)
 	ON_BN_CLICKED(IDC_CHECK_FAMILY, &CGaDescendants::OnClickedCheckFamily)
 	ON_BN_CLICKED(IDC_CHECK_LASTNAME, &CGaDescendants::OnClickedCheckLastname)
 	ON_BN_CLICKED(IDC_RADIO_LIST, &CGaDescendants::OnClickedRadioList)
+	ON_BN_CLICKED(IDC_BUTTON_DEFAULT, &CGaDescendants::OnClickedButtonDefault)
 END_MESSAGE_MAP()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Bemenet:
@@ -114,10 +122,12 @@ BOOL CGaDescendants::OnInitDialog()
 		m_ComboName.AddString( attrib[i].text );
 		m_ComboSpec.AddString( attrib[i].text );
 		m_ComboComm.AddString( attrib[i].text );
+		m_ComboFamily.AddString( attrib[i].text );
 	}
 	m_ComboName.SetCurSel( m_ixName );
 	m_ComboComm.SetCurSel( m_ixComment );
 	m_ComboSpec.SetCurSel( m_ixSpec );
+	m_ComboFamily.SetCurSel( m_ixFamily );
 
 	for( int i = 0; i < szinSize; ++i )
 	{
@@ -259,6 +269,7 @@ void CGaDescendants::treeTables()
 
 	for( UINT i = 0; i < theApp.v_tableNumbers.size(); ++i )
 	{
+		m_familyName.Empty();
 		m_tableNumber.Format( L"%d", theApp.v_tableNumbers.at(i) );
 
 		m_command.Format( L"SELECT tableHeader FROM tables WHERE rowid ='%d'", theApp.v_tableNumbers.at(i) );
@@ -517,6 +528,27 @@ void CGaDescendants::OnClickedRadioClear()  // fekete szín beállítása
 	m_ComboComm.SetCurSel( 0 );
 	m_ComboBgrd.SetCurSel( 0 );
 }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////4
+void CGaDescendants::OnClickedButtonDefault()
+{
+	m_setCombo = 1;
+	m_ComboName.SetCurSel( 1 );
+	m_ComboSpec.SetCurSel( 0 );
+	m_ComboComm.SetCurSel( 2 );
+	m_ComboFamily.SetCurSel( 3 );
+
+	m_ComboBgrd.SetCurSel( 0 );
+
+	m_spaces		= true;
+	m_woman			= true;
+	m_connect		= true;
+	m_checkFamily	= true;
+	m_CheckLastName = false;
+	m_numbering		= 2;
+
+
+	UpdateData( TOSCREEN );
+}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaDescendants::OnRadioDefault()		// default szín beállítása
 {
@@ -530,31 +562,36 @@ void CGaDescendants::OnRadioDefault()		// default szín beállítása
 void CGaDescendants::OnClickedRadioList()
 {
 	if( m_numbering != 0 ) 
-	{
 		m_spaces = !m_spaces;
-	}
-	UpdateData(TOSCREEN);
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaDescendants::OnClickedCheckWoman()
 {
 	m_woman	= !m_woman;				// ha a nõk cgyerekeit is listázni akarjuk, akkor a táblákat is össze kell kötni!!
-	if( m_woman ) m_connect = true;
-	UpdateData(TOSCREEN);			// az m_connect-et meg kell  mutatni a képernyõn!
+	if( m_woman )
+		m_connect = true;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaDescendants::OnClickedCheckConnect()
 {
 	if( m_woman )					// ha nõk lszrámazoittait is listázzuk, akkor mindenképpen összekötés kell
-	{
 		m_connect = true;
-		UpdateData(TOSCREEN);
-	}
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaDescendants::OnClickedCheckFamily()
 {
 	m_checkFamily = ! m_checkFamily;	// azért kel, hogy OnClickedCheckWoman UpdateData-ja a helyes értéket állítsa be
+	if( m_checkFamily )
+	{
+		GetDlgItem( IDC_STATIC_FAMILY )->EnableWindow( true );
+		GetDlgItem( IDC_COMBO_FAMILY )->EnableWindow( true );
+	}
+	else
+	{
+		GetDlgItem( IDC_STATIC_FAMILY )->EnableWindow( false );
+		GetDlgItem( IDC_COMBO_FAMILY )->EnableWindow( false );
+	}
+
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaDescendants::OnClickedCheckLastname()
@@ -588,8 +625,9 @@ void CGaDescendants::OnBnClickedOk()
 	m_ixName	= m_ComboName.GetCurSel();
 	m_ixSpec	= m_ComboSpec.GetCurSel();
 	m_ixComment = m_ComboComm.GetCurSel();
-	m_ixBgrd	= m_ComboBgrd.GetCurSel();
+	m_ixFamily	= m_ComboFamily.GetCurSel();
 
+	m_ixBgrd	= m_ComboBgrd.GetCurSel();
 	m_colorBgrnd = szin[m_ixBgrd].rgb;
 
 	if( m_woman ) m_connect = true;
@@ -602,3 +640,4 @@ void CGaDescendants::OnBnClickedOk()
 
 	CDialogEx::OnOK();
 }
+
