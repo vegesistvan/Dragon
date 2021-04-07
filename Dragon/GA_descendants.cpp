@@ -35,8 +35,8 @@ IMPLEMENT_DYNAMIC(CGaDescendants, CDialogEx)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CGaDescendants::CGaDescendants(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CGaDescendants::IDD, pParent)
-	,m_connect(TRUE)		// táblákat összekösse-e
-	,m_woman(TRUE)			// nõk leszármazottait listázza-e
+	,m_connect(true)		// táblákat összekösse-e
+	,m_woman(false)			// nõk leszármazottait listázza-e
 	,m_setCombo(1)			// 0= nincsenek kiemelések, 1= defeault kiemelések 
 
 	,m_ixName( 1 )			// név bold
@@ -47,11 +47,11 @@ CGaDescendants::CGaDescendants(CWnd* pParent /*=NULL*/)
 	,m_rowid1(L"")			// a leszármazott rowid-ja
 	,m_name(L"")			// leszármazott õs neve
 	,m_tableNumber(L"")		// tablenumber, ha a táblázat leszármazotti listáját kérjük
-	,m_CheckLastName(FALSE)	// családnév kiírása
-	,m_code(FALSE)			// ANSI vagy UTF8 kódrendszer
+	,m_CheckLastName(false)	// családnév kiírása
+	,m_code(true)			// ANSI vagy UTF8 kódrendszer
 	,m_numbering(2)			// milyen számozási rendszer legyen (0,1,2) 
-	,m_checkFamily(TRUE)	// %%% családnév,elõnév kiemelése
-	,m_spaces(TRUE)
+	,m_checkFamily(true)	// %%% családnév,elõnév kiemelése
+	,m_spaces(false)
 {
 	
 }
@@ -539,7 +539,7 @@ void CGaDescendants::OnClickedButtonDefault()
 
 	m_ComboBgrd.SetCurSel( 0 );
 
-	m_spaces		= true;
+	m_spaces		= false;
 	m_woman			= true;
 	m_connect		= true;
 	m_checkFamily	= true;

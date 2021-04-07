@@ -111,6 +111,7 @@ Nõk leszármazottai: %s\n\
 	print( body );
 	print( header );
 	print( title );
+
 	if( m_spaces )
 		print( L"<pre>" );
 	return TRUE;
@@ -128,8 +129,9 @@ void CGaDescendants::closeHtml()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaDescendants::createStyle()
 {
-	
+
 	fwprintf( fl, L"<style>\n" );
+	fwprintf( fl, L"html{width:100cm;}\n" );
 	if( m_numbering != 0 )
 	{
 	fwprintf( fl, L"ul {\n" );

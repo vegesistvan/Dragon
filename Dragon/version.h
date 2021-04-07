@@ -4,5 +4,5 @@
 // Y ha új funkció van vagy funkció megszûnik
 // Z ha a funkció módosítása történt
 // W ha hibajavítás történt
-#define VERSION L"2.2.14.0"
+#define VERSION L"2.2.15.0"
 
