@@ -95,8 +95,8 @@ Nõk leszármazottai: %s\n\
 
 	CString body;
 	body.Format( L"<body bgcolor=\"%06x\">", colorBgrnd );
-
-//	body = L"<body font-family: Avenir Next, Calibri, Verdana, sans-serif>";
+	CString font;
+	font = L"<body font-family: Avenir Next, Calibri, Verdana, sans-serif>";
 
 	m_htmlFile.Format(L"%s\\%s_%s.html",theApp.m_workingDirectory,file, getTimeTag() );
 	if( !openFileSpec( &fl, m_htmlFile, L"w+" ) ) return false;
@@ -109,11 +109,9 @@ Nõk leszármazottai: %s\n\
 	createStyle();
 	print( L"</head>\n" );
 	print( body );
+//	print( font );
 	print( header );
 	print( title );
-
-	if( m_spaces )
-		print( L"<pre>" );
 	return TRUE;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -131,7 +129,26 @@ void CGaDescendants::createStyle()
 {
 
 	fwprintf( fl, L"<style>\n" );
-	fwprintf( fl, L"html{width:100cm;}\n" );
+	if( !m_wrap )
+		fwprintf( fl, L"html{width:100cm;}\n" );
+
+	CString font;
+	font = L"body {font-family: courier, serif;}";
+	font = L"body {font-family: Arial, Helvetica, sans-serif;}";
+	font = L"body {font-family: Verdana;}";
+	font = L"<body class=\"w3-container\">";
+//	fwprintf( fl, L"%s\n", font );
+	CString fontSize;
+	fontSize.Format( L"body {font-size: %dpx;}", 10 + 2* m_ixFontSize );
+	fwprintf( fl, L"%s\n", fontSize );
+
+//	fwprintf( fl, L"body {font-size: 10px;}" );
+	
+
+//	CString font;
+//	font = L"<font-family: Avenir Next, Calibri, Verdana, sans-serif>\n";
+//	fwprintf( fl, font );
+
 	if( m_numbering != 0 )
 	{
 	fwprintf( fl, L"ul {\n" );

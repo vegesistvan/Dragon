@@ -43,6 +43,7 @@ CGaDescendants::CGaDescendants(CWnd* pParent /*=NULL*/)
 	,m_ixSpec( 0 )			// speciális karakterek (*+=) bold
 	,m_ixComment( 2 )		// comment bold
 	,m_ixFamily( 3 )
+	,m_ixFontSize( 3 )
 
 	,m_rowid1(L"")			// a leszármazott rowid-ja
 	,m_name(L"")			// leszármazott õs neve
@@ -51,7 +52,7 @@ CGaDescendants::CGaDescendants(CWnd* pParent /*=NULL*/)
 	,m_code(true)			// ANSI vagy UTF8 kódrendszer
 	,m_numbering(2)			// milyen számozási rendszer legyen (0,1,2) 
 	,m_checkFamily(true)	// %%% családnév,elõnév kiemelése
-	,m_spaces(false)
+	, m_wrap(false)
 {
 	
 }
@@ -79,14 +80,14 @@ void CGaDescendants::DoDataExchange(CDataExchange* pDX)
 
 	DDX_Check(pDX, IDC_CHECK_FAMILY, m_checkFamily);
 	DDX_Control(pDX, IDC_SZLUHA, m_szluhaCtrl);
-	DDX_Radio(pDX, IDC_RADIO_LIST, m_spaces);
-	
+	DDX_Check(pDX, IDC_CHECK_WRAP, m_wrap);
+	DDX_Control(pDX, IDC_COMBO_FONTSIZE, m_ComboFontSize);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CGaDescendants, CDialogEx)
 	ON_WM_CTLCOLOR()
 
-	ON_MESSAGE( WM_CTLCOLORBTN, OnCtlColorBtn )
+//	ON_MESSAGE( WM_CTLCOLORBTN, OnCtlColorBtn )
 	
 	ON_COMMAND(IDC_RADIO_DEFAULT, &CGaDescendants::OnRadioDefault)
 	ON_COMMAND(IDC_TUPIGNY, &CGaDescendants::OnTupigny)
@@ -100,7 +101,7 @@ BEGIN_MESSAGE_MAP(CGaDescendants, CDialogEx)
 	ON_BN_CLICKED(IDOK, &CGaDescendants::OnBnClickedOk)
 	ON_BN_CLICKED(IDC_CHECK_FAMILY, &CGaDescendants::OnClickedCheckFamily)
 	ON_BN_CLICKED(IDC_CHECK_LASTNAME, &CGaDescendants::OnClickedCheckLastname)
-	ON_BN_CLICKED(IDC_RADIO_LIST, &CGaDescendants::OnClickedRadioList)
+//	ON_BN_CLICKED(IDC_RADIO_LIST, &CGaDescendants::OnClickedRadioList)
 	ON_BN_CLICKED(IDC_BUTTON_DEFAULT, &CGaDescendants::OnClickedButtonDefault)
 END_MESSAGE_MAP()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -128,6 +129,13 @@ BOOL CGaDescendants::OnInitDialog()
 	m_ComboComm.SetCurSel( m_ixComment );
 	m_ComboSpec.SetCurSel( m_ixSpec );
 	m_ComboFamily.SetCurSel( m_ixFamily );
+
+	for( INT i = 0; i < 6; ++i )
+	{
+		str.Format( L"%d", 10+i*2 );
+		m_ComboFontSize.AddString( str );
+	}
+	m_ComboFontSize.SetCurSel( m_ixFontSize );
 
 	for( int i = 0; i < szinSize; ++i )
 	{
@@ -377,13 +385,9 @@ void CGaDescendants::descendants()
 		if( !vDesc.at(ix).hidden	)	
 		{
 			if( m_gen > generationsMax )
-//			if( linenumber > linenumberMax )
 			{
-				if( !m_spaces )
-				{
-					for( int i =0; i < cnt_ol; ++i )
-						fwprintf( fl, L"%s\n", m_tag2 );
-				}
+				for( int i =0; i < cnt_ol; ++i )
+					fwprintf( fl, L"%s\n", m_tag2 );
 				str.Format( L"<br><br><font color='red'>%d-nál több generációt írt ki, már kezelhetetlen, ezért abbahoagyom!!!</font>", linenumberMax );
 				print( str );
 				break;
@@ -511,14 +515,17 @@ CString CGaDescendants::getNextChildRowid( UINT ix )
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////// B E Á L L Í T Á S O K //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 LRESULT CGaDescendants::OnCtlColorBtn( WPARAM wparam, LPARAM lparam )
 {
 	HDC pDC = (HDC)wparam;
 	HWND hand = (HWND)lparam;
 	return TRUE;
 }
+*/
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaDescendants::OnClickedRadioClear()  // fekete szín beállítása
 {
@@ -527,27 +534,7 @@ void CGaDescendants::OnClickedRadioClear()  // fekete szín beállítása
 	m_ComboSpec.SetCurSel( 0 );
 	m_ComboComm.SetCurSel( 0 );
 	m_ComboBgrd.SetCurSel( 0 );
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////4
-void CGaDescendants::OnClickedButtonDefault()
-{
-	m_setCombo = 1;
-	m_ComboName.SetCurSel( 1 );
-	m_ComboSpec.SetCurSel( 0 );
-	m_ComboComm.SetCurSel( 2 );
-	m_ComboFamily.SetCurSel( 3 );
-
-	m_ComboBgrd.SetCurSel( 0 );
-
-	m_spaces		= false;
-	m_woman			= true;
-	m_connect		= true;
-	m_checkFamily	= true;
-	m_CheckLastName = false;
-	m_numbering		= 2;
-
-
-	UpdateData( TOSCREEN );
+	m_ComboFamily.SetCurSel(0);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaDescendants::OnRadioDefault()		// default szín beállítása
@@ -557,13 +544,22 @@ void CGaDescendants::OnRadioDefault()		// default szín beállítása
 	m_ComboSpec.SetCurSel( 0 );
 	m_ComboComm.SetCurSel( 2 );
 	m_ComboBgrd.SetCurSel( 0 );
+	m_ComboFamily.SetCurSel(3);
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CGaDescendants::OnClickedRadioList()
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////4
+void CGaDescendants::OnClickedButtonDefault()
 {
-	if( m_numbering != 0 ) 
-		m_spaces = !m_spaces;
+	OnRadioDefault();
+
+	m_woman			= false;
+	m_connect		= true;
+	m_checkFamily	= true;
+	m_CheckLastName = false;
+	m_numbering		= 2;
+	m_wrap			= false;
+	UpdateData( TOSCREEN );
 }
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaDescendants::OnClickedCheckWoman()
 {
@@ -604,31 +600,29 @@ void CGaDescendants::OnClickedSzluha()
 {
 	m_numbering = 0;
 	GetDlgItem( IDC_RADIO_LIST )->EnableWindow( false );
-	GetDlgItem( IDC_RADIO_SPACES )->EnableWindow( false );
 }
 void CGaDescendants::OnVillers()
 {
 	m_numbering = 1;
 	GetDlgItem( IDC_RADIO_LIST )->EnableWindow( true );
-	GetDlgItem( IDC_RADIO_SPACES )->EnableWindow( true );
 }
 void CGaDescendants::OnTupigny()
 {
 	m_numbering = 2;
 	GetDlgItem( IDC_RADIO_LIST )->EnableWindow( true );
-	GetDlgItem( IDC_RADIO_SPACES )->EnableWindow( true );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaDescendants::OnBnClickedOk()
 {
 	UpdateData( FROMSCREEN );
-	m_ixName	= m_ComboName.GetCurSel();
-	m_ixSpec	= m_ComboSpec.GetCurSel();
-	m_ixComment = m_ComboComm.GetCurSel();
-	m_ixFamily	= m_ComboFamily.GetCurSel();
+	m_ixName		= m_ComboName.GetCurSel();
+	m_ixSpec		= m_ComboSpec.GetCurSel();
+	m_ixComment		= m_ComboComm.GetCurSel();
+	m_ixFamily		= m_ComboFamily.GetCurSel();
+	m_ixFontSize	= m_ComboFontSize.GetCurSel();
 
-	m_ixBgrd	= m_ComboBgrd.GetCurSel();
-	m_colorBgrnd = szin[m_ixBgrd].rgb;
+	m_ixBgrd		= m_ComboBgrd.GetCurSel();
+	m_colorBgrnd	= szin[m_ixBgrd].rgb;
 
 	if( m_woman ) m_connect = true;
 

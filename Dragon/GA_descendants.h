@@ -1,10 +1,8 @@
 
-
-
 #pragma once
 
-#if !defined(AFX_DESCENDANT_H__930379D8_BDD1_4973_93FF_041F3F3811E4__INCLUDED_)
-#define AFX_DESCENDANT_H__930379D8_BDD1_4973_93FF_041F3F3811E4__INCLUDED_
+//#if !defined(AFX_DESCENDANT_H__930379D8_BDD1_4973_93FF_041F3F3811E4__INCLUDED_)
+//#define AFX_DESCENDANT_H__930379D8_BDD1_4973_93FF_041F3F3811E4__INCLUDED_
 
 enum 
 {
@@ -28,11 +26,6 @@ public:
 
 // Dialog Data
 	enum { IDD = IDD_GA_DESCENDANTS };
-	BOOL m_join;
-	BOOL m_limited;
-//	BOOL _woman;				// nõk leszármazottait is kistázza-e
-
-
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
@@ -83,6 +76,8 @@ protected:
 	CComboBox m_ComboBgrd;
 	CComboBox m_ComboComm;
 	CComboBox m_ComboName;
+	CComboBox m_ComboFamily;
+
 	CButton m_szluhaCtrl;
 
 	DESCENDANTS desc;
@@ -104,11 +99,9 @@ protected:
 	CString getNextChildRowid( UINT ix );
 	void descendants();
 
-	void tab();
 	void print( CString str );
 	void printGAline();
 	void printBegining();
-	void printBegining2();
 	void printDescendant();
 	void printMarriages();
 	void printMarriage( CString place, CString date, int i, int numberOfSpouses );
@@ -130,18 +123,21 @@ protected:
 	int	m_ixSpec;
 	int	m_ixComment;
 	int	m_ixFamily;
+	int m_ixFontSize;
+
+	BOOL m_join;
+	BOOL m_limited;
 
 	BOOL m_CheckLastName;
-	
 
 	int m_setCombo;
 	
 	BOOL m_connect;
 	BOOL m_woman;
+	BOOL m_wrap;	
+
+
 	
-
-
-
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnInitDialog();
@@ -157,7 +153,7 @@ public:
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnClickedRadioClear();
 	afx_msg void OnRadioDefault();
-	afx_msg LRESULT OnCtlColorBtn( WPARAM wparam, LPARAM lparam );
+//	afx_msg LRESULT OnCtlColorBtn( WPARAM wparam, LPARAM lparam );
 	afx_msg void OnClickedCheckWoman();
 	afx_msg void OnClickedCheckConnect();
 	afx_msg void OnClickedSzluha();
@@ -165,10 +161,7 @@ public:
 	afx_msg void OnVillers();
 	afx_msg void OnClickedCheckFamily();
 	afx_msg void OnClickedCheckLastname();
-	BOOL m_spaces;
-	afx_msg void OnClickedRadioList();
 	afx_msg void OnClickedButtonDefault();
-//	CString m_ComboFamily;
-	CComboBox m_ComboFamily;
+	CComboBox m_ComboFontSize;
 };
-#endif // !defined(AFX_DESCENDANT_H__930379D8_BDD1_4973_93FF_041F3F3811E4__INCLUDED_)
+//#endif // !defined(AFX_DESCENDANT_H__930379D8_BDD1_4973_93FF_041F3F3811E4__INCLUDED_)

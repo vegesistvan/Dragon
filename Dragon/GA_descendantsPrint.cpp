@@ -14,13 +14,9 @@ void CGaDescendants::printGAline()
 
 	CString rowid;
 	rowid = vDesc.at( vDesc.size()-1).rowid;
-//	rowid = vDesc.at(ix).rowid;
 	queryPeople( rowid, &p );
 
-	if( m_spaces )
-		printBegining2();	// html kódok és generáció elkészítése; 
-	else
-		printBegining();	// html kódok és generáció elkészítése; 
+	printBegining();	// html kódok és generáció elkészítése; 
 	printDescendant();
 	printMarriages(); 
 
@@ -38,22 +34,14 @@ void CGaDescendants::printGAline()
 		str.Format( L"<font color='blue'> %c%c%c folyt %s</font>", '%','%','%', p.folyt );
 		print( str );
 	}
-	fflush( fl );
 
 	if( !p.known_as.IsEmpty() )
 	{
-		if( !m_spaces )
-			str.Format( L"<ul><font color='blue'> %c %s</font>", '%', p.known_as );
-		else
-		{
-			tab();
-			str.Format( L"<font color='blue'> %c %s</font>", '%', p.known_as );
-		}
+		str.Format( L"<ul><font color='blue'> %c %s</font>", '%', p.known_as );
 		print( str );
-		fflush( fl );
 	}
-
-
+	fwprintf( fl, L"\n" );
+	fflush( fl );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // A genráció változástól függû behuzás és genrációs kód nyomtatása az m_sytax értékétõl függõen
@@ -121,52 +109,6 @@ void CGaDescendants::printBegining()
 		str.Format( L"%s%c%d&diams;", tags, gen, vDesc.at(ix).children );
 	else if( m_numbering == TUP )
 		str.Format( L"%s%c-%d&diams;", tags, gen, vSerial.at( generation ) );
-	print( str );
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CGaDescendants::tab()
-{
-	fwprintf( fl, L"<br>%*s", m_gen*4, L" " );
-//	fwprintf( fl, L"<br>%*s", m_gen, L"\t" );
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// A genráció változástól függû behuzás és genrációs kód nyomtatása az m_sytax értékétõl függõen
-void CGaDescendants::printBegining2()
-{
-	CString tags;
-	bool ul = false;
-	int ix = vDesc.size() -1;
-
-	UINT	generation	= vDesc.at(ix).gen;
-	m_gen = vDesc.at(ix).gen;
-
-	TCHAR	gen			= TCHAR('A') + TCHAR(generation);	// a generációs karakter-jel ( A,B,C,D.....);
-
-	CString family;
-
-	if( m_checkFamily )
-	{
-		if( m_familyName != p.last_name )
-		{
-			family = getFamilyName();			// a tables táblából visszadja a tableHeader értékét 
-			fwprintf( fl, L"<br>" );
-			tab();
-//			str.Format( L"<b>%s %s</b><br>", L"%%%", family );
-			str.Format( L"%s %s\n", L"%%%", family );
-			str = getColoredString( str, m_ixFamily );
-			print( str );
-		}
-		m_familyName = p.last_name;
-	}
-	tab();
-
-
-	if( m_numbering == SZLUHA )
-		str.Format( L"%c&diams;",  gen );			// gedcom és kézi bevitelnél nincs generáció, ezt úgy kell beletenni!!
-	else if( m_numbering == VIL )
-		str.Format( L"%c%d&diams;", gen, vDesc.at(ix).children );
-	else if( m_numbering == TUP )
-		str.Format( L"%c-%d&diams;", gen, vSerial.at( generation ) );
 	print( str );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -452,18 +394,17 @@ CString CGaDescendants::getLastFirst( PPEOPLE* p )
 	CString name;
 	if( !p->first_name.IsEmpty() && !p->last_name.IsEmpty() )
 	{
-		name = attrib[m_ixName].code1;
 		name += p->last_name;
 		name += L" ";
 		name += p->first_name;
-		name += attrib[m_ixName].code2;
+		name = getColoredString( name, m_ixName );
 	}
 	return name;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CGaDescendants::getFullname( PPEOPLE* p )
 {
-	CString fullname  = attrib[m_ixName].code1;
+	CString fullname;
 
 	if( !p->title.IsEmpty() )
 	{
@@ -496,7 +437,8 @@ CString CGaDescendants::getFullname( PPEOPLE* p )
 		fullname += p->posterior;
 	}
 	fullname.Trim();
-	fullname += attrib[m_ixName].code2;
+	fullname = getColoredString( fullname, m_ixName );
+//	fullname += attrib[m_ixName].code2;
 	return( fullname.Trim() );
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
