@@ -115,8 +115,7 @@ protected:
 	CString getLastFirst( PPEOPLE* p );
 	CString getFullname( PPEOPLE* p );
 	CString getPlaceDateBlock( CString place, CString date, CString jel );
-	CString getCommentBlock( CString comment );
-
+	
 	CString getFamilyName();
 
 	int	m_ixName;

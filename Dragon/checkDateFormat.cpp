@@ -79,7 +79,10 @@ hogy az adatbázisban vagy a GA.html fájlban módosítsuk a hibás dátumot.\
 	fillTable();
 
 	if( !m_ListCtrl.GetItemCount() )
+	{
+		AfxMessageBox( L"Minden dátum formátuma helyes!", MB_ICONINFORMATION );
 		OnCancel();
+	}
 
 	return TRUE;
 }

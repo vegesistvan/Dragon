@@ -18,6 +18,10 @@ public:
 	CString m_rowidH;		// husband rowid;
 	CString m_rowidW;		// wife rowid;
 
+	CString m_orderHusband;
+	CString m_orderWife;
+	CString m_place;
+	CString m_date;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
@@ -27,13 +31,6 @@ protected:
 
 	
 	
-	CString m_place;
-	CString m_date;
-	CString m_orderWife;
-	CString m_orderHusband;
-
-
-
 	CString getSpouse( CString rowid );
 	DECLARE_MESSAGE_MAP()
 public:

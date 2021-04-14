@@ -140,7 +140,9 @@ protected:
 	
 public:
 	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
-	afx_msg void OnEditDelete();
+//	HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
+
+		afx_msg void OnEditDelete();
 	afx_msg void OnEditUpdate();
 	afx_msg void OnEditGyerek();
 
@@ -182,4 +184,8 @@ public:
 	afx_msg void OnChangeEditPosterior();
 	afx_msg void OnChangeEditTitle();
 
+	afx_msg void OnAscestor();
+	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
+	CStatic m_CtrlGrp;
+	afx_msg void OnDescendants();
 };

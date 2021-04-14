@@ -178,6 +178,7 @@ ON_COMMAND(ID_CONTRACTEDCOUPLES, &CDragonDlg::OnContractedCouples)
 ON_COMMAND(ID_CONTRACT_PEOPLE, &CDragonDlg::OnContractedPeople)
 ON_COMMAND(ID_DISPLAY_FAMILIES, &CDragonDlg::OnDisplayFamilies)
 ON_COMMAND(ID_CHECK_WEDDINGDATE, &CDragonDlg::OnCheckWeddingDate)
+ON_COMMAND(ID_SPOUSES_SEX, &CDragonDlg::OnSpousesSex)
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CDragonDlg::OnInitDialog()
@@ -426,24 +427,6 @@ void CDragonDlg::OnDisplayMarriages()
 	}
 */
 }
-/*
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragonDlg::OnDisplayFamilies()
-{
-	if( m_pFamilies != NULL )
-	{
-		m_pFamilies->ShowWindow(SW_RESTORE);		// néha kell!!
-		m_pFamilies->SetForegroundWindow();
-	}
-	else
-	{
-		m_pFamilies = new CCheckFamilyDates(this);
-		m_pFamilies->Create( IDD_CHECK_FAMILYDATES,GetDesktopWindow());
-		m_pFamilies->m_always = true;
-		m_pFamilies->ShowWindow(SW_SHOW);
-	}
-}
-*/
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonDlg::OnDisplayTables()
 {
@@ -973,5 +956,11 @@ void CDragonDlg::OnCheckWeddingDate()
 {
 	CCheckSameSpouses dlg;
 	dlg.m_wedding = true;
+	dlg.DoModal();
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDragonDlg::OnSpousesSex()
+{
+	CCheckSpousesSex dlg;
 	dlg.DoModal();
 }

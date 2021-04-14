@@ -423,4 +423,5 @@ public:
 	afx_msg LRESULT OnMainTitle(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnDisplayFamilies();
 	afx_msg void OnCheckWeddingDate();
+	afx_msg void OnSpousesSex();
 };

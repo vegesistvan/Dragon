@@ -101,7 +101,6 @@ BEGIN_MESSAGE_MAP(CGaDescendants, CDialogEx)
 	ON_BN_CLICKED(IDOK, &CGaDescendants::OnBnClickedOk)
 	ON_BN_CLICKED(IDC_CHECK_FAMILY, &CGaDescendants::OnClickedCheckFamily)
 	ON_BN_CLICKED(IDC_CHECK_LASTNAME, &CGaDescendants::OnClickedCheckLastname)
-//	ON_BN_CLICKED(IDC_RADIO_LIST, &CGaDescendants::OnClickedRadioList)
 	ON_BN_CLICKED(IDC_BUTTON_DEFAULT, &CGaDescendants::OnClickedButtonDefault)
 END_MESSAGE_MAP()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -382,7 +381,7 @@ void CGaDescendants::descendants()
 
 	while( vDesc.size() )
 	{
-		if( !vDesc.at(ix).hidden	)	
+		if( !vDesc.at(ix).hidden )	
 		{
 			if( m_gen > generationsMax )
 			{
@@ -599,17 +598,17 @@ void CGaDescendants::OnClickedCheckLastname()
 void CGaDescendants::OnClickedSzluha()
 {
 	m_numbering = 0;
-	GetDlgItem( IDC_RADIO_LIST )->EnableWindow( false );
+//	GetDlgItem( IDC_RADIO_LIST )->EnableWindow( false );
 }
 void CGaDescendants::OnVillers()
 {
 	m_numbering = 1;
-	GetDlgItem( IDC_RADIO_LIST )->EnableWindow( true );
+//	GetDlgItem( IDC_RADIO_LIST )->EnableWindow( true );
 }
 void CGaDescendants::OnTupigny()
 {
 	m_numbering = 2;
-	GetDlgItem( IDC_RADIO_LIST )->EnableWindow( true );
+//	GetDlgItem( IDC_RADIO_LIST )->EnableWindow( true );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaDescendants::OnBnClickedOk()

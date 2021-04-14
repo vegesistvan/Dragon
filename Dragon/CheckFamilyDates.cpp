@@ -11,6 +11,7 @@
 #include "EditPeople.h"
 #include "CheckFamilyDatesStart.h"
 #include "checkParam.h"
+#include "EditPeopleManual.h"
 
 // SELECT  FROM people father
 enum
@@ -242,7 +243,8 @@ BEGIN_MESSAGE_MAP(CCheckFamilyDates, CDialogEx)
 	ON_COMMAND(ID_HTML_NOTEPAD_PARENTS, &CCheckFamilyDates::OnHtmlNotepadParents)
 	ON_COMMAND(ID_HTML_FATHERANDSIBLINGS, &CCheckFamilyDates::OnHtmlFatherAndSiblings)
 	ON_COMMAND(ID_DB_EDIT, &CCheckFamilyDates::OnDbEdit)
-	ON_COMMAND(ID_3GENERATIONS, &CCheckFamilyDates::On3Generations )
+//	ON_COMMAND(ID_3GENERATIONS, &CCheckFamilyDates::On3Generations )
+	ON_COMMAND(ID_EDIT_3GENERATIONS, &CCheckFamilyDates::On3Generations )
 	ON_COMMAND(ID_EDIT_DATABASE, &CCheckFamilyDates::OnEditDatabase )
 	ON_COMMAND(ID_HTML_CHILDREN, &CCheckFamilyDates::OnHtmlChildren)
 
@@ -1384,7 +1386,7 @@ void CCheckFamilyDates::OnEditDatabase()
 	CString name;
  	name = m_ListCtrl.GetItemText( nItem, L_NAME );
 
-	CEditPeople dlg;
+	CEditPeopleManual dlg;
 
 	dlg.m_rowid	= m_ListCtrl.GetItemText( nItem, L_ROWID );
 	dlg.m_caption.Format( L"%s szerkesztése", name );

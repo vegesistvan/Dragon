@@ -96,6 +96,11 @@ BOOL CCheckMotherDeath::OnInitDialog()
 	createColumns();
 	motherDeathChildBirth();
 
+	if( !m_ListCtrl.GetItemCount() )
+	{
+		AfxMessageBox( L"Nem találtam az anya halála után született gyerekeket!", MB_ICONINFORMATION );
+		CDialogEx::OnOK();
+	}
 	return TRUE;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

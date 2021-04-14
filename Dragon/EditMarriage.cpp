@@ -107,17 +107,13 @@ CString CEditMarriage::getSpouse( CString rowid )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CEditMarriage::OnBnClickedOk()
 {
-	CString orderHusband;
-	CString orderWife;
-	CString place;
-	CString date;
 
-	GetDlgItem( IDC_EDIT_ORDERWIFE )->GetWindowTextW( orderWife );
-	GetDlgItem( IDC_EDIT_ORDERHUSBAND )->GetWindowTextW( orderHusband );
-	GetDlgItem( IDC_EDIT_PLACE )->GetWindowTextW( place );
-	GetDlgItem( IDC_EDIT_DATE )->GetWindowTextW( date );
+	GetDlgItem( IDC_EDIT_ORDERWIFE )->GetWindowTextW( m_orderWife );
+	GetDlgItem( IDC_EDIT_ORDERHUSBAND )->GetWindowTextW( m_orderHusband );
+	GetDlgItem( IDC_EDIT_PLACE )->GetWindowTextW( m_place );
+	GetDlgItem( IDC_EDIT_DATE )->GetWindowTextW( m_date );
 
-	m_command.Format( L"UPDATE marriages SET orderHusband='%s', orderWife='%s', place='%s', date='%s' WHERE rowid='%s'", orderHusband, orderWife, place, date, m_rowid ); 
+	m_command.Format( L"UPDATE marriages SET orderHusband='%s', orderWife='%s', place='%s', date='%s' WHERE rowid='%s'", m_orderHusband, m_orderWife, m_place, m_date, m_rowid ); 
 	if( !theApp.execute( m_command ) ) return;
 
 	CDialogEx::OnOK();

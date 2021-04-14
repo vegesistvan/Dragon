@@ -16,12 +16,13 @@
 #include "setup.h"
 #include "html_EditLines.h"
 #include "pictures.h"
-#include "NewPeople.h"
 #include "EditPeople.h"
+#include "EditPeopleManual.h"
 #include "EditMarriage.h"
 #include "Help.h"
 #include "EditComment.h"
 #include "MoreSpouses.h"
+#include "GA_descendants.h"
 
 
 #define BISEX 0
@@ -157,6 +158,8 @@ void CRelations::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_NAME, colorName);
 	DDX_Text(pDX, IDC_EDIT_POSTERIOR, m_posterior);
 	DDX_Text(pDX, IDC_EDIT_TITLE, m_title);
+
+	DDX_Control(pDX, IDC_GROUP, m_CtrlGrp);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CRelations, CDialogEx)
@@ -207,6 +210,10 @@ ON_EN_CHANGE(IDC_COMMENT, &CRelations::OnChangeComment)
 
 ON_EN_CHANGE(IDC_EDIT_POSTERIOR, &CRelations::OnChangeEditPosterior)
 ON_EN_CHANGE(IDC_EDIT_TITLE, &CRelations::OnChangeEditTitle)
+ON_COMMAND(ID_ASCESTOR, &CRelations::OnAscestor)
+
+ON_WM_CTLCOLOR()
+ON_COMMAND(ID_DESCENDANTS, &CRelations::OnDescendants)
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CRelations::OnInitDialog()
@@ -221,6 +228,7 @@ BOOL CRelations::OnInitDialog()
 	colorNewMother.SetTextColor( theApp.m_colorClick );
 	colorComment.SetTextColor( theApp.m_colorClick );
 	colorChildren.SetTextColor( theApp.m_colorClick );
+
 
 	// szülõk
 	
@@ -446,6 +454,8 @@ bool CRelations::people( CString rowid )
 
 	colorName.SetTextColor( colorRed );
 	GetDlgItem( IDC_NAME )->SetWindowText( m_name );
+
+//	m_CtrlGrp.SetWindowTextW( m_name );
 	m_changed = false;
 	return true;
 }
@@ -787,8 +797,11 @@ void CRelations::OnDblclkListP(NMHDR *pNMHDR, LRESULT *pResult)
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	int nItem	= pNMItemActivate->iItem;
 	CString rowid = m_ListCtrlP.GetItemText( nItem, LISTP_ROWID );
-	if( m_changed ) savePeople();
-	createScreen( rowid );
+	if( !rowid.IsEmpty() )
+	{
+		if( m_changed ) savePeople();
+		createScreen( rowid );
+	}
 	*pResult = 0;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -951,7 +964,8 @@ bool CRelations::newSpouse( int db )
 		orderHusband = m_ListCtrlM.GetItemCount() + 1;
 	}
 
-	CNewPeople dlg;
+//	CNewPeople dlg;
+	CEditPeopleManual dlg;
 	dlg.m_caption = caption;
 	if( dlg.DoModal() == IDCANCEL ) return false;
 
@@ -962,9 +976,9 @@ bool CRelations::newSpouse( int db )
 		return( false );
 	}
 	if( m_sex_id == MAN )
-		m_command.Format( L"INSERT INTO marriages ( spouse1_id, spouse2_id, orderHusband  ) VALUES ('%s', '%s', %d )", m_rowid, dlg.m_rowid, orderWife );
+		m_command.Format( L"INSERT INTO marriages ( spouse1_id, spouse2_id, orderWife  ) VALUES ('%s', '%s', %d )", m_rowid, dlg.m_rowid, orderWife );
 	else
-		m_command.Format( L"INSERT INTO marriages ( spouse1_id, spouse2_id, orderWife ) VALUES ('%s', '%s', %d )", dlg.m_rowid, m_rowid, orderHusband );
+		m_command.Format( L"INSERT INTO marriages ( spouse1_id, spouse2_id, orderHusband ) VALUES ('%s', '%s', %d )", dlg.m_rowid, m_rowid, orderHusband );
 	theApp.execute( m_command );
 
 	hazastarsak( p_rowid, m_sex_id );
@@ -981,9 +995,10 @@ void CRelations::OnClickedNewFather()
 		if( AfxMessageBox( str, MB_YESNO ) == IDNO ) return;
 	}
 
-	CNewPeople dlg;
-	
+	CEditPeopleManual dlg;
 	dlg.m_last_name = m_last_name;
+	dlg.m_rowid.Empty();
+	dlg.m_tableNumber = m_tableNumber;
 	if( dlg.DoModal() == IDCANCEL ) return;
 
 	m_father_id = dlg.m_rowid;
@@ -1006,7 +1021,7 @@ void CRelations::OnClickedNewMother()
 		if( AfxMessageBox( str, MB_YESNO ) == IDNO ) return;
 	}
 
-	CNewPeople dlg;
+	CEditPeopleManual dlg;
 	dlg.m_last_name.Empty();
 	if( dlg.DoModal() == IDCANCEL ) return;
 
@@ -1045,8 +1060,10 @@ void CRelations::OnClickedSiblings()
 	CString mother_id;
 	int		parentIndex = 1;
 
-	CNewPeople dlg;
+	CEditPeopleManual dlg;
+	dlg.m_rowid.Empty();
 	dlg.m_last_name = m_last_name;
+	dlg.m_tableNumber = m_tableNumber;
 
 	if( dlg.DoModal() == IDCANCEL ) return;
 	switch( parentCnt )
@@ -1239,8 +1256,8 @@ void CRelations::OnEditGyerek()
 	CString rowidM;
 	rowidM = m_ListCtrlM.GetItemText( nItem, LISTM_ROWID );
 
-	CNewPeople dlg;
-
+//	CNewPeople dlg;
+	CEditPeopleManual dlg;
 	if( m_sex_id == MAN )
 	{
 //		dlg.m_orderFather = m_ListCtrlC.GetItemCount() + 1;
@@ -1265,76 +1282,42 @@ void CRelations::OnEditUpdate()
 	int	nItem;
 	CString name;
 
-	CNewPeople dlg;
+	CEditPeopleManual dlg;
 
 	switch( listCtrlFlag )
 	{
 	case PP:
-/*
-		nItem	= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED); 
-		if( nItem == -1 ) return;
-		name = m_ListCtrl.GetItemText( nItem, LIST_NAME );
-		
-		dlg.m_rowidClick	= m_ListCtrl.GetItemText( nItem, LIST_ROWID );
-		str.Format( L"%s szerkesztése", name );
-
-		dlg.m_newPeople = -1;
-		dlg.DoModal();
-		people( dlg.m_rowidClick );
-*/
 		break;
 	case FM:
 		nItem	= m_ListCtrlP.GetNextItem(-1, LVNI_SELECTED); 
 		if( nItem == -1 ) return;
-		name = m_ListCtrlP.GetItemText( nItem, LISTP_NAME );
 		dlg.m_rowid	= m_ListCtrlP.GetItemText( nItem, LISTP_ROWID );
-		str.Format( L"%s szerkesztése", name );
-//		dlg.m_newPeople = -1;
 		dlg.DoModal();
 		szulok( m_father_id, m_mother_id );
 		break;
 	case M:
 		nItem	= m_ListCtrlM.GetNextItem(-1, LVNI_SELECTED); 
 		if( nItem == -1 ) return;
-		name = m_ListCtrlM.GetItemText( nItem, LISTM_NAME );
-//		dlg.m_rowidClick	= m_ListCtrlM.GetItemText( nItem, LISTM_ROWID );
-		str.Format( L"%s szerkesztése", name );
-//		dlg.m_newPeople = -1;
+		dlg.m_rowid = m_ListCtrlM.GetItemText( nItem, LISTM_ROWID );
 		dlg.DoModal();
 		hazastarsak( p_rowid, m_sex_id );
 		break;
 	case S:
 		nItem	= m_ListCtrlS.GetNextItem(-1, LVNI_SELECTED); 
 		if( nItem == -1 ) return;
-		name = m_ListCtrlS.GetItemText( nItem, LISTS_NAME );
-//		dlg.m_rowidClick	= m_ListCtrlS.GetItemText( nItem, LISTS_ROWID );
-		str.Format( L"%s szerkesztése", name );
-//		dlg.m_newPeople = -1;
+		dlg.m_rowid = m_ListCtrlS.GetItemText( nItem, LISTS_ROWID );
 		dlg.DoModal();
 		testverek( p_rowid, m_father_id, m_mother_id  );
 		break;
 	case C:
 		nItem	= m_ListCtrlC.GetNextItem(-1, LVNI_SELECTED); 
 		if( nItem == -1 ) return;
-//		dlg.m_rowidClick	= m_ListCtrlC.GetItemText( nItem, LISTC_ROWID );
-		name = m_ListCtrlC.GetItemText( nItem, LISTC_NAME );
-		str.Format( L"%s szerkesztése", name );
-//		dlg.m_newPeople = -1;
+		dlg.m_rowid = m_ListCtrlC.GetItemText( nItem, LISTC_ROWID );
 		dlg.DoModal();
 		gyerekek( p_rowid, m_sex_id );
 		break;
 	}
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-void CRelations::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	listCtrlFlag = PP;
-	OnEditUpdate();
-	*pResult = 0;
-}
-*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CRelations::editMarriage( int nItem )
 {
@@ -1404,7 +1387,6 @@ void CRelations::OnPaint()
 	CImage image;
 	CBitmap bitmap;
 
-
 	image.Load( m_fileSpec ); // just change extension to load jpg
 	bitmap.Attach(image.Detach());
 
@@ -1434,11 +1416,11 @@ void CRelations::OnPaint()
 
 	x = rect.right - width - 20;
 
-	int	y = 120;
+	int	y = 50;
 
 	dc.SetStretchBltMode( STRETCH_HALFTONE );
 	dc.StretchBlt( x, y, width, height, &dcMemory, 0,0, bmWidth, bmHeight, SRCCOPY);	
-	
+
 	CDialogEx::OnPaint();
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1734,9 +1716,10 @@ void CRelations::OnClickedChildren()
 			}
 			break;
 	}
-
-	CNewPeople dlg;
+	CEditPeopleManual dlg;
 	dlg.m_last_name = last_name;
+	dlg.m_rowid.Empty();
+	dlg.m_tableNumber = m_tableNumber;
 
 	if( !father.IsEmpty() && !mother.IsEmpty() )
 		dlg.m_caption.Format( L"Add meg %s és %s gyerekét!", father, mother );
@@ -1762,9 +1745,168 @@ void CRelations::OnClickedChildren()
 		orderMother = m_ListCtrlC.GetItemCount() + 1;
 	}
 	if( dlg.DoModal() == IDCANCEL ) return;
-	m_command.Format( L"UPDATE people SET father_id='%s', mother_id='%s', orderFather=%d, orderMother=%d WHERE rowid = '%s'", rowidF, rowidM, orderFather, orderMother, dlg.m_rowid );
+	m_command.Format( L"UPDATE people SET father_id='%s', mother_id='%s', orderFather='%d', orderMother='%d', parentIndex='%d', parentIndexCalc='%d' WHERE rowid = '%s'", rowidF, rowidM, orderFather, orderMother, parentIndex, parentIndex, dlg.m_rowid );
 	if( !theApp.execute( m_command ) ) return;
 
 	gyerekek( p_rowid, m_sex_id );  // m_sex_id: apa vagy anya gyerekeit listázzuk? 
 }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////4
+void CRelations::OnAscestor()
+{
+	CString father_id	= m_father_id;
+	CString rowid		= m_rowid;
+	
+	if( father_id.IsEmpty() || father_id == L"0") return;
 
+	while( !father_id.IsEmpty() )
+	{
+		m_command.Format( L"SELECT father_id FROM people WHERE rowid ='%s'", father_id );
+		if( !query2( m_command ) ) return;
+		str = m_recordset2->GetFieldString( 0 );
+		if( str.IsEmpty() || str == L"0")
+		{
+			rowid = father_id;
+			break;
+		}
+//		rowid		= father_id;
+		father_id	= str;
+	}
+	createScreen( rowid );
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
+HBRUSH CRelations::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
+{
+   HBRUSH hBrush = NULL;
+   const COLORREF rgbGreen =  0x0000FF00;
+   const COLORREF colorBack = PINK;
+   HBRUSH m_brushBack;
+
+   m_brushBack = CreateSolidBrush( colorBack );
+
+   switch(nCtlColor)
+   {
+   case CTLCOLOR_DLG:
+      // just return a not NULL brush handle
+      hBrush = (HBRUSH)m_brushBack;
+      break;
+   case CTLCOLOR_STATIC:
+      {
+         // set text color, transparent back node then 
+         pDC->SetTextColor( rgbGreen );
+         pDC->SetBkMode(TRANSPARENT);
+         // return a not NULL brush handle
+         hBrush = (HBRUSH)m_brushBack;
+      }
+      break;
+   default:
+      // do the default processing
+      hBrush = CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
+      break;
+   }      
+   return hBrush;
+}
+*/
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+HBRUSH CRelations::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
+{
+
+	HBRUSH hbr = CDialogEx::OnCtlColor(pDC, pWnd, nCtlColor);
+
+	const COLORREF colorBack = PINK;
+	HBRUSH m_brush = CreateSolidBrush( colorBack );
+	
+
+
+// This OnCtlColor handler will change the color of a static control
+// with the ID of IDC_MYSTATIC. The code assumes that the CPenWidthsDlg
+// class has an initialized and created CBrush member named m_brush.
+// The control will be painted with red text and a background
+// color of m_brush.
+// Call the base class implementation first! Otherwise, it may
+// undo what we're trying to accomplish here.
+
+/*
+   // Are we painting the IDC_MYSTATIC control? We can use
+   // CWnd::GetDlgCtrlID() to perform the most efficient test.
+   if (pWnd->GetDlgCtrlID() == IDC_GROUP )
+   {
+      // Set the text color to red
+      pDC->SetTextColor( RGB(255, 0, 0));
+//	  pDC->SetTextColor( colorRed );
+
+      // Set the background mode for text to transparent 
+      // so background will show thru.
+      pDC->SetBkMode(TRANSPARENT);
+
+      // Return handle to our CBrush object
+//     hbr = m_brush;
+
+   }
+
+   return hbr;
+*/
+
+//	const COLORREF colorBack = PINK;
+//	HBRUSH m_brushBack;
+
+//	m_brushBack = CreateSolidBrush( colorBack );
+
+//	pDC->SetBkMode(TRANSPARENT);
+//    return (HBRUSH)GetStockObject( LTGRAY_BRUSH );
+
+
+/*
+	HBRUSH hBrush = NULL;
+	const COLORREF rgbGreen =  0x0000FF00;
+	const COLORREF colorBack = PINK;
+	HBRUSH m_brushBack;
+
+	m_brushBack = CreateSolidBrush( colorBack );
+
+	switch(nCtlColor)
+	{
+	case CTLCOLOR_DLG:
+		 // just return a not NULL brush handle
+		hBrush = (HBRUSH)m_brushBack;
+		break;
+	case CTLCOLOR_STATIC:
+	{
+		// set text color, transparent back node then 
+		pDC->SetTextColor( rgbGreen );
+		pDC->SetBkMode(TRANSPARENT);
+		// return a not NULL brush handle
+		hBrush = (HBRUSH)m_brushBack;
+		break;
+	}
+	default:
+		// do the default processing
+		hBrush = CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
+		break;
+	}
+	return hBrush;
+*/
+
+
+  int nID = pWnd->GetDlgCtrlID();
+  if( IDC_GROUP ==nID) 
+  {
+	pDC->SetTextColor( RED );
+    pDC->SetBkMode(TRANSPARENT);
+//    hbr = m_brush; // blueBrush_ is member of CMyDialog, set to BLUE_COLOR in ctor
+  }
+	return hbr;
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CRelations::OnDescendants()
+{
+	CGaDescendants dlg;
+
+	dlg.m_numbering	= 0;
+	dlg.m_code		= ANSI;
+	dlg.m_rowid1	=  m_rowid;
+	dlg.m_source	= 0;
+	dlg.m_name		= m_name;
+	dlg.m_tableNumber	= m_tableNumber;
+	if( dlg.DoModal() == IDCANCEL ) return;
+}

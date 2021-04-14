@@ -365,10 +365,10 @@ CString CDragonApp::getInputMode()
 			else if( type == GEDCOM_FILE )
 				m_inputMode = GEDCOM;
 			else
-			{
-					m_inputMode = L"";
-					AfxMessageBox( L"Ismeretlen eredetû adatbázis!" );
-			}
+//			{
+				m_inputMode = MANUAL;
+//					AfxMessageBox( L"Ismeretlen eredetû adatbázis!" );
+//			}
 		}
 	}
 	

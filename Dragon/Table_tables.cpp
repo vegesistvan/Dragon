@@ -68,9 +68,7 @@ BEGIN_MESSAGE_MAP(CTableTables, CDialogEx)
 	ON_COMMAND(ID_EXPORT_SELECTED, &CTableTables::OnExportSelected)
 	ON_COMMAND(ID_UNFILTER, &CTableTables::OnUnfilter)
 	ON_COMMAND(ID_FILTER_FAMILY, &CTableTables::OnFilterFamily)
-//	ON_BN_CLICKED(IDOK, &CTableTables::OnBnClickedOk)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CTableTables::OnDblclkList)
-//	ON_COMMAND(ID_GALINE, &CTableTables::OnGaline)
 	ON_COMMAND(ID_GAHTML, &CTableTables::OnGahtml)
 
 	ON_COMMAND(ID_DESCENDANTS_TABLE, &CTableTables::OnDescendantsTable)
@@ -371,11 +369,23 @@ void CTableTables::OnFilterName()
 void CTableTables::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-//	if( !m_select )
+
+	if( !m_select )
 		OnEditUpdate();
-//	else
-//		OnBnClickedOk();
+	else
+		returnSelected();
 	*pResult = 0;
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTableTables::returnSelected()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+
+	m_tableHeader	= m_ListCtrl.GetItemText( nItem, T_TABLEHEADER );
+	m_id			= m_ListCtrl.GetItemText( nItem, T_ROWID );
+	m_last_name		= m_ListCtrl.GetItemText( nItem, T_FAMILYNAME );
+	OnOK();
+
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTableTables::OnDescendantsTable()
@@ -563,8 +573,12 @@ LRESULT CTableTables::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 	if(Menu.LoadMenu( MENU_IDR ))
     {
 		pPopup = Menu.GetSubMenu(0);
-		pPopup->EnableMenuItem(ID_EDIT_INSERT,MF_BYCOMMAND | MF_GRAYED);
-		pPopup->EnableMenuItem(ID_EDIT_UPDATE,MF_BYCOMMAND | MF_GRAYED);
+
+		if( theApp.m_inputMode == GAHTML )
+		{
+			pPopup->EnableMenuItem(ID_EDIT_INSERT,MF_BYCOMMAND | MF_GRAYED);
+			pPopup->EnableMenuItem(ID_EDIT_UPDATE,MF_BYCOMMAND | MF_GRAYED);
+		}
 
 
 		pPopup->EnableMenuItem(ID_HTML_NOTEPAD_PARENTS,MF_BYCOMMAND | MF_GRAYED);

@@ -20,13 +20,14 @@ public:
 
 	CString m_caption;
 	CString m_rowid;
+	CString	m_tableNumber;
+
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	CColorStatic colorTable;
 
 	CRect rectW;	// a dlg ablak adatai  ( 0,0 pont a menü alatt!!
 	
-	CString	m_tableNumber;
 	CString m_father_id;
 	CString m_mother_id;
 	int		m_mother_index;
@@ -34,13 +35,9 @@ protected:
 	CString m_table;
 
 
-	CString m_m;
 	
 	int		m_role;
 	int		m_sex_id;
-//	int		m_titleX;
-
-
 
 	bool	m_paint;
 	int		m_orderix;
@@ -69,7 +66,6 @@ protected:
 	CString m_birth_date;
 	CString m_generation;
 	CString m_folyt;
-//	CString m_sources;
 	CString m_nameChanged;
 	
 	CString m_name;
@@ -81,6 +77,11 @@ protected:
 	CString m_mother;
 	CString m_father;
 	CString m_csalad_ose;
+	
+	CString m_title;
+	CString m_posterior;
+
+
 //	CColorStatic colorMarriages;
 	CColorStatic colorFather;
 	CColorStatic colorMother;
@@ -143,6 +144,5 @@ public:
 	afx_msg LRESULT OnSetColumnColor(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnColumnSorted(WPARAM wParam, LPARAM lParam);
 
-	CString m_title;
-	CString m_posterior;
+	
 };

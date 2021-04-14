@@ -81,7 +81,11 @@ sikere nagymértékben függ az emeberek nevének és nemének helyességétõl.\
 
 	createColumns();
 	fillColumns();
-
+	if( !m_ListCtrl.GetItemCount() )
+	{
+		AfxMessageBox( L"Minden házaspár férfi-nõ", MB_ICONINFORMATION );
+		OnCancel();
+	}
 	return TRUE;
 }
 /*
@@ -220,13 +224,6 @@ void CCheckSpousesSex::fillColumns()
 		if (wndP.Cancelled()) break;
 	}
 	wndP.DestroyWindow();
-
-
-	if( !cnt )
-	{
-		AfxMessageBox( L"Minden házastárs különbözõ nemû." );
-		CDialogEx::OnOK();
-	}
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCheckSpousesSex::OnList()

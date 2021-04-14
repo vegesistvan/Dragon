@@ -66,10 +66,15 @@ public:
 	virtual ~CTableMarriages();
 	enum { IDD = IDD_TABLE_MARRIAGES };
 
+	CString	m_rowid;
+	int		m_nItem;
+
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	void CTableMarriages::fillTable( UINT nItem  );
 	void CTableMarriages::push( CString str );
+	void CTableMarriages::updateEntry( CString orderHusband, CString orderWife, CString place, CString date );
+	void CTableMarriages::updateField( int nItem, int i, CString str );
 
 	std::vector<TCHAR*> v_tableMarriages; 
 	CString m_command;
@@ -85,7 +90,6 @@ protected:
 	void	enableMenu( BOOL flag );
 	void CTableMarriages::azonosMarriages( int list );
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
-//	virtual void PostNcDestroy();
 
 
 	std::vector<SPOUSE11>	vSpouse1;
@@ -99,19 +103,10 @@ protected:
 	CSqliteDBRecordSet*	 m_recordset3;
 	CSqliteDBRecordSet*	 m_recordset4;
 
-//	BOOL CTableMarriages::fillVectors();
 	
 	void htmlHeader( CString title );
 
-//	void collectHusband();
-//	void collectWife();
-//	void fillSpouse1();
-//	void fillSpouse2();
 	void listHtml();
-//	void fillTable();
-//	void fillTableF();
-//	void push2( int i );
-//	void emptyRow();
 	void keress( int start );
 
 	BOOL query( CString command );
@@ -146,7 +141,6 @@ public:
 	afx_msg LRESULT OnColumnSorted(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnExportAll();
 	afx_msg void OnExportSelected();
-//	afx_msg void OnAzonosMarriagelist();
 	afx_msg void OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnClickedKeres();
 	afx_msg void OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult);
@@ -160,14 +154,13 @@ public:
 	afx_msg void OnMarriagesParents();
 	afx_msg void OnRowidMarriages();
 	afx_msg void OnNameMarriages();
-//	afx_msg void OnMoreMarriages();
 	afx_msg void OnClickedNext();
 
 
 	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnEditUpdate();
 	afx_msg void OnEditDelete();
-
+/*
 	afx_msg	void OnHtmlEditLines();
 	afx_msg void OnHtmlNotepad();
 	afx_msg void OnHtmlNotepadParents();
@@ -176,4 +169,5 @@ public:
 
 	afx_msg void OnHtmlChildren();
 	afx_msg void On3generations();
+*/
 };

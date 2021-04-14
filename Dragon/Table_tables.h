@@ -48,6 +48,7 @@ protected:
 
 	void OnHtmlEdit();
 	void OnHtmlNotepad();
+	void returnSelected();
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnInitDialog();

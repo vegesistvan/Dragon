@@ -37,7 +37,7 @@ void CGaDescendants::printGAline()
 
 	if( !p.known_as.IsEmpty() )
 	{
-		str.Format( L"<ul><font color='blue'> %c %s</font>", '%', p.known_as );
+		str.Format( L"<li><font color='blue'> %c %s</font>", '%', p.known_as );
 		print( str );
 	}
 	fwprintf( fl, L"\n" );
@@ -53,22 +53,22 @@ void CGaDescendants::printBegining()
 
 	UINT	generation	= vDesc.at(ix).gen;
 	m_gen = generation;
-	TCHAR	gen			= TCHAR('A') + TCHAR(generation);	// a generációs karakter-jel ( A,B,C,D.....);
+	
 
 	// a generációnak megfelelõ sor-kihúzás, visszatolás
-	if( generation > m_genPrev || m_genPrev == 0 )
+	if( generation > m_genPrev || m_genPrev == 0 )			// jobbra tolás, új sor generációja nagyobb, 
 	{
 		tags.Format( L"%s<li>", m_tag1 );
 		++cnt_ol;
 		ul = true;
 	}
-	else if( generation == m_genPrev )
+	else if( generation == m_genPrev )						// azonos generáció
 		tags = L"<li>";
-	else if( generation < m_genPrev )						// régi generáció, kijebb hozza a generáció-különbség-szeresen
+	else if( generation < m_genPrev )						// balra tolás vissza, régi generáció, kijebb hozza a generáció-különbség-szeresen
 	{
 		for( UINT i = 0; i < (m_genPrev - generation); ++i )
 		{
-			fwprintf( fl, L"%s\n", m_tag2 );
+			fwprintf( fl, L"%s\n", m_tag2 );				// anyiszor húzza vissza, amíg el nem éri a generációt
 			--cnt_ol;
 		}
 		tags = L"<li>";
@@ -77,32 +77,33 @@ void CGaDescendants::printBegining()
 	
 
 	CString family;
-//	CString familyName = getColoredString( p.last_name, m_ixName );
 
-
-	if( m_checkFamily )
+	if( m_checkFamily )  // kiemelt családnév
 	{
 		if( m_familyName != p.last_name )
 		{
 			family = getFamilyName();			// a tables táblából visszadja a tableHeader értékét 
-/*			if( ul )
-				str.Format( L"\n\n<p><b>%s %s</b><p>\n\n", L"%%%", family );
-			else
-				str.Format( L"\n\n<p><b>%s %s</b><p>\n\n", L"%%", family );
-*/
 
+			str.Format( L"\n\n<p>%s %s</p>\n\n", L"%%%", family );
+			str.Format( L"\n\n<br><br>%s%s %s<br><br>\n\n", tags, L"%%%", family );
+/*
 			if( ul )
 				str.Format( L"\n\n<p>%s %s</p>\n\n", L"%%%", family );
 			else
 				str.Format( L"\n\n<p>%s %s</p>\n\n", L"%%", family );
+*/
 			str = getColoredString( str, m_ixFamily );
 
 			print( str );
+			tags = L"<li>";
 		}
 		m_familyName = p.last_name;
 	}
 
-	
+
+	if( vDesc.at(0).hidden ) --generation;
+	TCHAR	gen = TCHAR('A') + TCHAR(generation);	// a generációs karakter-jel ( A,B,C,D.....);
+
 	if( m_numbering == SZLUHA )
 		str.Format( L"%s%c&diams;", tags, gen );			// gedcom és kézi bevitelnél nincs generáció, ezt úgy kell beletenni!!
 	else if( m_numbering == VIL )
@@ -180,7 +181,6 @@ void CGaDescendants::printDescendant()
 		if( !str.IsEmpty() )
 			cLine.Format( L"%s %s", (CString)cLine, str );
 
-//		str = getCommentBlock( p.comment );
 		str = getColoredString( p.comment, m_ixComment );
 		if( !str.IsEmpty() )
 			cLine.Format( L"%s %s", (CString)cLine, str );
@@ -287,7 +287,6 @@ void CGaDescendants::printSpouse()
 	if( !str.IsEmpty() )
 		spouse.Format( L"%s %s", (CString)spouse, str );
 
-//	str = getCommentBlock( s.comment );
 	str = getColoredString( s.comment, m_ixComment );
 	if( !str.IsEmpty() )
 		spouse.Format( L"%s %s", (CString)spouse, str );
@@ -462,16 +461,6 @@ CString CGaDescendants::getPlaceDateBlock( CString place, CString date, CString 
 		block.Trim();
 		
 	}
-	return block;
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CGaDescendants::getCommentBlock( CString comment )
-{
-	if( comment.IsEmpty() ) return L"";
-
-	CString block = attrib[m_ixComment].code1;
-	block += comment.Trim();
-	block += attrib[m_ixComment].code2;
 	return block;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

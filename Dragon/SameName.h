@@ -17,8 +17,6 @@ public:
 	enum { IDD = IDD_SAME_NAME };
 
 	CString m_caption;
-	CString m_people;
-	CString str;
 	CString m_rowid;
 
 	CString m_last_name;
@@ -29,11 +27,22 @@ public:
 	CString m_death_date;
 	CString m_comment;
 
+
+
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	CString m_people;
+	CString str;
+	CString m_command;
+
 
 	CListCtrlEx m_ListCtrl;
+	CSqliteDBRecordSet*	 m_recordset;
+
 	void fillTable();
+	BOOL query( CString command );
+
+
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnInitDialog();

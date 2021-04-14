@@ -239,8 +239,8 @@
     <ClInclude Include="Message.h" />
     <ClInclude Include="MoreSpouses.h" />
     <ClInclude Include="namesParam.h" />
-    <ClInclude Include="NewPeople.h" />
     <ClInclude Include="OpenDatabase.h" />
+    <ClInclude Include="EditPeopleManual.h" />
     <ClInclude Include="Pictures.h" />
     <ClInclude Include="SameName.h" />
     <ClInclude Include="ContractInfo.h" />
@@ -362,8 +362,8 @@
     <ClCompile Include="Message.cpp" />
     <ClCompile Include="MoreSpouses.cpp" />
     <ClCompile Include="namesParam.cpp" />
-    <ClCompile Include="NewPeople.cpp" />
     <ClCompile Include="OpenDatabase.cpp" />
+    <ClCompile Include="EditPeopleManual.cpp" />
     <ClCompile Include="Pictures.cpp" />
     <ClCompile Include="SameName.cpp" />
     <ClCompile Include="ContractInfo.cpp" />

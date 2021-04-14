@@ -33,6 +33,7 @@ CSameName::CSameName(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CSameName::IDD, pParent)
 {
 	m_rowid.Empty();
+	m_recordset = new CSqliteDBRecordSet;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CSameName::~CSameName()
@@ -62,6 +63,11 @@ BOOL CSameName::OnInitDialog()
 	EASYSIZE_ADD( IDCANCEL,	ES_BORDER,	ES_KEEPSIZE,	ES_KEEPSIZE,	ES_BORDER,	0 );
 
 	EASYSIZE_INIT();
+	
+	m_command.Format( L"SELECT rowid, * FROM people WHERE last_name='%s' AND first_name='%s'", m_last_name, m_first_name );
+	if( !query( m_command ) ) return false;
+	if( !m_recordset->RecordsCount() ) return true;
+
 
 	CString name;
 	name.Format( L"%s %s", m_last_name, m_first_name );
@@ -75,7 +81,7 @@ az adatbázisban már léterzõ azonos nevû emberek vannak felsorolva.\
 Ha bizos vagy benne, hogy új embert adtál meg, tehát egyik felsorolt emberrel sem egyezik meg, akkor az 'Új ember' \
 gombra kattints.\
 \r\n\
-Ekkor az ój embert az adatbázisba teszi és létrehozza a kijelölt rokoniu kapcsolatot.\
+Ekkor az új embert az adatbázisba teszi és létrehozza a kijelölt rokoni kapcsolatot.\
 \r\n\r\n\
 Ha az általad megadott ember megegyezik valamelyik felsorolt emberrel, akkor jelöld ki azt, majd kattins a \
 'Kijelölt ember' bombra.\
@@ -98,7 +104,7 @@ Ha nem vagy biztos egyik fenti esetben sem, akkor kattints a 'Cancel' gombra.\
 	m_ListCtrl.InsertColumn( N_BIRTH_DATE,			L"ideje",			LVCFMT_LEFT,	 70,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( N_DEATH_PLACE,			L"elhalálozás",		LVCFMT_LEFT,	120,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( N_DEATH_DATE,			L"ideje",			LVCFMT_LEFT,	 70,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( N_COMMENT,				L"leírás",		LVCFMT_LEFT,	100,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( N_COMMENT,				L"leírás",			LVCFMT_LEFT,	100,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( N_ROWID_FATHER,		L"apa_rowid",		LVCFMT_RIGHT,	50,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( N_FATHER,				L"apja",			LVCFMT_LEFT,	200,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( N_BIRTH_DATE_FATHER,	L"birth",			LVCFMT_LEFT,	80,-1,COL_TEXT);
@@ -129,19 +135,19 @@ void CSameName::fillTable()
 	m_ListCtrl.SetItemText( nItem, N_COMMENT, m_comment );
 	m_ListCtrl.SetItemData( nItem, 1 );
 	++nItem;
-	for( UINT i = 0; i < theApp.m_recordset2->RecordsCount(); ++i, theApp.m_recordset2->MoveNext() )
+	for( UINT i = 0; i < m_recordset->RecordsCount(); ++i, m_recordset->MoveNext() )
 	{
-		rowid		= theApp.m_recordset2->GetFieldString( PEOPLE_ROWID );
-		last_name	= theApp.m_recordset2->GetFieldString( PEOPLE_LAST_NAME );
-		first_name	= theApp.m_recordset2->GetFieldString( PEOPLE_FIRST_NAME );
+		rowid		= m_recordset->GetFieldString( PEOPLE_ROWID );
+		last_name	= m_recordset->GetFieldString( PEOPLE_LAST_NAME );
+		first_name	= m_recordset->GetFieldString( PEOPLE_FIRST_NAME );
 		nItem = m_ListCtrl.InsertItem( nItem, rowid );
 		m_ListCtrl.SetItemText( nItem, N_LAST_NAME, last_name );
 		m_ListCtrl.SetItemText( nItem, N_FIRST_NAME, first_name );
-		m_ListCtrl.SetItemText( nItem, N_BIRTH_PLACE, theApp.m_recordset2->GetFieldString( PEOPLE_BIRTH_PLACE ) );
-		m_ListCtrl.SetItemText( nItem, N_BIRTH_DATE, theApp.m_recordset2->GetFieldString( PEOPLE_BIRTH_DATE ) );
-		m_ListCtrl.SetItemText( nItem, N_DEATH_PLACE, theApp.m_recordset2->GetFieldString( PEOPLE_DEATH_PLACE ) );
-		m_ListCtrl.SetItemText( nItem, N_DEATH_DATE, theApp.m_recordset2->GetFieldString( PEOPLE_DEATH_DATE ) );
-		m_ListCtrl.SetItemText( nItem, N_COMMENT, theApp.m_recordset2->GetFieldString( PEOPLE_COMMENT ) );
+		m_ListCtrl.SetItemText( nItem, N_BIRTH_PLACE, m_recordset->GetFieldString( PEOPLE_BIRTH_PLACE ) );
+		m_ListCtrl.SetItemText( nItem, N_BIRTH_DATE, m_recordset->GetFieldString( PEOPLE_BIRTH_DATE ) );
+		m_ListCtrl.SetItemText( nItem, N_DEATH_PLACE, m_recordset->GetFieldString( PEOPLE_DEATH_PLACE ) );
+		m_ListCtrl.SetItemText( nItem, N_DEATH_DATE, m_recordset->GetFieldString( PEOPLE_DEATH_DATE ) );
+		m_ListCtrl.SetItemText( nItem, N_COMMENT, m_recordset->GetFieldString( PEOPLE_COMMENT ) );
 
 		m_ListCtrl.SetItemData( nItem, 0 );
 	}
@@ -204,3 +210,15 @@ void CSameName::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
 		break;
 	}
 }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BOOL CSameName::query( CString command )
+{
+	if( m_recordset->Query(command,theApp.mainDB))
+	{
+		str.Format(L"%s\n%s",command,m_recordset->GetLastError());
+		AfxMessageBox(str);
+		return FALSE;
+	}
+	return TRUE;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

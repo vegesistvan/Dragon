@@ -263,7 +263,7 @@ void CEditPeople::initialScreen()
 	m_ListCtrl.InsertColumn( L_SPOUSE,			L"házastárs",	LVCFMT_LEFT,	350,-1,COL_TEXT);
 
 	m_ListCtrlB.SortByHeaderClick(TRUE);
-	m_ListCtrlB.SetExtendedStyle(m_ListCtrl.GetExtendedStyle()| LVS_EX_GRIDLINES );
+	m_ListCtrlB.SetExtendedStyle(m_ListCtrlB.GetExtendedStyle()| LVS_EX_GRIDLINES );
 	m_ListCtrlB.InsertColumn( B_ROWID,			L"rowid",		LVCFMT_RIGHT,	40,-1,COL_HIDDEN );
 	m_ListCtrlB.InsertColumn( B_CNT,			L"",			LVCFMT_RIGHT,	30,-1,COL_NUM );
 	m_ListCtrlB.InsertColumn( B_TITLE,			L"cím",			LVCFMT_LEFT,	270,-1,COL_TEXT );
@@ -1104,6 +1104,5 @@ tableAncestry" );
 		);
 		if( !theApp.execute( m_command ) ) return;
 	}
-	m_m = m_rowid;   // m_rowid rossz lesz a TableIndividual.ban!! m_m jó!!! Érthetetlen!
 	CDialogEx::OnOK();
 }

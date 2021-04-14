@@ -204,6 +204,13 @@ void CContractedPeople::inputFile( int type )
 	}
 	wndP.DestroyWindow();
 	file.Close();
+	if( !vPeople.size() )
+	{
+		AfxMessageBox( L"Nincs összevonható bejegyzés az adatbázisban!", MB_ICONINFORMATION );
+		OnOK();
+		return;
+	}
+
 	m_ListCtrl.SetItemCountEx( vPeople.size() + 1  );
 	m_ListCtrl.AttachDataset( &vPeople );
 

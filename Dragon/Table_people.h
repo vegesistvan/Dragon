@@ -46,19 +46,23 @@ protected:
 	void CTablePeople::enableMenu( BOOL flag );
 	void CTablePeople::createListColumns();
 	void CTablePeople::fillTable( UINT nItem );
-	void CTablePeople::fillRow( UINT row );
+
+	void CTablePeople::addEntry();
+	void CTablePeople::updateEntry();
+
 	void CTablePeople::push( CString str );
 
-	int  CTablePeople::find_nItem( int rowid );
+//	int  CTablePeople::find_nItem( int rowid );
 
-	void CTablePeople::closeHtml();
+//	void CTablePeople::closeHtml();
 
 
 	void CTablePeople::updateField( int nItem, int i, CString str );
-	void CTablePeople::updateRow( int nItem );
-	void CTablePeople::insertRow();
 
-	void CTablePeople::parent( CString rowid, PARENT* p);
+
+	void keress( int start );
+
+//	void CTablePeople::parent( CString rowid, PARENT* p);
 	void CTablePeople::ChangeMenu();
 
 	BOOL CTablePeople::query( CString command );
@@ -72,7 +76,8 @@ protected:
 	BOOL	WOMEN_DESCENDANT;
 
 	CString m_name;
-	CString	m_rowid;
+	CString	m_rowid;			// a szerkesztett bejegyzás rowid-je
+	int		m_nItem;			// a szerkesztendõ sor nItem-je
 	int		m_sex_id;
 	CString m_rowid_father;
 	CString m_htmlFile;
@@ -82,6 +87,7 @@ protected:
 	FILE* fl;
 
 	CColorStatic colorKeres;
+	CColorStatic colorNext;
 	CListCtrlEx m_ListCtrl;
 
 	DECLARE_MESSAGE_MAP()
@@ -119,7 +125,6 @@ public:
 	afx_msg void OnGroupbyFirstname();
 	afx_msg void OnGroupbyLastname();
 	afx_msg void OnGroupbyTitolo();
-//	virtual void PostNcDestroy();
 	afx_msg void OnFilterDescendants();
 	afx_msg void OnFilterFathers();
 	afx_msg void OnFilterMothers();
@@ -136,8 +141,7 @@ public:
 	afx_msg void OnAscendants();
 	afx_msg void OnAscendantsChain();
 	afx_msg void OnInputManual();
-//	afx_msg void OnNcDestroy();
-	afx_msg LRESULT OnUpdateRecord( WPARAM wParam, LPARAM lParam);
+//	afx_msg LRESULT OnUpdateRecord( WPARAM wParam, LPARAM lParam);
 	afx_msg void OnIndividualDescendants();
 	afx_msg void OnGedcomOutput();
 	afx_msg void OnPrivateDescendants();
@@ -157,4 +161,6 @@ public:
 	afx_msg void On3Generations();
 	afx_msg void OnHtmlChildren();
 	afx_msg void OnInfo();
+	afx_msg void OnClickedNext();
+
 };
