@@ -15,6 +15,22 @@ class CCheckMotherDeath : public CDialogEx
 	DECLARE_DYNAMIC(CCheckMotherDeath)
 	DECLARE_EASYSIZE
 
+	// SELECT oszlopok
+enum 
+{
+	ROWID = 0,
+	LINE,
+	TABLE,
+	SOURCE,
+	UNITED,
+	LASTNAME,
+	FIRSTNAME,
+	BIRTH,
+	DEATH,
+};
+
+
+
 public:
 	CCheckMotherDeath(CWnd* pParent = NULL);   // standard constructor
 	virtual ~CCheckMotherDeath();

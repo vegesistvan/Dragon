@@ -48,11 +48,11 @@ CGaDescendants::CGaDescendants(CWnd* pParent /*=NULL*/)
 	,m_rowid1(L"")			// a leszármazott rowid-ja
 	,m_name(L"")			// leszármazott õs neve
 	,m_tableNumber(L"")		// tablenumber, ha a táblázat leszármazotti listáját kérjük
-	,m_CheckLastName(false)	// családnév kiírása
+	,m_CheckLastName(true)	// családnév kiírása
 	,m_code(true)			// ANSI vagy UTF8 kódrendszer
 	,m_numbering(2)			// milyen számozási rendszer legyen (0,1,2) 
-	,m_checkFamily(true)	// %%% családnév,elõnév kiemelése
-	, m_wrap(false)
+	,m_checkFamily(false)	// %%% családnév,elõnév kiemelése
+	, m_wrap(true)
 {
 	
 }
@@ -87,8 +87,7 @@ void CGaDescendants::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CGaDescendants, CDialogEx)
 	ON_WM_CTLCOLOR()
 
-//	ON_MESSAGE( WM_CTLCOLORBTN, OnCtlColorBtn )
-	
+
 	ON_COMMAND(IDC_RADIO_DEFAULT, &CGaDescendants::OnRadioDefault)
 	ON_COMMAND(IDC_TUPIGNY, &CGaDescendants::OnTupigny)
 	ON_COMMAND(IDC_VILLERS, &CGaDescendants::OnVillers)
@@ -184,7 +183,7 @@ void CGaDescendants::treePeople()
 		m_tag2 = L"</ul>";
 	}
 
-	file.Format( L"%s leszármazottai", m_name);
+	file.Format( L"%s descendants", m_name);
 	title.Format( L"%s<br>\n", file );
 
 	if( theApp.m_inputMode == GAHTML )
@@ -269,6 +268,9 @@ void CGaDescendants::treeTables()
 	openHtml( file, title, m_colorBgrnd );
 
 
+
+
+
 	CProgressWnd wndProgress(NULL,L"Leszármazotti táblák készítése folyik...." ); 
 	wndProgress.GoModal();
 	wndProgress.SetRange( 0, theApp.v_tableNumbers.size() );
@@ -292,9 +294,9 @@ void CGaDescendants::treeTables()
 		{
 			str.Format( L"%d táblában nincs õs!!", theApp.v_tableNumbers.at(i) );
 			AfxMessageBox( str );
-			break;
+			OnCancel();
+			return;
 		}
-
 
 		father_id	= m_recordset.GetFieldString( 3 );
 		if( father_id.IsEmpty() || !father_id.Compare( L"0" ) )  // ha nincs apa, akkor magát az õst teszi be a vDesc-be
@@ -625,7 +627,6 @@ void CGaDescendants::OnBnClickedOk()
 
 	if( m_woman ) m_connect = true;
 
-	OnCancel();
 	if( m_rowid1.IsEmpty() )
 		treeTables();
 	else

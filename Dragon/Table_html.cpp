@@ -329,7 +329,6 @@ void CTableHtml::keress( int start )
 	int		itemCnt	= m_ListCtrl.GetItemCount();
 	int		length	= search.GetLength();
 	int		nItem;
-	int		topIndex = m_ListCtrl.GetTopIndex();
 	CString	str;
 
 	CProgressWnd wndProgress(NULL, L"Folyik a keresés.." ); 
@@ -358,20 +357,7 @@ void CTableHtml::keress( int start )
 
 	if( nItem < itemCnt-1 )			// megtalálta a keresett embert,. aki az nItem-1 sorban van
 	{
-		m_ListCtrl.EnsureVisible( nItem, FALSE );
-
-		if( nItem > topIndex )   // lefele megy, fel kell hozni a tábla tetejére a megtalált sort
-		{
-			int countPP = m_ListCtrl.GetCountPerPage();
-			int nItemEV	= nItem - 1 + countPP;			// alaphelyzet: a kijelölt sor az ablak tetején
-
-			if( nItemEV > itemCnt - 1 )					// már nem lehet az ablak tetejére hozni, mert nincs annyi adat
-				nItemEV = itemCnt - 1;
-
-			m_ListCtrl.EnsureVisible( nItemEV, FALSE );
-		}
-		m_ListCtrl.SetItemState( nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED );
-//		Invalidate( false );
+		theApp.showItem( nItem, &m_ListCtrl );
 	}
 	else
 	{

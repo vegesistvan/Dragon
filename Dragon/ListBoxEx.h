@@ -11,6 +11,18 @@
 #define WM_LISTBOX_MENU WM_USER + 0x7FA4	
 /////////////////////////////////////////////////////////////////////////////
 // CListBoxEx window
+typedef struct _LISTBOX_COLOR_
+{
+	CString strText;
+	COLORREF fgColor;
+	COLORREF bgColor;
+	_LISTBOX_COLOR_()
+	{
+		strText.Empty();
+		fgColor = RGB(0, 0, 0);
+		bgColor = RGB(255, 255, 255);
+	}
+}LISTBOX_COLOR, *PLISTBOX_COLOR;
 
 class CListBoxEx : public CListBox
 {
@@ -33,12 +45,16 @@ public:
 public:
 	virtual ~CListBoxEx();
 
+	void AppendString(LPCSTR lpszText, COLORREF fgColor, COLORREF bgColor);
+	virtual void MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct);
+	virtual void DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct);
 	// Generated message map functions
 protected:
 	//{{AFX_MSG(CListBoxEx)
 	afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
-	//}}AFX_MSG
 
+	//}}AFX_MSG
+	afx_msg void OnDestroy();
 	DECLARE_MESSAGE_MAP()
 };
 

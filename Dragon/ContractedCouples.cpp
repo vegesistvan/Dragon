@@ -12,7 +12,7 @@
 #include "html_EditLines.h"
 //#include "html_Edit2Lines.h"
 //#include "html_EditLine.h"
-#include "Relations.h"
+#include "Relatives.h"
 
 enum
 {
@@ -418,11 +418,9 @@ void CContractedCouples::keress( int start )
 	wndProgress.SetStep(1);
 
 
-
 	int		itemCnt	= m_ListCtrl.GetItemCount();
 	int		length	= search.GetLength();
 	int		nItem;
-	int		topIndex = m_ListCtrl.GetTopIndex();
 	CString	str;
 
 	theApp.unselectAll( &m_ListCtrl );
@@ -440,20 +438,7 @@ void CContractedCouples::keress( int start )
 
 	if( nItem < itemCnt-1 )			// megtalálta a keresett embert,. aki az nItem-1 sorban van
 	{
-		m_ListCtrl.EnsureVisible( nItem, FALSE );
-
-		if( nItem > topIndex )   // lefele megy, fel kell hozni a tábla tetejére a megtalált sort
-		{
-			int countPP = m_ListCtrl.GetCountPerPage();
-			int nItemEV	= nItem - 1 + countPP;			// alaphelyzet: a kijelölt sor az ablak tetején
-
-			if( nItemEV > itemCnt - 1 )					// már nem lehet az ablak tetejére hozni, mert nincs annyi adat
-				nItemEV = itemCnt - 1;
-
-			m_ListCtrl.EnsureVisible( nItemEV, FALSE );
-		}
-		m_ListCtrl.SetItemState( nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED );
-		Invalidate( false );
+		theApp.showItem( nItem, &m_ListCtrl );
 	}
 	else
 	{
@@ -615,7 +600,7 @@ void CContractedCouples::OnDbEdit()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
 	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWIDH );
-	CRelations dlg;
+	CRelatives dlg;
 	dlg.m_rowid = rowid;
 	dlg.DoModal();
 }

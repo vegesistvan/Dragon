@@ -61,6 +61,8 @@ void CGedcomIn::fill_v_indi()
 	v_famc.clear();
 	v_indi.clear();
 	vPhotos.clear();
+
+	theApp.execute( L"BEGIN" );
 	while( file_ged.ReadString( cLine ) )
 	{
 		fpos = file_ged.GetPosition();
@@ -76,6 +78,7 @@ void CGedcomIn::fill_v_indi()
 			recordINDI( &lxtv );
 		}
 	}
+	theApp.execute( L"COMMIT" );
 	file_ged.Close();
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -132,6 +135,7 @@ void CGedcomIn::recordINDI( GEDLINE* gl )
 	INDIFAMS fams;
 
 	int pos;
+
 	indi.refI = gl->xref;
 	indi.numOfSpouses = 0;
 
@@ -153,7 +157,7 @@ void CGedcomIn::recordINDI( GEDLINE* gl )
 		if( lxtv.tag == L"NAME" )
 		{
 //			indi.titolo = lxtv.value;
-//			getName( lxtv.value, &indi );
+			getNameLloyd( lxtv.value, &indi );
 		}
 		else if( lxtv.tag == L"SEX" )
 			if( lxtv.value == L"M" )
@@ -231,10 +235,12 @@ void CGedcomIn::recordINDI( GEDLINE* gl )
 
 		v_lxtv.push_back( lxtv );
 	}
-	indi.parentIndex	= 0;
+
+	indi.tablenumber		= getTablenumber( indi.last_name );
+	indi.parentIndex		= 0;
 	indi.parentIndexCalc	= 0;
-	indi.orderFather	= 0;
-	indi.orderMother	= 0;
+	indi.orderFather		= 0;
+	indi.orderMother		= 0;
 	v_indi.push_back( indi );
 		
 	file_ged.Seek( fpos, 0 );
@@ -393,6 +399,35 @@ void CGedcomIn::getName( CString value, INDI* indi )
 			titolo = rest;
 		indi->title		= title;
 		indi->titolo	= titolo;
+	}
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// A NAME tagû sor value felbontása elõnév-családnév-keresztnév- comment substringekre 
+// Ez specifikusan egy ged fájlra készült. nem valószínû, hogy a standard NAME-ben íg lennének az elõnevek és a comment
+void CGedcomIn::getNameLloyd( CString value, INDI* indi )
+{
+	CString first_name(L"");
+	CString titolo(L"");
+	CString title(L"");
+	CString comment(L"");
+	CStringArray A;
+	CString rest(L"");
+	int n;
+	int ret;
+	int pos1;
+	int pos2;
+	CString firstnames;
+	CString lastname;
+
+	if( ( pos1 = value.Find( '/' ) ) != -1 )
+	{
+		if( pos2 = value.ReverseFind( '/' ) != -1 )
+		{
+			firstnames	= value.Left( pos1-1 );
+			lastname	= value.Mid( pos1+1, value.GetLength()-pos1-2 );
+			indi->first_name	= firstnames;
+			indi->last_name		= lastname;
+		}
 	}
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -606,4 +641,24 @@ int CGedcomIn::getMarriageAll( CString refI )
 		}
 	}
 	return 0;
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CString CGedcomIn::getTablenumber( CString lastname )
+{
+	CString rowid;
+	CString tableHeader;
+	tableHeader.Format( L"%s %s", L"%%%", lastname );
+	m_command.Format( L"SELECT rowid FROM tables WHERE familyName ='%s'", lastname );
+	if( !theApp.query( m_command ) ) return L"0";
+
+	rowid = theApp.m_recordset->GetFieldString( 0 );
+	if( !theApp.m_recordset->RecordsCount() )
+	{
+		m_command.Format( L"INSERT INTO tables ( familyNumber, tableHeader, percent, familyName) VALUES ( 1, '%s', '%s','%s' )", tableHeader, L"%%%", lastname );
+		if( !theApp.execute( m_command ) ) return 0;
+		m_command = L"SELECT last_insert_rowid() FROM tables";
+		if( !theApp.query( m_command ) ) return L"";
+		rowid = theApp.m_recordset->GetFieldString( 0 );
+	}
+	return rowid;
 }

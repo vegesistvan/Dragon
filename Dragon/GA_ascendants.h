@@ -55,6 +55,7 @@ protected:
 	int		m_listStyleIndex;
 	CString m_ulStyle;
 	
+	CString m_title;
 	CString m_sex;
 	CString m_last_name;
 	CString	m_first_name;
@@ -132,11 +133,12 @@ public:
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnClickedCheckNn();
 
-	afx_msg void OnClickedRadioHazastarsak();
+	afx_msg void OnRadioHazastarsak();
 	afx_msg void OnRadioApaianyai();
 	afx_msg void OnRadioApai();
 	afx_msg void OnRadioAnyai();
-	afx_msg void OnAnyaie();
-	afx_msg void OnRadioApaie();
+	afx_msg void OnRadioApaiE();
+	afx_msg void OnRadioAnyaiE();
 	BOOL m_code;
+	BOOL radio0;
 };

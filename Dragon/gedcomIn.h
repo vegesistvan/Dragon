@@ -21,6 +21,7 @@ typedef struct
 typedef struct
 {
 	CString refI;
+	CString tablenumber;
 	CString rowid;
 	CString title;
 	CString titolo;
@@ -167,6 +168,7 @@ protected:
 	void CGedcomIn::listZeroRecord( CString tag );
 	void CGedcomIn::list( CString fam, int cnt  );
 	void CGedcomIn::getName( CString value, INDI* indi );
+	void CGedcomIn::getNameLloyd( CString value, INDI* indi );
 	CString CGedcomIn::getIndi( CString ref );
 	int CGedcomIn::getIndexIndi( CString ref );
 	int CGedcomIn::getIndexFam( CString ref );
@@ -183,6 +185,7 @@ protected:
 
 	CString CGedcomIn::getRefSpouse( CString sex, CString refF );
 	int CGedcomIn::getMarriageAll( CString refI );
+	CString CGedcomIn::getTablenumber( CString lastname );
 
 	void (*foo)(CString );
 

@@ -10,7 +10,7 @@
 #include "html_EditLines.h"
 #include "html_EditLine.h"
 #include "ProgressWnd.h"
-#include "Relations.h"
+#include "Relatives.h"
 // CCheckFirstNames dialog
 
 enum
@@ -125,7 +125,7 @@ void CCheckFirstNames::OnDbEdit()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
 	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
-	CRelations dlg;
+	CRelatives dlg;
 	dlg.m_rowid = rowid;
 	dlg.DoModal();
 }

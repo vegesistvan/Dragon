@@ -10,7 +10,7 @@
 #include "Table_people.h"
 #include "afxdialogex.h"
 #include "Filter.h"
-#include "Relations.h"
+#include "Relatives.h"
 #include "SelectOne.h"
 #include "Table_files.h"
 #include "Table_tables.h"
@@ -26,11 +26,12 @@
 #include "GA_ascendants.h"
 #include "GA_ascendantsChain.h"
 #include "pictures.h"
-#include "Relations.h"
+#include "Relatives.h"
 #include "GedcomOut.h"
 #include "Message.h"
 #include "ProgressWnd.h"
-#include "EditPeopleManual.h"
+#include "EditPeople.h"
+#include "Relatives.h"
 
 // GEDCOM
 enum
@@ -133,7 +134,12 @@ BEGIN_MESSAGE_MAP(CTablePeople, CDialogEx)
 	ON_COMMAND(ID_FILTER_UNFILTER, &CTablePeople::OnFilterUnfilter)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CTablePeople::OnDblclkList)
 
+
+	ON_MESSAGE(WM_SYNCRONIZE_PEOPLE, OnSyncronize )
 // DROPDOWN menü funkciók
+
+
+
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
 	ON_COMMAND(ID_DB_EDIT, &CTablePeople::OnEditUpdate )
 	ON_COMMAND(ID_HTML_NOTEPAD_PARENTS, &CTablePeople::OnHtmlNotepadParents )
@@ -193,6 +199,7 @@ ON_STN_CLICKED(IDC_KERES, &CTablePeople::OnClickedKeres)
 
 ON_COMMAND(ID_INFO, &CTablePeople::OnInfo)
 ON_STN_CLICKED(IDC_NEXT, &CTablePeople::OnClickedNext)
+ON_COMMAND(ID_SET_ANCESTOR, &CTablePeople::OnSetAncestor)
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CTablePeople::OnInitDialog()
@@ -329,8 +336,8 @@ AND ( rowid IN (SELECT father_id FROM people ) OR rowid IN (SELECT mother_id FRO
 
 	else
 	{
-		m_filterNew.Format(L"tableAncestry!='0'" );
-		m_filterNew.Format(L"generation=='A'" );
+		m_filterNew.Format( L"tableAncestry == 1" );
+//		m_filterNew.Format(L"generation=='A'" );
 		m_filterTextNew.Format(L"Az adatbázisban lévõ õsõk");
 	}
 	fillTable(0);
@@ -595,7 +602,7 @@ void CTablePeople::createListColumns( )
 	m_ListCtrl.InsertColumn( G_BIRTH_DATE,			L"ideje",			LVCFMT_LEFT,	 70,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( G_DEATH_PLACE,			L"elhalálozás",		LVCFMT_LEFT,	120,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( G_DEATH_DATE,			L"ideje",			LVCFMT_LEFT,	 70,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( G_COMMENT,				L"leírás",			LVCFMT_LEFT,	300,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( G_COMMENT,				L"leírás",			LVCFMT_LEFT,	600,-1,COL_TEXT);
 	}
 	else if( theApp.m_inputMode == GAHTML )
 	{
@@ -625,7 +632,7 @@ void CTablePeople::createListColumns( )
 		m_ListCtrl.InsertColumn( L_BIRTH_DATE,			L"ideje",			LVCFMT_LEFT,	 70,-1,COL_TEXT);
 		m_ListCtrl.InsertColumn( L_DEATH_PLACE,			L"elhalálozás",		LVCFMT_LEFT,	100,-1,COL_TEXT);
 		m_ListCtrl.InsertColumn( L_DEATH_DATE,			L"ideje",			LVCFMT_LEFT,	 70,-1,COL_TEXT);
-		m_ListCtrl.InsertColumn( L_COMMENT,				L"leírás",			LVCFMT_LEFT,	300,-1,COL_TEXT);
+		m_ListCtrl.InsertColumn( L_COMMENT,				L"leírás",			LVCFMT_LEFT,	600,-1,COL_TEXT);
 	}
 
 	else if( theApp.m_inputMode == MANUAL )
@@ -641,7 +648,7 @@ void CTablePeople::createListColumns( )
 		m_ListCtrl.InsertColumn( N_BIRTH_DATE,			L"ideje",			LVCFMT_LEFT,	 70,-1,COL_TEXT);
 		m_ListCtrl.InsertColumn( N_DEATH_PLACE,			L"elhalálozás",		LVCFMT_LEFT,	120,-1,COL_TEXT);
 		m_ListCtrl.InsertColumn( N_DEATH_DATE,			L"ideje",			LVCFMT_LEFT,	 70,-1,COL_TEXT);
-		m_ListCtrl.InsertColumn( N_COMMENT,				L"leírás",		LVCFMT_LEFT,		300,-1,COL_TEXT);
+		m_ListCtrl.InsertColumn( N_COMMENT,				L"leírás",		LVCFMT_LEFT,		600,-1,COL_TEXT);
 	}
 	m_columnsCount = m_ListCtrl.GetHeaderCtrl()->GetItemCount();
 }
@@ -760,7 +767,7 @@ Mégis megad új személyt?";
 
 	if( AfxMessageBox( message, MB_YESNO ) == IDNO ) return;
 
-	CEditPeopleManual dlg;
+	CEditPeople dlg;
 	dlg.m_rowid.Empty();
 
 	if( dlg.DoModal() == IDCANCEL ) return;
@@ -783,6 +790,10 @@ Mégis megad új személyt?";
 	}
 	m_ListCtrl.SetItemState( nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED);
 	m_ListCtrl.EnsureVisible( nItem, FALSE );
+
+	CRelatives dlgR;
+	dlgR.m_rowid = m_rowid;
+	if( dlgR.DoModal() == IDCANCEL ) return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -901,7 +912,7 @@ void CTablePeople::OnEditUpdate()
 {
 	m_nItem	= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED); 
 
-	CEditPeopleManual dlg;
+	CEditPeople dlg;
 	CString name;
 
 	if( theApp.m_inputMode == GEDCOM )
@@ -1355,7 +1366,7 @@ void CTablePeople::OnClickedKeres()
 void CTablePeople::OnClickedNext()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	if( nItem == -0 )
+	if( nItem == 0 )
 	{
 		AfxMessageBox( L"Nincs kijelölve sor!" );
 		return;
@@ -1373,23 +1384,9 @@ void CTablePeople::keress( int start )
 		return;
 	}
 
-	CProgressWnd wndProgress(NULL, L"Folyik a keresés.." ); 
-	wndProgress.GoModal();
-	wndProgress.SetRange(0, m_ListCtrl.GetItemCount() );
-	wndProgress.SetPos(0);
-	wndProgress.SetStep(1);
-
-
-
-	int		itemCnt	= m_ListCtrl.GetItemCount();
-	int		length	= search.GetLength();
-	int		nItem;
-	int		topIndex = m_ListCtrl.GetTopIndex();
-	CString	str;
-
-	theApp.unselectAll( &m_ListCtrl );
 
 	int LASTNAME;
+
 	if( theApp.m_inputMode == GAHTML )
 		LASTNAME = L_LAST_NAME;
 	else if( theApp.m_inputMode == GEDCOM )
@@ -1397,40 +1394,7 @@ void CTablePeople::keress( int start )
 	else
 		LASTNAME = N_LAST_NAME;
 
-
-	for( nItem = start; nItem < itemCnt-1; ++nItem )
-	{
-		str = m_ListCtrl.GetItemText( nItem, LASTNAME );
-		str = str.Left(length);						// az aktuális search string hosszával azonos hosszúság leválasztása
-		if( str == search )	break;
-		wndProgress.StepIt();
-		wndProgress.PeekAndPump();
-		if (wndProgress.Cancelled()) break;
-	}
-	wndProgress.DestroyWindow();
-
-	if( nItem < itemCnt-1 )			// megtalálta a keresett embert,. aki az nItem-1 sorban van
-	{
-		m_ListCtrl.EnsureVisible( nItem, FALSE );
-
-		if( nItem > topIndex )   // lefele megy, fel kell hozni a tábla tetejére a megtalált sort
-		{
-			int countPP = m_ListCtrl.GetCountPerPage();
-			int nItemEV	= nItem - 1 + countPP;			// alaphelyzet: a kijelölt sor az ablak tetején
-
-			if( nItemEV > itemCnt - 1 )					// már nem lehet az ablak tetejére hozni, mert nincs annyi adat
-				nItemEV = itemCnt - 1;
-
-			m_ListCtrl.EnsureVisible( nItemEV, FALSE );
-		}
-		m_ListCtrl.SetItemState( nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED );
-		Invalidate( false );
-	}
-	else
-	{
-		str.Format( L"%s nevû embert nem találtam!", search );
-		AfxMessageBox( str );
-	}
+	theApp.keress( search, &m_ListCtrl, LASTNAME, start );
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CTablePeople::PreTranslateMessage(MSG* pMsg)
@@ -1444,15 +1408,15 @@ BOOL CTablePeople::PreTranslateMessage(MSG* pMsg)
 		case VK_RETURN:
 			GetDlgItem( IDC_SEARCH )->GetWindowTextW( str );
 			if( str.GetLength() ) 
-				OnClickedKeres();
+			OnClickedKeres();
 			break;
 		case VK_ESCAPE:
 			CDialogEx::OnCancel();
 		}
 	}
-    return CWnd::PreTranslateMessage(pMsg);
+	return CWnd::PreTranslateMessage(pMsg);
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////44
 LRESULT CTablePeople::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 {
 	CPoint* point=(CPoint*) lParam;
@@ -1531,7 +1495,7 @@ void CTablePeople::On3Generations()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
 
-	CRelations dlg;
+	CRelatives dlg;
 	dlg.m_rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
 
 	dlg.DoModal();
@@ -1586,7 +1550,7 @@ void CTablePeople::OnEditInsert()
 	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
 	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
 
-	CRelations dlg;
+	CRelatives dlg;
 	dlg.m_rowid = rowid;
 	dlg.DoModal();
 }
@@ -1605,4 +1569,118 @@ G - generációs kód\
 ";
 	AfxMessageBox( info, MB_ICONINFORMATION );
 }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTablePeople::OnSetAncestor()
+{
+	CString rowid;
+	CString father_id;
+	UINT	i;
 
+	m_command.Format( L"SELECT rowid, father_id FROM people WHERE last_name = 'Gardiner'" );
+/*
+	m_command.Format( L"SELECT rowid, father_id FROM people" );
+	if( !query( m_command ) ) return;
+
+	CProgressWnd wndProgress(NULL, L"Õsök keresése" );
+	wndProgress.GoModal();
+	wndProgress.SetRange(0, m_recordset->RecordsCount() );
+	wndProgress.SetPos(0);
+	wndProgress.SetStep(1);
+
+
+	for( i = 0; i < m_recordset->RecordsCount(); ++i, m_recordset->MoveNext() )
+	{
+ 		rowid		= m_recordset->GetFieldString( 0 );
+		father_id	= m_recordset->GetFieldString( 1 );
+		if( father_id.IsEmpty() || father_id == L"0" ) 
+		{	
+			setAncestor( rowid );
+		}
+		else
+		{
+			rowid = ancestor( father_id );
+			if( !rowid.IsEmpty() )
+				setAncestor( rowid );
+		}
+		wndProgress.StepIt();
+		wndProgress.PeekAndPump();
+		if (wndProgress.Cancelled()) break;
+	}
+*/
+	if( !theApp.execute( L"UPDATE people SET tableAncestry = 0" ) ) return; 
+	m_command.Format( L"SELECT rowid FROM people WHERE \
+	(father_id == 0 || father_id == '' || typeof( father_id ) == 'null') AND \
+	(mother_id == 0 || mother_id == '' || typeof( mother_id ) == 'null') " );
+	if( !query( m_command ) ) return;
+
+	CProgressWnd wndProgress(NULL, L"Õsök keresése" );
+	wndProgress.GoModal();
+	wndProgress.SetRange(0, m_recordset->RecordsCount() );
+	wndProgress.SetPos(0);
+	wndProgress.SetStep(1);
+
+
+	for( i = 0; i < m_recordset->RecordsCount(); ++i, m_recordset->MoveNext() )
+	{
+		setAncestor( m_recordset->GetFieldString( 0 ) );
+	}
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////4
+// Az father_id-jû bejegyzás õsét keresi meg, azaz akkinek már nincsa apja
+CString CTablePeople::ancestor( CString father_id )
+{
+	CString rowid;
+	while( !father_id.IsEmpty() )
+	{
+		m_command.Format( L"SELECT father_id FROM people WHERE rowid ='%s'", father_id );
+		if( !query2( m_command ) ) return 0;
+		str = m_recordset2->GetFieldString( 0 );
+		if( str.IsEmpty() || str == L"0")
+		{
+			rowid = father_id;
+			break;
+		}
+		father_id	= str;
+	}
+	return rowid;
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////4
+// Az father_id-jû bejegyzás õsét keresi meg, azaz akkinek már nincsa apja
+bool CTablePeople::setAncestor( CString rowid  )
+{
+	m_command.Format( L"UPDATE people SET tableAncestry = 1 WHERE rowid = '%s'", rowid );
+	if( !theApp.execute( m_command ) ) return false;
+	return true;
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////44
+LRESULT CTablePeople::OnSyncronize(WPARAM wParam, LPARAM lParam)
+{
+	m_rowid.Format( L"%d", wParam );
+	bool uj = lParam;
+	if( uj )
+	{
+		m_command.Format( L"SELECT rowid, * FROM people WHERE rowid ='%s'", m_rowid );
+		if( !query( m_command ) ) return false ;
+		addEntry();
+		
+		int nItem = v_individuals.size() -1;
+		m_ListCtrl.DetachDataset();
+		m_ListCtrl.AttachDataset( &v_individuals );
+//		m_ListCtrl.ReSort();
+		m_orderix = 0;
+		theApp.showItem( nItem, &m_ListCtrl );
+	}
+	else
+	{
+		
+		UINT i;
+		for( i = 0; i*m_columnsCount - N_ROWID  < v_individuals.size(); ++i )
+		{
+			if( v_individuals.at( i*m_columnsCount + N_ROWID ) == m_rowid )
+				break;
+		}
+		if( i < v_individuals.size() - m_columnsCount + N_ROWID )  // már létezõ bejegyzés módosítása
+			updateEntry();
+	}
+	return true;
+}

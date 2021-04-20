@@ -66,7 +66,11 @@ BOOL CSameName::OnInitDialog()
 	
 	m_command.Format( L"SELECT rowid, * FROM people WHERE last_name='%s' AND first_name='%s'", m_last_name, m_first_name );
 	if( !query( m_command ) ) return false;
-	if( !m_recordset->RecordsCount() ) return true;
+	if( !m_recordset->RecordsCount() )
+	{
+		OnOK();
+		return true;
+	}
 
 
 	CString name;

@@ -529,7 +529,7 @@ void CEditTable::OnEditInsert()
 		m_ListCtrl.SetItemText( nItem, B_TITLE, theApp.vBlobs.at(i).filename );
 		++sorsz;
 	}
-	m_ListCtrl.EnsureVisible( nItem, FALSE );
+	theApp.showItem( nItem, &m_ListCtrl );
 	if( m_ListCtrl.GetItemCount() )
 		GetDlgItem( IDC_PHOTOS )->EnableWindow( true );
 }

@@ -321,6 +321,9 @@ public:
 	bool	getStructure( const DB* filestructure, CString fileSpec );
 	bool	checkStructure( CSqliteDBRecordSet* rec,  const DB* fileStructure, int tableNumnberDB, CString fileSpec );
 
+	void	keress( CString searh, CListCtrlEx* m_listCtrl, int column, int start );
+	void	showItem( int nItem, CListCtrlEx* p_listCtrl );
+
 	BOOL	query( CString command );
 	BOOL	query1( CString command );
 	BOOL	query2( CString command );

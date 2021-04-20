@@ -133,7 +133,6 @@ CString CGaDescendants::getFamilyName()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaDescendants::printDescendant()
 {
-
 	int ix = vDesc.size() -1;
 // leszármazott neve
 	if( m_CheckLastName )
@@ -181,9 +180,24 @@ void CGaDescendants::printDescendant()
 		if( !str.IsEmpty() )
 			cLine.Format( L"%s %s", (CString)cLine, str );
 
-		str = getColoredString( p.comment, m_ixComment );
+		str.Empty();
+		if( !p.comment.IsEmpty() )
+		{ 
+			if( !p.occupation.IsEmpty() )
+				str.Format( L"%s, %s", p.comment, p.occupation );
+			else
+				str = p.comment;
+		}
+		else 
+		{
+			if( !p.occupation.IsEmpty() )
+				str = p.occupation;
+		}
 		if( !str.IsEmpty() )
+		{
+			str = getColoredString( str, m_ixComment );
 			cLine.Format( L"%s %s", (CString)cLine, str );
+		}
 	}
 	else if( m_numbering == VIL )
 	{

@@ -6,7 +6,6 @@
 #include "GAtoDB.h"
 #include "SelectTableName.h"
 #include "ConnectCsaladTorzs.h"
-#include "InputErrors.h"
 #include "ProgressWnd.h"
 #include "checkFirstNames.h"
 #include "CheckNames.h"

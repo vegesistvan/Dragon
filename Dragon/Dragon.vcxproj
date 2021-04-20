@@ -194,9 +194,7 @@
     <ClInclude Include="ContractPeople.h" />
     <ClInclude Include="EditComment.h" />
     <ClInclude Include="EditMarriage.h" />
-    <ClInclude Include="EditPeople.h" />
     <ClInclude Include="checkFamilyDatesStart.h" />
-    <ClInclude Include="html_Edit2Lines.h" />
     <ClInclude Include="FatherMother.h" />
     <ClInclude Include="GedcomOut.h" />
     <ClInclude Include="GA_ascendantsChain.h" />
@@ -240,11 +238,13 @@
     <ClInclude Include="MoreSpouses.h" />
     <ClInclude Include="namesParam.h" />
     <ClInclude Include="OpenDatabase.h" />
-    <ClInclude Include="EditPeopleManual.h" />
+    <ClInclude Include="EditPeople.h" />
     <ClInclude Include="Pictures.h" />
+    <ClInclude Include="Relatives.h" />
     <ClInclude Include="SameName.h" />
     <ClInclude Include="ContractInfo.h" />
     <ClInclude Include="SaveFirstName.h" />
+    <ClInclude Include="SelectFromPeople.h" />
     <ClInclude Include="sqlite3.h" />
     <ClInclude Include="Table_blobs.h" />
     <ClInclude Include="Table_firstnames.h" />
@@ -261,7 +261,6 @@
     <ClInclude Include="SelectFamily.h" />
     <ClInclude Include="SelectFamilyName.h" />
     <ClInclude Include="SelectParent.h" />
-    <ClInclude Include="Relations.h" />
     <ClInclude Include="EditText.h" />
     <ClInclude Include="Dragon.h" />
     <ClInclude Include="DragonDlg.h" />
@@ -310,10 +309,8 @@
     <ClCompile Include="ContractPeople.cpp" />
     <ClCompile Include="EditComment.cpp" />
     <ClCompile Include="EditMarriage.cpp" />
-    <ClCompile Include="EditPeople.cpp" />
     <ClCompile Include="checkFamilyDatesStart.cpp" />
     <ClCompile Include="GA_input_processPeople.cpp" />
-    <ClCompile Include="html_Edit2Lines.cpp" />
     <ClCompile Include="FatherMother.cpp" />
     <ClCompile Include="GA_input_processDescendantSubstr.cpp" />
     <ClCompile Include="GA_input_processMarriageString.cpp" />
@@ -363,11 +360,13 @@
     <ClCompile Include="MoreSpouses.cpp" />
     <ClCompile Include="namesParam.cpp" />
     <ClCompile Include="OpenDatabase.cpp" />
-    <ClCompile Include="EditPeopleManual.cpp" />
+    <ClCompile Include="EditPeople.cpp" />
     <ClCompile Include="Pictures.cpp" />
+    <ClCompile Include="Relatives.cpp" />
     <ClCompile Include="SameName.cpp" />
     <ClCompile Include="ContractInfo.cpp" />
     <ClCompile Include="SaveFirstName.cpp" />
+    <ClCompile Include="SelectFromPeople.cpp" />
     <ClCompile Include="Table_blobs.cpp" />
     <ClCompile Include="Table_firstnames.cpp" />
     <ClCompile Include="Table_people.cpp" />
@@ -382,7 +381,6 @@
     <ClCompile Include="SelectFamily.cpp" />
     <ClCompile Include="SelectFamilyName.cpp" />
     <ClCompile Include="SelectParent.cpp" />
-    <ClCompile Include="Relations.cpp" />
     <ClCompile Include="EditText.cpp" />
     <ClCompile Include="Dragon.cpp" />
     <ClCompile Include="DragonDlg.cpp" />

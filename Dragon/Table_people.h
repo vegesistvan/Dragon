@@ -51,6 +51,8 @@ protected:
 	void CTablePeople::updateEntry();
 
 	void CTablePeople::push( CString str );
+	CString CTablePeople::ancestor( CString father_id );
+	bool CTablePeople::setAncestor( CString rowid  );
 
 //	int  CTablePeople::find_nItem( int rowid );
 
@@ -150,6 +152,7 @@ public:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 
 	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnSyncronize(WPARAM wParam, LPARAM lParam);
 	afx_msg	void OnHtmlEditLines();
 	afx_msg void OnHtmlNotepad();
 	afx_msg void OnHtmlNotepadParents();
@@ -163,4 +166,5 @@ public:
 	afx_msg void OnInfo();
 	afx_msg void OnClickedNext();
 
+	afx_msg void OnSetAncestor();
 };

@@ -123,6 +123,7 @@ void CGaDescendants::closeHtml()
 	fwprintf( fl, L"</html>" );
 	fclose( fl );
 	ShellExecute(NULL, L"open", m_htmlFile,NULL, NULL, SW_SHOWNORMAL);
+//	CDialogEx::EndDialog( true );
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaDescendants::createStyle()

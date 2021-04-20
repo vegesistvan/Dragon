@@ -10,7 +10,7 @@
 #include "ProgressWnd.h"
 #include "ContractInfo.h"
 #include "html_EditLines.h"
-#include "Relations.h"
+#include "Relatives.h"
 #include "GetString.h"
 //#include "FilterLoop.h"
 
@@ -299,11 +299,9 @@ void CContractedPeople::keress( int start )
 	wndProgress.SetStep(1);
 
 
-
 	int		itemCnt	= m_ListCtrl.GetItemCount();
 	int		length	= search.GetLength();
 	int		nItem;
-	int		topIndex = m_ListCtrl.GetTopIndex();
 	CString	str;
 
 	theApp.unselectAll( &m_ListCtrl );
@@ -321,20 +319,7 @@ void CContractedPeople::keress( int start )
 
 	if( nItem < itemCnt-1 )			// megtalálta a keresett embert,. aki az nItem-1 sorban van
 	{
-		m_ListCtrl.EnsureVisible( nItem, FALSE );
-
-		if( nItem > topIndex )   // lefele megy, fel kell hozni a tábla tetejére a megtalált sort
-		{
-			int countPP = m_ListCtrl.GetCountPerPage();
-			int nItemEV	= nItem - 1 + countPP;			// alaphelyzet: a kijelölt sor az ablak tetején
-
-			if( nItemEV > itemCnt - 1 )					// már nem lehet az ablak tetejére hozni, mert nincs annyi adat
-				nItemEV = itemCnt - 1;
-
-			m_ListCtrl.EnsureVisible( nItemEV, FALSE );
-		}
-		m_ListCtrl.SetItemState( nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED );
-		Invalidate( false );
+		theApp.showItem( nItem, &m_ListCtrl );
 	}
 	else
 	{
@@ -539,8 +524,8 @@ void CContractedPeople::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
 
 	CString rowid	= m_ListCtrl.GetItemText( nItem, L_ROWID );
 
-	CRelations dlg;
-	dlg.nItem		= nItem;
+	CRelatives  dlg;
+//	dlg.nItem		= nItem;
 	dlg.m_rowid		= rowid;
 	if( dlg.DoModal() == IDCANCEL ) return;
 
@@ -668,7 +653,7 @@ void CContractedPeople::OnDbEdit()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
 	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
-	CRelations dlg;
+	CRelatives dlg;
 	dlg.m_rowid = rowid;
 	dlg.DoModal();
 }
@@ -679,7 +664,7 @@ void CContractedPeople::On3Generations()
 	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
 	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
 
-	CRelations dlg;
+	CRelatives dlg;
 	dlg.m_rowid = rowid;
 
 	dlg.DoModal();

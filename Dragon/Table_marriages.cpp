@@ -16,7 +16,7 @@
 #include "windows.h"
 #include "ProgressWnd.h"
 #include "utilities.h"
-#include "Relations.h"
+#include "Relatives.h"
 
 #include "checkParam0.h"
 #include <algorithm>
@@ -631,7 +631,7 @@ void CTableMarriages::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
 void CTableMarriages::OnClickedNext()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	if( nItem == -0 )
+	if( nItem == -1 )
 	{
 		AfxMessageBox( L"Nincs kijelölve sor!" );
 		return;
@@ -644,7 +644,7 @@ void CTableMarriages::OnClickedKeres()
 {
 	keress( 0 );
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTableMarriages::keress( int start )
 {
 	CString	search;
@@ -654,51 +654,13 @@ void CTableMarriages::keress( int start )
 		AfxMessageBox( L"Meg kell adni a keresendõ stringet!");
 		return;
 	}
-
-
-	int		itemCnt	= m_ListCtrl.GetItemCount();
-	int		length	= search.GetLength();
-	int		nItem;
-	int		topIndex = m_ListCtrl.GetTopIndex();
-	CString	str;
-
-	theApp.unselectAll( &m_ListCtrl );
-	if( m_columnsCount != 18 )
-
-	m_orderix = L_NAME;	
-	for( nItem = start; nItem < itemCnt-1; ++nItem )
-	{
-		str = m_ListCtrl.GetItemText( nItem, m_orderix);
-		str = str.Left(length);						// az aktuális search string hosszával azonos hosszúság leválasztása
-		if( str == search )	break;
-	}
-
-	
-
-	if( nItem < itemCnt-1 )			// megtalálta a keresett embert,. aki az nItem-1 sorban van
-	{
-		m_ListCtrl.EnsureVisible( nItem, FALSE );
-
-		if( nItem > topIndex )   // lefele megy, fel kell hozni a tábla tetejére a megtalált sort
-		{
-			int countPP = m_ListCtrl.GetCountPerPage();
-			int nItemEV	= nItem - 1 + countPP;			// alaphelyzet: a kijelölt sor az ablak tetején
-
-			if( nItemEV > itemCnt - 1 )					// már nem lehet az ablak tetejére hozni, mert nincs annyi adat
-				nItemEV = itemCnt - 1;
-
-			m_ListCtrl.EnsureVisible( nItemEV, FALSE );
-		}
-		m_ListCtrl.SetItemState( nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED );
-		Invalidate( false );
-	}
-	else
-	{
-		str.Format( L"%s nevû embert nem találtam!", search );
-		AfxMessageBox( str );
-	}
-
+	int NAME = LIST_HLASTNAME;
+	if( m_orderix != 0 )
+		NAME = m_orderix;
+	theApp.keress( search, &m_ListCtrl, NAME, start );
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CTableMarriages::PreTranslateMessage(MSG* pMsg)
 {
@@ -866,82 +828,3 @@ void CTableMarriages::OnEditDelete()
 
 	m_ListCtrl.DeleteItem( nItem );
 }
-/*
-// GA.HTML DB
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTableMarriages::OnHtmlEditLines()
-{
-	CString title;
-	int selectedCount	= m_ListCtrl.GetSelectedCount();
-	int nItem			= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	if( selectedCount == 1 )
-		title.Format( L"%s %s a ga.html fájlban (%s. sor)", m_ListCtrl.GetItemText( nItem, LIST_HLASTNAME ), m_ListCtrl.GetItemText( nItem, LIST_HFIRSTNAME ), m_ListCtrl.GetItemText( nItem, LIST_LINENUMBER )  );
-	else
-		title.Format( L"%d kijelölt sor a ga.html fájlban", selectedCount );
-
-	theApp.htmlEditLines( &m_ListCtrl, LIST_LINENUMBER, title );
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTableMarriages::OnHtmlNotepad()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	CString lineNumber = m_ListCtrl.GetItemText( nItem,	LIST_LINENUMBER );
-	if( !lineNumber.IsEmpty() ) 
-		theApp.editNotepad( lineNumber );
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTableMarriages::OnHtmlNotepadParents()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
-	CString rowid = m_ListCtrl.GetItemText( nItem, LIST_SPOUSE1_ID );
-
-	theApp.HtmlNotepadParents( rowid );
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTableMarriages::OnHtmlFatherAndSiblings()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
-
-	CString rowid = m_ListCtrl.GetItemText( nItem, 	LIST_SPOUSE1_ID );
-	CHtmlEditLines dlg;
-	dlg.m_title.Format( L"%s %s szülei és testvérei", m_ListCtrl.GetItemText( nItem, LIST_HLASTNAME ), m_ListCtrl.GetItemText( nItem, LIST_HFIRSTNAME ) );
-	dlg.m_type	= L"F_SIBLINGS";
-	dlg.m_rowid = rowid;
-	dlg.DoModal();
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTableMarriages::OnDbEdit()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
-	CString rowid = m_ListCtrl.GetItemText( nItem, 	LIST_SPOUSE1_ID );
-	CRelations dlg;
-	dlg.m_rowid = rowid;
-	dlg.DoModal();
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTableMarriages::OnHtmlChildren()
-{
-int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
-
-	CString rowid = m_ListCtrl.GetItemText( nItem, 	LIST_SPOUSE1_ID );
-	CHtmlEditLines dlg;
-	dlg.m_title.Format( L"%s %s és gyermekei", m_ListCtrl.GetItemText( nItem, LIST_HLASTNAME ), m_ListCtrl.GetItemText( nItem, LIST_HFIRSTNAME ) );
-	dlg.m_type	= L"F_CHILDREN";
-	dlg.m_rowid = rowid;
-	dlg.DoModal();
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTableMarriages::On3generations()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
-	CString rowid = m_ListCtrl.GetItemText( nItem, 	LIST_SPOUSE1_ID );
-
-	CRelations dlg;
-	dlg.m_rowid = rowid;
-
-	ShowWindow( SW_HIDE );
-	dlg.DoModal();
-	ShowWindow( SW_RESTORE );
-
-}
-*/

@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 #include "ProgressWnd.h"
 #include "utilities.h"
-#include "Relations.h"
+#include "Relatives.h"
 #include "html_EditLines.h"
 
 enum
@@ -323,7 +323,7 @@ void CCheckNames::OnDbEdit()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
 	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
-	CRelations dlg;
+	CRelatives dlg;
 	dlg.m_rowid = rowid;
 	dlg.DoModal();
 }

@@ -11,7 +11,6 @@
 #include "SaveFirstName.h"
 #include "version.h"
 #include "ProgressWnd.h"
-#include "html_Edit2Lines.h"
 #include "html_EditLines.h"
 #include <math.h>
 
@@ -1116,10 +1115,10 @@ void CDragonApp::unselectAll( CListCtrlEx * p_ListCtrl )
 void CDragonApp::search( CString search, INT_PTR orderix,  CListCtrlEx* p_ListCtrl )
 {
 	int		n				= p_ListCtrl->GetItemCount();
-	int		count_per_page	= p_ListCtrl->GetCountPerPage();
+//	int		count_per_page	= p_ListCtrl->GetCountPerPage();
 	int		length			= search.GetLength();
 	int		nItem;
-	int		up;
+//	int		up;
 	CString	substring;
 	CString	str;
 
@@ -1130,12 +1129,15 @@ void CDragonApp::search( CString search, INT_PTR orderix,  CListCtrlEx* p_ListCt
 		substring = str.Left(length);						// az aktuális search string hosszával azonos hosszúság leválasztása
 		if( substring == search )
 		{
+			theApp.showItem( nItem, p_ListCtrl );
+/*
 			up = nItem + count_per_page - 1;
 			if( up >= n ) up = n-1;
 
 			p_ListCtrl->SetItemState( nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED );
 //			p_ListCtrl->SetSelectionMark( nItem );
 			p_ListCtrl->EnsureVisible( up, FALSE );
+*/
 			break;
 		}
 	}
@@ -1219,12 +1221,61 @@ void CDragonApp::HtmlNotepadParents( CString rowid )
 	linenumber = m_recordset->GetFieldString( 0 );
 	editNotepad( linenumber );
 }
-/*
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragonApp::edit2lines( std::vector<CString>* vLines )
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDragonApp::keress( CString search, CListCtrlEx* p_ListCtrl, int column, int start )
 {
-	CEditTwoLines dlg;
-	dlg.vLines = vLines;
-	dlg.DoModal();
+
+	int	itemCnt	= p_ListCtrl->GetItemCount();
+	CProgressWnd wndProgress(NULL, L"Folyik a keresés.." ); 
+	wndProgress.GoModal();
+	wndProgress.SetRange(0, itemCnt );
+	wndProgress.SetPos(0);
+	wndProgress.SetStep(1);
+
+	
+	int		length	= search.GetLength();
+	int		nItem;
+	int		topIndex = p_ListCtrl->GetTopIndex();
+	CString	str;
+
+	theApp.unselectAll( p_ListCtrl );
+
+	for( nItem = start; nItem < itemCnt-1; ++nItem )
+	{
+		str = p_ListCtrl->GetItemText( nItem, column );
+		str = str.Left(length);						// az aktuális search string hosszával azonos hosszúság leválasztása
+		if( str == search )	break;
+		wndProgress.StepIt();
+		wndProgress.PeekAndPump();
+		if (wndProgress.Cancelled()) break;
+	}
+	wndProgress.DestroyWindow();
+
+	if( nItem < itemCnt )			// megtalálta a keresett embert,. aki az nItem-1 sorban van
+	{
+		showItem( nItem, p_ListCtrl );
+	}
+	else
+	{
+		str.Format( L"%s stringet nem találtam a %d, oszlopban!", search, column );
+		AfxMessageBox( str );
+	}
 }
-*/
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDragonApp::showItem( int nItem, CListCtrlEx* p_ListCtrl )
+{
+	int	itemCount	= p_ListCtrl->GetItemCount();
+	int topIndex	= p_ListCtrl->GetTopIndex();
+	int countPP		= p_ListCtrl->GetCountPerPage();
+	int nItemEV		= nItem - 1 + countPP;			// alaphelyzet: a kijelölt sor az ablak tetején
+
+	p_ListCtrl->EnsureVisible( nItem, FALSE );
+
+	if( nItem > topIndex )   // lefele megy, fel kell hozni a tábla tetejére a megtalált sort
+	{
+		if( nItemEV > itemCount - 1 )					// már nem lehet az ablak tetejére hozni, mert nincs annyi adat
+			nItemEV = itemCount - 1;
+		p_ListCtrl->EnsureVisible( nItemEV, FALSE );
+	}
+	p_ListCtrl->SetItemState( nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED );
+}

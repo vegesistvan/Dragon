@@ -6,7 +6,7 @@
 #include "checkSameNameAnd.h"
 #include "afxdialogex.h"
 #include "html_EditLines.h"
-#include "Relations.h"
+#include "Relatives.h"
 #include "CheckParam0.h"
 #include "GetLastFirst.h"
 #include "ProgressWnd.h"
@@ -595,13 +595,13 @@ void CcheckSameNameAnd::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 
-	CRelations dlg;
+	CRelatives dlg;
 	int nItem		= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
 	CString rowid	= m_ListCtrl.GetItemText( nItem, L_ROWID );
 
 //	dlg.m_insert	= 0;
 //	dlg.m_LCtrl		= &m_ListCtrl;
-	dlg.nItem		= nItem;
+//	dlg.nItem		= nItem;
 	dlg.m_rowid		= rowid;
 	if( dlg.DoModal() == IDCANCEL ) return;
 
@@ -1035,7 +1035,7 @@ void CcheckSameNameAnd::OnDbEdit()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
 	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
-	CRelations dlg;
+	CRelatives dlg;
 	dlg.m_rowid = rowid;
 	dlg.DoModal();
 }
@@ -1095,20 +1095,7 @@ void CcheckSameNameAnd::keress( int start )
 
 	if( nItem < itemCnt-1 )			// megtalálta a keresett embert,. aki az nItem-1 sorban van
 	{
-		m_ListCtrl.EnsureVisible( nItem, FALSE );
-
-		if( nItem > topIndex )   // lefele megy, fel kell hozni a tábla tetejére a megtalált sort
-		{
-			int countPP = m_ListCtrl.GetCountPerPage();
-			int nItemEV	= nItem - 1 + countPP;			// alaphelyzet: a kijelölt sor az ablak tetején
-
-			if( nItemEV > itemCnt - 1 )					// már nem lehet az ablak tetejére hozni, mert nincs annyi adat
-				nItemEV = itemCnt - 1;
-
-			m_ListCtrl.EnsureVisible( nItemEV, FALSE );
-		}
-		m_ListCtrl.SetItemState( nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED );
-		Invalidate( false );
+		theApp.showItem( nItem, &m_ListCtrl );
 	}
 	else
 	{

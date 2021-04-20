@@ -1,4 +1,3 @@
-
 #include "stdafx.h"
 #include "utilities.h"
 #include "Dragon.h"
@@ -39,6 +38,7 @@ CGaAscendants::CGaAscendants(CWnd* pParent /*=NULL*/)
 	, m_bold(FALSE)
 	, m_numOfG_S( L"5" )
 	, m_code(FALSE)
+	, radio0(FALSE)
 {
 
 }
@@ -55,17 +55,18 @@ void CGaAscendants::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO_LISTSTYLE, m_ListStyle);
 	DDX_Text(pDX, IDC_EDIT, m_numOfG_S);
 	DDX_Radio(pDX, IDC_ANSI, m_code);
+	DDX_Radio(pDX, IDC_RADIO_HAZASTARSAK, radio0);
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CGaAscendants, CDialogEx)
 ON_BN_CLICKED(IDOK, &CGaAscendants::OnBnClickedOk)
 ON_BN_CLICKED(IDC_CHECK_NN, &CGaAscendants::OnClickedCheckNn)
-ON_COMMAND(IDC_ANYAIE, &CGaAscendants::OnAnyaie)
-ON_COMMAND(IDC_RADIO_APAIE, &CGaAscendants::OnRadioApaie)
-ON_BN_CLICKED(IDC_RADIO_HAZASTARSAK, &CGaAscendants::OnClickedRadioHazastarsak)
+ON_BN_CLICKED(IDC_RADIO_HAZASTARSAK, &CGaAscendants::OnRadioHazastarsak)
 ON_COMMAND(IDC_RADIO_APAIANYAI, &CGaAscendants::OnRadioApaianyai)
 ON_COMMAND(IDC_RADIO_APAI, &CGaAscendants::OnRadioApai)
 ON_COMMAND(IDC_RADIO_ANYAI, &CGaAscendants::OnRadioAnyai)
+ON_COMMAND(IDC_RADIO_APAIE, &CGaAscendants::OnRadioApaiE)
+ON_COMMAND(IDC_RADIO_ANYAIE, &CGaAscendants::OnRadioAnyaiE)
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CGaAscendants::OnInitDialog()
@@ -111,6 +112,7 @@ BOOL CGaAscendants::OnInitDialog()
 	str.Format( L"%s felmenõinek listája", m_name );
 	SetWindowTextW( str );
 
+
 	return TRUE;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -133,30 +135,13 @@ int CGaAscendants::getPDA( CString parent_id)
 void CGaAscendants::OnBnClickedOk()
 {
 	UpdateData( FROMSCREEN );
-	m_numOfG = _wtoi( m_numOfG_S ); 
 
+	m_numOfG = _wtoi( m_numOfG_S ); 
 	m_listStyleIndex = m_ListStyle.GetCurSel();
 	m_ulStyle.Format( L"<ul style=list-style-type:%s;><li>", listStyle[m_listStyleIndex] );
 
 	m_fileSpec = openFile();
 
-	CString lista;
-
-	switch( m_lista )
-	{
-	case COUPLES:
-		lista = L"házastársak";
-		break;
-	case APAIANYAI:
-		lista = L"apai-anyai ágak";
-		break;
-	case APAI:
-		lista = L"apai ág";
-		break;
-	 case ANYAI:
-		lista = L"anyai ág";
-		break;
-	}
 
 	if( m_lista == APAIE )
 		directFatherAscendants();
@@ -181,15 +166,13 @@ void CGaAscendants::OnBnClickedOk()
 		}
 
 		fwprintf( fh1, L"<pre>" );
-		
-		str.Format( L"%s %s\n",	L"lista                         :", lista );
+		str.Format( L"%-31s: %s", L"lista", m_title );
 		if( m_code == UTF8 ) str = UnicodeToUtf8( str ); 
-		fwprintf( fh1, L"%s", str );
+		fwprintf( fh1, L"%s\n", str );
 
-		str.Format( L"%s %d\n",	L"listázott generációk          :", m_numOfG );
+		str.Format( L"%-31s:%d",	L"listázott generációk", m_numOfG );
 		if( m_code == UTF8 ) str = UnicodeToUtf8( str ); 
-		fwprintf( fh1, L"%s", str );
-
+		fwprintf( fh1, L"%s\n", str );
 		fwprintf( fh1, L"</pre>" );
 
 		if( m_lista == COUPLES )
@@ -202,6 +185,7 @@ void CGaAscendants::OnBnClickedOk()
 		printSame();					// a tbbször elõforduló embereket írja ki
 	}
 
+/*
 	fwprintf( fh1, L"<pre>" );
 	str.Format( L"<br><br>Eltelt idõ: %s<br><br>", theApp.get_time_elapsed() );
 	if( m_code == UTF8 ) str = UnicodeToUtf8( str ); 
@@ -209,6 +193,7 @@ void CGaAscendants::OnBnClickedOk()
 
 
 	fwprintf( fh1, L"</pre>" );
+*/
 	fclose( fh1 );
 	ShellExecute(NULL, L"open", m_fileSpec,NULL, NULL, SW_SHOWNORMAL);
 	CDialogEx::OnOK();	
@@ -1496,6 +1481,7 @@ void CGaAscendants::OnClickedCheckNn()
 		}
 	}
 }
+/*
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaAscendants::OnAnyaie()
 {
@@ -1512,13 +1498,22 @@ void CGaAscendants::OnRadioApaie()
 	GetDlgItem( IDC_CHECK_NN )->EnableWindow( FALSE );
 	m_numOfG = 1;
 }
+#define COUPLES		0
+#define APAIANYAI	1
+#define APAI		2
+#define ANYAI		3
+#define APAIE		4
+#define ANYAIE		5
+*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CGaAscendants::OnClickedRadioHazastarsak()
+void CGaAscendants::OnRadioHazastarsak()
 {
-	GetDlgItem( IDC_EDIT )->EnableWindow( TRUE );
-	GetDlgItem( IDC_CHECK_NN )->EnableWindow( TRUE );
+	GetDlgItem( IDC_EDIT )->EnableWindow( TRUE );		// listázandó generációk száam
+	GetDlgItem( IDC_CHECK_NN )->EnableWindow( TRUE );	// nem ismert felmenõk helyettesítése NN-el
 	str.Format( L"%d", __max( m_numOfFG, m_numOfMG ) );
 	GetDlgItem( IDC_EDIT )->SetWindowText( str );
+	m_lista = COUPLES;
+	m_title.Format( L"házastársak" );
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaAscendants::OnRadioApaianyai()
@@ -1527,6 +1522,8 @@ void CGaAscendants::OnRadioApaianyai()
 	GetDlgItem( IDC_CHECK_NN )->EnableWindow( TRUE );
 	str.Format( L"%d", __max( m_numOfFG, m_numOfMG ) );
 	GetDlgItem( IDC_EDIT )->SetWindowText( str );
+	m_lista = APAIANYAI;
+	m_title = L"apai-anyai ágak";
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaAscendants::OnRadioApai()
@@ -1535,13 +1532,43 @@ void CGaAscendants::OnRadioApai()
 	GetDlgItem( IDC_CHECK_NN )->EnableWindow( TRUE );
 	str.Format( L"%d", m_numOfFG );
 	GetDlgItem( IDC_EDIT )->SetWindowText( str );
+	m_lista = APAI;
+	m_title = L"apai ág";
+
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaAscendants::OnRadioAnyai()
 {
-	GetDlgItem( IDC_EDIT )->EnableWindow( TRUE );
-	GetDlgItem( IDC_CHECK_NN )->EnableWindow( TRUE );
-	str.Format( L"%d", m_numOfMG );
-	GetDlgItem( IDC_EDIT )->SetWindowText( str );
+	GetDlgItem( IDC_EDIT )->SetWindowText( L"" );
+	GetDlgItem( IDC_EDIT )->EnableWindow( FALSE );
+	GetDlgItem( IDC_CHECK_NN )->EnableWindow( FALSE );
+	m_numOfG = 1;
+	m_lista = ANYAI;
+	m_title = L"anyai ág";
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CGaAscendants::OnRadioApaiE()
+{
+	GetDlgItem( IDC_EDIT )->SetWindowText( L"" );
+	GetDlgItem( IDC_EDIT )->EnableWindow( FALSE );
+	GetDlgItem( IDC_CHECK_NN )->EnableWindow( FALSE );
+
+	GetDlgItem( IDC_NUMOFFDA )->GetWindowTextW(  str );
+	m_numOfG = _wtoi( str );
+	m_lista = APAIE;
+	m_title = L"direkt apai ág";
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CGaAscendants::OnRadioAnyaiE()
+{
+	GetDlgItem( IDC_EDIT )->SetWindowText( L"" );
+	GetDlgItem( IDC_EDIT )->EnableWindow( FALSE );
+	GetDlgItem( IDC_CHECK_NN )->EnableWindow( FALSE );
+
+	GetDlgItem( IDC_NUMOFMDA )->GetWindowTextW(  str );
+	m_numOfG = _wtoi( str );
+	m_lista = ANYAIE;
+	m_title = L"direkt anyai ág";
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

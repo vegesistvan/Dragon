@@ -8,7 +8,18 @@ class CCheckFatherDeath9 : public CDialogEx
 {
 	DECLARE_DYNAMIC(CCheckFatherDeath9)
 	DECLARE_EASYSIZE
-
+	enum 
+	{
+	ROWID = 0,
+	LINE,
+	TABLE,
+	SOURCE,
+	UNITED,
+	LASTNAME,
+	FIRSTNAME,
+	BIRTH,
+	DEATH,
+	};
 public:
 	CCheckFatherDeath9(CWnd* pParent = NULL);   // standard constructor
 	virtual ~CCheckFatherDeath9();

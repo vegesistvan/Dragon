@@ -34,49 +34,45 @@ BOOL CEditMarriage::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
+
 	if( m_rowid.IsEmpty() )
 	{
-		m_command.Format( L"SELECT rowid FROM marriages WHERE spouse1_id ='%s' AND spouse2_id='%s'", m_rowidH, m_rowidW );
+		
+		m_command.Format( L"SELECT rowid, * FROM marriages WHERE spouse1_id ='%s' AND spouse2_id='%s'", m_rowidH, m_rowidW );
 		if( !theApp.query( m_command ) ) return false;
-		m_rowid = theApp.m_recordset->GetFieldString( 0 );
+		m_rowid = theApp.m_recordset->GetFieldString( MARRIAGES_ROWID );
 		if( m_rowid.IsEmpty() )
 		{
-			AfxMessageBox( L"Nincs hátzasság!" );
+			AfxMessageBox( L"Nincs házasság!" );
+			OnCancel();
 			return false;
 		}
+		
 	}
 
+	if( !m_rowid.IsEmpty() )
+	{
+		m_command.Format( L"SELECT rowid,* FROM marriages WHERE rowid ='%s'", m_rowid );
+		if( !theApp.query( m_command ) ) return false;
+		
+		m_rowidH = theApp.m_recordset->GetFieldString( MARRIAGES_SPOUSE1_ID );
+		m_rowidW = theApp.m_recordset->GetFieldString( MARRIAGES_SPOUSE2_ID );
+		m_place = theApp.m_recordset->GetFieldString( MARRIAGES_PLACE );
+		m_date = theApp.m_recordset->GetFieldString( MARRIAGES_DATE );
 
+		GetDlgItem( IDC_EDIT_PLACE )->SetWindowTextW( m_place );
+		GetDlgItem( IDC_EDIT_DATE )->SetWindowTextW( m_date );
 
+		m_orderWife		= theApp.m_recordset->GetFieldString( MARRIAGES_ORDERWIFE );
+		m_orderHusband	= theApp.m_recordset->GetFieldString( MARRIAGES_ORDERHUSBAND );
 
+		GetDlgItem( IDC_EDIT_ORDERWIFE )->SetWindowTextW( m_orderWife );
+		GetDlgItem( IDC_EDIT_ORDERHUSBAND )->SetWindowTextW( m_orderHusband );
+	}
 
+	GetDlgItem( IDC_HUSBAND )->SetWindowTextW( getSpouse( m_rowidH ) );
+	GetDlgItem( IDC_WIFE )->SetWindowTextW( getSpouse( m_rowidW ) );
 
-
-	m_command.Format( L"SELECT rowid,* FROM marriages WHERE rowid ='%s'", m_rowid );
-	if( !theApp.query( m_command ) ) return false;
-
-	CString rowidH;
-	CString rowidW;
-
-	rowidH = theApp.m_recordset->GetFieldString( MARRIAGES_SPOUSE1_ID );
-	rowidW = theApp.m_recordset->GetFieldString( MARRIAGES_SPOUSE2_ID );
-
-	GetDlgItem( IDC_HUSBAND )->SetWindowTextW( getSpouse( rowidH ) );
-	GetDlgItem( IDC_WIFE )->SetWindowTextW( getSpouse( rowidW ) );
-
-	m_place = theApp.m_recordset->GetFieldString( MARRIAGES_PLACE );
-	m_date = theApp.m_recordset->GetFieldString( MARRIAGES_DATE );
-
-	GetDlgItem( IDC_EDIT_PLACE )->SetWindowTextW( m_place );
-	GetDlgItem( IDC_EDIT_DATE )->SetWindowTextW( m_date );
-
-	m_orderWife		= theApp.m_recordset->GetFieldString( MARRIAGES_ORDERWIFE );
-	m_orderHusband	= theApp.m_recordset->GetFieldString( MARRIAGES_ORDERHUSBAND );
-
-	GetDlgItem( IDC_EDIT_ORDERWIFE )->SetWindowTextW( m_orderWife );
-	GetDlgItem( IDC_EDIT_ORDERHUSBAND )->SetWindowTextW( m_orderHusband );
-
-	GetDlgItem( IDOK )->SetFocus();
 
 	return TRUE;
 }
@@ -113,7 +109,11 @@ void CEditMarriage::OnBnClickedOk()
 	GetDlgItem( IDC_EDIT_PLACE )->GetWindowTextW( m_place );
 	GetDlgItem( IDC_EDIT_DATE )->GetWindowTextW( m_date );
 
-	m_command.Format( L"UPDATE marriages SET orderHusband='%s', orderWife='%s', place='%s', date='%s' WHERE rowid='%s'", m_orderHusband, m_orderWife, m_place, m_date, m_rowid ); 
+	if( m_rowid.IsEmpty() )
+		m_command.Format( L"INSERT INTO marriages (place, date, spouse1_id,spouse2_id, orfderHusband, orderWife )\
+		VALUES ('%s','%s', '%s', '%s','%s', '%s')", m_place, m_date, m_rowidH, m_rowidW, m_orderHusband, m_orderWife );
+	else
+		m_command.Format( L"UPDATE marriages SET orderHusband='%s', orderWife='%s', place='%s', date='%s' WHERE rowid='%s'", m_orderHusband, m_orderWife, m_place, m_date, m_rowid ); 
 	if( !theApp.execute( m_command ) ) return;
 
 	CDialogEx::OnOK();

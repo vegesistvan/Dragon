@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 #include "CheckParam.h"
 #include "html_EditLines.h"
-#include "Relations.h"
+#include "Relatives.h"
 #include "ProgressWnd.h"
 #include "utilities.h"
 
@@ -374,7 +374,7 @@ void CCheckParentChild::OnClickedKeres()
 void CCheckParentChild::OnClickedNext()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	if( nItem == -0 )
+	if( nItem == 0 )
 	{
 		AfxMessageBox( L"Nincs kijelölve sor!" );
 		return;
@@ -422,20 +422,7 @@ void CCheckParentChild::keress( int start )
 
 	if( nItem < itemCnt-1 )			// megtalálta a keresett embert,. aki az nItem-1 sorban van
 	{
-		m_ListCtrl.EnsureVisible( nItem, FALSE );
-
-		if( nItem > topIndex )   // lefele megy, fel kell hozni a tábla tetejére a megtalált sort
-		{
-			int countPP = m_ListCtrl.GetCountPerPage();
-			int nItemEV	= nItem - 1 + countPP;			// alaphelyzet: a kijelölt sor az ablak tetején
-
-			if( nItemEV > itemCnt - 1 )					// már nem lehet az ablak tetejére hozni, mert nincs annyi adat
-				nItemEV = itemCnt - 1;
-
-			m_ListCtrl.EnsureVisible( nItemEV, FALSE );
-		}
-		m_ListCtrl.SetItemState( nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED );
-		Invalidate( false );
+		theApp.showItem( nItem, &m_ListCtrl );
 	}
 	else
 	{
@@ -535,7 +522,7 @@ void CCheckParentChild::OnDbEdit()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
 	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
-	CRelations dlg;
+	CRelatives dlg;
 	dlg.m_rowid = rowid;
 	dlg.DoModal();
 }

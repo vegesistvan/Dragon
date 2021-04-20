@@ -33,7 +33,6 @@
 #include "utilities.h"
 #include <atlimage.h>
 #include "html_EditLine.h"
-#include "FirstLetter.h"
 #include "html_Brackets.h"
 #include "EditPeople.h"
 #include "gedcomin.h"
@@ -179,6 +178,7 @@ ON_COMMAND(ID_CONTRACT_PEOPLE, &CDragonDlg::OnContractedPeople)
 ON_COMMAND(ID_DISPLAY_FAMILIES, &CDragonDlg::OnDisplayFamilies)
 ON_COMMAND(ID_CHECK_WEDDINGDATE, &CDragonDlg::OnCheckWeddingDate)
 ON_COMMAND(ID_SPOUSES_SEX, &CDragonDlg::OnSpousesSex)
+ON_COMMAND(ID_UNREFERENCED, &CDragonDlg::OnUnreferenced)
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CDragonDlg::OnInitDialog()
@@ -271,9 +271,9 @@ BOOL CDragonDlg::query( CString command )
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CDragonDlg::query1( CString command )
 {
-	if( m_recordset2->Query(command,theApp.mainDB))
+	if( m_recordset1->Query(command,theApp.mainDB))
 	{
-		str.Format(L"%s\n%s",command,m_recordset2->GetLastError());
+		str.Format(L"%s\n%s",command,m_recordset1->GetLastError());
 		AfxMessageBox(str);
 		return FALSE;
 	}
@@ -963,4 +963,50 @@ void CDragonDlg::OnSpousesSex()
 {
 	CCheckSpousesSex dlg;
 	dlg.DoModal();
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDragonDlg::OnUnreferenced()
+{
+	CString filespec;
+	CString filename = L"unreferenced";
+
+	FILE* fl;
+	filespec = theApp.openTextFile( &fl, filename,  L"w+" );
+
+// nekik nincs sem apjuk sem anyjuk
+	m_command.Format( L"SELECT rowid, last_name, first_name FROM people WHERE \
+( father_id='0' OR father_id= '' OR typeof(father_id)='null' ) AND \
+( mother_id='0' OR mother_id= '' OR typeof(mother_id)='null' ) ");
+	if(!query( m_command ) ) return;
+	int n = m_recordset->RecordsCount();
+
+
+	CString rowid;
+	CString name;
+	int cnt = 0;
+// Havatkoznak rá mint apa vagy anya vagy házastárs?
+	for( int i = 0; i < m_recordset->RecordsCount(); ++i, m_recordset->MoveNext() )
+	{
+		rowid = m_recordset->GetFieldString( 0 );
+		m_command.Format( L"SELECT rowid FROM people WHERE father_id = '%s' OR mother_id= '%s'", rowid, rowid );   
+		if( !query1( m_command ) ) return;
+
+		m_command.Format( L"SELECT rowid FROM marriages WHERE spouse1_id = '%s' OR spouse2_id= '%s'", rowid, rowid );   
+		if( !query3( m_command ) ) return;
+
+		if( !m_recordset1->RecordsCount() && !m_recordset3->RecordsCount() )
+		{
+			++cnt;
+			name.Format( L"%s %s", m_recordset->GetFieldString(1), m_recordset->GetFieldString(2) ); 
+			fwprintf( fl, L"%6d %6d %s\n", cnt, rowid, name );
+		}
+	}
+
+
+
+	fclose( fl );
+	if( !cnt )
+		AfxMessageBox( L"Nincs olyan bejegyzés, amire ne lenne hivatkozás!" );
+	else
+		theApp.showFile( filespec );
 }

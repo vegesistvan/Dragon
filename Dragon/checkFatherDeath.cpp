@@ -5,7 +5,7 @@
 #include "html_EditLines.h"
 #include "ProgressWnd.h"
 #include "utilities.h"
-#include "Relations.h"
+#include "Relatives.h"
 
 // ListCtrl oszlopok
 enum
@@ -26,18 +26,7 @@ enum
 };
 
 // SELECT oszlopok
-enum 
-{
-	ROWID = 0,
-	LINE,
-	TABLE,
-	SOURCE,
-	UNITED,
-	LASTNAME,
-	FIRSTNAME,
-	BIRTH,
-	DEATH,
-};
+
 CString m_columns = L"rowid,lineNumber,tableNumber,source,united,last_name,first_name,birth_date,death_date"; 
 
 
@@ -471,7 +460,7 @@ void CCheckFatherDeath9::OnDbEdit()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
 	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
-	CRelations dlg;
+	CRelatives dlg;
 	dlg.m_rowid = rowid;
 	dlg.DoModal();
 }

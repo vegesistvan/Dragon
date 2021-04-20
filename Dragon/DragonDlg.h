@@ -92,6 +92,8 @@ public:
 	void CDragonDlg::closeHtml();
 	void CDragonDlg::reloadMSubstr();
 
+	
+
 	int _xDest;
 	int _yDest;
 	int _wDest;
@@ -424,4 +426,5 @@ public:
 	afx_msg void OnDisplayFamilies();
 	afx_msg void OnCheckWeddingDate();
 	afx_msg void OnSpousesSex();
+	afx_msg void OnUnreferenced();
 };

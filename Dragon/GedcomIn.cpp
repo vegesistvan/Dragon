@@ -86,6 +86,7 @@ void CGedcomIn::insertPeople()
 	int		pos;
 
 
+
 	fields.Format( L"\
 fileNumber,\
 tableNumber,\
@@ -120,7 +121,8 @@ orderMother\
 	{
 		id = v_indi.at(i).refI;
 		parentIndex = v_indi.at(i).parentIndex;
-		values.Format( L" 1, 1, '%s','%s', '%s','%s','%s','%s','%s','%s','%s','%d', '%d','%s','%s','%s','%d','%d'",
+		values.Format( L" 1, '%s', '%s','%s', '%s','%s','%s','%s','%s','%s','%s','%d', '%d','%s','%s','%s','%d','%d'",
+		v_indi.at(i).tablenumber,\
 		v_indi.at(i).sex,\
 		v_indi.at(i).title,\
 		v_indi.at(i).titolo,\
@@ -273,6 +275,7 @@ orderWife\
 		spouse1_id	= getRowid( v_fam.at(i).refH );
 		spouse2_id	= getRowid( v_fam.at(i).refW );
 		place		= v_fam.at(i).place;
+		place.Replace( '\'', '|' );
 		date		= date2date( v_fam.at(i).date );
 		orderHusband = v_fam.at(i).marriageH;				// férj házasságának sorszáma
 		orderWife	 = v_fam.at(i).marriageW;				// feleség házasságának sorszáma

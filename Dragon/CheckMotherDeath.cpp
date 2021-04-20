@@ -5,7 +5,7 @@
 #include "Dragon.h"
 #include "CheckMotherDeath.h"
 #include "afxdialogex.h"
-#include "Relations.h"
+#include "Relatives.h"
 #include "html_EditLines.h"
 #include "ProgressWnd.h"
 #include "utilities.h"
@@ -28,19 +28,6 @@ enum
 	L_ITEMDATA,
 };
 
-// SELECT oszlopok
-enum 
-{
-	ROWID = 0,
-	LINE,
-	TABLE,
-	SOURCE,
-	UNITED,
-	LASTNAME,
-	FIRSTNAME,
-	BIRTH,
-	DEATH,
-};
 
 
 
@@ -605,7 +592,7 @@ void CCheckMotherDeath::OnDbEdit()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
 	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
-	CRelations dlg;
+	CRelatives dlg;
 	dlg.m_rowid = rowid;
 	dlg.DoModal();
 }

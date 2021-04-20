@@ -6,7 +6,7 @@
 #include "checkLifespan.h"
 #include "afxdialogex.h"
 #include "html_EditLines.h"
-#include "Relations.h"
+#include "Relatives.h"
 #include "checkParam.h"
 #include "ProgressWnd.h"
 #include "utilities.h"
@@ -316,7 +316,7 @@ void CLifeSpan::OnDbEdit()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
 	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
-	CRelations dlg;
+	CRelatives dlg;
 	dlg.m_rowid = rowid;
 	dlg.DoModal();
 }

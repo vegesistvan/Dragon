@@ -9,8 +9,8 @@
 #include "html_EditLines.h"
 #include "ProgressWnd.h"
 #include "utilities.h"
-#include "Relations.h"
 #include "html_EditLine.h"
+#include "Relatives.h"
 
 enum
 {
@@ -207,23 +207,6 @@ void CDateFormat::fillTable()
 	}
 	wndP.DestroyWindow();
 }
-/*
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDateFormat::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-
-	int nItem = pNMItemActivate->iItem;
-	CString rowid	= m_ListCtrl.GetItemText( nItem, L_ROWID );
-
-	CRelations dlg;
-	dlg.nItem		= nItem;
-	dlg.m_rowid		= rowid;
-	if( dlg.DoModal() == IDCANCEL ) return;
-
-	*pResult = 0;
-}
-*/
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 LRESULT CDateFormat::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 {
@@ -263,7 +246,7 @@ void CDateFormat::OnDbEdit()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
 	CString rowid = m_ListCtrl.GetItemText( nItem, 	L_ROWID );
-	CRelations dlg;
+	CRelatives dlg;
 	dlg.m_rowid = rowid;
 	dlg.DoModal();
 }
