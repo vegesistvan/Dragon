@@ -89,6 +89,26 @@ class CDragonApp : public CWinApp
 public:
 	CDragonApp();
 
+	enum
+{
+	ROWID = 0,
+	LINENUMBER,
+	SEXID,
+	LASTNAME,
+	FIRSTNAME,
+	BIRTHPLACE,
+	BIRTHDATE,
+	DEATHPLACE,
+	DEATHDATE,
+	PROFESSION,
+	COMMENT,
+	FATHERID,
+	MOTHERID,
+	COLUMNSCOUNT
+};
+
+
+
 // Overrides
 public:
 	virtual BOOL InitInstance();
@@ -321,6 +341,7 @@ public:
 	bool	getStructure( const DB* filestructure, CString fileSpec );
 	bool	checkStructure( CSqliteDBRecordSet* rec,  const DB* fileStructure, int tableNumnberDB, CString fileSpec );
 
+	CString selectPeople( CString rowid, CString* linenumber );
 	void	keress( CString searh, CListCtrlEx* m_listCtrl, int column, int start );
 	void	showItem( int nItem, CListCtrlEx* p_listCtrl );
 

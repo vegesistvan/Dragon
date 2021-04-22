@@ -307,8 +307,8 @@ bool CGaInput::inputFile()
 	insertTableHeader();
 
 	connectBranches();
-	setDummyFather();
 	connectCsalad();
+	setDummyFather();
 
 	CCheckFirstNames dlg;
 	dlg.m_message = false;
@@ -319,6 +319,7 @@ bool CGaInput::inputFile()
 	dlgN.DoModal();
 
 	CDateFormat dlgD;
+	dlgD.m_massage = false;
 	dlgD.DoModal();
 
 	str.Format( L"Az adatok beolvasása befejezõdött a\n\n%s fájlból a\n%s adatbázisba.\n\nVégezd el az összes öszevonás elõtti ellenõrzést\nés amit lehet, javítsd a ga.html fájlban!", theApp.m_htmlFileName, theApp.m_databaseName );
@@ -527,9 +528,17 @@ void CGaInput::fillFatherMother( )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaInput::setDummyFather()
 {
-	// generációk azonosága is kellene?
-	m_command.Format( L"UPDATE people SET father_id=%d+tableNumber WHERE father_id=0 AND source=1 ", NOFATHERID );
+
+	CProgressWnd wndP(NULL, L"Apa nélküli leszármazottaknak dummy apák (1000000 + tableNumber" );
+	wndP.GoModal();
+	wndP.SetRange(0, 10 );
+	wndP.SetPos(0);
+	wndP.SetStep(1);
+
+	m_command.Format( L"UPDATE people SET father_id=%d+tableNumber WHERE (father_id=0 OR father_id='' OR typeof(father_id)='null') AND source=1", NOFATHERID );
 	if( !theApp.execute( m_command ) ) return;
+
+	wndP.DestroyWindow();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaInput::connectBranches()

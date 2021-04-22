@@ -1262,6 +1262,7 @@ void CDragonApp::keress( CString search, CListCtrlEx* p_ListCtrl, int column, in
 	}
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// A p_ListCtrl-al megadott list control nItem-edik  sorát képbe hozza és kijelölöi
 void CDragonApp::showItem( int nItem, CListCtrlEx* p_ListCtrl )
 {
 	int	itemCount	= p_ListCtrl->GetItemCount();
@@ -1269,13 +1270,66 @@ void CDragonApp::showItem( int nItem, CListCtrlEx* p_ListCtrl )
 	int countPP		= p_ListCtrl->GetCountPerPage();
 	int nItemEV		= nItem - 1 + countPP;			// alaphelyzet: a kijelölt sor az ablak tetején
 
-	p_ListCtrl->EnsureVisible( nItem, FALSE );
+//	p_ListCtrl->EnsureVisible( nItem, FALSE );
 
 	if( nItem > topIndex )   // lefele megy, fel kell hozni a tábla tetejére a megtalált sort
 	{
 		if( nItemEV > itemCount - 1 )					// már nem lehet az ablak tetejére hozni, mert nincs annyi adat
 			nItemEV = itemCount - 1;
-		p_ListCtrl->EnsureVisible( nItemEV, FALSE );
+		nItem = nItemEV;
+//		p_ListCtrl->EnsureVisible( nItemEV, FALSE );
 	}
+	p_ListCtrl->EnsureVisible( nItem, FALSE );
 	p_ListCtrl->SetItemState( nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED );
 }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CString CDragonApp::selectPeople( CString rowid, CString* linenumber )
+{
+	CString sexid;
+	CString lastname;
+	CString firstname;
+	CString birthplace;
+	CString birthdate;
+	CString deathplace;
+	CString deathdate;
+	CString profession;
+	CString comment;
+	CString father_id;
+	CString mother_id;
+
+	CString birth;
+	CString death;
+	
+	CString columns = L"rowid, linenumber, sex_id, last_name, first_name, birth_place, birth_date, death_place, death_date, occupation, comment, father_id, mother_id";
+
+	m_command.Format( L"SELECT %s FROM people WHERE rowid = '%s'", columns, rowid );
+	if( !query4( m_command ) ) return L"";
+	*linenumber	= m_recordset4->GetFieldString( LINENUMBER );
+	sexid		= m_recordset4->GetFieldString( SEXID );
+	lastname	= m_recordset4->GetFieldString( LASTNAME );
+	firstname	= m_recordset4->GetFieldString( FIRSTNAME );
+	birthplace	= m_recordset4->GetFieldString( BIRTHPLACE );
+	birthdate	= m_recordset4->GetFieldString( BIRTHDATE );
+	deathplace	= m_recordset4->GetFieldString( DEATHPLACE );
+	deathdate	= m_recordset4->GetFieldString( DEATHDATE );
+	profession	= m_recordset4->GetFieldString( PROFESSION );
+	comment		= m_recordset4->GetFieldString( COMMENT );
+	father_id	= m_recordset4->GetFieldString( FATHERID );
+	mother_id	= m_recordset4->GetFieldString( MOTHERID );
+
+	birth = pack( L"*", birthplace, birthdate );
+	death = pack( L"+", deathplace, deathdate );
+	
+	str.Format( L"%s %s", lastname, firstname );
+	str.Format( L"%s %s", (CString)str, birth );
+	str.TrimRight() ;
+	str.Format( L"%s %s", (CString)str, death );
+	str.TrimRight();
+	str.Format( L"%s %s", (CString)str, comment ); 
+	str.TrimRight();
+	str.Format( L"%s %s", (CString)str, profession ); 
+	str.TrimRight();
+
+	return  str;
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

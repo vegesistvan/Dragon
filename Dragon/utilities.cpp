@@ -1066,3 +1066,13 @@ CString  getNameBD( CString name, CString birth, CString death, CString wedding 
 
 	return nameBD;
 }
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CString pack( CString tag, CString place, CString date )
+{
+	CString str;
+	str.Format( L"%s %s", place, date );
+	str.Trim();
+	if( !str.IsEmpty() )
+		str.Format( L"%s%s", tag, (CString)str );
+	return str;
+}

@@ -426,5 +426,5 @@ public:
 	afx_msg void OnDisplayFamilies();
 	afx_msg void OnCheckWeddingDate();
 	afx_msg void OnSpousesSex();
-	afx_msg void OnUnreferenced();
+	afx_msg void OnUnreferencedItems();
 };

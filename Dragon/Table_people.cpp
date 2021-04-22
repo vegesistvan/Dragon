@@ -1657,18 +1657,15 @@ LRESULT CTablePeople::OnSyncronize(WPARAM wParam, LPARAM lParam)
 {
 	m_rowid.Format( L"%d", wParam );
 	bool uj = lParam;
+	int nItem;
+	m_orderix = 0;
+	m_ListCtrl.SetSortOrder( 1, 1 );
 	if( uj )
 	{
 		m_command.Format( L"SELECT rowid, * FROM people WHERE rowid ='%s'", m_rowid );
 		if( !query( m_command ) ) return false ;
 		addEntry();
-		
-		int nItem = v_individuals.size() -1;
-		m_ListCtrl.DetachDataset();
-		m_ListCtrl.AttachDataset( &v_individuals );
-//		m_ListCtrl.ReSort();
-		m_orderix = 0;
-		theApp.showItem( nItem, &m_ListCtrl );
+		nItem = v_individuals.size() -1;
 	}
 	else
 	{
@@ -1681,6 +1678,11 @@ LRESULT CTablePeople::OnSyncronize(WPARAM wParam, LPARAM lParam)
 		}
 		if( i < v_individuals.size() - m_columnsCount + N_ROWID )  // már létezõ bejegyzés módosítása
 			updateEntry();
+
+		nItem = i;
 	}
+	m_ListCtrl.DetachDataset();
+	m_ListCtrl.AttachDataset( &v_individuals );
+	theApp.showItem( nItem, &m_ListCtrl );
 	return true;
 }

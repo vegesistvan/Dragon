@@ -20,12 +20,12 @@ enum
 	T_PERCENT,
 	T_FAMILYNAME,
 	T_TABLENUMBERROMAN,
+	T_JOINT,
 	T_FOLYT,
 	T_TORZS,
 	T_TITOLO,
 	T_COMMENT,
 	T_ARM,
-	T_JOINT,
 	T_NEWFAMILIES,
 	T_KNOWN_AS,
 	T_ALIAS,
@@ -104,13 +104,14 @@ BOOL CTableTables::OnInitDialog()
 	m_ListCtrl.InsertColumn( T_PERCENT,		L"%%%",			LVCFMT_LEFT,	 50,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( T_FAMILYNAME,	L"családnév",	LVCFMT_LEFT,	150,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( T_TABLENUMBERROMAN,L"roman#",	LVCFMT_RIGHT,	 60,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( T_JOINT,		L"kapcs",		LVCFMT_LEFT,	 40,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( T_FOLYT,		L"folyt",		LVCFMT_LEFT,	100,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( T_TORZS,		L"törzs",		LVCFMT_LEFT,	100,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( T_TITOLO,		L"elõnév",		LVCFMT_LEFT,	200,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( T_COMMENT,		L"megj.",		LVCFMT_LEFT,	150,-1,COL_TEXT);
 
 	m_ListCtrl.InsertColumn( T_ARM,			L"ág",			LVCFMT_LEFT,	100,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( T_JOINT,		L"kapcs",		LVCFMT_LEFT,	 40,-1,COL_TEXT);
+
 	m_ListCtrl.InsertColumn( T_NEWFAMILIES,	L"új családok",	LVCFMT_LEFT,	100,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( T_KNOWN_AS,	L"ismert",		LVCFMT_LEFT,	 50,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( T_ALIAS,		L"alias",		LVCFMT_LEFT,	 50,-1,COL_TEXT);
@@ -171,14 +172,15 @@ void CTableTables::setRow( int nItem )
 	m_ListCtrl.SetItemText( nItem, T_FAMILYNAME,		theApp.m_recordset->GetFieldString( TABLES_FAMILY_NAME ));
 	m_ListCtrl.SetItemText( nItem, T_TITOLO,			theApp.m_recordset->GetFieldString( TABLES_TITOLO ));
 	m_ListCtrl.SetItemText( nItem, T_TABLENUMBERROMAN,	theApp.m_recordset->GetFieldString( TABLES_TABLENUMBERROMAN ) );
+	int joint = _wtoi( theApp.m_recordset->GetFieldString( TABLES_JOINT ) );
+	if( !joint )
+		m_ListCtrl.SetItemText( nItem, T_JOINT,			L"nem" );
 	m_ListCtrl.SetItemText( nItem, T_FOLYT,				theApp.m_recordset->GetFieldString( TABLES_FOLYT ) );
 	m_ListCtrl.SetItemText( nItem, T_TORZS,				theApp.m_recordset->GetFieldString( TABLES_TORZS ) );
 	m_ListCtrl.SetItemText( nItem, T_COMMENT,			theApp.m_recordset->GetFieldString( TABLES_COMMENT ) );
 	
 	m_ListCtrl.SetItemText( nItem, T_ARM,				theApp.m_recordset->GetFieldString( TABLES_ARM ) );
-	int joint = _wtoi( theApp.m_recordset->GetFieldString( TABLES_JOINT ) );
-	if( !joint )
-		m_ListCtrl.SetItemText( nItem, T_JOINT,			L"nem" );
+	
 	m_ListCtrl.SetItemText( nItem, T_NEWFAMILIES,		theApp.m_recordset->GetFieldString( TABLES_NEWFAMILIES ) );
 	m_ListCtrl.SetItemText( nItem, T_KNOWN_AS,			theApp.m_recordset->GetFieldString( TABLES_KNOWN_AS ) );
 	m_ListCtrl.SetItemText( nItem, T_ALIAS,				theApp.m_recordset->GetFieldString( TABLES_ALIAS ) );

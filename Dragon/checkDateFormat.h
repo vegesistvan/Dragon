@@ -15,6 +15,7 @@ public:
 // Dialog Data
 	enum { IDD = IDD_CHECK_DATEFORMAT };
 
+	bool m_massage;
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	void CDateFormat::createColumns();

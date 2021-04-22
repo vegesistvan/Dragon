@@ -293,6 +293,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="SameParams.h" />
     <ClInclude Include="checkFirstNames.h" />
+    <ClInclude Include="UNreferencedItems.h" />
     <ClInclude Include="utilities.h" />
     <ClInclude Include="version.h" />
     <ClInclude Include="version_num.h" />
@@ -419,6 +420,7 @@
     </ClCompile>
     <ClCompile Include="SameParams.cpp" />
     <ClCompile Include="checkFirstNames.cpp" />
+    <ClCompile Include="UNreferencedItems.cpp" />
     <ClCompile Include="utilities.cpp" />
   </ItemGroup>
   <ItemGroup>

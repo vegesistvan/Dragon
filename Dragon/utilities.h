@@ -82,3 +82,4 @@ int			dateDiff( CString date1, CString date2 );
 int			compDate( CString date1, CString date2 );
 int			diffD( CString date1, CString date2, int* pYear );
 CString		getNameBD( CString name, CString birth, CString death, CString wedding );
+CString		pack( CString tag, CString place, CString date );

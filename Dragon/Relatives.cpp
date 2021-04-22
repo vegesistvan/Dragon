@@ -117,7 +117,7 @@ void CRelatives::createColumns( CListCtrlEx* p_ListCtrl )
 	p_ListCtrl->SetExtendedStyle( m_ListCtrlS.GetExtendedStyle()| LVS_EX_GRIDLINES );	
 
 	p_ListCtrl->InsertColumn( L_NAME,	L"name",		LVCFMT_LEFT,	150,-1,COL_HIDDEN );
-	p_ListCtrl->InsertColumn( L_ROWID,	L"rowid",		LVCFMT_RIGHT,	 50,-1,COL_TEXT);
+	p_ListCtrl->InsertColumn( L_ROWID,	L"rowid",		LVCFMT_RIGHT,	 65,-1,COL_TEXT);
 	p_ListCtrl->InsertColumn( L_PEOPLE,	L"people",		LVCFMT_LEFT,   2000,-1,COL_TEXT );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -166,6 +166,10 @@ BOOL CRelatives::createPeople()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CRelatives::createFather( CString father_id )
 {
+	int id = _wtoi( father_id );
+	if( id > 1000000 ) return true;
+	if( !id ) return true;
+
 	CString people;
 
 	people = selectPeople( father_id );
@@ -204,6 +208,7 @@ BOOL CRelatives::createSpouses()
 		m_command.Format( L"SELECT spouse2_id FROM marriages WHERE spouse1_id = '%s'", m_rowid );
 	else
 		m_command.Format( L"SELECT spouse1_id FROM marriages WHERE spouse2_id = '%s'", m_rowid );
+
 	if( !query2( m_command ) ) return false;
 
 	for( i = 0; i < m_recordset2->RecordsCount(); ++i, m_recordset2->MoveNext() )

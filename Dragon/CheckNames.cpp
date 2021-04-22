@@ -145,9 +145,10 @@ ill. 'A sor a Notepad-ben' funkciókat. Bármelyikban javíthatjuk a ga.html fájl m
 		m_ListCtrl.SetColumnWidth(i,LVSCW_AUTOSIZE_USEHEADER);
 	wndP.DestroyWindow();
 
-	if( !nItem  && m_message )
+	if( !m_ListCtrl.GetItemCount() )
 	{
-		AfxMessageBox( L"Minden ember család és keresztneve meg van adva!" );
+		if( m_message )
+			AfxMessageBox( L"Minden ember család és keresztneve meg van adva!" );
 		OnCancel();
 	}
 	return TRUE;
