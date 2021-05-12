@@ -1,7 +1,7 @@
 #pragma once
 #include "afxwin.h"
+#include "GA_ascendants_str.h"
 
-// CGaAscendants dialog
 
 class CGaAscendants : public CDialogEx
 {

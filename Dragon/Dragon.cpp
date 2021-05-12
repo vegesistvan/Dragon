@@ -98,8 +98,11 @@ BOOL CDragonApp::InitInstance()
 	{
 		if( !selectDatabase() ) return FALSE;
 	}
-	while( !openDatabase() )
-		if( !selectDatabase() ) break;
+
+	if( !openDatabase() ) return false;
+	
+//	while( !openDatabase() )
+//		if( !selectDatabase() ) break;
 
 
 // system database ********************************************************************************************************/
@@ -251,7 +254,11 @@ BOOL CDragonApp::openDatabase()
 	open.m_numberOfTables	= numberOfTables;
 	open.m_numberOfIndexes	= numberOfIndexes;
 
-	if( !open.openDatabase() ) return false;
+	if( !open.openDatabase() ) 
+	{
+		WriteProfileString( L"Settings",L"databasespec", L"" ); 
+		return false;
+	}
 
 	
 	WriteProfileString( L"Settings",L"databasespec", m_databaseSpec ); // jó adatbázis, eltenni

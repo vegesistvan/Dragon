@@ -56,14 +56,14 @@ BOOL CCheckMotherIndex::OnInitDialog()
 	EASYSIZE_ADD( IDC_LIST,	ES_BORDER,	ES_BORDER,		ES_BORDER,		ES_BORDER,	0 );
 	EASYSIZE_INIT()
 
-
+/*
 	if( theApp.getUserVersion() )
 	{
 		AfxMessageBox( L"Csak összevonás elõtt van értelme ezt az ellenõrzést elvégezni!" );
 		CDialog::OnCancel();
 		return false;
 	}
-
+*/
 	int nItem = 0;
 	CString rowid;
 	CString name;
@@ -76,6 +76,8 @@ BOOL CCheckMotherIndex::OnInitDialog()
 	CString parent_id;
 	CString parent;
 
+	CString rowidC;
+
 	int		z;
 	int		pos;
 	int		sex_id;
@@ -83,6 +85,7 @@ BOOL CCheckMotherIndex::OnInitDialog()
 	int		parentIndex;
 	int		count;
 	int		cnt = 0;
+	int		numOfMarriages;
 
 	CString info = L"\
 Sorpárokat láthatunk az alábbi listában. Az elsõ sor a szülõ, a második a gyermek sora a ga-html fájlban.\
@@ -118,7 +121,7 @@ Ha leányági leszármazottak gyeremekei is vannak a GA-html-ben, akkor az apa és a
 		vPos.push_back( gafile.GetPosition() );
 
 // gyerekek lekérdezése	
-	m_command = L"SELECT rowid, lineNumber, parentIndex, father_id, mother_id, first_name, last_name FROM people WHERE source='1' ORDER BY lineNumber";
+	m_command = L"SELECT rowid, lineNumber, parentIndex, father_id, mother_id, first_name, last_name, numOfMarriages FROM people WHERE source='1' ORDER BY lineNumber";
 	if( !theApp.query( m_command ) )
 	{
 		OnCancel();
@@ -151,7 +154,7 @@ Ha leányági leszármazottak gyeremekei is vannak a GA-html-ben, akkor az apa és a
 		m_command.Format( L"SELECT lineNumber FROM marriages WHERE spouse1_id='%s' AND spouse2_id= '%s'", father_id, mother_id );  // az ember apjának házasságai
 		if( !theApp.query1( m_command ) ) OnCancel();
 		if( !theApp.m_recordset1->RecordsCount() ) goto cont;
-
+		
 		lineNumberP	= theApp.m_recordset1->GetFieldString( 0 );
 		lineP = getHtmlLine( lineNumberP );
 		
@@ -178,10 +181,61 @@ Ha leányági leszármazottak gyeremekei is vannak a GA-html-ben, akkor az apa és a
 			parent_id = mother_id;
 			if( !count ) goto cont;
 		}
-
-		if( parentIndex > count  )
+		if( parentIndex > count )
 		{
 			// szülõ
+			++cnt;
+			str.Format( L"%d", cnt );
+			nItem = m_ListCtrl.InsertItem( nItem, str );
+		
+			str.Format( L"%d", count );
+			m_ListCtrl.SetItemText( nItem, L_INDEX, str );
+			m_ListCtrl.SetItemText( nItem, L_ROWID, parent_id );
+			m_ListCtrl.SetItemText( nItem, L_LINENUMBER, lineNumberP);
+			m_ListCtrl.SetItemText( nItem, L_LINE, lineP );
+			++nItem;
+
+			// gyermek 
+			str.Format( L"%d-%d", cnt, parentIndex );
+			nItem = m_ListCtrl.InsertItem( nItem, str );
+
+			str.Format( L"%d", parentIndex );
+			m_ListCtrl.SetItemText( nItem, L_INDEX, str );
+			m_ListCtrl.SetItemText( nItem, L_ROWID, rowid );
+			m_ListCtrl.SetItemText( nItem, L_LINENUMBER, lineNumber );
+
+			str = getHtmlLine( lineNumber );
+			m_ListCtrl.SetItemText( nItem, L_LINE, str );
+			++nItem;
+
+			nItem = m_ListCtrl.InsertItem( nItem, L"" );
+			++nItem;
+		}
+		
+		////////////////////////////////////////////////////////////////////////////////////////////////////
+		theApp.m_recordset->MoveFirst();
+		for( int i = 0; i < theApp.m_recordset->RecordsCount(); ++i, theApp.m_recordset->MoveNext() )
+		{
+			numOfMarriages = _wtoi( theApp.m_recordset->GetFieldString( 7 ) );
+			if( numOfMarriages < 2 ) continue;
+
+			rowid			= theApp.m_recordset->GetFieldString( 0 );
+			lineNumberP		= theApp.m_recordset->GetFieldString( 1 );
+			lineP			= getHtmlLine( lineNumberP );
+
+			m_command.Format( L"SELECT rowid  FROM people WHERE father_id = '%s'", rowid ); 
+			if( !theApp.query1( m_command ) ) return false;
+			if( !theApp.m_recordset1->RecordsCount() ) continue;  // nincs gyereke
+
+			rowidC			= theApp.m_recordset1->GetFieldString( 0 );
+			m_command.Format( L"SELECT parentIndex, linenumber  FROM people WHERE rowid ='%s'", rowidC );
+			if( !theApp.query1( m_command ) ) return false;
+			parentIndex = _wtoi( theApp.m_recordset1->GetFieldString( 0 ) );
+			if( parentIndex ) continue;
+
+			lineNumber		= theApp.m_recordset1->GetFieldString( 1 );
+
+
 			++cnt;
 			str.Format( L"%d", cnt );
 			nItem = m_ListCtrl.InsertItem( nItem, str );

@@ -298,9 +298,9 @@ public:
 //	CDescendant* m_pDescendantsT;
 //	CDescendant* m_pDescendantsL;
 
-//	CMarriages* m_pMarriagesF;
-//	CMarriages* m_pMarriagesT;
-//	CMarriages* m_pMarriagesL;
+//	CHtmlMarriages* m_pMarriagesF;
+//	CHtmlMarriages* m_pMarriagesT;
+//	CHtmlMarriages* m_pMarriagesL;
 
 //	CHtmlSpouses* m_pSpousesF;
 //	CHtmlSpouses* m_pSpousesT;
@@ -335,9 +335,9 @@ public:
 	afx_msg void OnMarriagesTable();
 	afx_msg void OnMarriagesLine();
 
-	afx_msg void OnSpousesFile();
-	afx_msg void OnSpousesLine();
-	afx_msg void OnSpousesTable();
+//	afx_msg void OnSpousesFile();
+//	afx_msg void OnSpousesLine();
+//	afx_msg void OnSpousesTable();
 
 	afx_msg void OnSsFile();
 	afx_msg void OnSsTable();

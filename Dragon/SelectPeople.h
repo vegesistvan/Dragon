@@ -30,13 +30,15 @@ protected:
 	void CSelectPeople::createColumns();
 	void CSelectPeople::fillTable();
 	BOOL CSelectPeople::query( CString command );
+	void CSelectPeople::keress( int start );
 	DECLARE_MESSAGE_MAP()
 public:
 	CListCtrlEx m_ListCtrl;
 	virtual BOOL OnInitDialog();
 	afx_msg void OnBnClickedOk();
-	afx_msg void OnChangeSearch();
 	afx_msg LRESULT OnSetColumnColor(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnColumnSorted(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnClickedButtonClear();
+	afx_msg void OnClickedKeress();
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };

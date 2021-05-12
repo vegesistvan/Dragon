@@ -11,25 +11,11 @@
 #include "afxdialogex.h"
 #include "utilities.h"
 #include "GA_descendants.h"
-#include "GA_structures.h"
 #include <winuser.h>
 #include "ProgressWnd.h"
+#include "ColorButton.h"
+#include <wingdi.h>
 
-SZIN szin[] =
-{ 
-	{ L"white",			0XFFFFFF }, 
-	{ L"light yellow",	0XFFFFE0 },
-	{ L"aquamarine",	0X7FFFD4 },
-	{ L"cian",			0X00FFFF },
-	{ L"deepskyblue",	0X00BFFF },
-	{ L"lavenderBlush",	0XFFF0F5 },
-	{ L"mistyRose",		0XFFE4E1 },
-	{ L"bisque",		0XFFE4C4 },
-	{ L"thistle",		0XD8BFD8 }, 
-	{ L"aqua",			0X00FFFF },
-	{ L"moccasin",		0XFFE4B5 }, 
-};
-const UINT szinSize = sizeof( szin ) / sizeof( SZIN );
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 IMPLEMENT_DYNAMIC(CGaDescendants, CDialogEx)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -50,7 +36,7 @@ CGaDescendants::CGaDescendants(CWnd* pParent /*=NULL*/)
 	,m_tableNumber(L"")		// tablenumber, ha a táblázat leszármazotti listáját kérjük
 	,m_CheckLastName(true)	// családnév kiírása
 	,m_code(true)			// ANSI vagy UTF8 kódrendszer
-	,m_numbering(2)			// milyen számozási rendszer legyen (0,1,2) 
+	,m_numbering(TUP)		// milyen számozási rendszer legyen (0,1,2) SZLUHA/VIL/TUP
 	,m_checkFamily(false)	// %%% családnév,elõnév kiemelése
 	, m_wrap(true)
 {
@@ -72,7 +58,6 @@ void CGaDescendants::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO_NAME, m_ComboName);
 	DDX_Control(pDX, IDC_COMBO_SPEC, m_ComboSpec);
 	DDX_Control(pDX, IDC_COMBO_FAMILY, m_ComboFamily);
-	DDX_Control(pDX, IDC_COMBO_BGRD, m_ComboBgrd);
 
 	DDX_Radio(pDX, IDC_RADIO_CLEAR, m_setCombo);
 	DDX_Check(pDX, IDC_CHECK_LASTNAME, m_CheckLastName);
@@ -82,11 +67,12 @@ void CGaDescendants::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SZLUHA, m_szluhaCtrl);
 	DDX_Check(pDX, IDC_CHECK_WRAP, m_wrap);
 	DDX_Control(pDX, IDC_COMBO_FONTSIZE, m_ComboFontSize);
+	DDX_Control(pDX, IDC_STATIC_BACKGROUND, colorBgrnd);
+	DDX_Control(pDX, IDC_BUTTON_BGNCOLOR, colorBgn);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CGaDescendants, CDialogEx)
 	ON_WM_CTLCOLOR()
-
 
 	ON_COMMAND(IDC_RADIO_DEFAULT, &CGaDescendants::OnRadioDefault)
 	ON_COMMAND(IDC_TUPIGNY, &CGaDescendants::OnTupigny)
@@ -101,6 +87,7 @@ BEGIN_MESSAGE_MAP(CGaDescendants, CDialogEx)
 	ON_BN_CLICKED(IDC_CHECK_FAMILY, &CGaDescendants::OnClickedCheckFamily)
 	ON_BN_CLICKED(IDC_CHECK_LASTNAME, &CGaDescendants::OnClickedCheckLastname)
 	ON_BN_CLICKED(IDC_BUTTON_DEFAULT, &CGaDescendants::OnClickedButtonDefault)
+	ON_STN_CLICKED(IDC_STATIC_BACKGROUND, &CGaDescendants::OnClickedStaticBackground)
 END_MESSAGE_MAP()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Bemenet:
@@ -135,17 +122,16 @@ BOOL CGaDescendants::OnInitDialog()
 	}
 	m_ComboFontSize.SetCurSel( m_ixFontSize );
 
-	for( int i = 0; i < szinSize; ++i )
-	{
-		m_ComboBgrd.AddString( szin[i].name );
-	}
-	m_ComboBgrd.SetCurSel( 0 );
-
 	if( theApp.m_inputMode == MANUAL )
 	{
 		m_connect	= true;
 		m_woman		= true;
 	}
+
+	colorBgrnd.SetTextColor( theApp.m_colorClick );
+
+	m_colorBgrnd = WHITE;
+	colorBgn.SetColor( BLACK, m_colorBgrnd );
 
 	m_numbering = 2;
 	((CButton *)GetDlgItem(IDC_SZLUHA))->SetCheck(FALSE); 
@@ -155,64 +141,56 @@ BOOL CGaDescendants::OnInitDialog()
 	UpdateData( TOSCREEN );
 	return TRUE;
 }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CGaDescendants::OnBnClickedOk()
+{
+	UpdateData( FROMSCREEN );
+	m_ixName		= m_ComboName.GetCurSel();
+	m_ixSpec		= m_ComboSpec.GetCurSel();
+	m_ixComment		= m_ComboComm.GetCurSel();
+	m_ixFamily		= m_ComboFamily.GetCurSel();
+	m_ixFontSize	= m_ComboFontSize.GetCurSel();
+
+	if( m_woman ) m_connect = true;
+
+	CDialogEx::OnOK();
+	if( m_rowid1.IsEmpty() )
+		treeTables();
+	else
+		treePeople();
+
+	CDialogEx::OnCancel();
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaDescendants::treePeople()
 {
 	CString file;
 	CString title;
-	CString table;
-	TCHAR* kicsoda[] = 
-	{ 
-		L"leszármazott",
-		L"leszármazott házastársa",
-		L"Leszármazott házastársának apja",
-		L"leszármazott házastársának anyja",
-		L"leszármazott házastársának további házastársa"
-	};
-
+	CString tableHeader;
 	
-//	if( m_unordered == 0 )  // orderd list
-	if( m_numbering == SZLUHA ) // orderd list
-	{
-		m_tag1 = L"<ol>";
-		m_tag2 = L"</ol>";
-	}
-	else				// unordered list
-	{
-		m_tag1 = L"<ul>";
-		m_tag2 = L"</ul>";
-	}
-
-	file.Format( L"%s descendants", m_name);
-	title.Format( L"%s<br>\n", file );
-
-	if( theApp.m_inputMode == GAHTML )
-	{
-		m_command.Format( L"SELECT tableHeader from tables WHERE rowid = %s", m_tableNumber );
-		if( !query4( m_command ) ) return;
-		table = m_recordset4.GetFieldString( 0 );
-
-		title.Format( L"<b>%s ( %s a %s táblából)</b ><br>\n", file, kicsoda[m_source-1], table );
-		title.Format( L"%s<br>\n", file );
-	}
+	file.Format( L"%s leszármazottai", m_name);
+	title.Format( L"%s leszármazottai", m_name );
 	
 	openHtml( file, title, m_colorBgrnd );
 
-
-	if( !m_checkFamily )
+	if( theApp.m_inputMode == GAHTML && !m_checkFamily )
 	{
-		str.Format( L"<b>%s</b>\n", table );
+		m_command.Format( L"SELECT tableHeader from tables WHERE rowid = %s", m_tableNumber );
+		if( !query4( m_command ) ) return;
+		tableHeader = m_recordset4.GetFieldString( 0 );
+		str.Format( L"<b>%s</b>\n", tableHeader );
 		print( str );
 	}
 
-	queryP( m_rowid1 );				// m_sex_id-t és m_numOfSpouses-t határozza meg
-	desc.gen				= 0;
+
+	queryP( m_rowid1 );								// m_sex_id-t és m_numOfSpouses-t határozza meg
 	desc.rowid				= m_rowid1;
 	desc.sex_id				= m_sex_id;
 	desc.numOfSpouses		= m_numOfSpouses;
 	desc.numOfChildren		= getNumberOfChildren( m_rowid1, m_sex_id );
 	desc.childrenPrinted	= 0;
-	desc.children			= 1;
+	desc.parentIndexLast	= 0;
 	desc.hidden				= false;
 
 	vSerial.clear();
@@ -221,8 +199,8 @@ void CGaDescendants::treePeople()
 	vDesc.clear();
 	vDesc.push_back( desc );
 
-	m_genPrev	= 0;
-	cnt_ol		= 0;
+	m_genPrev	= 0;		// elõzõ kiírt generáció
+	cnt_ol		= 0;		// a behúzások pillanatny száma
 
 	descendants();
 	closeHtml();
@@ -231,43 +209,36 @@ void CGaDescendants::treePeople()
 void CGaDescendants::treeTables()
 {
 	CString file;
-	CString title(L"");
-	CString last_name;
-	CString family;
-	CString fileNumber(L"");
-	CString tableHeader;
+	CString title;
+
 	CString familyName;
+	CString tableHeader;
+	CString tableRoman;
 	CString father_id;
 
-	if( m_numbering == SZLUHA || m_numbering == VIL )
-	{
-		m_tag1 = L"<ol list-style-type: circle>";
-		m_tag2 = L"</ol>";
-	}
-	else
-{
-		m_tag1 = L"<ul>";
-		m_tag2 = L"</ul>";
-	}
 
-	if( theApp.v_tableNumbers.size() == 1 )
+	m_command.Format( L"SELECT familyName, tableHeader, tableRoman FROM tables WHERE rowid ='%d'", theApp.v_tableNumbers.at(0) );
+	if( !query( m_command ) ) return;
+	familyName	= m_recordset.GetFieldString( 0 );
+	tableRoman	= m_recordset.GetFieldString( 2 );
+	
+	if( theApp.v_tableNumbers.size() > 1 )
 	{
-		m_command.Format( L"SELECT familyName, tableHeader, tableRoman FROM tables WHERE rowid ='%d'", theApp.v_tableNumbers.at(0) );
-		if( !query( m_command ) ) return;
-		familyName = m_recordset.GetFieldString( 0 );
-		tableHeader = m_recordset.GetFieldString( 1 );
-		title.Format( L"%s tábla leszármazottai<br>", tableHeader );
-		file.Format( L"%s %s tábla leszármazottai", familyName, m_recordset.GetFieldString( 2 ) );
-		title.Empty();
+		if( tableRoman.IsEmpty() )
+			file.Format( L"%s és további %d tábla", familyName, theApp.v_tableNumbers.size() - 1 );
+		else
+			file.Format( L"%s %s és további %d tábla", familyName, tableRoman, theApp.v_tableNumbers.size() - 1 );
+
 	}
 	else
 	{
-		file.Format( L"%d tábla leszármazottai", theApp.v_tableNumbers.size() ); 
-		title.Format( L"%s<br><br>\n", file );
+		if( tableRoman.IsEmpty() )
+			file.Format( L"%s tábla", familyName );
+		else
+			file.Format( L"%s %s tábla", familyName, tableRoman );
 	}
+	title = file;
 	openHtml( file, title, m_colorBgrnd );
-
-
 
 
 
@@ -281,45 +252,45 @@ void CGaDescendants::treeTables()
 		m_familyName.Empty();
 		m_tableNumber.Format( L"%d", theApp.v_tableNumbers.at(i) );
 
-		m_command.Format( L"SELECT tableHeader FROM tables WHERE rowid ='%d'", theApp.v_tableNumbers.at(i) );
+		m_command.Format( L"SELECT tableHeader FROM tables WHERE rowid ='%s'", m_tableNumber );
 		if( !query( m_command ) ) return;
 		tableHeader = m_recordset.GetFieldString( 0 );
-		str.Format( L"%s tábla leszármazottai<br><br>", tableHeader );
+		str.Format( L"<b>%s</b>\n", tableHeader );
 		print( str );
 
-		m_command.Format( L"SELECT rowid, last_name, sex_id, father_id FROM people WHERE tableNumber = '%d' AND tableAncestry == 1 ", theApp.v_tableNumbers.at(i) );
+		m_command.Format( L"SELECT rowid, last_name, sex_id, father_id FROM people WHERE tableNumber = '%s' AND tableAncestry == 1 ", m_tableNumber );
 		if( ! query( m_command ) ) return;
 
 		if( !m_recordset.RecordsCount() )
 		{
-			str.Format( L"%d táblában nincs õs!!", theApp.v_tableNumbers.at(i) );
+			str.Format( L"%s táblában nincs õs!!", m_tableNumber );
 			AfxMessageBox( str );
 			OnCancel();
 			return;
 		}
 
 		father_id	= m_recordset.GetFieldString( 3 );
+
+		desc.childrenPrinted	= 0;
+		desc.numOfSpouses		= 0;
+		desc.parentIndexLast	= 0;
+
+		vDesc.clear();
+		vSerial.clear();
+		cnt_ol		= 0;
+		m_genPrev	= 0;
+
 		if( father_id.IsEmpty() || !father_id.Compare( L"0" ) )  // ha nincs apa, akkor magát az õst teszi be a vDesc-be
 		{
 			p.generation = m_recordset1.GetFieldString( 3 );
-
-			vDesc.clear();
-			cnt_ol = 0;
-			m_genPrev = 0;
-			
 			m_rowid1 = m_recordset.GetFieldString( 0 );
 			m_sex_id = _wtoi( m_recordset.GetFieldString( 2 ) );
 
-			desc.gen				= 0;
-			desc.rowid				= m_rowid1;
 			desc.sex_id				= m_sex_id;
-			desc.childrenPrinted	= 0;
-			desc.children			= 0;
-			desc.numOfSpouses			= 0;
+			desc.rowid				= m_rowid1;
 			desc.hidden				= false;
-			vDesc.push_back( desc );
+			desc.numOfChildren		= getNumberOfChildren( m_rowid1, m_sex_id );
 
-			vDesc.at(0).numOfChildren = getNumberOfChildren( m_rowid1, m_sex_id );
 		}
 		else		// ha van apja az õsnek, akkor az apát hidden-ként elteszi, hogy ha több gyereke van, akkor mind listázza 
 		{
@@ -327,28 +298,16 @@ void CGaDescendants::treeTables()
 			if( ! query1( m_command ) ) return;
 
 			p.generation = m_recordset1.GetFieldString( 3 );
-			vDesc.clear();
-			cnt_ol = 0;
-			m_genPrev = 0;
-			
 			m_sex_id = 1;
-			desc.gen				= 0;
-			desc.rowid				= father_id;
-			desc.sex_id				= m_sex_id;
-			desc.numOfSpouses			= 0;
-			desc.childrenPrinted	= 0;
-			desc.children			= 1;
-			desc.hidden				= true;
-			vDesc.push_back( desc );
 
-			vDesc.at(0).numOfChildren = getNumberOfChildren( father_id, m_sex_id );
+			desc.sex_id				= 1;
+			desc.rowid				= father_id;
+			desc.hidden				= true;
+			desc.numOfChildren		= getNumberOfChildren( father_id, m_sex_id );
 		}
-		vSerial.clear();
+		vDesc.push_back( desc );
 		vSerial.push_back(1);
 		
-		m_genPrev	= 0;
-		cnt_ol		= 0;
-
 		descendants();
 
 		if( theApp.v_tableNumbers.size() > 1 )
@@ -367,80 +326,85 @@ void CGaDescendants::treeTables()
 	closeHtml();
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// A kinyomtatandó leszármazot azonosítóit a vDesc vektorba töltjük fel, és annak felhasználásával nyomtatjuk ki õket.
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// A kinyomtatandó leszármazot azonosítóit a <DESCENDANTS> vDesc vektorba töltjük fel, 
+// és annak felhasználásával nyomtatjuk ki õket.
 // Mindaddig abban maradnak, amíg az összes gyerekük kinyomtatásra kerül.Akkor töröljük öt a vektorból
-
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaDescendants::descendants()
 {
 	CString rowid;
-	int ix = 0;
-	int linenumberMax = 100;
-	int linenumber = 0;
 	int generationsMax = 25;
 	m_gen = 0;
 
-	// az elsõ emeber a treePeople, treeTables-ben kerül betöltésre 
-
-	while( vDesc.size() )
+	if( m_numbering == SZLUHA ) // orderd list
 	{
-		if( !vDesc.at(ix).hidden )	
+		m_tag1 = L"<ol>";
+		m_tag2 = L"</ol>";
+	}
+	else				// unordered list
+	{
+		m_tag1 = L"<ul>";
+		m_tag2 = L"</ul>";
+	}
+
+	// az elsõ ember a treePeople, treeTables-ben kerül betöltésre 
+	while( true )
+	{
+
+		if( !vDesc.at( m_gen ).hidden )
 		{
 			if( m_gen > generationsMax )
 			{
 				for( int i =0; i < cnt_ol; ++i )
 					fwprintf( fl, L"%s\n", m_tag2 );
-				str.Format( L"<br><br><font color='red'>%d-nál több generációt írt ki, már kezelhetetlen, ezért abbahoagyom!!!</font>", linenumberMax );
+				str.Format( L"<br><br><font color='red'>%d-nál több generációt írt ki, már kezelhetetlen, ezért abbahagyom!!!</font>", generationsMax );
 				print( str );
 				break;
 			}
 			printGAline();	// a vDesc tetején lévõ leszármazottat kinyomttajuk  m_genPrev-et beállítja
-			++linenumber;
-		}
-		
-		if( vDesc.at(ix).sex_id == WOMAN && !m_woman )		// ha nõ a leszármazott és annak a gyerekeit nem akarjuk listázni
-		{
-			vDesc.at(ix).numOfChildren		= 0;
-			vDesc.at(ix).childrenPrinted	= 0;
 		}
 
-		if( vDesc.at( ix ).numOfChildren == vDesc.at( ix ).childrenPrinted )	// már minden gyerekét kiírta
+		
+		if( vDesc.at( m_gen ).sex_id == WOMAN && !m_woman )		// ha nõ a leszármazott és annak a gyerekeit nem akarjuk listázni
+		{
+			vDesc.at( m_gen ).numOfChildren		= 0;
+			vDesc.at( m_gen ).childrenPrinted	= 0;
+		}
+
+		if( vDesc.at( m_gen ).numOfChildren == vDesc.at( m_gen ).childrenPrinted )	// már minden gyerekét kiírta
 		{
 			//visszamegy az elõzõ generációra, amelyiknak még van ki nem írt gyereke
-			while( ix >= 0 && vDesc.at( ix ).numOfChildren == vDesc.at( ix ).childrenPrinted )
+			while( m_gen >= 0 && vDesc.at( m_gen ).numOfChildren == vDesc.at( m_gen ).childrenPrinted )
 			{
 				vDesc.pop_back();		// visszamegy az elõzõ generációra
-				ix -= 1;
+				--m_gen;
 			}
 		}
-		// ix a testvérre mutat vagy egy az apára ?
-		// desc-be a kinyomtatandó ember adatai kerülenk
-		if( ix >= 0 )
-		{																	// akkor a következõ gyereket is beteszi  
-			// a kinyomtatott ember következõ, még ki nem nyomtatott gyerekét keresi
-			rowid = getNextChildRowid( ix );
-			if( !rowid.IsEmpty() )			// van még gyerek
-			{
-				queryP( rowid );		// lekérdezi a gyereket és beállítja m_sex_id-t és m_numOfSpouses-t
-				desc.gen				= vDesc.size();
-				desc.rowid				= rowid;
-				desc.sex_id				= m_sex_id;
-				desc.numOfSpouses		= m_numOfSpouses;				// a gyerek apja feleségeinek számát megõrzi 
-				desc.numOfMothers		= vDesc.at(ix).numOfSpouses;	// a korábban megõrzött és most kinyomtatandó gyerek apja feleségeinek száma
-				desc.childrenPrinted	= 0;
-				desc.children			= vDesc.at(ix).childrenPrinted + 1;	// a korábban már kinyomtatott testvérek száma
-				desc.hidden				= false;
-				desc.numOfChildren		= getNumberOfChildren( rowid, m_sex_id );
+		if( m_gen < 0 ) break;
 
-				vDesc.at(ix).childrenPrinted += 1;		// a most kinyomtatandó testvérek száma nõ egyet
+		// a kinyomtatott ember következõ, még ki nem nyomtatott gyerekét keresi
+		rowid = getNextChildRowid();
+		if( !rowid.IsEmpty() )			// van még gyerek
+		{
+			queryP( rowid );		// lekérdezi a gyereket és beállítja m_sex_id-t és m_numOfSpouses-t
+			desc.rowid				= rowid;
+			desc.sex_id				= m_sex_id;
+			desc.numOfSpouses		= m_numOfSpouses;				// a gyerek apja feleségeinek számát megõrzi 
+			desc.childrenPrinted	= 0;
+			desc.parentIndexLast	= 0;
+			desc.hidden				= false;
+			desc.numOfChildren		= getNumberOfChildren( rowid, m_sex_id );
 
-				vDesc.push_back( desc );
+			vDesc.at( m_gen ).childrenPrinted += 1;							// a most kinyomtatandó testvérek száma nõ egyet
 
-				// Tupigny-hõz elõállítja a generáción belüõl egyesével növekvõ sorszámokat
-				if( desc.gen < vSerial.size() ) ++vSerial.at(desc.gen);	// már létezõ generáció, 1-el növeli a sorszámot	
-				else	vSerial.push_back( 1 );							// új generáció: sorszám1-el kezdõdik 
+			vDesc.push_back( desc );
+			++m_gen;
 
-				ix += 1;
-			}
+			// Tupigny-hÖz elõállítja a generáción belüõl egyesével növekvõ sorszámokat
+			if( m_gen < vSerial.size() ) ++vSerial.at( m_gen );			// már létezõ generáció, 1-el növeli a sorszámot	
+			else	vSerial.push_back( 1 );								// új generáció: sorszám1-el kezdõdik 
 		}
 	}
 }
@@ -482,11 +446,11 @@ int CGaDescendants::getNumberOfChildren( CString rowid, int sex_id  )
 	return( _wtoi( m_recordset.GetFieldString(0) ) );
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CGaDescendants::getNextChildRowid( UINT ix )
+CString CGaDescendants::getNextChildRowid()
 {
-	CString parent_id	= vDesc.at(ix).rowid;
-	UINT	ixChild		= vDesc.at( ix ).childrenPrinted + 1;	// leszármazott ixChild-adik gyerekét keresi  
-	int		sex_id		= vDesc.at(ix).sex_id;
+	CString parent_id	= vDesc.at( m_gen ).rowid;
+	UINT	ixChild		= vDesc.at( m_gen ).childrenPrinted + 1;	// leszármazott ixChild-adik gyerekét keresi  
+	int		sex_id		= vDesc.at( m_gen ).sex_id;
 
 	if( sex_id == MAN )
 	{
@@ -519,22 +483,12 @@ CString CGaDescendants::getNextChildRowid( UINT ix )
 ///////////////////////// B E Á L L Í T Á S O K //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-LRESULT CGaDescendants::OnCtlColorBtn( WPARAM wparam, LPARAM lparam )
-{
-	HDC pDC = (HDC)wparam;
-	HWND hand = (HWND)lparam;
-	return TRUE;
-}
-*/
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaDescendants::OnClickedRadioClear()  // fekete szín beállítása
 {
 	m_setCombo = 0;
 	m_ComboName.SetCurSel( 0 );
 	m_ComboSpec.SetCurSel( 0 );
 	m_ComboComm.SetCurSel( 0 );
-	m_ComboBgrd.SetCurSel( 0 );
 	m_ComboFamily.SetCurSel(0);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -544,7 +498,6 @@ void CGaDescendants::OnRadioDefault()		// default szín beállítása
 	m_ComboName.SetCurSel( 1 );
 	m_ComboSpec.SetCurSel( 0 );
 	m_ComboComm.SetCurSel( 2 );
-	m_ComboBgrd.SetCurSel( 0 );
 	m_ComboFamily.SetCurSel(3);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////4
@@ -596,42 +549,28 @@ void CGaDescendants::OnClickedCheckLastname()
 	m_CheckLastName = !m_CheckLastName;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Az UpdateData(TOSCREEN) miatt az m_numbering-értéke mindig helyes legyen!!
 void CGaDescendants::OnClickedSzluha()
 {
-	m_numbering = 0;
-//	GetDlgItem( IDC_RADIO_LIST )->EnableWindow( false );
+	m_numbering = SZLUHA;
 }
 void CGaDescendants::OnVillers()
 {
-	m_numbering = 1;
-//	GetDlgItem( IDC_RADIO_LIST )->EnableWindow( true );
+	m_numbering = VIL;
 }
 void CGaDescendants::OnTupigny()
 {
-	m_numbering = 2;
-//	GetDlgItem( IDC_RADIO_LIST )->EnableWindow( true );
+	m_numbering = TUP;
 }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CGaDescendants::OnBnClickedOk()
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CGaDescendants::OnClickedStaticBackground()
 {
-	UpdateData( FROMSCREEN );
-	m_ixName		= m_ComboName.GetCurSel();
-	m_ixSpec		= m_ComboSpec.GetCurSel();
-	m_ixComment		= m_ComboComm.GetCurSel();
-	m_ixFamily		= m_ComboFamily.GetCurSel();
-	m_ixFontSize	= m_ComboFontSize.GetCurSel();
+	CMFCColorDialog dlgColors;
+	dlgColors.SetCurrentColor( WHITE );
+	if( dlgColors.DoModal() == IDCANCEL ) return;
 
-	m_ixBgrd		= m_ComboBgrd.GetCurSel();
-	m_colorBgrnd	= szin[m_ixBgrd].rgb;
+	COLORREF bgn = dlgColors.GetColor();
+	colorBgn.SetColor( BLACK, bgn );
 
-	if( m_woman ) m_connect = true;
-
-	if( m_rowid1.IsEmpty() )
-		treeTables();
-	else
-		treePeople();
-
-	CDialogEx::OnOK();
+	m_colorBgrnd = GetRValue( bgn ) << 16 | GetGValue( bgn ) << 8 | GetBValue( bgn );
+	return;
 }
-

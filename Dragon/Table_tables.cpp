@@ -18,17 +18,20 @@ enum
 	T_LINENUMBER,
 	T_TABLEHEADER,
 	T_PERCENT,
+	T_TITOLO,
 	T_FAMILYNAME,
+	T_KNOWN_AS,
+	T_ALIAS,
+	T_ARM,
+	T_DUMMY1,
 	T_TABLENUMBERROMAN,
 	T_JOINT,
 	T_FOLYT,
+	T_DUMMY2,
+	T_CSALAD,
 	T_TORZS,
-	T_TITOLO,
+	T_DUMMY3,
 	T_COMMENT,
-	T_ARM,
-	T_NEWFAMILIES,
-	T_KNOWN_AS,
-	T_ALIAS,
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 IMPLEMENT_DYNAMIC(CTableTables, CDialogEx)
@@ -47,7 +50,7 @@ void CTableTables::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_LIST, m_ListCtrl);
-	DDX_Control(pDX, IDC_KERES, colorKeres);
+	DDX_Control(pDX, IDC_STATIC_KERESS, colorKeres);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CTableTables, CDialogEx)
@@ -75,7 +78,9 @@ BEGIN_MESSAGE_MAP(CTableTables, CDialogEx)
 	ON_COMMAND(ID_FILTER_NAME, &CTableTables::OnFilterName)
 	ON_COMMAND(ID_FILTER_TABLES, &CTableTables::OnFilterTables)
 	ON_COMMAND(ID_PRIVAT_DESCENDANTS_TABLE, &CTableTables::OnPrivatDescendantsTable)
-	ON_STN_CLICKED(IDC_KERES, &CTableTables::OnClickedKeres)
+	ON_STN_CLICKED(IDC_STATIC_KERESS, &CTableTables::OnClickedKeress)
+
+	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST, &CTableTables::OnCustomdrawList)
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CTableTables::OnInitDialog()
@@ -87,8 +92,6 @@ BOOL CTableTables::OnInitDialog()
 //	EASYSIZE_ADD( IDCANCEL,	ES_BORDER,	ES_KEEPSIZE,	ES_KEEPSIZE,	ES_BORDER,	0 );
 
 	EASYSIZE_INIT()
-
-//	SetWindowPos(&wndTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 
 	SetWindowText( m_caption );
 
@@ -102,20 +105,23 @@ BOOL CTableTables::OnInitDialog()
 	m_ListCtrl.InsertColumn( T_LINENUMBER,	L"line#",		LVCFMT_RIGHT,	 50,-1,COL_NUM);
 	m_ListCtrl.InsertColumn( T_TABLEHEADER,	L"header",		LVCFMT_LEFT,	200,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( T_PERCENT,		L"%%%",			LVCFMT_LEFT,	 50,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( T_FAMILYNAME,	L"családnév",	LVCFMT_LEFT,	150,-1,COL_TEXT);
+
+	m_ListCtrl.InsertColumn( T_TITOLO,		L"elõnév",		LVCFMT_LEFT,	140,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( T_FAMILYNAME,	L"családnév",	LVCFMT_LEFT,	140,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( T_KNOWN_AS,	L"ismert",		LVCFMT_LEFT,	140,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( T_ALIAS,		L"alias",		LVCFMT_LEFT,	140,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( T_ARM,			L"ág",			LVCFMT_LEFT,	100,-1,COL_TEXT);
+
+	m_ListCtrl.InsertColumn( T_DUMMY1,		L"",			LVCFMT_RIGHT,	 5,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( T_TABLENUMBERROMAN,L"roman#",	LVCFMT_RIGHT,	 60,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( T_JOINT,		L"kapcs",		LVCFMT_LEFT,	 40,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( T_FOLYT,		L"folyt",		LVCFMT_LEFT,	100,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( T_TORZS,		L"törzs",		LVCFMT_LEFT,	100,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( T_TITOLO,		L"elõnév",		LVCFMT_LEFT,	200,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( T_DUMMY2,		L"",			LVCFMT_RIGHT,	 5,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( T_CSALAD,		L"család->",	LVCFMT_LEFT,	100,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( T_TORZS,		L"->törzs",		LVCFMT_LEFT,	100,-1,COL_TEXT);
+	m_ListCtrl.InsertColumn( T_DUMMY3,		L"",			LVCFMT_RIGHT,	 5,-1,COL_TEXT);
+	
 	m_ListCtrl.InsertColumn( T_COMMENT,		L"megj.",		LVCFMT_LEFT,	150,-1,COL_TEXT);
-
-	m_ListCtrl.InsertColumn( T_ARM,			L"ág",			LVCFMT_LEFT,	100,-1,COL_TEXT);
-
-	m_ListCtrl.InsertColumn( T_NEWFAMILIES,	L"új családok",	LVCFMT_LEFT,	100,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( T_KNOWN_AS,	L"ismert",		LVCFMT_LEFT,	 50,-1,COL_TEXT);
-	m_ListCtrl.InsertColumn( T_ALIAS,		L"alias",		LVCFMT_LEFT,	 50,-1,COL_TEXT);
-
 	colorKeres.SetTextColor( theApp.m_colorClick );
 
 	if( !m_select )
@@ -130,7 +136,8 @@ BOOL CTableTables::OnInitDialog()
 	}
 
 
-	m_orderix = 7;
+	m_colored = true;
+	m_orderix = 8;
 	fillTables();
 
 
@@ -141,11 +148,10 @@ BOOL CTableTables::OnInitDialog()
 void CTableTables::fillTables()
 {
 	CString familyName;
-
 	if( m_filter.IsEmpty() )
-		m_command = L"SELECT rowid,* FROM tables";
+		m_command = L"SELECT rowid,* FROM tables ORDER BY familyName, titolo";
 	else
-		m_command.Format( L"SELECT rowid, * FROM tables %s", m_filter ); 
+		m_command.Format( L"SELECT rowid, * FROM tables %s ORDER BY familyName, titolo", m_filter ); 
 	if( !theApp.query( m_command ) ) return;
 
 
@@ -157,34 +163,62 @@ void CTableTables::fillTables()
 		m_ListCtrl.InsertItem( nItem, theApp.m_recordset->GetFieldString( TABLES_ROWID ));
 		setRow( nItem );
 	}
-	m_ListCtrl.SetSortOrder( 1, m_orderix+1 );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTableTables::setRow( int nItem )
 {
-	m_ListCtrl.SetItemData( nItem, 4 );
+	CString titoloName;
+	CString titoloName1;
+
+	m_ListCtrl.SetItemData( nItem, 0 );
 	m_ListCtrl.SetItemText( nItem, T_ROWID,				theApp.m_recordset->GetFieldString( TABLES_ROWID ));
 	m_ListCtrl.SetItemText( nItem, T_FILENUMBER,		theApp.m_recordset->GetFieldString( TABLES_FILENUMBER ));
 	m_ListCtrl.SetItemText( nItem, T_FAMILYNUMBER,		theApp.m_recordset->GetFieldString( TABLES_FAMILYNUMBER ));
 	m_ListCtrl.SetItemText( nItem, T_LINENUMBER,		theApp.m_recordset->GetFieldString( TABLES_LINENUMBER ));
 	m_ListCtrl.SetItemText( nItem, T_TABLEHEADER,		theApp.m_recordset->GetFieldString( TABLES_TABLEHEADER ));
+	
 	m_ListCtrl.SetItemText( nItem, T_PERCENT,			theApp.m_recordset->GetFieldString( TABLES_PERCENT ));
-	m_ListCtrl.SetItemText( nItem, T_FAMILYNAME,		theApp.m_recordset->GetFieldString( TABLES_FAMILY_NAME ));
 	m_ListCtrl.SetItemText( nItem, T_TITOLO,			theApp.m_recordset->GetFieldString( TABLES_TITOLO ));
+
+	m_ListCtrl.SetItemText( nItem, T_FAMILYNAME,		theApp.m_recordset->GetFieldString( TABLES_FAMILY_NAME ));
+	m_ListCtrl.SetItemText( nItem, T_KNOWN_AS,			theApp.m_recordset->GetFieldString( TABLES_KNOWN_AS ) );
+	m_ListCtrl.SetItemText( nItem, T_ALIAS,				theApp.m_recordset->GetFieldString( TABLES_ALIAS ) );
+	m_ListCtrl.SetItemText( nItem, T_ARM,				theApp.m_recordset->GetFieldString( TABLES_ARM ) );
+
 	m_ListCtrl.SetItemText( nItem, T_TABLENUMBERROMAN,	theApp.m_recordset->GetFieldString( TABLES_TABLENUMBERROMAN ) );
-	int joint = _wtoi( theApp.m_recordset->GetFieldString( TABLES_JOINT ) );
+		int joint = _wtoi( theApp.m_recordset->GetFieldString( TABLES_JOINT ) );
 	if( !joint )
 		m_ListCtrl.SetItemText( nItem, T_JOINT,			L"nem" );
 	m_ListCtrl.SetItemText( nItem, T_FOLYT,				theApp.m_recordset->GetFieldString( TABLES_FOLYT ) );
+	m_ListCtrl.SetItemText( nItem, T_CSALAD,			theApp.m_recordset->GetFieldString( TABLES_CSALAD ) );
 	m_ListCtrl.SetItemText( nItem, T_TORZS,				theApp.m_recordset->GetFieldString( TABLES_TORZS ) );
+
 	m_ListCtrl.SetItemText( nItem, T_COMMENT,			theApp.m_recordset->GetFieldString( TABLES_COMMENT ) );
 	
-	m_ListCtrl.SetItemText( nItem, T_ARM,				theApp.m_recordset->GetFieldString( TABLES_ARM ) );
-	
-	m_ListCtrl.SetItemText( nItem, T_NEWFAMILIES,		theApp.m_recordset->GetFieldString( TABLES_NEWFAMILIES ) );
-	m_ListCtrl.SetItemText( nItem, T_KNOWN_AS,			theApp.m_recordset->GetFieldString( TABLES_KNOWN_AS ) );
-	m_ListCtrl.SetItemText( nItem, T_ALIAS,				theApp.m_recordset->GetFieldString( TABLES_ALIAS ) );
-
+	titoloName.Format( L"%s%s", theApp.m_recordset->GetFieldString( TABLES_TITOLO ), theApp.m_recordset->GetFieldString( TABLES_FAMILY_NAME ) );
+	if( nItem > 0 )
+	{
+		theApp.m_recordset->MovePrevious();
+		titoloName1.Format( L"%s%s", theApp.m_recordset->GetFieldString( TABLES_TITOLO ), theApp.m_recordset->GetFieldString( TABLES_FAMILY_NAME ) );
+		theApp.m_recordset->MoveNext();
+	}
+	if( m_colored )				// az elõzõ sor szines
+	{
+		if( !nItem )
+			m_ListCtrl.SetItemData( nItem, 1 );
+		else if( titoloName == titoloName1 )
+			m_ListCtrl.SetItemData( nItem, 1 );
+		else
+			m_colored = false;
+	}
+	else
+	{
+		if( titoloName != titoloName1  )
+		{
+			m_ListCtrl.SetItemData( nItem, 1 );
+			m_colored = true;
+		}
+	}
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
@@ -294,13 +328,6 @@ void CTableTables::OnSizing(UINT fwSide, LPRECT pRect)
 	CDialogEx::OnSizing(fwSide, pRect);
 	EASYSIZE_MINSIZE(430,314,fwSide,pRect); 
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//void CTableTables::OnChangeSearch()
-//{
-//	CString	search;
-//	GetDlgItem( IDC_SEARCH )->GetWindowText( search );
-//	theApp.search( search, m_orderix,  &m_ListCtrl );
-//}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 LRESULT CTableTables::OnSetColumnColor(WPARAM wParam, LPARAM lParam)//wparam: oszlopszam, lparam: a COLUMNCOLOR struktura cime
 {
@@ -439,55 +466,6 @@ void CTableTables::OnPrivatDescendantsTable()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-void CTableTables::OnBnClickedOk()
-{
-	int	n = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
-	if( n < 0 )
-	{
-		AfxMessageBox(L"Nincs kijelölve semmi!"); 
-		return;
-	}
-	if( m_selected.IsEmpty() )
-		m_selected	= m_ListCtrl.GetItemText(n,T_FAMILYNAME);
-	else
-		m_selected	= m_ListCtrl.GetItemText(n,T_TABLEHEADER );
-
-	m_last_name		= m_ListCtrl.GetItemText(n,T_FAMILYNAME);
-	m_tableHeader	= m_ListCtrl.GetItemText( n, T_TABLEHEADER );
-
-	if( m_select_id == L"familyNumber" )
-	{
-		m_id		= m_ListCtrl.GetItemText(n,T_FAMILYNUMBER);
-	}
-	else
-	{
-		m_id		= m_ListCtrl.GetItemText(n,T_ROWID );
-	}
-	
-	POSITION pos = m_ListCtrl.GetFirstSelectedItemPosition();
-	int nItem;
-	CString rowid;
-
-	v_tableNumbers.clear();
-	while( pos )
-	{
-		nItem = m_ListCtrl.GetNextSelectedItem( pos );
-		rowid = m_ListCtrl.GetItemText( nItem, T_ROWID ); 
-		v_tableNumbers.push_back( rowid );
-	}
-	CDialogEx::OnOK();
-}
-*/
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-void CTableTables::OnGaline()
-{
-	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	T_LINENUMBER ) );
-	theApp.listHtmlLine( lineNumber );
-}
-*/
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTableTables::OnGahtml()
 {
@@ -499,65 +477,41 @@ void CTableTables::OnGahtml()
 	command.Format( L"%s -n%s -alwaysOnTop -nosession", theApp.m_htmlFileSpec, lineNumber );
 	ShellExecute(NULL,L"open",theApp.m_editorName, command,theApp.m_editorFolder,SW_SHOW);
 
-//	TCHAR command[100];
-//	swprintf(command, 100, L"%d", 1 );
-//	ShellExecute(NULL, L"open", L"webApp.exe", NULL, L"d:\\VS2019\\cpp\\webApp\\Release", SW_SHOW);
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTableTables::OnClickedKeres()
-{
-	if( m_orderix == 0 )
-	{
-		AfxMessageBox( L"Rendezni kell az oszlopot, amelyben keresni akarsz!" );
-		return;
-	}
-	CString	search;
-	GetDlgItem( IDC_SEARCH )->GetWindowText( search );
-	if( search.IsEmpty() )
-	{
-		AfxMessageBox( L"Meg kell adni a keresendõ stringet!");
-		return;
-	}
-
-	int		n				= m_ListCtrl.GetItemCount();
-	int		length			= search.GetLength();
-	int		nItem;
-	CString	str;
-
-	theApp.unselectAll( &m_ListCtrl );
-	for( nItem = 0; nItem < n; ++nItem )
-	{
-		str = m_ListCtrl.GetItemText( nItem, m_orderix);
-		str = str.Left(length);						// az aktuális search string hosszával azonos hosszúság leválasztása
-		if( str == search )
-		{
-			m_ListCtrl.SetItemState( nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED );
-			m_ListCtrl.EnsureVisible( nItem, FALSE );
-			break;
-		}
-	}
-}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////// K E R E S É S /////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CTableTables::PreTranslateMessage(MSG* pMsg)
 {
-	int x=(int)pMsg->wParam;
-
-    if( pMsg->message==WM_KEYDOWN)
-    {
-		switch( x )
+	if( pMsg->message==WM_KEYDOWN)
+	{
+		if( pMsg->wParam == VK_RETURN )
 		{
-		case VK_RETURN:
-			GetDlgItem( IDC_SEARCH )->GetWindowTextW( str );
-			if( str.GetLength() )
-				OnClickedKeres();
-			break;
-		case VK_ESCAPE:
-			CDialogEx::OnCancel();
+			keress(0);
+			return true;			// mert az alsó return-re debug módban hibát jelezne
 		}
 	}
-    return CWnd::PreTranslateMessage(pMsg);
+	return CDialogEx::PreTranslateMessage(pMsg);
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTableTables::OnClickedKeress()
+{
+	keress(0);
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTableTables::keress( int start )
+{
+	CString	search;
+	GetDlgItem( IDC_SEARCH )->GetWindowText( search );
+	theApp.keress( search, &m_ListCtrl, m_orderix, start );
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 LRESULT CTableTables::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 {
 	CPoint* point=(CPoint*) lParam;
@@ -611,3 +565,44 @@ void CTableTables::OnHtmlNotepad()
 		theApp.editNotepad( lineNumber );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTableTables::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	NMLVCUSTOMDRAW* pLVCD = reinterpret_cast<NMLVCUSTOMDRAW*>( pNMHDR );
+
+	int nItem;
+	int nCol;
+	int itemData;
+	*pResult = 0;
+
+	switch( pLVCD->nmcd.dwDrawStage )
+	{
+	case CDDS_PREPAINT:
+		pLVCD->clrTextBk = WHITE;
+		*pResult = CDRF_NOTIFYITEMDRAW;
+		break;
+	case CDDS_ITEMPREPAINT:
+		pLVCD->clrTextBk = WHITE;
+		*pResult = CDRF_NOTIFYSUBITEMDRAW;
+		break;
+	case CDDS_ITEMPREPAINT|CDDS_SUBITEM:
+		nCol = pLVCD->iSubItem;
+		if( nCol == T_DUMMY1 || nCol == T_DUMMY2 || nCol == T_DUMMY3 )
+		{
+			pLVCD->clrTextBk = RGB( 0,255,205);
+		}
+
+		if( m_orderix == 8 )
+		{
+			nItem = pLVCD->nmcd.dwItemSpec;
+			itemData = m_ListCtrl.GetItemData( nItem );
+			if( itemData == 1 )
+				pLVCD->clrTextBk = YELLOW;
+		}
+
+
+		*pResult = CDRF_DODEFAULT;
+		break;
+	}
+}

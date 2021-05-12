@@ -1,7 +1,5 @@
 #include "stdafx.h"
 #include "Dragon.h"
-#include "DragonDlg.h"
-#include <stdio.h>
 #include "about.h"
 #include "version_num.h"
 #include "build_defs.h"
@@ -29,27 +27,6 @@ const unsigned char completeVersion[] =
     BUILD_SEC_CH0, BUILD_SEC_CH1,
     '\0'
 };
-/*
-const unsigned char build[] =
-{
-    BUILD_YEAR_CH0, BUILD_YEAR_CH1, BUILD_YEAR_CH2, BUILD_YEAR_CH3,
-    '-',
-    BUILD_MONTH_CH0, BUILD_MONTH_CH1,
-    '-',
-    BUILD_DAY_CH0, BUILD_DAY_CH1,
-    ' ',
-    BUILD_HOUR_CH0, BUILD_HOUR_CH1,
-    ':',
-    BUILD_MIN_CH0, BUILD_MIN_CH1,
-    ':',
-    BUILD_SEC_CH0, BUILD_SEC_CH1,
-    '\0'
-};
-*/
-
-
-
-
 CAboutDlg::CAboutDlg() : CDialogEx(CAboutDlg::IDD)
 {
 }
@@ -61,7 +38,6 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
-	ON_BN_CLICKED(ID_USERMANUAL, &CAboutDlg::OnClickedUsermanual)
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CAboutDlg::OnInitDialog()
@@ -72,6 +48,7 @@ BOOL CAboutDlg::OnInitDialog()
 	CString command;
 	CString sqliteSourceId;
 	CString sqliteVersion;
+	CString str;
 
 	static const char *built = __DATE__" "__TIME__;
 	str = MultiToUnicode( built );
@@ -82,15 +59,6 @@ BOOL CAboutDlg::OnInitDialog()
 	CStringArray A;
 
 	wordList( &A, str, ' ', TRUE );
-/*
-	month	= getWord( str, 1 );
-	day		= getWord( str, 2 );
-	year	= getWord( str, 3 );
-	time	= getWord( str, 4 );
-*/
-
-//	BUILT.Format( L"%s. %s. %s  %s", A[2], A[0], A[1], A[3] );
-
 
 	command = L"SELECT sqlite_source_id()";
 	if( !theApp.query( command ) ) return FALSE;
@@ -101,12 +69,6 @@ BOOL CAboutDlg::OnInitDialog()
 	str.Format( L"%s - %s", sqliteVersion, sqliteSourceId );
 
 	BUILT.Format( L"%s - %s", VERSION, MultiToUnicode( LPCSTR( build ) ) );
-//	BUILT = VERSION;
-//	BUILT += L" - ";
-//	BUILT += LPCSTR(build);
-//	CString str1;
-//	str1 = completeVersion;
-//	GetDlgItem( IDC_STATIC_BUILT )->SetWindowText( str1 );
 	BUILT.Trim();
 	GetDlgItem( IDC_STATIC_BUILT )->SetWindowText( BUILT );
 	GetDlgItem( IDC_STATIC_SQLITE )->SetWindowText( str );
@@ -116,20 +78,3 @@ BOOL CAboutDlg::OnInitDialog()
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CAboutDlg::OnClickedUsermanual()
-{
-	if( _waccess( theApp.m_helpFileSpec, 0 ) )
-	{
-		AfxMessageBox( L"Nincs a faHelp.chm fájl a program könyvtárában!" );
-		return;
-	}
-	else
-	{
-		ShowWindow( SW_HIDE );
-		ShellExecute(NULL, L"open", theApp.m_helpFileSpec,NULL, NULL, SW_SHOWNORMAL);
-		ShowWindow( SW_RESTORE );
-	}
-
-
-
-}

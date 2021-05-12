@@ -31,6 +31,7 @@ protected:
 	
 	bool	m_paint;
 	CString	m_ext;
+	CString m_filename;
 	CString m_fileSpec;
 	int m_cnt;
 	bool	m_modified;
@@ -40,6 +41,7 @@ protected:
 	void CPictures::caption( int sorsz );
 	bool CPictures::writeBlockToFile( void* block, int blob_size  );
 	bool CPictures::paintBlob( int nIitem );
+	bool CPictures::showPdf( int nItem );
 	void CPictures::saveValues();
 	void fillBlobTable();
 

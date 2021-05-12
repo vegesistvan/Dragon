@@ -32,6 +32,8 @@ protected:
 
 	void CTableTables::fillTables();
 
+	CColorStatic colorKeres;
+
 	CString m_command;
 	CString str;
 	CListCtrlEx m_ListCtrl;
@@ -42,10 +44,15 @@ protected:
 
 	int m_orderix;
 	int m_nItem;
+	CString m_namePrev;
+	int		m_nItemPrev;
+	bool	m_colored;
+	bool	m_same;
 
 	void setRow( int nItem );
-	void CTableTables::editUpdate( CString tableNUmber );
+	void editUpdate( CString tableNUmber );
 
+	void keress( int start );
 	void OnHtmlEdit();
 	void OnHtmlNotepad();
 	void returnSelected();
@@ -58,7 +65,6 @@ public:
 	afx_msg void OnEditUpdate();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
-//	afx_msg void OnChangeSearch();
 	afx_msg LRESULT OnSetColumnColor(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnColumnSorted(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
@@ -73,10 +79,8 @@ public:
 	afx_msg void OnDescendantsTable();
 	afx_msg void OnFilterName();
 	afx_msg void OnFilterTables();
-//	afx_msg void OnPrivatDescendantsTable();
 	afx_msg void OnPrivatDescendantsTable();
-//	CColorStatic colorKeres;
-//	CColorStatic colorKeres;
-	afx_msg void OnClickedKeres();
-	CColorStatic colorKeres;
+	afx_msg void OnClickedKeress();
+	afx_msg void OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult);
+
 };

@@ -39,7 +39,7 @@ void CTableHtml::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_LISTHTML, m_ListCtrl);
 	DDX_Control(pDX, IDC_CAPTION, colorCaption);
-	DDX_Control(pDX, IDC_KERES, colorKeres);
+	DDX_Control(pDX, IDC_STATIC_KERESS, colorKeres);
 	DDX_Control(pDX, IDC_NEXT, colorNext);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,7 +49,7 @@ BEGIN_MESSAGE_MAP(CTableHtml, CDialogEx)
 	ON_COMMAND(ID_FILTER_UNFILTER, &CTableHtml::OnFilterUnfilter)
 	ON_COMMAND(ID_OPEN_HTML, &CTableHtml::OnOpenHtml)
 	ON_COMMAND(ID_FILTER_SUBSTRING, &CTableHtml::OnFilterSubstring)
-	ON_STN_CLICKED(IDC_KERES, &CTableHtml::OnClickedKeres)
+	ON_STN_CLICKED(IDC_STATIC_KERESS, &CTableHtml::OnClickedKeress)
 	ON_STN_CLICKED(IDC_NEXT, &CTableHtml::OnClickedNext)
 	ON_NOTIFY(NM_DBLCLK, IDC_LISTHTML, &CTableHtml::OnDblclkListhtml)
 	ON_MESSAGE(WM_SET_COLUMN_COLOR, OnSetColumnColor)
@@ -292,8 +292,25 @@ LRESULT CTableHtml::OnColumnSorted(WPARAM wParam, LPARAM lParam) //wparam: colum
 	m_orderix = wParam;
 	return TRUE;
 }
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////// K E R E S É S /////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BOOL CTableHtml::PreTranslateMessage(MSG* pMsg)
+{
+	if( pMsg->message==WM_KEYDOWN)
+	{
+		if( pMsg->wParam == VK_RETURN )
+		{
+			keress(0);
+			return true;			// mert az alsó return-re debug módban hibát jelez
+		}
+	}
+	return CDialogEx::PreTranslateMessage(pMsg);
+}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTableHtml::OnClickedKeres()
+void CTableHtml::OnClickedKeress()
 {
 	keress( 0 );
 }
@@ -301,11 +318,6 @@ void CTableHtml::OnClickedKeres()
 void CTableHtml::OnClickedNext()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	if( nItem == -0 )
-	{
-		AfxMessageBox( L"Nincs kijelölve sor!" );
-		return;
-	}
 	keress( nItem + 1 );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -313,75 +325,9 @@ void CTableHtml::keress( int start )
 {
 	CString	search;
 	GetDlgItem( IDC_SEARCH )->GetWindowText( search );
-	if( search.IsEmpty() )
-	{
-		AfxMessageBox( L"Meg kell adni a keresendõ stringet!");
-		return;
-	}
-/*
-//	if( m_orderix == 0 )
-	{
-		AfxMessageBox( L"Rendezni kell az oszlopot, amelyben keresni akarsz!" );
-		return;
-	}
-*/
-
-	int		itemCnt	= m_ListCtrl.GetItemCount();
-	int		length	= search.GetLength();
-	int		nItem;
-	CString	str;
-
-	CProgressWnd wndProgress(NULL, L"Folyik a keresés.." ); 
-	wndProgress.GoModal();
-	wndProgress.SetRange(0, m_ListCtrl.GetItemCount()-start );
-	wndProgress.SetPos(0);
-	wndProgress.SetStep(1);
-
-	theApp.unselectAll( &m_ListCtrl );
-
-	for( nItem = start; nItem < itemCnt; ++nItem )
-	{
-		str = m_ListCtrl.GetItemText( nItem, m_orderix);
-		str = str.Left(length);						// az aktuális search string hosszával azonos hosszúság leválasztása
-		if( str == search )
-		{
-			m_ListCtrl.SetItemState( nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED );
-			m_ListCtrl.EnsureVisible( nItem, FALSE );
-			break;
-		}
-		wndProgress.StepIt();
-		wndProgress.PeekAndPump();
-		if (wndProgress.Cancelled()) break;
-	}
-	wndProgress.DestroyWindow();
-
-	if( nItem < itemCnt-1 )			// megtalálta a keresett embert,. aki az nItem-1 sorban van
-	{
-		theApp.showItem( nItem, &m_ListCtrl );
-	}
-	else
-	{
-		str.Format( L"%s szöveget!", search );
-		AfxMessageBox( str );
-	}
+	theApp.keress( search, &m_ListCtrl, m_orderix, start );
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////44
-BOOL CTableHtml::PreTranslateMessage(MSG* pMsg)
-{
-	int x=(int)pMsg->wParam;
-
-    if( pMsg->message==WM_KEYDOWN)
-    {
-		switch( x )
-		{
-		case VK_RETURN:
-			GetDlgItem( IDC_SEARCH )->GetWindowTextW( str );
-			if( str.GetLength() ) 
-			OnClickedKeres();
-			break;
-		case VK_ESCAPE:
-			CDialogEx::OnCancel();
-		}
-	}
-	return CWnd::PreTranslateMessage(pMsg);
-}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

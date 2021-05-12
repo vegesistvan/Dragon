@@ -85,10 +85,8 @@ BOOL CRelatives::OnInitDialog()
 	EASYSIZE_ADD( IDCANCEL,				ES_BORDER,ES_KEEPSIZE,	ES_KEEPSIZE,ES_BORDER,	0 );
 	EASYSIZE_INIT();
 
-	m_columns = L"rowid, tablenumber, sex_id, last_name, first_name, birth_place, birth_date, death_place, death_date, occupation, comment, father_id, mother_id";
+	m_columns = L"rowid, tablenumber, sex_id, last_name, first_name, birth_place, birth_date, death_place, death_date, occupation, comment, father_id, mother_id, parentIndex";
 
-//	colorPeople.SetTextColor( RIVERBLUE );
-//	colorPeople.SetTextColor( RGB( 255,255,0 ) );
 	colorPeople.SetTextColor( RGB( 255,51,255 ) );
 	colorPeople.SetTextColor( RGB( 255,0,0 ) );
 
@@ -99,9 +97,9 @@ BOOL CRelatives::OnInitDialog()
 	colorSiblings.SetTextColor( theApp.m_colorClick );
 
 	createColumns( &m_ListCtrlP );
+	createColumns( &m_ListCtrlS );
 	createColumns( &m_ListCtrlM );
 	createColumns( &m_ListCtrlC );
-	createColumns( &m_ListCtrlS );
 
 	m_rowidFirst = m_rowid;
 
@@ -116,9 +114,10 @@ void CRelatives::createColumns( CListCtrlEx* p_ListCtrl )
 	p_ListCtrl->KeepSortOrder(TRUE);
 	p_ListCtrl->SetExtendedStyle( m_ListCtrlS.GetExtendedStyle()| LVS_EX_GRIDLINES );	
 
-	p_ListCtrl->InsertColumn( L_NAME,	L"name",		LVCFMT_LEFT,	150,-1,COL_HIDDEN );
-	p_ListCtrl->InsertColumn( L_ROWID,	L"rowid",		LVCFMT_RIGHT,	 65,-1,COL_TEXT);
-	p_ListCtrl->InsertColumn( L_PEOPLE,	L"people",		LVCFMT_LEFT,   2000,-1,COL_TEXT );
+	p_ListCtrl->InsertColumn( L_NAME,			L"name",		LVCFMT_LEFT,	150,-1,COL_HIDDEN );
+	p_ListCtrl->InsertColumn( L_PARENT_INDEX,	L"",			LVCFMT_RIGHT,	 20,-1,COL_HIDDEN );
+	p_ListCtrl->InsertColumn( L_ROWID,			L"rowid",		LVCFMT_RIGHT,	 65,-1,COL_TEXT);
+	p_ListCtrl->InsertColumn( L_PEOPLE,			L"people",		LVCFMT_LEFT,   2000,-1,COL_TEXT );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CRelatives::createScreen()
@@ -152,6 +151,7 @@ BOOL CRelatives::createPeople()
 	m_comment		= m_recordset->GetFieldString( COMMENT );
 	m_father_id		= m_recordset->GetFieldString( FATHERID );
 	m_mother_id		= m_recordset->GetFieldString( MOTHERID );
+	
 
 	m_name.Format( L"%s %s", m_lastname, m_firstname );
 
@@ -202,22 +202,37 @@ BOOL CRelatives::createSpouses()
 	UINT	i;
 	CString	rowid;
 	CString	people;
+	CString order;
 
 	m_ListCtrlM.DeleteAllItems();
 	if( m_sexid == L"1" )
-		m_command.Format( L"SELECT spouse2_id FROM marriages WHERE spouse1_id = '%s'", m_rowid );
+		m_command.Format( L"SELECT spouse2_id, orderWife FROM marriages WHERE spouse1_id = '%s'", m_rowid );
 	else
-		m_command.Format( L"SELECT spouse1_id FROM marriages WHERE spouse2_id = '%s'", m_rowid );
+		m_command.Format( L"SELECT spouse1_id, orderHusband FROM marriages WHERE spouse2_id = '%s'", m_rowid );
 
 	if( !query2( m_command ) ) return false;
+
+	m_numOfSpouses = m_recordset2->RecordsCount();
+
+	if( m_numOfSpouses > 1 )
+	{
+		m_ListCtrlM.SetColumnVisibility( L_PARENT_INDEX, true );
+		m_ListCtrlM.SetColumnWidth( L_PARENT_INDEX, 20 );
+	}
+	else
+		m_ListCtrlM.SetColumnVisibility( L_PARENT_INDEX, false );
+	
+
 
 	for( i = 0; i < m_recordset2->RecordsCount(); ++i, m_recordset2->MoveNext() )
 	{ 
 		rowid	= m_recordset2->GetFieldString( 0 );
+		order	= m_recordset2->GetFieldString( 1 );
 		people	= selectPeople( rowid );
 		
 		m_ListCtrlM.InsertItem( i, m_name );
 		m_ListCtrlM.SetItemText( i, L_ROWID, rowid ); 
+		m_ListCtrlM.SetItemText( i, L_PARENT_INDEX, order ); 
 		m_ListCtrlM.SetItemText( i, L_PEOPLE, people );
 	}
 	return true;
@@ -228,7 +243,7 @@ BOOL CRelatives::createChildren()
 	UINT i;
 	CString rowid;
 	CString people;
-
+	
 	m_ListCtrlC.DeleteAllItems();
 
 	if( m_sexid == L"1" )
@@ -237,12 +252,21 @@ BOOL CRelatives::createChildren()
 		m_command.Format( L"SELECT rowid FROM people WHERE mother_id = '%s'", m_rowid );
 	if( !query2( m_command ) ) return false;
 
+	if( m_numOfSpouses > 1 )
+	{
+		m_ListCtrlC.SetColumnVisibility( L_PARENT_INDEX, true );
+		m_ListCtrlC.SetColumnWidth( L_PARENT_INDEX, 20 );
+	}
+	else
+		m_ListCtrlC.SetColumnVisibility( L_PARENT_INDEX, false );
+
 	for( i = 0; i < m_recordset2->RecordsCount(); ++i, m_recordset2->MoveNext() )
 	{
 		rowid	= m_recordset2->GetFieldString( 0 );
 		people	= selectPeople( rowid );
 		m_ListCtrlC.InsertItem( i, m_name );
 		m_ListCtrlC.SetItemText( i, L_ROWID, rowid ); 
+		m_ListCtrlC.SetItemText( i, L_PARENT_INDEX, m_parent_index ); 
 		m_ListCtrlC.SetItemText( i, L_PEOPLE, people );
 	}
 	return true;
@@ -318,6 +342,7 @@ CString CRelatives::selectPeople( CString rowid )
 	comment		= m_recordset->GetFieldString( COMMENT );
 	father_id	= m_recordset->GetFieldString( FATHERID );
 	mother_id	= m_recordset->GetFieldString( MOTHERID );
+	m_parent_index	= m_recordset->GetFieldString( PARENTINDEX );
 
 	birth = pack( L"*", birthplace, birthdate );
 	death = pack( L"+", deathplace, deathdate );
@@ -573,25 +598,7 @@ void CRelatives::OnEditUpdate()
 
 	switch( m_listCtrlFlag )
 	{
-	case 1:
-/*
-		nIndex	= m_ListBoxP.GetCurSel();
-		if( nIndex == LB_ERR )
-		{
-			AfxMessageBox( L"Ki kell jelölni egy szülõt!" );
-			return;
-		}
-		rowid	= m_ListBoxP.GetItemData( nIndex );
-		dlg.m_rowid.Format( L"%d", rowid );
-		if( dlg.DoModal() == IDCANCEL ) return;
-
-		m_ListBoxP.DeleteString( nIndex );
-		if( nIndex == 0 )
-			createFather( dlg.m_rowid );
-		else
-			createMother( dlg.m_rowid );
-		break;
-*/
+	case 1:															// szülõk
 		nItem = m_ListCtrlP.GetNextItem(-1, LVNI_SELECTED); 
 		dlg.m_rowid = m_ListCtrlP.GetItemText( nItem, L_ROWID );
 		dlg.DoModal();
@@ -601,19 +608,19 @@ void CRelatives::OnEditUpdate()
 		else
 			createMother( dlg.m_rowid );
 		break;
-	case 2:
+	case 2:															// házastársak
 		nItem = m_ListCtrlM.GetNextItem(-1, LVNI_SELECTED); 
 		dlg.m_rowid = m_ListCtrlM.GetItemText( nItem, L_ROWID );
 		dlg.DoModal();
 		createSpouses();
 		break;
-	case 3:
+	case 3:															// gyerek
 		nItem = m_ListCtrlC.GetNextItem(-1, LVNI_SELECTED); 
 		dlg.m_rowid = m_ListCtrlC.GetItemText( nItem, L_ROWID );
 		dlg.DoModal();
 		createChildren();
 		break;
-	case 4:
+	case 4:															// testvér
 		nItem = m_ListCtrlS.GetNextItem(-1, LVNI_SELECTED); 
 		dlg.m_rowid = m_ListCtrlS.GetItemText( nItem, L_ROWID );
 		dlg.DoModal();
@@ -741,16 +748,16 @@ void CRelatives::OnAscestor()
 void CRelatives::OnDescendants()
 {
 	CGaDescendants dlg;
+
 	dlg.m_numbering		= 0;
 	dlg.m_code			= ANSI;
 	dlg.m_rowid1		= m_rowid;
-	dlg.m_source		= 0;
+	dlg.m_source		= 1;
 	dlg.m_name			= m_name;
 	dlg.m_tableNumber	= m_tablenumber;
 	if( dlg.DoModal() == IDCANCEL ) return;
 
 	dlg.DoModal();
-
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CRelatives::OnReset()
@@ -924,7 +931,7 @@ void CRelatives::OnInsertGyerek()
 		dlg.m_last_name = getFirstWord( nameS );
 	if( dlg.DoModal() == IDCANCEL  ) return;
 
-	m_command.Format( L"UPDATE people SET father_id='%s', mother_id='%s', parentindex = '%d' WHERE rowid = '%s'", m_rowid, mother_id, nItem + 1, dlg.m_rowid ); 
+	m_command.Format( L"UPDATE people SET father_id='%s', mother_id='%s', parentindex = '%d', parentindexCalc='%d' WHERE rowid = '%s'", m_rowid, mother_id, nItem + 1, nItem + 1, dlg.m_rowid ); 
 	if( !theApp.execute( m_command ) ) return;
 	createScreen();
 }

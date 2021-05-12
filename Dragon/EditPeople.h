@@ -40,6 +40,7 @@ protected:
 	bool	m_paint;
 	bool	m_modified;
 
+	CString	m_filename;
 	CString	m_fileSpec;
 	CString str;
 	CString m_command;
@@ -63,13 +64,11 @@ protected:
 	CColorStatic colorPhotos;	
 
 
-	void	displayPicture();
-	void	initialScreen();
 	CString	getTableName( CString tableNumber );
 	CString	getParent( CString rowid );
 	void	displayParent( int IDC, CString rowid );
 	CString	getPeopleString( CString rowid );
-	CString	getPlaceDateBlock( CString place, CString date, TCHAR jel );
+	CString	getPlaceDateBlock( TCHAR jel, CString place, CString date );
 	CString	getCommentBlock( CString comment, CString occupation  );
 	void	updateM( int nItem );
 	bool	writeBlockToFile( void* block, int blob_size  );

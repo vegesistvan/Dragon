@@ -22,6 +22,7 @@ void CGaInput::splitLine( CString cLine)
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Leszedi a sor végérõl az elágazás jelzését, amit megtisztítva a d.folyt változóba tesz;
+// valmaint az m_tableHeader.folyt.ban is akkumulálja
 // A megtisztított sort visszadja.
 CString CGaInput::getBranch( CString cLine )
 {
@@ -33,11 +34,8 @@ CString CGaInput::getBranch( CString cLine )
 		str		= cLine.Mid( pos + 10 );
 		folyt	= getFirstWord( str );   // lehet a romanNumber után még valami feljegyzés!!
 		d.folyt	= folyt;
-
 		folyt += L",";
 		m_tableHeader.folyt += folyt;
-		//v_tableHeader.at( v_tableHeader.size() -1 ).folyt += folyt;  // gyûjti a táblában elõforduló folyt számokat
-
 		cLine = cLine.Left( pos-1 );				// lehagyja a %%% jeleket
 		
 	}
@@ -46,7 +44,9 @@ CString CGaInput::getBranch( CString cLine )
 	int pos1;
 	int pos2;
 	CString root;
-	
+	CString csalad;
+
+	// ha a sor végén [root] -et talál
 	while( (pos2 = cLine.ReverseFind( ']' ) ) != -1 )
 	{
 		if( cLine.GetAt( cLine.GetLength() - 1 ) == ']' )		// a cLine végén van
@@ -55,14 +55,18 @@ CString CGaInput::getBranch( CString cLine )
 			{
 				if( pos1 < pos2 )
 				{
-					//root = cLine.Mid( pos1+1, pos2-pos1 - 1 );
 					if( ( pos = cLine.Find( L"család õse]" ) ) != -1  )
 						d.gap	= 1;
 					if( ( pos = cLine.Find( L"család]" ) ) != -1 ||  ( pos = cLine.Find( L"család õse]" ) ) != -1 )
 					{
 						root = cLine.Mid( pos1+1, pos2-pos1 - 1 );
 						if( iswupper( root.GetAt( 0 ) ) )
-							d.csalad = getCsalad( root );
+						{
+							csalad = getCsalad( root );
+							d.csalad = csalad;
+							csalad += L",";
+							m_tableHeader.csalad += csalad;
+						}
 					}
 					else
 					{

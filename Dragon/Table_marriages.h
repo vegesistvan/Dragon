@@ -142,7 +142,7 @@ public:
 	afx_msg void OnExportAll();
 	afx_msg void OnExportSelected();
 	afx_msg void OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnClickedKeres();
+	afx_msg void OnClickedKeress();
 	afx_msg void OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnUnfilter();
 	afx_msg void OnFilterHlastname();

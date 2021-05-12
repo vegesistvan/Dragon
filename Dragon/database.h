@@ -140,7 +140,6 @@ const COLUMN people[] =
 	{ L"csalad",					L"TEXT" },		// családalapító [ xy család õse] ?
 	{ L"gap",						L"INT" },
 	{ L"numOfMarriages",			L"INT" },		// házasságok száma
-	
 };
 
 enum
@@ -201,11 +200,11 @@ const COLUMN tables[] =
 	{ L"tableRoman",		L"TEXT" },
 	{ L"comment",			L"TEXT" },
 	{ L"torzs",				L"TEXT" },
-	{ L"newFamilies",		L"TEXT" },
 	{ L"known_as",			L"TEXT" },
 	{ L"arm",				L"TEXT" },
 	{ L"joint",				L"INT"	},	 
 	{ L"folyt",				L"TEXT" },
+	{ L"csalad",			L"TEXT" },
 };
 enum
 {
@@ -222,11 +221,11 @@ enum
 	TABLES_TABLENUMBERROMAN,
 	TABLES_COMMENT,
 	TABLES_TORZS,			// [törzs: xy]
-	TABLES_NEWFAMILIES,		// rá hivatkozó [xy család]
 	TABLES_KNOWN_AS,
 	TABLES_ARM,
 	TABLES_JOINT,	
 	TABLES_FOLYT,
+	TABLES_CSALAD,			// [xy csalad]
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const COLUMN united[] =

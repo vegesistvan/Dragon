@@ -63,6 +63,17 @@ enum
 	L_LINENUMBERF,
 	L_LINENUMBERM,
 };
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void sameClear( SAME * same )
+{
+	same->index = 0;
+	same->repleceBy.Empty();
+	same->rowid.Empty();
+	same->same = ' ';
+	same->group = 0;
+	same->identical = L"";
+	same->timeConflict = L"";
+}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 IMPLEMENT_DYNAMIC(CcheckSameNameAnd, CDialogEx)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -101,7 +112,7 @@ void CcheckSameNameAnd::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_LIST, m_ListCtrl);
-	DDX_Control(pDX, IDC_KERES, colorKeres);
+	DDX_Control(pDX, IDC_STATIC_KERESS, colorKeres);
 	DDX_Control(pDX, IDC_NEXT, colorNext);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -119,7 +130,7 @@ BEGIN_MESSAGE_MAP(CcheckSameNameAnd, CDialogEx)
 	ON_COMMAND(ID_HTML_FATHERANDSIBLINGS, &CcheckSameNameAnd::OnHtmlFatherAndSiblings)
 	ON_COMMAND(ID_DB_EDIT, &CcheckSameNameAnd::OnDbEdit)
 
-	ON_STN_CLICKED(IDC_KERES, &CcheckSameNameAnd::OnClickedKeres)
+	ON_STN_CLICKED(IDC_STATIC_KERESS, &CcheckSameNameAnd::OnClickedKeress)
 	ON_STN_CLICKED(IDC_NEXT, &CcheckSameNameAnd::OnClickedNext)
 	ON_COMMAND(ID_INFO, &CcheckSameNameAnd::OnInfo)
 END_MESSAGE_MAP()
@@ -1039,20 +1050,31 @@ void CcheckSameNameAnd::OnDbEdit()
 	dlg.m_rowid = rowid;
 	dlg.DoModal();
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CcheckSameNameAnd::OnClickedKeres()
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////// K E R E S É S /////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BOOL CcheckSameNameAnd::PreTranslateMessage(MSG* pMsg)
+{
+	if( pMsg->message==WM_KEYDOWN)
+	{
+		if( pMsg->wParam == VK_RETURN )
+		{
+			keress(0);
+			return true;			// mert az alsó return-re debug módban hibát jelez
+		}
+	}
+	return CDialogEx::PreTranslateMessage(pMsg);
+}
+void CcheckSameNameAnd::OnClickedKeress()
 {
 	keress( 0 );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CcheckSameNameAnd::OnClickedNext()
 {
-int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	if( nItem == -0 )
-	{
-		AfxMessageBox( L"Nincs kijelölve sor!" );
-		return;
-	}
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
 	keress( nItem + 1 );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1060,70 +1082,13 @@ void CcheckSameNameAnd::keress( int start )
 {
 	CString	search;
 	GetDlgItem( IDC_SEARCH )->GetWindowText( search );
-	if( search.IsEmpty() )
-	{
-		AfxMessageBox( L"Meg kell adni a keresendõ stringet!");
-		return;
-	}
-
-	CProgressWnd wndProgress(NULL, L"Folyik a keresés.." ); 
-	wndProgress.GoModal();
-	wndProgress.SetRange(0, m_ListCtrl.GetItemCount() );
-	wndProgress.SetPos(0);
-	wndProgress.SetStep(1);
-
-
-
-	int		itemCnt	= m_ListCtrl.GetItemCount();
-	int		length	= search.GetLength();
-	int		nItem;
-	int		topIndex = m_ListCtrl.GetTopIndex();
-	CString	str;
-
-	theApp.unselectAll( &m_ListCtrl );
-
-	for( nItem = start; nItem < itemCnt-1; ++nItem )
-	{
-		str = m_ListCtrl.GetItemText( nItem, L_NAME );
-		str = str.Left(length);						// az aktuális search string hosszával azonos hosszúság leválasztása
-		if( str == search )	break;
-		wndProgress.StepIt();
-		wndProgress.PeekAndPump();
-		if (wndProgress.Cancelled()) break;
-	}
-	wndProgress.DestroyWindow();
-
-	if( nItem < itemCnt-1 )			// megtalálta a keresett embert,. aki az nItem-1 sorban van
-	{
-		theApp.showItem( nItem, &m_ListCtrl );
-	}
-	else
-	{
-		str.Format( L"%s nevû embert nem találtam!", search );
-		AfxMessageBox( str );
-	}
+	theApp.keress( search, &m_ListCtrl, L_NAME, start );
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////44
-BOOL CcheckSameNameAnd::PreTranslateMessage(MSG* pMsg)
-{
-	int x=(int)pMsg->wParam;
 
-    if( pMsg->message==WM_KEYDOWN)
-    {
-		switch( x )
-		{
-		case VK_RETURN:
-			GetDlgItem( IDC_SEARCH )->GetWindowTextW( str );
-			if( str.GetLength() ) 
-			OnClickedKeres();
-			break;
-		case VK_ESCAPE:
-			CDialogEx::OnCancel();
-		}
-	}
-	return CWnd::PreTranslateMessage(pMsg);
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CcheckSameNameAnd::OnInfo()
 {
 	CString info( "\

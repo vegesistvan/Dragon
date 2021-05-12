@@ -2,7 +2,6 @@
 
 #include "vector"
 #include "structures.h"
-#include "GA_structures.h"
 
 #define	ONE	TRUE			// for wordList
 #define	MORE FALSE
@@ -15,7 +14,7 @@
 #define UTF8BOM 2
 
 
-TCHAR *		string2char( CString str );
+//TCHAR *		string2char( CString str );
 CString		getString( int n );
 double		Log2( double n );
 TCHAR *		thousend( unsigned _int64 val);
@@ -35,7 +34,7 @@ CString		getLastWord( CString str );
 CString		getTwoWords( CString str );
 CString		sepFirstName( CString str );
 
-CString		toLower( CString str );
+//CString		toLower( CString str );
 
 CString		date2date( CString date );
 int			isDate( CStringArray* A, int i, CString* datum );
@@ -51,17 +50,17 @@ CString		cleanHtmlTags( CString cLine );
 CString		packWords( CStringArray* A, int from, int db );
 void		setCreationTime( CString filespec );
 
-void		sameClear( SAME * same );
+//void		sameClear( SAME * same );
 
 //bool operator<(const SAMEMARRIAGE &s1, const SAMEMARRIAGE &s2);
 
 bool		isLastCharacter( CString str, TCHAR kar );
 
 CString		getMultiItem( CStringArray A, int i, int j );
-CString		upper( CString str );
+//CString		upper( CString str );
 
-bool		sortByName(const SPOUSES &v1, const SPOUSES &v2);
-bool		sortByNameKids(const KIDS &v1, const KIDS &v2);
+//bool		sortByName(const SPOUSES &v1, const SPOUSES &v2);
+//bool		sortByNameKids(const KIDS &v1, const KIDS &v2);
 
 
 CString		firstUpper( CString name );
@@ -78,8 +77,8 @@ int			getYearFromDate( CString date );
 CString		getTimeTag();
 bool		openFileSpec( FILE** ff, CString fileSpec, CString mode );
 CString		roundDate( CString date );
-int			dateDiff( CString date1, CString date2 );
-int			compDate( CString date1, CString date2 );
+//int			dateDiff( CString date1, CString date2 );
+//int			compDate( CString date1, CString date2 );
 int			diffD( CString date1, CString date2, int* pYear );
 CString		getNameBD( CString name, CString birth, CString death, CString wedding );
 CString		pack( CString tag, CString place, CString date );

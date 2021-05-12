@@ -62,13 +62,13 @@ BEGIN_MESSAGE_MAP(CDescendant, CDialogEx)
 	ON_MESSAGE(WM_SET_COLUMN_COLOR, OnSetColumnColor)
 	ON_MESSAGE(WM_CLICKED_COLUMN, OnColumnSorted)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CDescendant::OnDblclkList)
-	ON_EN_CHANGE(IDC_SEARCH, &CDescendant::OnChangeSearch)
 	ON_COMMAND(ID_NEWTABLE, &CDescendant::OnNewtable)
 	ON_COMMAND(ID_D_LIST, &CDescendant::OnDList)
 	
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
 	ON_COMMAND(ID_HTML_EDIT, &CDescendant::OnHtmlEdit)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CDescendant::OnHtmlNotepad)
+	ON_STN_CLICKED(IDC_STATIC_KERESS, &CDescendant::OnClickedKeress)
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CDescendant::OnInitDialog()
@@ -219,17 +219,17 @@ void CDescendant::fillTable( )
 			m_ListCtrl.SetItemText( nItem, PS_TABLENUMBER, str );
 
 			m_ListCtrl.SetItemText( nItem, PS_PEOPLE, split.m_descendant );
-/*
-			m_ListCtrl.SetItemText( nItem, PS_NAME_STR, split.desc.name );
-			m_ListCtrl.SetItemText( nItem, PS_BIRTH_STR, split.desc.birth );
-			m_ListCtrl.SetItemText( nItem, PS_DEATH_STR, split.desc.death );
+
+			m_ListCtrl.SetItemText( nItem, PS_NAME_STR, split.desc.nameSubstr );
+			m_ListCtrl.SetItemText( nItem, PS_BIRTH_STR, split.desc.birthSubstr );
+			m_ListCtrl.SetItemText( nItem, PS_DEATH_STR, split.desc.deathSubstr );
 			m_ListCtrl.SetItemText( nItem, PS_COMMENT, split.d.comment );
-*/
+/*
 			m_ListCtrl.SetItemText( nItem, PS_NAME_STR, split.m_nameSubstr );
 			m_ListCtrl.SetItemText( nItem, PS_BIRTH_STR, split.m_birthSubstr );
 			m_ListCtrl.SetItemText( nItem, PS_DEATH_STR, split.m_deathSubstr );
 			m_ListCtrl.SetItemText( nItem, PS_COMMENT, split.d.comment );
-
+*/
 
 			m_ListCtrl.SetItemText( nItem, PS_TITOLO, split.m_titolo );
 			m_ListCtrl.SetItemText( nItem, PS_TITLE, split.d.title );
@@ -356,13 +356,7 @@ void CDescendant::OnDList()
 	CString	title( L"Kijelölt leszármazottak" );
 	theApp.exportSelected( logFile, title, &m_ListCtrl );
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendant::OnChangeSearch()
-{
-	CString	search;
-	GetDlgItem( IDC_SEARCH )->GetWindowText( search );
-	theApp.search( search, m_orderix,  &m_ListCtrl );
-}
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendant::OnNewtable()
 {
@@ -374,20 +368,6 @@ void CDescendant::OnNewtable()
 	else 
 		dlg.OnDescendantFile();
 }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-void CDescendant::PostNcDestroy()
-{
-	CDialog::PostNcDestroy();
-	if(m_pParent)
-	{		
-		((CDragonDlg*)m_pParent)->m_pDescendantsF = NULL;
-		((CDragonDlg*)m_pParent)->m_pDescendantsT = NULL;
-		((CDragonDlg*)m_pParent)->m_pDescendantsL = NULL;
-	}
-	delete this;
-}
-*/
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 LRESULT CDescendant::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 {
@@ -424,6 +404,37 @@ void CDescendant::OnHtmlNotepad()
 	if( !lineNumber.IsEmpty() ) 
 		theApp.editNotepad( lineNumber );
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////// K E R E S É S /////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BOOL CDescendant::PreTranslateMessage(MSG* pMsg)
+{
+	if( pMsg->message==WM_KEYDOWN)
+	{
+		if( pMsg->wParam == VK_RETURN )
+		{
+			keress();
+			return true;			// mert az alsó return-re debug módban hibát jelez
+		}
+	}
+	return CDialogEx::PreTranslateMessage(pMsg);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDescendant::OnClickedKeress()
+{
+	keress();
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDescendant::keress()
+{
+	CString	search;
+	GetDlgItem( IDC_SEARCH )->GetWindowText( search );
+	theApp.keress( search, &m_ListCtrl, m_orderix, 0 );
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

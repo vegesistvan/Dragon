@@ -43,6 +43,7 @@ void CTableFirstnames::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_LIST, m_ListCtrl);
+	DDX_Control(pDX, IDC_STATIC_KERESS, colorKeress);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CTableFirstnames, CDialogEx)
@@ -50,7 +51,7 @@ BEGIN_MESSAGE_MAP(CTableFirstnames, CDialogEx)
 	ON_BN_CLICKED(ID_EDIT_DELETE, &CTableFirstnames::OnClickedDelete )
 	ON_MESSAGE(WM_SET_COLUMN_COLOR, OnSetColumnColor)
 	ON_MESSAGE(WM_CLICKED_COLUMN, OnColumnSorted)
-	ON_EN_CHANGE(IDC_SEARCH, &CTableFirstnames::OnChangeSearch)
+//	ON_EN_CHANGE(IDC_SEARCH, &CTableFirstnames::OnChangeSearch)
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
 	ON_COMMAND(ID_LIST_SELECTED, &CTableFirstnames::OnListTable)
 	ON_COMMAND(ID_UNFILTER, &CTableFirstnames::OnUnfilter)
@@ -69,6 +70,7 @@ BEGIN_MESSAGE_MAP(CTableFirstnames, CDialogEx)
 	ON_WM_SIZE()
 	ON_WM_SIZING()
 	ON_COMMAND(ID_FILTER_LANGUAGE, &CTableFirstnames::OnFilterLanguage)
+	ON_STN_CLICKED(IDC_STATIC_KERESS, &CTableFirstnames::OnClickedKeress)
 END_MESSAGE_MAP()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CTableFirstnames::OnInitDialog()
@@ -94,6 +96,7 @@ BOOL CTableFirstnames::OnInitDialog()
 	m_ListCtrl.InsertColumn( L_COMMENT,		L"leírás",	LVCFMT_LEFT, 120,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_OCCURANCE,	L"elõfordult",	LVCFMT_RIGHT, 80,-1,COL_NUM);
 
+	colorKeress.SetTextColor( theApp.m_colorClick );
 
 	m_sexLast = 1;
 	OnUnfilter();
@@ -322,13 +325,6 @@ BOOL CTableFirstnames::firstNameExists( CString first_name )
 	if( theApp.m_recordsetSystem->RecordsCount() ) return TRUE;
 	return FALSE;
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTableFirstnames::OnChangeSearch()
-{
-	CString	search;
-	GetDlgItem( IDC_SEARCH )->GetWindowText( search );
-	theApp.search( search, m_orderix,  &m_ListCtrl );
-}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 LRESULT CTableFirstnames::OnSetColumnColor(WPARAM wParam, LPARAM lParam)//wparam: oszlopszam, lparam: a COLUMNCOLOR struktura cime
 {
@@ -348,32 +344,6 @@ LRESULT CTableFirstnames::OnColumnSorted(WPARAM wParam, LPARAM lParam) //wparam:
 	return TRUE;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Helyes név módostása
-/*
-void CTableFirstnames::OnUdateReplace()
-{
-	int nItem	= m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	if( nItem == -1 )
-	{
-		AfxMessageBox( L"Nincs kijelölve semmi!" );
-		return;
-	}
-	CString comment_old = m_ListCtrl.GetItemText( nItem, L_COMMENT );
-
-	CString comment;
-//	GetDlgItem( IDC_EDIT )->GetWindowText( comment );
-	comment.Trim();
-
-	str.Format( L"Tényleg módosítani akarod a '%s' nevet '%s' névre?", comment_old, comment );
-	if( AfxMessageBox( str, MB_YESNO ) == IDNO ) return;
-
-	CString rowid = m_ListCtrl.GetItemText( nItem, L_ROWID );
-	m_command.Format( L"UPDATE firstnames SET comment='%s' WHERE rowid = '%s'", comment, rowid );
-	if( !theApp.executeSys( m_command ) ) return;
-	m_ListCtrl.SetItemText( nItem, L_COMMENT, comment );
-}
-*/
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTableFirstnames::OnListTable()
 {
 	CString	logFile(L"firstNames"); 
@@ -561,25 +531,6 @@ void CTableFirstnames::OnReadtxtfile()
 	}
 	if( !theApp.executeSys( L"COMMIT" ) ) return;
 }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CTableFirstnames::PreTranslateMessage(MSG* pMsg)
-{
-	int x=(int)pMsg->wParam;
-
-    if( pMsg->message==WM_KEYDOWN)
-    {
-		switch( x )
-		{
-		case VK_RETURN:
-//			OnClickedBeszur();
-			return TRUE;
-		case VK_ESCAPE:
-			CDialogEx::OnCancel();
-			break;
-		}
-	}
-	return CDialogEx::PreTranslateMessage(pMsg);
-}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTableFirstnames::OnSize(UINT nType, int cx, int cy)
 {
@@ -591,4 +542,36 @@ void CTableFirstnames::OnSizing(UINT fwSide, LPRECT pRect)
 	CDialogEx::OnSizing(fwSide, pRect);
 	EASYSIZE_MINSIZE(430,314,fwSide,pRect); 
 }
-
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////// K E R E S É S /////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BOOL CTableFirstnames::PreTranslateMessage(MSG* pMsg)
+{
+	if( pMsg->message==WM_KEYDOWN)
+	{
+		if( pMsg->wParam == VK_RETURN )
+		{
+			keress(0);
+			return true;			// mert az alsó return-re debug módban hibát jelez
+		}
+	}
+	return CDialogEx::PreTranslateMessage(pMsg);
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTableFirstnames::OnClickedKeress()
+{
+	keress(0);
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTableFirstnames::keress( int start )
+{
+	CString	search;
+	GetDlgItem( IDC_SEARCH )->GetWindowText( search );
+	theApp.keress( search, &m_ListCtrl, m_orderix, start );
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

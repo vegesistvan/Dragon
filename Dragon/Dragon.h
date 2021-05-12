@@ -8,7 +8,7 @@
 #include "SqliteDBEx.h"
 #include "ListCtrlEx.h"
 #include "structures.h"
-#include "GA_structures.h"
+//#include "GA_structures.h"
 #include "database.h"
 #include "Color.h"
 #include "WM_USER.h"
@@ -18,7 +18,37 @@
 #endif
 
 
-
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// egy people rekordból kivett adatok
+typedef struct
+{
+	CString rowid;
+	CString xid;
+	CString fileNumber;
+	CString familyNumber;
+	CString tableNumber;
+	CString lineNumber;
+	CString source;
+	CString generation;
+	CString sex_id;
+	CString title;
+	CString titolo;
+	CString first_name;
+	CString last_name;
+	CString posterior;
+	CString birth_place;
+	CString birth_date;
+	CString death_place;
+	CString death_date;
+	CString comment;
+	CString father_id;;
+	CString mother_id;
+	CString parentIndex;
+	CString parentIndexCalc;
+	CString folyt;
+	CString tableAncestry;
+	CString tableRoman;
+}P;
 
 
 #define	TOSCREEN FALSE
@@ -269,9 +299,6 @@ public:
 	void	setUserVersion( int user_version );
 	bool	insertIntoFiles( CString fileSpec, int type );
 // Implementation
-//	void	replaceBy( CString rowid, CString rowidBy, CString sex_id, int source );
-//	void CDragonApp::replaceBy( CString rowid, CString rowidBy, CString rowidS1, CString rowidS2, CString sex_id, int source );
-//	void CDragonApp::replaceBy( CString rowid, CString rowidBy, CString rowidM_I, CString sex_id, int source );
 	BOOL	question( CString caption, CString question );
 	void	message( CString caption, CString message );
 	void	inputGed( int ins );
@@ -364,7 +391,7 @@ public:
 
 	void	createCommand( CString tablename, COLUMN *tableStruct, int n );
 //	void	changeTime();
-	void	search( CString search, INT_PTR orderix,  CListCtrlEx* p_ListCtrl );
+//	void	search( CString search, INT_PTR orderix,  CListCtrlEx* p_ListCtrl );
 	void	selectAll( CListCtrlEx * p_ListCtrl );
 	void	unselectAll( CListCtrlEx * p_ListCtrl );
 

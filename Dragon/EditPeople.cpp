@@ -15,28 +15,7 @@
 #include "Pictures.h"
 #include "SaveFirstName.h"
 #include "SameName.h"
-/*
-enum
-{
-	L_ROWID = 0,
-	L_ROWIDS, 
-	L_ORDERH,
-	L_PLACE,
-	L_DATE,
-	L_SPOUSE,
-	L_ORDERW,
-};
 
-enum
-{
-	B_ROWID = 0,
-	B_CNT,
-	B_TITLE, 
-	B_DATE,
-	B_EXT,
-	B_COMMENT,
-};
-*/
 const TCHAR* dateModi[] =
 {
 	L"",
@@ -122,10 +101,8 @@ BOOL CEditPeople::OnInitDialog()
 	CString birth;
 	CString death;
 
-
 	colorTable.SetTextColor( theApp.m_colorClick );
 	colorPhotos.SetTextColor( theApp.m_colorClick );
-
 
 	m_ComboSex.AddString( L"" );
 	m_ComboSex.AddString( L"férfi" );
@@ -140,45 +117,34 @@ BOOL CEditPeople::OnInitDialog()
 	comboBirth.SetCurSel( 0 );
 	comboDeath.SetCurSel( 0 );
 
-//	m_orderix = 1;
-
+	m_paint = false;
 	m_modified = false;
-	initialScreen();
 
-	return TRUE;
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CEditPeople::initialScreen()
-{
 	if( !m_rowid.IsEmpty() )
 	{
-	m_command.Format( L"SELECT rowid,* FROM people WHERE rowid='%s'", m_rowid );
-	if( !theApp.query( m_command ) ) return;
+		m_command.Format( L"SELECT rowid,* FROM people WHERE rowid='%s'", m_rowid );
+		if( !theApp.query( m_command ) ) return false;
 
-	m_tableNumber	= theApp.m_recordset->GetFieldString( PEOPLE_TABLENUMBER );
-	m_title			= theApp.m_recordset->GetFieldString( PEOPLE_TITLE );
-	m_titolo		= theApp.m_recordset->GetFieldString( PEOPLE_TITOLO);
-	m_last_name		= theApp.m_recordset->GetFieldString( PEOPLE_LAST_NAME );
-	m_first_name	= theApp.m_recordset->GetFieldString( PEOPLE_FIRST_NAME );
-	m_posterior		= theApp.m_recordset->GetFieldString( PEOPLE_POSTERIOR );
-	m_birth_place	= theApp.m_recordset->GetFieldString( PEOPLE_BIRTH_PLACE );
-	m_birth_date	= theApp.m_recordset->GetFieldString( PEOPLE_BIRTH_DATE );
-	m_death_place	= theApp.m_recordset->GetFieldString( PEOPLE_DEATH_PLACE );
-	m_death_date	= theApp.m_recordset->GetFieldString( PEOPLE_DEATH_DATE );
-	m_comment		= theApp.m_recordset->GetFieldString( PEOPLE_COMMENT );
-	m_occupation	= theApp.m_recordset->GetFieldString( PEOPLE_OCCUPATION );
-	m_nameChanged	= theApp.m_recordset->GetFieldString( PEOPLE_KNOWN_AS );
+		m_tableNumber	= theApp.m_recordset->GetFieldString( PEOPLE_TABLENUMBER );
+		m_title			= theApp.m_recordset->GetFieldString( PEOPLE_TITLE );
+		m_titolo		= theApp.m_recordset->GetFieldString( PEOPLE_TITOLO);
+		m_last_name		= theApp.m_recordset->GetFieldString( PEOPLE_LAST_NAME );
+		m_first_name	= theApp.m_recordset->GetFieldString( PEOPLE_FIRST_NAME );
+		m_posterior		= theApp.m_recordset->GetFieldString( PEOPLE_POSTERIOR );
+		m_birth_place	= theApp.m_recordset->GetFieldString( PEOPLE_BIRTH_PLACE );
+		m_birth_date	= theApp.m_recordset->GetFieldString( PEOPLE_BIRTH_DATE );
+		m_death_place	= theApp.m_recordset->GetFieldString( PEOPLE_DEATH_PLACE );
+		m_death_date	= theApp.m_recordset->GetFieldString( PEOPLE_DEATH_DATE );
+		m_comment		= theApp.m_recordset->GetFieldString( PEOPLE_COMMENT );
+		m_occupation	= theApp.m_recordset->GetFieldString( PEOPLE_OCCUPATION );
+		m_nameChanged	= theApp.m_recordset->GetFieldString( PEOPLE_KNOWN_AS );
 
-	m_sex_id		= _wtoi( theApp.m_recordset->GetFieldString( PEOPLE_SEX_ID ) );
+		m_sex_id		= _wtoi( theApp.m_recordset->GetFieldString( PEOPLE_SEX_ID ) );
+		m_ComboSex.SetCurSel( m_sex_id );	
 	
+		m_name.Format( L"%s %s", m_last_name, m_first_name );
+		m_table			= getTableName( m_tableNumber );
 	}
-	m_name.Format( L"%s %s", m_last_name, m_first_name );
-
-//	if( !m_rowid.IsEmpty() )
-	m_table			= getTableName( m_tableNumber );
-
-	
-	m_ComboSex.SetCurSel( m_sex_id );
 	UpdateData( TOSCREEN );
 
 	CString caption;
@@ -188,32 +154,32 @@ void CEditPeople::initialScreen()
 		caption.Format( L"%s %s (rowid=%s) szerkesztése", m_last_name, m_first_name, m_rowid );
 	SetWindowTextW( caption );
 
-	displayPicture();
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CEditPeople::displayPicture()
-{
-
-	m_command.Format( L"SELECT rowid FROM pictures WHERE id='%s' AND table_id=%d AND primaryPic=1", m_rowid, PEOPLEX );
-	if( !theApp.queryBlob( m_command ) ) return;
-
 	InvalidateRect( NULL, true );
-	m_paint = false;
-	CString rowid = theApp.m_recordsetBlob->GetFieldString( 0 );
-	if( !rowid.IsEmpty() )
+	m_command.Format( L"SELECT rowid FROM pictures WHERE id='%s' AND table_id=%d AND primaryPic=1", m_rowid, PEOPLEX );
+	if( !theApp.queryBlob( m_command ) ) return false;
+
+
+	if( theApp.m_recordsetBlob->RecordsCount() )
 	{
-		_int64 blob_size;
-		void* block = theApp.blobDB->blobRead( "pictures", "picture", rowid, &blob_size );
-		if( block == NULL ) return;
-		if( !writeBlockToFile( block, blob_size ) ) return;
-		m_paint = true;
+		CString rowid = theApp.m_recordsetBlob->GetFieldString( PIC_ROWID );
+		CString ext =theApp.m_recordsetBlob->GetFieldString( PIC_EXT );
+		m_filename = theApp.m_recordsetBlob->GetFieldString( PIC_FILENAME );
+		if( ext != L"pdf" && !rowid.IsEmpty() )
+		{
+			_int64 blob_size;
+			void* block = theApp.blobDB->blobRead( "pictures", "picture", rowid, &blob_size );
+			if( block == NULL ) return false;
+			if( !writeBlockToFile( block, blob_size ) ) return false;
+			m_paint = true;
+		}
 	}
+	return true;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CEditPeople::writeBlockToFile( void* block, int blob_size  )
 {
-	m_fileSpec.Format( L"%s\\tmp.jpg", theApp.m_workingDirectory );
-	if( !openFileSpec( &theApp.fl, m_fileSpec, L"wb" ) ) return false;
+	m_fileSpec.Format( L"%s\\%s.jpg", theApp.m_workingDirectory, m_filename );
+	if( !openFileSpec( &theApp.fl, m_fileSpec, L"w+b" ) ) return false;
 
 	if( fwrite( block, blob_size, 1, theApp.fl ) != 1 )
 	{
@@ -457,15 +423,15 @@ CString CEditPeople::getPeopleString( CString rowid )
 	occupation	= theApp.m_recordset1->GetFieldString( PEOPLE_OCCUPATION );
 
 	str.Format( L"%s %s", last_name, first_name );
-	str += getPlaceDateBlock( birth_place, birth_date, '*' );
-	str += getPlaceDateBlock( death_place, death_date, '+' );
-	str += getPlaceDateBlock( comment, occupation, ' ' );
+	str += getPlaceDateBlock( '*', birth_place, birth_date );
+	str += getPlaceDateBlock( '+', death_place, death_date );
+	str += getPlaceDateBlock( ' ', comment, occupation );
 
 	str.Trim();
 	return str;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CEditPeople::getPlaceDateBlock( CString place, CString date, TCHAR jel )
+CString CEditPeople::getPlaceDateBlock( TCHAR jel, CString place, CString date )
 {
 	
 	CString block(L"");
@@ -525,11 +491,6 @@ void CEditPeople::OnBnClickedOk()
 	}
 
 	UpdateData( FROMSCREEN );
-	
-
-//	theApp.WriteProfileInt( L"Settings", L"tableNumber", _wtoi(m_tableNumber) );
-//	theApp.WriteProfileStringW( L"Settings", L"father_id", m_father_id );
-//	theApp.WriteProfileStringW( L"Settings", L"mother_id", m_mother_id );
 
 	m_sex_id = m_ComboSex.GetCurSel();
 	m_last_name.Trim();
@@ -538,7 +499,7 @@ void CEditPeople::OnBnClickedOk()
 	m_birth_date.Trim();
 	m_death_place.Trim();
 	m_death_date.Trim();
-	 m_comment.Trim();
+	m_comment.Trim();
 
 
 
@@ -656,6 +617,7 @@ known_as\
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CEditPeople::PreTranslateMessage(MSG* pMsg) //hogy ne az ablak kapja az uzeneteket, hanem az edit control
 {
+
 	int x = (int)pMsg->wParam;
 	if( pMsg->message == WM_KEYDOWN )	
 	{		
@@ -670,6 +632,7 @@ BOOL CEditPeople::PreTranslateMessage(MSG* pMsg) //hogy ne az ablak kapja az uze
 		}
 	}
 	return CDialogEx::PreTranslateMessage(pMsg);
+
 }
 
 

@@ -1,6 +1,7 @@
 #pragma once
 #include "afxwin.h"
 
+#include "GA_ascendants_str.h"
 
 // CGaAscendantsChain dialog
 
@@ -21,7 +22,6 @@ public:
 	CString m_father_id;
 	CString m_mother_id;
 	CString m_spouse_id;
-//	BOOL	m_bold;
 
 
 protected:

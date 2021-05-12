@@ -19,11 +19,16 @@ void CGaInput::insertTableHeader()
 	CString tableHeader;
 	CString values;
 	CString folyt;
+	CString csalad;
 	if( !theApp.execute( L"BEGIN" ) ) return;
 	for( UINT i = 0; i < v_tableHeader.size(); ++i )
 	{
 		folyt = v_tableHeader.at(i).folyt;
 		folyt = folyt.Left( folyt.GetLength() -1 );
+
+		csalad = v_tableHeader.at(i).csalad;
+		csalad = csalad.Left( csalad.GetLength() -1 );
+
 		tableHeader = v_tableHeader.at(i).tableHeader;
 		if( !v_tableHeader.at(i).known_as.IsEmpty() )
 		{
@@ -31,7 +36,7 @@ void CGaInput::insertTableHeader()
 			tableHeader += v_tableHeader.at(i).known_as;
 		}
 
-		values.Format( L"'%d','%d', '%d','%s','%s','%s', '%s','%s', '%s','%s', '%s', '%s', '%s', '%d','%s'",
+		values.Format( L"'%d','%d','%d','%s','%s','%s', '%s','%s', '%s','%s', '%s', '%s', '%s', '%d','%s', '%s'",
 		m_fileNumber,
 		v_tableHeader.at(i).familyNumber,
 		v_tableHeader.at(i).lineNumber,
@@ -46,7 +51,8 @@ void CGaInput::insertTableHeader()
 		v_tableHeader.at(i).known_as,
 		v_tableHeader.at(i).arm,
 		v_tableHeader.at(i).joint,
-		folyt
+		folyt,
+		csalad
 		);
 		m_command.Format( L"INSERT INTO tables ( %s ) VALUES ( %s )", m_fieldsT, values );
 		if( !theApp.execute( m_command ) ) return;

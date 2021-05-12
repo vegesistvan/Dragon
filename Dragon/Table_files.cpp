@@ -98,13 +98,11 @@ BOOL CTableFiles::PreTranslateMessage(MSG* pMsg)
     {
 		switch( x )
 		{
-		case VK_RETURN:
+			case VK_RETURN:
 			return TRUE;
-		case VK_ESCAPE:
-			CDialogEx::OnCancel();
 		}
 	}
-    return CWnd::PreTranslateMessage(pMsg);
+	return CDialogEx::PreTranslateMessage(pMsg);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTableFiles::OnBrowser()

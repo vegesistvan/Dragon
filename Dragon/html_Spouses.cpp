@@ -10,6 +10,7 @@
 #include "DragonDlg.h"
 #include "ProgressWnd.h"
 #include "utilities.h"
+#include "html_Spouses.h"
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 enum
@@ -83,6 +84,7 @@ void CHtmlSpouses::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_LIST, m_ListCtrl);
 	DDX_Control(pDX, IDC_CAPTION, colorCaption);
+	DDX_Control(pDX, IDC_STATIC_SEARCH, colorKeress);
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CHtmlSpouses, CDialogEx)
@@ -91,8 +93,8 @@ BEGIN_MESSAGE_MAP(CHtmlSpouses, CDialogEx)
 	ON_MESSAGE(WM_SET_COLUMN_COLOR, OnSetColumnColor)
 	ON_MESSAGE(WM_CLICKED_COLUMN, OnColumnSorted)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CHtmlSpouses::OnDblclkList)
-	ON_EN_CHANGE(IDC_SEARCH, &CHtmlSpouses::OnChangeSearch)
 	ON_COMMAND(ID_NEWTABLE, &CHtmlSpouses::OnNewtable)
+	ON_STN_CLICKED(IDC_STATIC_SEARCH, &CHtmlSpouses::OnClickedStaticSearch)
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CHtmlSpouses::OnInitDialog()
@@ -159,6 +161,7 @@ BOOL CHtmlSpouses::OnInitDialog()
 
 	m_ListCtrl.InsertColumn( MG_SPOUSE_SPOUSES,	L"házastárs házastársai",	LVCFMT_LEFT,    200,-1,COL_TEXT);
 
+	colorKeress.SetTextColor( theApp.m_colorClick );
 	colorCaption.SetTextColor( theApp.m_colorClick );
 	m_orderix = 0;
 	fillTable();
@@ -407,23 +410,14 @@ BOOL CHtmlSpouses::PreTranslateMessage(MSG* pMsg)
 		switch( x )
 		{
 		case VK_RETURN:
-//			listHtmlLine();
-			return TRUE;
+			keress(0);
+			break;
 		case VK_ESCAPE:
 			CDialogEx::OnCancel();
 			break;
 		}
 	}
 	return CDialogEx::PreTranslateMessage(pMsg);
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CHtmlSpouses::OnChangeSearch()
-{
-	CString	search;
-	GetDlgItem( IDC_SEARCH )->GetWindowText( search );
-	theApp.search( search, m_orderix,  &m_ListCtrl );
-
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CHtmlSpouses::OnNewtable()
@@ -438,30 +432,19 @@ void CHtmlSpouses::OnNewtable()
 		dlg.OnSpousesFile();
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-void CHtmlSpouses::menu()
+void CHtmlSpouses::OnClickedStaticSearch()
 {
-	CMenu* pMenu = GetMenu();
-
-	UINT cnt = pMenu->GetMenuItemCount();
-
-	for( int i=cnt; i > -1; --i )
-		pMenu->DeleteMenu( i, MF_BYPOSITION );
-
-	pMenu->AppendMenuW( MF_STRING, ID_NEWTABLE_SP,		L"Új lekérdezés" );
+	keress( 0 );
 }
-*/
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-void CHtmlSpouses::PostNcDestroy()
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CHtmlSpouses::keress( int start )
 {
-	CDialog::PostNcDestroy();
-	if(m_pParent)
-	{		
-		((CDragonDlg*)m_pParent)->m_pSpousesF = NULL;
-		((CDragonDlg*)m_pParent)->m_pSpousesT = NULL;
-		((CDragonDlg*)m_pParent)->m_pSpousesL = NULL;
+	CString	search;
+	GetDlgItem( IDC_SEARCH )->GetWindowText( search );
+	if( search.IsEmpty() )
+	{
+		AfxMessageBox( L"Meg kell adni a keresendõ stringet!");
+		return;
 	}
-	delete this;
+	theApp.keress( search, &m_ListCtrl, m_orderix, start );
 }
-*/

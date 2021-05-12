@@ -362,19 +362,10 @@ void CDragonDlg::mainTitle( )
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CDragonDlg::PreTranslateMessage(MSG* pMsg)
 {
-	int x=(int)pMsg->wParam;
-
-    if( pMsg->message==WM_KEYDOWN)
-    {
-		switch( x )
-		{
-		case VK_RETURN:
-//			CDialogEx::OnOK();	// exit
-			return TRUE;
-		case VK_ESCAPE:
-			CDialogEx::OnCancel();
-			break;
-		}
+	if( pMsg->message==WM_KEYDOWN)
+	{
+		if( pMsg->wParam == VK_RETURN )
+			return true;						// hogy ne lépjen ki Enter-re
 	}
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
@@ -457,10 +448,12 @@ void CDragonDlg::OnOpenDb()
 */
 	if( !theApp.selectDatabase() ) return;
 	
-	while( !theApp.openDatabase() )
-	{
-		theApp.selectDatabase();
-	}
+	if( !theApp.openDatabase() ) return;
+	
+//	while( !theApp.openDatabase() )
+//	{
+//		theApp.selectDatabase();
+//	}
 
 
 	mainTitle();

@@ -18,6 +18,15 @@
 #define new DEBUG_NEW
 #endif
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// return TRUE ne cseréljen
+// return FALS cseréljen
+bool sortByName(const SPOUSES &v1, const SPOUSES &v2) 
+{ 
+	if( ! v1.rowid.Compare( v2.rowid ) )
+		return( v1.name < v2.name  );
+	return( v1.name < v2.name ); 
+}
 bool sortByName1(const CString &v1, const CString &v2);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CDragonApp::openTextFile( FILE ** fl, CString fileName, CString mode )
@@ -204,41 +213,6 @@ _int64 CDragonApp::dateDiff( CString date1, CString date2 )
 
 	return ( diffI );
 }
-/*
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-_int64 CDragonApp::dateDiff( CString date1, CString date2 )
-{
-	_int64 d1;
-	_int64 d2;
-	int len1 = date1.GetLength();
-	int len2 = date2.GetLength();
-	float	diffD;
-	int		diffI;
-	
-	date1.Replace( '.', '-' );
-	date2.Replace( '.', '-' );
-	if( len1 < len2 )
-		date2 =date2.Left(len1);
-	else if( len1 > len2 )
-		date1 = date1.Left( len2 );
-
-
-
-	m_command.Format( L"SELECT julianday( '%s')", date1 );
-	if( !query4( m_command ) ) return 0;
-	d1 = _wtoi64( m_recordset4->GetFieldString( 0 ) );
-
-	m_command.Format( L"SELECT julianday( '%s')", date2 );
-	if( !query4( m_command ) ) return 0;
-	d2 = _wtoi64( m_recordset4->GetFieldString( 0 ) );
-
-	diffD = (float)(d1 - d2)/365 + 0,5;
-
-	diffI = (int)diffD;
-
-	return ( diffI );
-}
-*/
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CDragonApp::getYear( _int64 diff )
 {
@@ -617,7 +591,6 @@ bool CDragonApp::selectFile(  CString fileSpec, BLOBSTAT* stat)
 {
 	if( fileSpec.IsEmpty() )
 	{
-//		CFileDialog dlg( TRUE, L".*", NULL, OFN_HIDEREADONLY | OFN_EXPLORER | OFN_ALLOWMULTISELECT,
 		CFileDialog dlg( TRUE, L".*", NULL, OFN_HIDEREADONLY | OFN_EXPLORER,
 		L"jpg files(*.jpg)|*.jpg|pdf files(*.pdf)|*.pdf|All Files (*.*)|*.*||" );
 		if( dlg.DoModal( ) == IDCANCEL ) return false;
@@ -1112,6 +1085,7 @@ void CDragonApp::unselectAll( CListCtrlEx * p_ListCtrl )
 	}
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 void CDragonApp::search( CString search, INT_PTR orderix,  CListCtrlEx* p_ListCtrl )
 {
 	int		n				= p_ListCtrl->GetItemCount();
@@ -1130,19 +1104,12 @@ void CDragonApp::search( CString search, INT_PTR orderix,  CListCtrlEx* p_ListCt
 		if( substring == search )
 		{
 			theApp.showItem( nItem, p_ListCtrl );
-/*
-			up = nItem + count_per_page - 1;
-			if( up >= n ) up = n-1;
-
-			p_ListCtrl->SetItemState( nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED );
-//			p_ListCtrl->SetSelectionMark( nItem );
-			p_ListCtrl->EnsureVisible( up, FALSE );
-*/
 			break;
 		}
 	}
 	
 }
+*/
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CDragonApp::getHtmlLine( CString lineNumber )
 {
@@ -1224,6 +1191,7 @@ void CDragonApp::HtmlNotepadParents( CString rowid )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonApp::keress( CString search, CListCtrlEx* p_ListCtrl, int column, int start )
 {
+	if( search.IsEmpty() ) return;
 
 	int	itemCnt	= p_ListCtrl->GetItemCount();
 	CProgressWnd wndProgress(NULL, L"Folyik a keresés.." ); 
@@ -1250,7 +1218,6 @@ void CDragonApp::keress( CString search, CListCtrlEx* p_ListCtrl, int column, in
 		if (wndProgress.Cancelled()) break;
 	}
 	wndProgress.DestroyWindow();
-
 	if( nItem < itemCnt )			// megtalálta a keresett embert,. aki az nItem-1 sorban van
 	{
 		showItem( nItem, p_ListCtrl );
@@ -1265,21 +1232,19 @@ void CDragonApp::keress( CString search, CListCtrlEx* p_ListCtrl, int column, in
 // A p_ListCtrl-al megadott list control nItem-edik  sorát képbe hozza és kijelölöi
 void CDragonApp::showItem( int nItem, CListCtrlEx* p_ListCtrl )
 {
-	int	itemCount	= p_ListCtrl->GetItemCount();
-	int topIndex	= p_ListCtrl->GetTopIndex();
-	int countPP		= p_ListCtrl->GetCountPerPage();
-	int nItemEV		= nItem - 1 + countPP;			// alaphelyzet: a kijelölt sor az ablak tetején
+	int	itemCount	= p_ListCtrl->GetItemCount();	// összesen ennyi sor van
+	int topIndex	= p_ListCtrl->GetTopIndex();	// jelenleg ez van az ablak tetjén
+	int countPP		= p_ListCtrl->GetCountPerPage();// oldalanként ennyi sor van
+	int nVisible	= nItem;						// default láttatás
 
-//	p_ListCtrl->EnsureVisible( nItem, FALSE );
-
-	if( nItem > topIndex )   // lefele megy, fel kell hozni a tábla tetejére a megtalált sort
+	if( nItem > topIndex )							// felhúzza a tábla tetejére, vagy ha már nincs annyi, akkor  a megtalált sort
 	{
-		if( nItemEV > itemCount - 1 )					// már nem lehet az ablak tetejére hozni, mert nincs annyi adat
-			nItemEV = itemCount - 1;
-		nItem = nItemEV;
-//		p_ListCtrl->EnsureVisible( nItemEV, FALSE );
-	}
-	p_ListCtrl->EnsureVisible( nItem, FALSE );
+		if( (nItem + countPP) < itemCount ) 
+			nVisible = nItem + countPP - 1;
+		else
+			nVisible = itemCount - 1;
+	}																	
+	p_ListCtrl->EnsureVisible( nVisible, FALSE );
 	p_ListCtrl->SetItemState( nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -64,6 +64,9 @@ void CGaInput::processDescendantSubstring( CString cLine )
 	cLine = str.Trim();
 
 	processPeopleStr( cLine, &d );
+	desc.nameSubstr		= m_nameSubstr;
+	desc.birthSubstr	= m_birthSubstr;
+	desc.deathSubstr	= m_deathSubstr;
 	d.titolo = m_tableHeader.titolo;
 //	d.last_name = m_tableHeader.familyName;
 	d.last_name = m_familyName;

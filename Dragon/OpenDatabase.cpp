@@ -36,6 +36,7 @@ END_MESSAGE_MAP()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool COpenDatabase::openDatabase() 
 {
+	bool ret = true;
 	if( m_databaseSpec.IsEmpty() )
 	{
 		AfxMessageBox( L"Az adatbázis fáj specifikációja nincs megadva!" );
@@ -94,13 +95,14 @@ bool COpenDatabase::openDatabase()
 	}
 	else
 	{
-		if( !checkStructure( m_tabla, m_databaseTables, m_numberOfTables, m_databaseSpec ) ) return false;
-		if( !checkIntegrity() ) return true;
+		if( !checkStructure( m_tabla, m_databaseTables, m_numberOfTables, m_databaseSpec ) )
+		{
+			WriteProfileString( L"Settings",L"databasespec", L"" ); 
+			ret = false;
+		}
+		if( !checkIntegrity() ) ret = false;
 	}
-
-	
-
-	return 1;
+	return ret;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL COpenDatabase::createTable( CString tablename, COLUMN *tableStruct, int n )
@@ -120,6 +122,7 @@ BOOL COpenDatabase::createTable( CString tablename, COLUMN *tableStruct, int n )
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool COpenDatabase::checkStructure( CSqliteDBRecordSet* rec, const DB* fileStructure, int tableNumberDB, CString fileSpec )
 {
+	bool ret = true;
 	int tableCnt = rec->RecordsCount();
 	
 	if( tableCnt != tableNumberDB )
@@ -145,7 +148,8 @@ bool COpenDatabase::checkStructure( CSqliteDBRecordSet* rec, const DB* fileStruc
 			str.Format( L"%s\nadatbázis fájlban a %d. tábla név '%s', pedig '%s'-nek kellen lenni!\n", fileSpec, i+1, tableName, fileStructure[i].name );
 			str +=  L"\nJelölj ki egy másik adatbázis fájlt vagy adj meg egy újat!";
 			AfxMessageBox( str );
-			return false;
+			ret =  false;
+			break;
 		}
 		createCommand	= rec->GetFieldString( MASTERTABLE_SQL );
 		createColumnVector( createCommand, &vColumns );
@@ -156,7 +160,8 @@ bool COpenDatabase::checkStructure( CSqliteDBRecordSet* rec, const DB* fileStruc
 			str.Format( L"%s\nadatbázis fájlban '%s' táblájában %d oszlop van,\n pedig %d-nek kellen lenni!\n", fileSpec, tableName, vColumns.size(), numOfColumnsDB );
 			str +=  L"\nJelölj ki egy másik adatbázis fájlt vagy adj meg egy újat!";
 			AfxMessageBox( str );
-			return false;
+			ret = false;
+			break;
 		}
 
 		for( UINT j = 0 ; j < vColumns.size(); ++j )
@@ -167,11 +172,13 @@ bool COpenDatabase::checkStructure( CSqliteDBRecordSet* rec, const DB* fileStruc
 				str.Format( L"A %s\nadatbázis fájl '%s' táblájában a %d. oszlop '%s'\npedig '%s'-nek kellen lenni!\n", fileSpec, tableName, j+1, vColumns.at(j), columnName );
 				str +=  L"\nJelölj ki egy másik adatbázis fájlt vagy adj meg egy újat!";
 				AfxMessageBox( str );
-				return false;
+				ret = false;
+				break;
 			}
 		}
+		if( !ret ) break;
 	}
-	return true;
+	return ret;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool COpenDatabase::createColumnVector( CString list, std::vector<CString>* vColumns )

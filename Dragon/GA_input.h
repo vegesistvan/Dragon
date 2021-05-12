@@ -1,7 +1,184 @@
 #pragma once
 
 
-#include "GA_structures.h"
+#include "GA_input_structures.h"
+
+// beolvasásnál használja
+typedef struct 
+{
+	TCHAR	gen;
+	CString	descendant_id;
+	CString spouse_id[10];
+	int		parentIndex;
+	int		descendant_sex_id;
+	int		orderFather;
+	int		orderMother;
+	int		numOfSpouses;
+	CString known_as;
+	CString familyName;
+} GENERATIONS;
+
+typedef struct						// az ebbõl készült vektor indexe a generáció sorszáma ( 0-n)
+{									// az alábbi adatok erre a generációra vonatkoznak
+	CString rowid;					// az utolsó  
+	CString sexid;
+	CString numofSpouses;
+	CString parentIndex;
+	UINT	numofChildren;
+	UINT	numofChildrenPrinted;
+	UINT	printedInGeneration;
+	UINT	orderFather;
+	UINT	orderMother;
+}GA;
+
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// beolvasásnál d, s, sm, sf, ss struktúrája
+typedef struct
+{
+	int		lineNumber;
+	CString	rowid;
+	int		tableAncestry;			// TRUE: egy tábla õse
+	CString tableNumber;
+	CString tableRoman;	// a tábla fejléc római száma
+	int		source;				// az ember típusa 1=leszármazott, 2=házastársa, 3=házastárs apja, 4=házastárs anyja, 5=házastárs további házastársa
+	TCHAR	generation;			// generációs karakter leszárazott esetén
+	int		sex_id;				// 1=férfi, 2= nõ
+	CString title;				
+	CString titolo;
+	CString first_name;
+	CString last_name;
+	CString posterior;
+	CString known_as;
+	CString birth_place ;
+	CString birth_date;
+	CString death_place ;
+	CString death_date;
+	CString comment;
+	CString	father_id;
+	CString	mother_id;
+	int		parentIndex;
+	int		parentIndexCalc;
+	int		orderFather;
+	int		orderMother;
+	CString folyt;						// "folyt" utáni római szám, ha van.
+	CString arm;						// [] zárójelben lévõ string a család ága [ arm ] 
+	CString csalad;
+	int		gap;
+} PEOPLE;
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+typedef struct
+{
+	int order;
+	CString marriage;
+	CString place;
+	CString date;
+	CString spouse;
+	CString parents;
+	CString spouse_spouses;
+}MARRIAGE;
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Leszármazott házastársának strukturája  v_marriages vektort alkot
+typedef struct
+{
+	int		order;			// = jel elõtti szám ( vagy 0 )
+	CString line;
+	CString marriageSubstr;	// = jel utáni substr
+	CString weddigSubstr;
+	CString nameSubstr;
+	CString birthSubstr;
+	CString deathSubstr;
+	CString relativesSubstr;
+	CString parentsSubstr ;
+	CString spousesSubstr;
+
+	CString brace;			// () zárójel tartalma
+	CString parents;
+	CString spouses;				// a zárójelben felsorolt további házastársak
+	CString arm;			// [ ] zárójel tartalma
+
+	CString place;
+	CString date;
+	CString fullname;
+	CString comment;
+
+	CString spouse_id;
+
+	int		sex_id;					// házastárs blokkja
+	CString title;
+	CString titolo;
+	CString first_name;
+	CString last_name;
+	CString posterior;
+
+	CString birth_place;
+	CString birth_date;
+	CString death_place;
+	CString death_date;
+	CString	rowid;
+	CString	father_id;
+	CString	mother_id;
+	int		orderSpouse;
+
+	CString moreSpouses;
+
+	int		sex_idF;				// házastárs apjának blokkja
+	CString titleF;
+	CString titoloF;
+	CString firstNameF;
+	CString lastNameF;
+	CString posteriorF;
+	CString birthPlaceF;
+	CString birthDateF;
+	CString deathPlaceF;
+	CString deathDateF;
+	CString commentF;
+	CString	rowidF;
+
+
+	int		sex_idM;				// házastárs anyjának blokkja
+	CString titleM;
+	CString titoloM;
+	CString firstNameM;
+	CString lastNameM;
+	CString posteriorM;
+	CString birthPlaceM;
+	CString birthDateM;
+	CString deathPlaceM;
+	CString deathDateM;
+	CString commentM;
+	CString	rowidM;
+
+	
+	CString spouseFullname;
+	
+	CString father;					// a zárójelben megadott apa utóneve
+	CString mother;					// a zárójelben megadott anya teljes neve
+} MARRIAGES;
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Leszármazott házastársának további házastársai  v_spouseSpouses vektort alkot
+typedef struct
+{
+	int		spouseIndex;		// a v_marriages vektor indexe
+	CString	rowid;
+	int		order;
+	int		sex_id;
+	CString title;
+	CString titolo;
+	CString last_name;
+	CString first_name;
+	CString posterior;
+	CString comment;
+	CString birth_place;
+	CString birth_date;
+	CString death_place;
+	CString death_date;
+} SPOUSESPOUSES;
+
 
 class CGaInput
 {
@@ -20,6 +197,13 @@ public:
 
 	TABLEHEADER m_tableHeader;
 	std::vector<TABLEHEADER>	v_tableHeader;
+
+	struct 
+	{
+		CString nameSubstr;
+		CString birthSubstr;
+		CString deathSubstr;
+	}desc;
 
 // sorok szétszedése
 	CString m_known_as;

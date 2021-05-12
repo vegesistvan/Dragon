@@ -2,6 +2,7 @@
 #include "listboxex.h"
 #include "afxwin.h"
 #include "listctrlex.h"
+#include "colorstatic.h"
 
 
 // CTableFirstnames dialog
@@ -35,21 +36,18 @@ protected:
 	BOOL firstNameExists( CString first_name );
 	void fillTable();
 	void fillRow( int nItem );
-	//void OnClickedBeszur();
+	void keress( int start );
 	
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnInitDialog();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	afx_msg void OnClickedDelete();
-//	afx_msg LRESULT OnFillTable( WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnSetColumnColor(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnColumnSorted(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnContextMenu(CWnd* /*pWnd*/, CPoint /*point*/);
-	afx_msg void OnChangeSearch();
 	afx_msg void OnClickedUpdate();
-//	afx_msg void OnUdateReplace();
 	afx_msg void OnListTable();
 	afx_msg void OnUnfilter();
 	afx_msg void OnFilterOccurance();
@@ -67,4 +65,6 @@ public:
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
 	afx_msg void OnFilterLanguage();
+	afx_msg void OnClickedKeress();
+	CColorStatic colorKeress;
 };

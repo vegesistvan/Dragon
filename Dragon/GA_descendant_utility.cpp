@@ -5,7 +5,6 @@
 #include "afxdialogex.h"
 
 #include "GA_descendants.h"
-#include "GA_structures.h"
 #include "version.h"
 #include "utilities.h"
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -66,10 +65,6 @@ BOOL CGaDescendants::query4( CString command )
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CGaDescendants::openHtml( CString file, CString title, UINT colorBgrnd )
 {
-//	CString link;
-//	link.Format( L"<link rel=\"stylesheet\" type=\"text/css\" href=\"%s\">\n", cssFile );
-
-
 	CString today;
 	today = theApp.getPresentDateTime();
 
@@ -78,16 +73,31 @@ BOOL CGaDescendants::openHtml( CString file, CString title, UINT colorBgrnd )
 	else
 		str = L"nem";
 
+	CString numbering;
+	switch( m_numbering )
+	{
+		case SZLUHA:
+			numbering = L"Szluha-Késmárky";
+			break;
+		case VIL:
+			numbering = L"de Villers/Pama";
+			break;
+		case TUP:
+			numbering = L"Meurgey de Tupigny";
+	}
+	numbering += L" számozási rendszer";
 
 	CString header;
 	header.Format( L"\n\
 <pre>\n\
-Program:            %s\n\
-Adatbázis:          %s\n\
-Készült:            %s\n\
-Nõk leszármazottai: %s\n\
+Program:             %s\n\
+Adatbázis:           %s\n\
+Készült:             %s\n\
+Lista:               %s\n\
+Leszármazotti lista: %s\n\
+Nõk leszármazottai:  %s\n\
 </pre>\n\n\
-", L"Dragon version " VERSION, theApp.m_databaseSpec, today, str );
+", L"Dragon version " VERSION, theApp.m_databaseSpec, today, title, numbering, str  );
 
 	
 //	CString style;
@@ -109,9 +119,13 @@ Nõk leszármazottai: %s\n\
 	createStyle();
 	print( L"</head>\n" );
 	print( body );
-//	print( font );
 	print( header );
-	print( title );
+	
+
+
+
+
+
 	return TRUE;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

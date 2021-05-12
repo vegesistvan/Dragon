@@ -9,7 +9,7 @@
 #include "ProgressWnd.h"
 #include "utilities.h"
 
-// CGaAscendantsChain dialog
+
 #define SPOUSES 0
 #define FATHER_MOTHER_BRANCH 1
 

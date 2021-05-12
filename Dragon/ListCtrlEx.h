@@ -122,6 +122,7 @@ public:
 	void DeleteByDeleteKey(BOOL bDelete);//sor torlese delete bill.-el
 	virtual BOOL DeleteColumn(int nCol);//oszlop torlese. virtual listctrl eseten nem mukodik
 	BOOL SetColumnType(int nCol, int nColType);//oszlop tipusanak megvaltoztatasa
+	BOOL SetColumnVisibility(int nCol, bool bShow);
 	int GetColumnType(int nCol);//oszlop tipusanak lekerdezese
 	virtual int InsertColumn(int nCol, const LVCOLUMN* pColumn, int nColType=0);//oszlop beszurasa. virtual listctrl eseten nem mukodik
 	virtual int InsertColumn(int nCol, LPCTSTR lpszColumnHeading, int nFormat = LVCFMT_LEFT, int nWidth = -1, int nSubItem = -1,int nColType=0);//oszlop beszurasa. virtual listctrl eseten nem mukodik
@@ -153,7 +154,7 @@ protected:
 
 private:
 	static int CompareData (const void *pInfo,const void * a, const void * b);
-	BOOL SetColumnVisibility(int nCol, bool bShow);
+//	BOOL SetColumnVisibility(int nCol, bool bShow);
 	void Sorting();
 	void SetSortCaseSense(bool caseSense);
 	static int CALLBACK CompareFunct(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);

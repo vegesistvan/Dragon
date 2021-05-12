@@ -22,6 +22,7 @@ enum
 	COMMENT,
 	FATHERID,
 	MOTHERID,
+	PARENTINDEX,
 	COLUMNSCOUNT
 };
 
@@ -34,6 +35,7 @@ class CRelatives : public CDialogEx
 enum
 {
 	L_NAME = 0,
+	L_PARENT_INDEX,
 	L_ROWID,
 	L_PEOPLE,
 };
@@ -52,6 +54,7 @@ protected:
 	CString m_columns;
 	CString m_rowidFirst;
 
+	UINT	m_numOfSpouses;
 	int		m_listCtrlFlag;
 
 	CListCtrlEx m_ListCtrlP;
@@ -73,6 +76,7 @@ protected:
 	CString m_father_id;
 	CString m_mother_id;
 	CString m_name;
+	CString m_parent_index;
 
 	CColorStatic colorPeople;
 	CColorStatic colorFather;

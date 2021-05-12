@@ -50,7 +50,7 @@ public:
 	afx_msg void OnFilterUnfilter();
 	afx_msg void OnOpenHtml();
 	afx_msg void OnFilterSubstring();
-	afx_msg void OnClickedKeres();
+	afx_msg void OnClickedKeress();
 	afx_msg void OnClickedNext();
 	afx_msg void OnDblclkListhtml(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg LRESULT OnSetColumnColor(WPARAM wParam, LPARAM lParam);

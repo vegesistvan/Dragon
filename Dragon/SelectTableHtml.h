@@ -1,5 +1,6 @@
 #pragma once
 #include "listctrlex.h"
+#include "colorstatic.h"
 
 
 // CSelectTable dialog
@@ -19,16 +20,19 @@ public:
 	INT_PTR	m_tableNumberSelected;
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-
+	void CSelectTable::keress( int start );
 	int m_orderix;
+	CColorStatic colorKeress;
 
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnInitDialog();
 	CListCtrlEx m_ListCtrl;
-	afx_msg void OnChangeSearch();
 	afx_msg void OnBnClickedOk();
 	afx_msg LRESULT OnSetColumnColor(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnColumnSorted(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult);
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	afx_msg void OnClickedKeress();
+
 };

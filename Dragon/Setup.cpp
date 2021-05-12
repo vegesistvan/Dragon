@@ -89,17 +89,7 @@ BOOL CSetup::PreTranslateMessage(MSG* pMsg)
 		{
 		case VK_RETURN:
 			return TRUE;
-		case VK_ESCAPE:
-			return TRUE;
 		}
 	}
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
-
-
-//void CSetup::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
-//{
-//	// TODO: Add your message handler code here and/or call default
-//
-//	CDialogEx::OnKeyDown(nChar, nRepCnt, nFlags);
-//}

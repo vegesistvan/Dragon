@@ -81,6 +81,8 @@ enum
 	L_DEATH_PLACE,
 	L_DEATH_DATE,
 	L_COMMENT,
+	L_AG,
+	L_CSALAD,
 };
 // MANUAL
 
@@ -121,7 +123,7 @@ void CTablePeople::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_LIST, m_ListCtrl);
-	DDX_Control(pDX, IDC_KERES, colorKeres);
+	DDX_Control(pDX, IDC_STATIC_KERESS, colorKeres);
 	DDX_Control(pDX, IDC_NEXT, colorNext);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -195,7 +197,7 @@ ON_COMMAND(ID_ASCENDANTS_CHAIN, &CTablePeople::OnAscendantsChain)
 ON_COMMAND(ID_GEDCOM_OUTPUT, &CTablePeople::OnGedcomOutput)
 ON_COMMAND(ID_PRIVATE_DESCENDANTS, &CTablePeople::OnPrivateDescendants)
 ON_COMMAND(ID_FILTER_BISEX, &CTablePeople::OnFilterBisex)
-ON_STN_CLICKED(IDC_KERES, &CTablePeople::OnClickedKeres)
+ON_STN_CLICKED(IDC_STATIC_KERESS, &CTablePeople::OnClickedKeress)
 
 ON_COMMAND(ID_INFO, &CTablePeople::OnInfo)
 ON_STN_CLICKED(IDC_NEXT, &CTablePeople::OnClickedNext)
@@ -633,8 +635,9 @@ void CTablePeople::createListColumns( )
 		m_ListCtrl.InsertColumn( L_DEATH_PLACE,			L"elhalálozás",		LVCFMT_LEFT,	100,-1,COL_TEXT);
 		m_ListCtrl.InsertColumn( L_DEATH_DATE,			L"ideje",			LVCFMT_LEFT,	 70,-1,COL_TEXT);
 		m_ListCtrl.InsertColumn( L_COMMENT,				L"leírás",			LVCFMT_LEFT,	600,-1,COL_TEXT);
+		m_ListCtrl.InsertColumn( L_AG,					L"ág",				LVCFMT_LEFT,	200,-1,COL_TEXT);
+		m_ListCtrl.InsertColumn( L_CSALAD,				L"család",			LVCFMT_LEFT,	100,-1,COL_TEXT);
 	}
-
 	else if( theApp.m_inputMode == MANUAL )
 	{
 		m_ListCtrl.InsertColumn( N_ROWID,				L"rowid",			LVCFMT_RIGHT,	 40,-1,COL_NUM);
@@ -734,13 +737,16 @@ void CTablePeople::fillTable( UINT nItem )
 	m_ListCtrl.ReSort();
 
 	int cntPerPage = m_ListCtrl.GetCountPerPage();
-	if( nItem > 0 )
+	if( nItem >= 0 )
 	{
+		theApp.showItem( nItem, &m_ListCtrl );
+/*
 		m_ListCtrl.SetItemState( nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED);
 		nItem += cntPerPage/2;
 		if( nItem > m_recordset->RecordsCount() )
 			nItem = m_recordset->RecordsCount() - 1;
 		m_ListCtrl.EnsureVisible( nItem, FALSE );
+*/
 	}
 	enableMenu( MF_ENABLED );
 	str.Format( L"%s (%d)", m_filterText, m_ListCtrl.GetItemCount() );
@@ -871,6 +877,8 @@ void CTablePeople::addEntry()
 		push( m_recordset->GetFieldString( PEOPLE_DEATH_PLACE ) );
 		push( m_recordset->GetFieldString( PEOPLE_DEATH_DATE ) );
 		push( m_recordset->GetFieldString( PEOPLE_COMMENT ) );
+		push( m_recordset->GetFieldString( PEOPLE_ARM ) );
+		push( m_recordset->GetFieldString( PEOPLE_CSALAD ) );
 	}
 	else if( theApp.m_inputMode == MANUAL )
 	{
@@ -1357,8 +1365,25 @@ void CTablePeople::OnGedcomOutput()
 	dlg.p_ListCtrl = &m_ListCtrl;
 	dlg.DoModal();
 }
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////// K E R E S É S /////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BOOL CTablePeople::PreTranslateMessage(MSG* pMsg)
+{
+	if( pMsg->message==WM_KEYDOWN)
+	{
+		if( pMsg->wParam == VK_RETURN )
+		{
+			keress(0);
+			return true;			// mert az alsó return-re debug módban hibát jelez
+		}
+	}
+	return CDialogEx::PreTranslateMessage(pMsg);
+}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTablePeople::OnClickedKeres()
+void CTablePeople::OnClickedKeress()
 {
 	keress(0);
 }
@@ -1366,11 +1391,6 @@ void CTablePeople::OnClickedKeres()
 void CTablePeople::OnClickedNext()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	if( nItem == 0 )
-	{
-		AfxMessageBox( L"Nincs kijelölve sor!" );
-		return;
-	}
 	keress( nItem + 1 );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1378,44 +1398,12 @@ void CTablePeople::keress( int start )
 {
 	CString	search;
 	GetDlgItem( IDC_SEARCH )->GetWindowText( search );
-	if( search.IsEmpty() )
-	{
-		AfxMessageBox( L"Meg kell adni a keresendõ stringet!");
-		return;
-	}
-
-
-	int LASTNAME;
-
-	if( theApp.m_inputMode == GAHTML )
-		LASTNAME = L_LAST_NAME;
-	else if( theApp.m_inputMode == GEDCOM )
-		LASTNAME = G_LAST_NAME;
-	else
-		LASTNAME = N_LAST_NAME;
-
-	theApp.keress( search, &m_ListCtrl, LASTNAME, start );
+	theApp.keress( search, &m_ListCtrl, m_orderix, start );
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CTablePeople::PreTranslateMessage(MSG* pMsg)
-{
-	int x=(int)pMsg->wParam;
-
-    if( pMsg->message==WM_KEYDOWN)
-    {
-		switch( x )
-		{
-		case VK_RETURN:
-			GetDlgItem( IDC_SEARCH )->GetWindowTextW( str );
-			if( str.GetLength() ) 
-			OnClickedKeres();
-			break;
-		case VK_ESCAPE:
-			CDialogEx::OnCancel();
-		}
-	}
-	return CWnd::PreTranslateMessage(pMsg);
-}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////44
 LRESULT CTablePeople::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 {

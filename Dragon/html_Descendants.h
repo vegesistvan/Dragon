@@ -31,10 +31,12 @@ protected:
 
 	void CDescendant::listHtmlLine();
 	void CDescendant::fillTable( );
-//	virtual void PostNcDestroy();
+	void keress();
 	void OnHtmlEdit();
 	void OnHtmlNotepad();
 	CListCtrlEx m_ListCtrl;
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+
 	DECLARE_MESSAGE_MAP()
 
 public:
@@ -47,6 +49,6 @@ public:
 	afx_msg LRESULT OnColumnSorted(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnNewtable();
 	afx_msg void OnDList();
-	afx_msg void OnChangeSearch();
 
+	afx_msg void OnClickedKeress();
 };

@@ -178,7 +178,7 @@ public:
 	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	
-	afx_msg void OnClickedKeres();
+	afx_msg void OnClickedKeress();
 	afx_msg void OnClickedNext();
 	afx_msg void OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnInfo();

@@ -5,8 +5,6 @@
 #include "listctrlex.h"
 
 
-// CColumnsList dialog
-
 class CColumnsList : public CDialogEx
 {
 	DECLARE_DYNAMIC(CColumnsList)
@@ -14,32 +12,31 @@ class CColumnsList : public CDialogEx
 public:
 	CColumnsList(CWnd* pParent = NULL);   // standard constructor
 	virtual ~CColumnsList();
-	int	m_selected;
-// Dialog Data
+
 	enum { IDD = IDD_COLUMNSLIST };
-	int		m_numberOfColumns;
+
+	int	m_selected;
+	int	m_numberOfColumns;
+
+	BOOL m_underline;
+	
 	CListCtrl* p_ListCtrl;
-//	BOOL * selected;
 	std::vector<BOOL>* selected;
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-
-	CString	str;
-	DECLARE_MESSAGE_MAP()
-public:
-	virtual BOOL OnInitDialog();
 	CListCtrlEx m_ListCtrl;
+	CString	str;
+
+	DECLARE_MESSAGE_MAP()
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnClickedCheckUnderline();
-	BOOL m_underline;
+	virtual BOOL OnInitDialog();
 };
-
 
 IMPLEMENT_DYNAMIC(CColumnsList, CDialogEx)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CColumnsList::CColumnsList(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CColumnsList::IDD, pParent)
-	, m_underline(FALSE)
 {
 
 }
@@ -63,8 +60,6 @@ END_MESSAGE_MAP()
 BOOL CColumnsList::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-	
-//	SetWindowPos(&wndTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 	
 	int i;
 	m_numberOfColumns = p_ListCtrl->GetHeaderCtrl()->GetItemCount();
@@ -93,7 +88,6 @@ void CColumnsList::OnBnClickedOk()
 {
 	for( int i = 0; i < m_numberOfColumns; i++ )
 	{
-//		selected[i] = m_ListCtrl.GetCheck( i );
 		selected->push_back( m_ListCtrl.GetCheck( i ) );
 	}
 	CDialogEx::OnOK();
@@ -103,12 +97,9 @@ void CColumnsList::OnClickedCheckUnderline()
 {
 	m_underline = !m_underline;
 }
-
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonApp::exportAll( CString logFile, CString title, CListCtrlEx* p_ListCtrl )
 {
-//	int n = p_ListCtrl->GetItemCount();
 	for( int i=0; i < p_ListCtrl->GetItemCount(); ++i)
 	{
 		p_ListCtrl->SetItemState(i, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED);
@@ -121,10 +112,8 @@ void CDragonApp::exportSelected( CString logFile, CString title, CListCtrlEx* p_
 	if( p_ListCtrl->GetSelectedCount() == 0 )
 	{
 		message( L"", L"Nincs kijelölve egy sor sem!" );
-//		AfxMessageBox( L"No selected lines to list!" );
 		return;
 	}
-//	int n = p_ListCtrl->GetSelectedCount();
 
 	if( openLogFile( logFile,title )==NULL) return;
 	if( !listTable( fl, p_ListCtrl ) )
@@ -163,7 +152,6 @@ BOOL CDragonApp::listTable( FILE * fl, CListCtrlEx* p_ListCtrl )
 	if( numberOfSelectedLines == 0 )
 	{
 		message( L"", L"Nincs kijelölve egy sor sem!" );
-//		AfxMessageBox( L"No selected lines to list!" );
 		return FALSE;
 	}
 
@@ -200,7 +188,6 @@ BOOL CDragonApp::listTable( FILE * fl, CListCtrlEx* p_ListCtrl )
 		fwprintf( fl, L"\n" );
 		v_notfound.clear();
 	}
-
 
 
 	// oszopok igazításának iránya és header szélességek összegyûjtése

@@ -1,6 +1,7 @@
 #pragma once
 #include "listboxex.h"
 #include "listctrlex.h"
+#include "colorstatic.h"
 
 
 // CSelectFamily dialog
@@ -25,6 +26,7 @@ protected:
 
 	CString str;
 	int m_orderix;
+	void keress( int start );
 
 	DECLARE_MESSAGE_MAP()
 public:
@@ -32,9 +34,12 @@ public:
 
 	virtual BOOL OnInitDialog();
 	afx_msg void OnBnClickedOk();
-	afx_msg void OnChangeSearch();
+//	afx_msg void OnChangeSearch();
 	afx_msg LRESULT OnSetColumnColor(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnColumnSorted(WPARAM wParam, LPARAM lParam);
 	CListCtrlEx m_ListCtrl;
 	afx_msg void OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnClickedKeress();
+	CColorStatic colorKeress;
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };

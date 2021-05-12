@@ -6,10 +6,6 @@
 #if _MSC_VER > 1000
 #pragma once
 #endif // _MSC_VER > 1000
-// SelectOne.h : header file
-//
-//#define	TOSCREEN FALSE
-//#define	FROMSCREEN TRUE
 /////////////////////////////////////////////////////////////////////////////
 // CSelectOne dialog
 
@@ -20,12 +16,11 @@ public:
 	CSelectOne(CWnd* pParent = NULL);   // standard constructor
 	virtual ~CSelectOne();
 // Dialog Data
-	//{{AFX_DATA(CSelectOne)
+
 	enum { IDD = IDD_SELECTONE };
+
 	CListCtrlEx	m_ListCtrl;
 	CString	m_search;
-	//}}AFX_DATA
-
 	CString	m_caption;		
 	CString	m_table;
 	CString m_column;
@@ -53,10 +48,8 @@ protected:
 	CString	m_command;
 	void	fillTable();
 	BOOL	query( CString command );
-
-	// Generated message map functions
-	//{{AFX_MSG(CSelectOne)
-	afx_msg void OnChangeSearch();
+		
+	void	keress( int start );
 	afx_msg LRESULT OnSetColumnColor(WPARAM wParam, LPARAM lParam);	//!< set color of column
 	afx_msg LRESULT OnColumnSorted(WPARAM wParam, LPARAM lParam);	//!< signal column number to be colored
 	virtual BOOL OnInitDialog();
@@ -65,6 +58,8 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnClickedButtonClear();
+	afx_msg void OnClickedKeress();
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };
 
 //{{AFX_INSERT_LOCATION}}

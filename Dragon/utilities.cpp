@@ -380,14 +380,6 @@ CString packWords( CStringArray* A, int n, int m )
 	CString str(L"");
 	int cnt = 0;
 
-/*
-	int count = A->GetCount();
-
-	if( n + m > count )
-	{
-		int f = 1;
-	}
-*/
 	int db = A->GetSize() ;
 	if( db == 4 )
 			int g = 0;
@@ -427,44 +419,6 @@ void setCreationTime( CString filespec )
 	HANDLE fileHandle = CreateFile( filespec, FILE_WRITE_ATTRIBUTES, FILE_SHARE_READ|FILE_SHARE_WRITE, NULL,OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
 	SetFileTime( fileHandle, &thefiletime, (LPFILETIME) NULL,(LPFILETIME) NULL );
 	CloseHandle(fileHandle);
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void sameClear( SAME * same )
-{
-	same->index = 0;
-	same->repleceBy.Empty();
-	same->rowid.Empty();
-	same->same = ' ';
-	same->group = 0;
-	same->identical = L"";
-	same->timeConflict = L"";
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString toLower( CString str )
-{
-	int tLen = str.GetLength()+1;
-	LPTSTR strC = new TCHAR[tLen];
-	_tcscpy_s( strC,tLen, str.GetBuffer());
-	_wcslwr_s( strC, tLen );
-	str = strC;
-	return str;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// return TRUE ne cseréljen
-// return FALS cseréljen
-bool sortByName(const SPOUSES &v1, const SPOUSES &v2) 
-{ 
-	if( ! v1.rowid.Compare( v2.rowid ) )
-		return( v1.name < v2.name  );
-	return( v1.name < v2.name ); 
-}
-
-bool sortByNameKids(const KIDS &v1, const KIDS &v2) 
-{ 
-	if( ! v1.rowid.Compare( v2.rowid ) )
-		return( v1.name < v2.name  );
-	return( v1.name < v2.name ); 
 }
 bool isLastCharacter( CString str, TCHAR kar )
 {
@@ -538,6 +492,7 @@ BOOL isDateOK( CString datum )
 	}
 	return FALSE;
 }
+/*
 //////////////////////////////////////////////////////////////////////////////////////////
 BOOL isValidBrace( CString brace )
 {
@@ -548,6 +503,7 @@ BOOL isValidBrace( CString brace )
 	if( brace.Find( L"fia" )	!= -1 )	return TRUE;
 	return FALSE;
 }
+*/
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString date2date( CString date )
 {
@@ -658,6 +614,7 @@ CString firstUpper( CString name )
 	out = packWords( &A, 0, n );
 	return out;
 }
+/*
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString upper( CString str )
 {
@@ -673,7 +630,7 @@ CString upper( CString str )
 	}
 	return out;
 }
-
+*/
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL isOdd( _int64 num )
 {
@@ -691,6 +648,7 @@ CString getString( int n )
 	str.Format( L"%d", n );
 	return str;
 }
+/*
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TCHAR * string2char( CString str )
 {
@@ -699,6 +657,7 @@ TCHAR * string2char( CString str )
 	_tcscpy_s( sT, tLen, str.GetBuffer());
 	return sT;
 }
+*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Elfogadott formátum:
 // az évnek 1000 és az aktuális év közé kell esni
@@ -759,6 +718,7 @@ bool checkDate( CString datum)
 	if( length > 10 ) return false;  // dátum után még van valami
 	return true;
 }
+/*
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString roundDate( CString date )
 {
@@ -776,6 +736,7 @@ CString roundDate( CString date )
 	}
 	return date;
 }
+*/
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Addig olvassa a fájlt, amíg a végére nem ér vagy talált benne UTF8BOM-ot vagy UTF8 kódot
 // Default kódolás: ANSI
@@ -912,23 +873,11 @@ CString Utf8ToAnsi( CString cLine )
 	return( Utf8ToUnicode( pBuffer ) ); 
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Ha referencia és par2 is meg van adva, akkor ahhoz hasonlítja par2-t.
-// Ha nincs, de par1 és par2 is adva van, akkor ezeket hasonlítja.
-// par1 vagy par2 üres, akkor return 0;
 //  1 : mindkettõ meg van adva és egyezik;
 //  0 : csak az egyik vagy egy sincs van megadva, így nincs ellentmondás
 //  -1 : mindkettõ meg van adva és nem egyezik
 int same( CString ref, CString par1, CString par2 )
 {
-/*
-	if( !ref.IsEmpty() && !par2.IsEmpty() )
-	{
-		if( ref == par2 )
-			return 1;
-		else
-			return -1;
-	}
-*/
 	int len1 = par1.GetLength();
 	int len2 = par2.GetLength();
 	int len;
@@ -940,20 +889,6 @@ int same( CString ref, CString par1, CString par2 )
 		else
 			return -1;
 	}
-
-/*
-
-	if( !par1.IsEmpty() && !par2.IsEmpty() )
-	{
-
-
-
-		if( par1 == par2 )
-			return 1;
-		else
-			return -1;
-	}
-*/
 	return 0;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -989,13 +924,15 @@ bool openFileSpec( FILE** ff, CString fileSpec, CString mode )
 	}
 	return true;
 }
+/*
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int dateDiff( CString date1, CString date2 )
 {
 	int diff = _wtoi( date1.Left(4) ) - _wtoi( date2.Left(4) );
 	return diff;
 }
-
+*/
+/*
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // return:
 // 1000000 - nem értékelhetõ
@@ -1014,6 +951,7 @@ int compDate( CString date1, CString date2 )
 	else if( n1> n2 )	date1 = date1.Left( n2 );
 	return( date1.Compare( date2 ) );
 }
+*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Két dátum YYYY[[.MM.]DD[ formátumú
 // a hosszabb dátumot csonkítja a rövidebb hosszára és úgy hasonlítja össze

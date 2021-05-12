@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "Dragon.h"
 #include "Ga_descendants.h"
-#include "GA_structures.h"
 #include "utilities.h"
 
 
@@ -13,9 +12,10 @@ void CGaDescendants::printGAline()
 //	fwprintf( fl, L"%d %d %d %d\n", vDesc.at(ix).childrenPrinted, vDesc.at(ix).gen, vDesc.at(ix).numOfChildren, vDesc.size() );
 
 	CString rowid;
-	rowid = vDesc.at( vDesc.size()-1).rowid;
+	rowid = vDesc.at( m_gen ).rowid;
 	queryPeople( rowid, &p );
 
+	
 	printBegining();	// html kódok és generáció elkészítése; 
 	printDescendant();
 	printMarriages(); 
@@ -41,6 +41,8 @@ void CGaDescendants::printGAline()
 		print( str );
 	}
 	fwprintf( fl, L"\n" );
+
+	m_genPrev = m_gen;
 	fflush( fl );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -48,33 +50,26 @@ void CGaDescendants::printGAline()
 void CGaDescendants::printBegining()
 {
 	CString tags;
-	bool ul = false;
-	int ix = vDesc.size() -1;
-
-	UINT	generation	= vDesc.at(ix).gen;
-	m_gen = generation;
-	
-
+	bool	ul = false;
+	int		child;
 	// a generációnak megfelelõ sor-kihúzás, visszatolás
-	if( generation > m_genPrev || m_genPrev == 0 )			// jobbra tolás, új sor generációja nagyobb, 
+	if( m_gen > m_genPrev || m_genPrev == 0 )			// jobbra tolás, új sor generációja nagyobb, 
 	{
 		tags.Format( L"%s<li>", m_tag1 );
 		++cnt_ol;
 		ul = true;
 	}
-	else if( generation == m_genPrev )						// azonos generáció
+	else if( m_gen == m_genPrev )						// azonos generáció
 		tags = L"<li>";
-	else if( generation < m_genPrev )						// balra tolás vissza, régi generáció, kijebb hozza a generáció-különbség-szeresen
+	else if( m_gen < m_genPrev )						// balra tolás vissza, régi generáció, kijebb hozza a generáció-különbség-szeresen
 	{
-		for( UINT i = 0; i < (m_genPrev - generation); ++i )
+		for( UINT i = 0; i < (m_genPrev - m_gen ); ++i )
 		{
 			fwprintf( fl, L"%s\n", m_tag2 );				// anyiszor húzza vissza, amíg el nem éri a generációt
 			--cnt_ol;
 		}
 		tags = L"<li>";
 	}
-	m_genPrev = generation;
-	
 
 	CString family;
 
@@ -83,33 +78,29 @@ void CGaDescendants::printBegining()
 		if( m_familyName != p.last_name )
 		{
 			family = getFamilyName();			// a tables táblából visszadja a tableHeader értékét 
-
-			str.Format( L"\n\n<p>%s %s</p>\n\n", L"%%%", family );
 			str.Format( L"\n\n<br><br>%s%s %s<br><br>\n\n", tags, L"%%%", family );
-/*
-			if( ul )
-				str.Format( L"\n\n<p>%s %s</p>\n\n", L"%%%", family );
-			else
-				str.Format( L"\n\n<p>%s %s</p>\n\n", L"%%", family );
-*/
 			str = getColoredString( str, m_ixFamily );
-
 			print( str );
 			tags = L"<li>";
 		}
 		m_familyName = p.last_name;
 	}
 
-
-	if( vDesc.at(0).hidden ) --generation;
-	TCHAR	gen = TCHAR('A') + TCHAR(generation);	// a generációs karakter-jel ( A,B,C,D.....);
+	TCHAR	gen = TCHAR('A') + TCHAR( m_gen );	// a generációs karakter-jel ( A,B,C,D.....);
 
 	if( m_numbering == SZLUHA )
 		str.Format( L"%s%c&diams;", tags, gen );			// gedcom és kézi bevitelnél nincs generáció, ezt úgy kell beletenni!!
 	else if( m_numbering == VIL )
-		str.Format( L"%s%c%d&diams;", tags, gen, vDesc.at(ix).children );
+	{
+		if( m_gen > 0 )
+			child = vDesc.at( m_gen-1).childrenPrinted;
+		else
+			child = 1;
+		str.Format( L"%s%c%d&diams;", tags, gen, child );
+
+	}
 	else if( m_numbering == TUP )
-		str.Format( L"%s%c-%d&diams;", tags, gen, vSerial.at( generation ) );
+		str.Format( L"%s%c-%d&diams;", tags, gen, vSerial.at( m_gen ) );
 	print( str );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -133,34 +124,30 @@ CString CGaDescendants::getFamilyName()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaDescendants::printDescendant()
 {
-	int ix = vDesc.size() -1;
-// leszármazott neve
+	// leszármazott neve
 	if( m_CheckLastName )
 		cLine.Format( L"%s %s",  getColoredString( p.last_name, m_ixName ), getColoredString( p.first_name, m_ixName )); 
 	else
 		cLine.Format( L"%s", getColoredString( p.first_name, m_ixName ));
 	cLine.TrimRight();
-// ha apjának több felkesége volt,a felség sorszámának kiírása
-
-	if( vDesc.at(ix).numOfMothers > 1 )
+// ha apjának több felesége volt (aki anya), akkor az anya sorszámának kiírása
+	
+	if( m_gen > 0 && vDesc.at( m_gen - 1 ).numOfSpouses > 1 )
 	{
-		if( p.parentIndex )									// parentindex != 0 csak ha változás van
-			m_parentindexLast = p.parentIndex;
-		if( m_numbering == SZLUHA || m_numbering == TUP )
+		if( p.parentIndexCalc && p.parentIndexCalc != vDesc.at(m_gen-1).parentIndexLast ) // csak akkor írja ki a parentIndex-et, ha változik
 		{
-			if( p.parentIndex != 0 )
+			vDesc.at(m_gen-1).parentIndexLast = p.parentIndexCalc;
+	
+			if( m_numbering == SZLUHA || m_numbering == TUP )
 			{
-				str.Format( L"/%d", p.parentIndex ); 
+				str.Format( L"/%d", p.parentIndexCalc ); 
 				cLine += str;
-				m_parentindexLast = p.parentIndex;
 			}
-		}
-		else if( m_numbering == VIL )  // felség sorszámának kiírása a név elõtt
-		{
-			if( m_parentindexLast )
-				fwprintf( fl, L"%d. ", m_parentindexLast );
+			else if ( m_numbering == VIL )
+				fwprintf( fl, L"%d. ", p.parentIndexCalc );
 		}
 	}
+
 	if( !p.posterior.IsEmpty() )
 	{
 		cLine += L" ";
@@ -170,7 +157,7 @@ void CGaDescendants::printDescendant()
 
 	// nem értem, hogy hogy az alábbi if-nek mi az értelme. Ezuért most kikapcsoltam 2020.10.04
 	
-	if( m_numbering == SZLUHA || m_numbering == TUP )
+//	if( m_numbering == SZLUHA || m_numbering == TUP )
 	{
 		str = getPlaceDateBlock( p.birth_place, p.birth_date, L"*" );
 		if( !str.IsEmpty() )
@@ -199,6 +186,7 @@ void CGaDescendants::printDescendant()
 			cLine.Format( L"%s %s", (CString)cLine, str );
 		}
 	}
+/*
 	else if( m_numbering == VIL )
 	{
 		str = getPlaceDateBlock( p.birth_place, p.birth_date, L"*" );
@@ -209,6 +197,7 @@ void CGaDescendants::printDescendant()
 		if( !str.IsEmpty() )
 			cLine.Format( L"%s %s", (CString)cLine, str );
 	}
+*/
 	cLine.Trim();
 
 	CString csalad;
@@ -219,7 +208,6 @@ void CGaDescendants::printDescendant()
 	}
 	print( cLine );
 	fflush( fl );
-	m_genPrev = vDesc.at(ix).gen;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaDescendants::printMarriages()
@@ -238,9 +226,7 @@ void CGaDescendants::printMarriages()
 	if( !query2( m_command ) ) return;
 
 	numberOfSpouses = m_recordset2.RecordsCount();
-
 	if( !numberOfSpouses ) return;					// nincs házastárs
-
 
 	for( int i = 0; i < numberOfSpouses; ++i, m_recordset2.MoveNext() )
 	{
@@ -257,7 +243,6 @@ void CGaDescendants::printMarriages()
 	}
 	fflush( fl );
 }
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaDescendants::printMarriage( CString place, CString date, int i, int numberOfSpouses )
 {
@@ -270,7 +255,6 @@ void CGaDescendants::printMarriage( CString place, CString date, int i, int numb
 
 	marriage = getColoredString( str, m_ixSpec );
 
-
 	if( !place.IsEmpty() )
 	{
 		marriage += place;
@@ -281,8 +265,6 @@ void CGaDescendants::printMarriage( CString place, CString date, int i, int numb
 		marriage += date;
 		marriage += L" ";
 	}
-//	if( m_code == UTF8 ) marriage =  UnicodeToUtf8( marriage );
-//	fwprintf( fl, L"%s", marriage );
 	print( marriage );
 	fflush( fl );
 }

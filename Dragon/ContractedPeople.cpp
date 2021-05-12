@@ -57,14 +57,14 @@ void CContractedPeople::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_LIST, m_ListCtrl);
 	DDX_Control(pDX, IDC_SEARCH, m_search);
-	DDX_Control(pDX, IDC_KERESS, colorKeress);
+	DDX_Control(pDX, IDC_STATIC_KERESS, colorKeress);
 	DDX_Control(pDX, IDC_NEXT, colorNext);
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CContractedPeople, CDialogEx)
 	ON_WM_SIZE()
 	ON_WM_SIZING()
-	ON_STN_CLICKED(IDC_KERESS, &CContractedPeople::OnClickedKeress)
+	ON_STN_CLICKED(IDC_STATIC_KERESS, &CContractedPeople::OnClickedKeress)
 	ON_STN_CLICKED(IDC_NEXT, &CContractedPeople::OnClickedNext)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST, &CContractedPeople::OnCustomdrawList)
 	ON_COMMAND(ID_INFO, &CContractedPeople::OnInfo)
@@ -245,35 +245,27 @@ void CContractedPeople::OnSizing(UINT fwSide, LPRECT pRect)
 	CDialogEx::OnSizing(fwSide, pRect);
 	EASYSIZE_MINSIZE(430,314,fwSide,pRect); 
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////// K E R E S É S /////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CContractedPeople::PreTranslateMessage(MSG* pMsg)
 {
-	int x=(int)pMsg->wParam;
-
-    if( pMsg->message==WM_KEYDOWN)
-    {
-		switch( x )
+	if( pMsg->message==WM_KEYDOWN)
+	{
+		if( pMsg->wParam == VK_RETURN )
 		{
-		case VK_RETURN:
-			GetDlgItem( IDC_SEARCH )->GetWindowTextW( str );
-			if( str.GetLength() ) 
-			OnClickedKeress();
-			break;
-		case VK_ESCAPE:
-			CDialogEx::OnCancel();
+			keress(0);
+			return true;			// mert az alsó return-re debug módban hibát jelez
 		}
 	}
-	return CWnd::PreTranslateMessage(pMsg);
+	return CDialogEx::PreTranslateMessage(pMsg);
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedPeople::OnClickedNext()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	if( nItem == -0 )
-	{
-		AfxMessageBox( L"Nincs kijelölve sor!" );
-		return;
-	}
 	keress( nItem + 1 );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -286,48 +278,12 @@ void CContractedPeople::keress( int start )
 {
 	CString	search;
 	GetDlgItem( IDC_SEARCH )->GetWindowText( search );
-	if( search.IsEmpty() )
-	{
-		AfxMessageBox( L"Meg kell adni a keresendõ stringet!");
-		return;
-	}
-
-	CProgressWnd wndProgress(NULL, L"Folyik a keresés.." ); 
-	wndProgress.GoModal();
-	wndProgress.SetRange(0, m_ListCtrl.GetItemCount() );
-	wndProgress.SetPos(0);
-	wndProgress.SetStep(1);
-
-
-	int		itemCnt	= m_ListCtrl.GetItemCount();
-	int		length	= search.GetLength();
-	int		nItem;
-	CString	str;
-
-	theApp.unselectAll( &m_ListCtrl );
-
-	for( nItem = start; nItem < itemCnt-1; ++nItem )
-	{
-		str = m_ListCtrl.GetItemText( nItem, L_NAME );
-		str = str.Left(length);						// az aktuális search string hosszával azonos hosszúság leválasztása
-		if( str == search )	break;
-		wndProgress.StepIt();
-		wndProgress.PeekAndPump();
-		if (wndProgress.Cancelled()) break;
-	}
-	wndProgress.DestroyWindow();
-
-	if( nItem < itemCnt-1 )			// megtalálta a keresett embert,. aki az nItem-1 sorban van
-	{
-		theApp.showItem( nItem, &m_ListCtrl );
-	}
-	else
-	{
-		str.Format( L"%s nevû embert nem találtam!", search );
-		AfxMessageBox( str );
-	}
+	theApp.keress( search, &m_ListCtrl, L_NAME, start );
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CContractedPeople::createColumns()
 {
 	m_ListCtrl.KeepSortOrder(TRUE);

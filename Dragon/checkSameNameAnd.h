@@ -96,7 +96,7 @@ public:
 	afx_msg void OnHtml();
 	afx_msg void OnEditNotepadParents();
 	afx_msg void OnFatherandsiblings();
-	afx_msg void OnClickedKeres();
+	afx_msg void OnClickedKeress();
 	afx_msg void OnClickedNext();
 
 	afx_msg void OnInfo();

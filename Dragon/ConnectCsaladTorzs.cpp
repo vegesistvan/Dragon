@@ -62,6 +62,8 @@ család->törzs kapcsolatokról. Az alábbi felsorolásokban megtaláljuk a nemlétezõ 
 	CString nameC;
 	CString generation;
 	CStringArray A;
+
+	CString rowidM;
 	int n;
 
 	CString caption;
@@ -94,6 +96,8 @@ család->törzs kapcsolatokról. Az alábbi felsorolásokban megtaláljuk a nemlétezõ 
 		birth_date	= theApp.m_recordset->GetFieldString( 6 );
 		death_date	= theApp.m_recordset->GetFieldString( 7 );
 		name.Format( L"%s %s", theApp.m_recordset->GetFieldString( 3 ), theApp.m_recordset->GetFieldString( 2 ) );
+		
+		
 		csalad		= theApp.m_recordset->GetFieldString( 4 );
 		n = wordList( &A, csalad, ' ', FALSE );
 		csalad = A[0];
@@ -105,6 +109,10 @@ család->törzs kapcsolatokról. Az alábbi felsorolásokban megtaláljuk a nemlétezõ 
 		csalad.Trim();
 		csaladR.Format( L"%s %s", csalad,roman );
 		csaladR.Trim();
+
+		m_command.Format( L"SELECT spouse2_id FROM marriages WHERE spouse1_id='%s'", rowidF );
+		if( !theApp.query3( m_command ) ) return;
+		rowidM = theApp.m_recordset3->GetFieldString( 0 );
 
 		m_command.Format( L"SELECT familyName, tableRoman FROM tables WHERE rowid = '%s'", tableNumber ); // a családalapító ebbena táblában van
 		if( !theApp.query3( m_command ) ) return;
@@ -158,7 +166,7 @@ család->törzs kapcsolatokról. Az alábbi felsorolásokban megtaláljuk a nemlétezõ 
 
 							if( connect )
 							{
-								m_command.Format( L"UPDATE people SET father_id = '%s' WHERE rowid = '%s'", rowidF, rowid );
+								m_command.Format( L"UPDATE people SET father_id = '%s', mother_id='%s' WHERE rowid = '%s'", rowidF, rowidM, rowid );
 								if( !theApp.execute( m_command ) ) return;
 							}
 							else

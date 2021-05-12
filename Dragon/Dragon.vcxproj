@@ -188,6 +188,7 @@
     <ClInclude Include="checkFamilyDates.h" />
     <ClInclude Include="checkGenerations.h" />
     <ClInclude Include="checkIntegrity.h" />
+    <ClInclude Include="ColorButton.h" />
     <ClInclude Include="ContractCouples.h" />
     <ClInclude Include="ContractedCouples.h" />
     <ClInclude Include="ContractedPeople.h" />
@@ -196,6 +197,7 @@
     <ClInclude Include="EditMarriage.h" />
     <ClInclude Include="checkFamilyDatesStart.h" />
     <ClInclude Include="FatherMother.h" />
+    <ClInclude Include="GA_ascendants_str.h" />
     <ClInclude Include="GedcomOut.h" />
     <ClInclude Include="GA_ascendantsChain.h" />
     <ClInclude Include="build_defs.h" />
@@ -214,7 +216,7 @@
     <ClInclude Include="checkSpousesDiff.h" />
     <ClInclude Include="checkSpousesSex.h" />
     <ClInclude Include="GA_descendants.h" />
-    <ClInclude Include="GA_structures.h" />
+    <ClInclude Include="GA_input_structures.h" />
     <ClInclude Include="GetLastFirst.h" />
     <ClInclude Include="GetMarriage.h" />
     <ClInclude Include="GetPeople.h" />
@@ -252,7 +254,6 @@
     <ClInclude Include="SelectMother.h" />
     <ClInclude Include="Setup.h" />
     <ClInclude Include="html_Descendants.h" />
-    <ClInclude Include="html_Spouses.h" />
     <ClInclude Include="checkSameSpouses.h" />
     <ClInclude Include="Filter.h" />
     <ClInclude Include="Info_db.h" />
@@ -304,6 +305,7 @@
     <ClCompile Include="checkFamilyDates.cpp" />
     <ClCompile Include="checkGenerations.cpp" />
     <ClCompile Include="checkIntegrity.cpp" />
+    <ClCompile Include="ColorButton.cpp" />
     <ClCompile Include="ContractCouples.cpp" />
     <ClCompile Include="ContractedCouples.cpp" />
     <ClCompile Include="ContractedPeople.cpp" />
@@ -374,7 +376,6 @@
     <ClCompile Include="SelectMother.cpp" />
     <ClCompile Include="Setup.cpp" />
     <ClCompile Include="html_Descendants.cpp" />
-    <ClCompile Include="html_Spouses.cpp" />
     <ClCompile Include="checkSameSpouses.cpp" />
     <ClCompile Include="DragonDlg_input.cpp" />
     <ClCompile Include="Filter.cpp" />

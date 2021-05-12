@@ -30,12 +30,13 @@ protected:
 	FILE* fh1;
 
 	CColorStatic m_colorCaption;
+	CColorStatic colorKeress;
 
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	void CSpouseSpouses::fillTable( );
 
+	void CSpouseSpouses::keress( int start );
 	void CSpouseSpouses::menu();
-//	virtual void PostNcDestroy();
 
 	void OnHtmlEdit();
 	void OnHtmlNotepad();
@@ -49,10 +50,11 @@ public:
 	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
 	afx_msg LRESULT OnSetColumnColor(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnColumnSorted(WPARAM wParam, LPARAM lParam);
-	afx_msg void OnChangeSearch();
 	afx_msg void OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	
 	afx_msg void OnNewtable();
+	afx_msg void OnClickedKeress();
+
 };

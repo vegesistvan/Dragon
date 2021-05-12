@@ -1,5 +1,6 @@
 #pragma once
 #include "listctrlex.h"
+#include "colorstatic.h"
 
 
 // CTableGaTables dialog
@@ -23,6 +24,9 @@ protected:
 	CString str;
 	FILE* fl1;
 
+	CListCtrlEx m_ListCtrl;
+	CColorStatic colorKeress;
+	void keress( int start );
 	void fillTable( );
 	int CTableGaTables::extract( FILE* flOut, int tablePosition, int tableLength );
 
@@ -31,14 +35,12 @@ public:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
-	CListCtrlEx m_ListCtrl;
 	afx_msg void OnExportAll();
 	afx_msg void OnExportSelected();
 	afx_msg void OnExtractTables();
 	afx_msg LRESULT OnSetColumnColor(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnColumnSorted(WPARAM wParam, LPARAM lParam);
-	afx_msg void OnChangeSearch();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
-//	afx_msg void OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnClickedKeress();
 };

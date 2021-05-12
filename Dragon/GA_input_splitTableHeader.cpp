@@ -201,8 +201,10 @@ void CGaInput::clearTableHeader()
 	m_tableHeader.lineNumber = 0;
 	m_tableHeader.percent.Empty();
 	m_tableHeader.torzs.Empty();
+	m_tableHeader.csalad.Empty();
 	m_tableHeader.tableHeader.Empty();
 	m_tableHeader.tableNumber = 0;
 	m_tableHeader.tableRoman.Empty();
 	m_tableHeader.titolo.Empty();
+	
 }

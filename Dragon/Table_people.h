@@ -148,7 +148,7 @@ public:
 	afx_msg void OnGedcomOutput();
 	afx_msg void OnPrivateDescendants();
 	afx_msg void OnFilterBisex();
-	afx_msg void OnClickedKeres();
+	afx_msg void OnClickedKeress();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 
 	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);

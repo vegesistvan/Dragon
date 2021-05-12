@@ -53,54 +53,52 @@ enum
 	L_DEATH_DATEM,
 	L_MORESPOUSES,
 };
-IMPLEMENT_DYNAMIC(CMarriages, CDialogEx)
+IMPLEMENT_DYNAMIC(CHtmlMarriages, CDialogEx)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CMarriages::CMarriages(CWnd* pParent /*=NULL*/)
-	: CDialogEx(CMarriages::IDD, pParent)
+CHtmlMarriages::CHtmlMarriages(CWnd* pParent /*=NULL*/)
+	: CDialogEx(CHtmlMarriages::IDD, pParent)
 {
 	m_pParent = pParent;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CMarriages::~CMarriages()
+CHtmlMarriages::~CHtmlMarriages()
 {
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CMarriages::DoDataExchange(CDataExchange* pDX)
+void CHtmlMarriages::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_LIST, m_ListCtrl);
 	DDX_Control(pDX, IDC_CAPTION, m_colorCaption);
+	DDX_Control(pDX, IDC_STATIC_KERESS, colorKeress);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BEGIN_MESSAGE_MAP(CMarriages, CDialogEx)
+BEGIN_MESSAGE_MAP(CHtmlMarriages, CDialogEx)
 	ON_MESSAGE(WM_SET_COLUMN_COLOR, OnSetColumnColor)
 	ON_MESSAGE(WM_CLICKED_COLUMN, OnColumnSorted)
 
 	ON_WM_SIZE()
 	ON_WM_SIZING()
-	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CMarriages::OnDblclkList)
-	ON_EN_CHANGE(IDC_SEARCH, &CMarriages::OnChangeSearch)
-	ON_COMMAND(ID_MSUBSTR_FILTER, &CMarriages::OnFilter)
-	ON_COMMAND(ID_MSUBSTR_UNFILTER, &CMarriages::OnUnfilter)
-	ON_COMMAND(ID_MSUBSTR_LIST, &CMarriages::OnList)
-	ON_COMMAND(ID_NEWTABLE, &CMarriages::OnNewtable )
+	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CHtmlMarriages::OnDblclkList)
+	ON_COMMAND(ID_MSUBSTR_FILTER, &CHtmlMarriages::OnFilter)
+	ON_COMMAND(ID_MSUBSTR_UNFILTER, &CHtmlMarriages::OnUnfilter)
+	ON_COMMAND(ID_MSUBSTR_LIST, &CHtmlMarriages::OnList)
+	ON_COMMAND(ID_NEWTABLE, &CHtmlMarriages::OnNewtable )
 
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_HTML_EDIT, &CMarriages::OnHtmlEdit)
-	ON_COMMAND(ID_HTML_NOTEPAD, &CMarriages::OnHtmlNotepad)
+	ON_COMMAND(ID_HTML_EDIT, &CHtmlMarriages::OnHtmlEdit)
+	ON_COMMAND(ID_HTML_NOTEPAD, &CHtmlMarriages::OnHtmlNotepad)
 
+	ON_STN_CLICKED(IDC_STATIC_KERESS, &CHtmlMarriages::OnClickedKeress)
 END_MESSAGE_MAP()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CMarriages::OnInitDialog()
+BOOL CHtmlMarriages::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 	EASYSIZE_ADD( IDC_LIST,	ES_BORDER,	ES_BORDER,		ES_BORDER,		ES_BORDER,	0 );
 	EASYSIZE_ADD( IDC_CAPTION,	ES_BORDER,	ES_BORDER,	ES_BORDER,		ES_KEEPSIZE,	0 );
 	EASYSIZE_INIT()
 
-//	menu();
-
-//	SetWindowPos(&wndTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 
 	m_ListCtrl.SortByHeaderClick(TRUE);
 	m_ListCtrl.SetExtendedStyle(m_ListCtrl.GetExtendedStyle()| LVS_EX_GRIDLINES );
@@ -147,6 +145,7 @@ BOOL CMarriages::OnInitDialog()
 	m_ListCtrl.InsertColumn( L_DEATH_DATEM,		L"halál",				LVCFMT_LEFT,	 80,-1,COL_TEXT);
 	m_ListCtrl.InsertColumn( L_MORESPOUSES,		L"házastársak",			LVCFMT_LEFT,	 80,-1,COL_TEXT);
 
+	colorKeress.SetTextColor( theApp.m_colorClick );
 	m_colorCaption.SetTextColor( theApp.m_colorClick );
 	m_orderix = 0;
 	m_filter.Empty();
@@ -154,7 +153,7 @@ BOOL CMarriages::OnInitDialog()
 	return TRUE;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CMarriages::fillTable( )
+void CHtmlMarriages::fillTable( )
 {
 	CString cLine;
 	CString pLine;
@@ -338,7 +337,7 @@ split.v_marriages.at(i).firstNameM,split.v_marriages.at(i).posteriorM );
 */
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CMarriages::OnFilter()
+void CHtmlMarriages::OnFilter()
 {
 	CGetString dlg;
 	
@@ -350,33 +349,33 @@ void CMarriages::OnFilter()
 	fillTable();
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CMarriages::OnUnfilter()
+void CHtmlMarriages::OnUnfilter()
 {
 	m_filter.Empty();
 	m_filterText.Format( L"Szûretlen házasságok" );
 	fillTable();
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CMarriages::OnList()
+void CHtmlMarriages::OnList()
 {
 	CString	logFile(L"marriagesProblems"); 
 	CString	title( L"Problémás házasságok" );
 	theApp.exportSelected( logFile, title, &m_ListCtrl );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CMarriages::OnSize(UINT nType, int cx, int cy)
+void CHtmlMarriages::OnSize(UINT nType, int cx, int cy)
 {
 	CDialogEx::OnSize(nType, cx, cy);
 	EASYSIZE_RESIZE()
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CMarriages::OnSizing(UINT fwSide, LPRECT pRect)
+void CHtmlMarriages::OnSizing(UINT fwSide, LPRECT pRect)
 {
 	CDialogEx::OnSizing(fwSide, pRect);
 	EASYSIZE_MINSIZE(430,314,fwSide,pRect); 
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-LRESULT CMarriages::OnSetColumnColor(WPARAM wParam, LPARAM lParam)//wparam: oszlopszam, lparam: a COLUMNCOLOR struktura cime
+LRESULT CHtmlMarriages::OnSetColumnColor(WPARAM wParam, LPARAM lParam)//wparam: oszlopszam, lparam: a COLUMNCOLOR struktura cime
 {
 	CELLCOLOR* cColor= (CELLCOLOR*) lParam;//a COLUMNCOLOR struktura deklaralva van a ListCtrlEx.h -ban.
 
@@ -388,13 +387,13 @@ LRESULT CMarriages::OnSetColumnColor(WPARAM wParam, LPARAM lParam)//wparam: oszl
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-LRESULT CMarriages::OnColumnSorted(WPARAM wParam, LPARAM lParam) //wparam: column number
+LRESULT CHtmlMarriages::OnColumnSorted(WPARAM wParam, LPARAM lParam) //wparam: column number
 {
 	m_orderix = (int)wParam;
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CMarriages::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
+void CHtmlMarriages::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
 {
 //	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	int nItem = m_ListCtrl.GetNextItem(-1,LVNI_SELECTED);
@@ -403,34 +402,9 @@ void CMarriages::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
 
 	*pResult = 0;
 }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CMarriages::OnChangeSearch()
-{
-	CString	search;
-	GetDlgItem( IDC_SEARCH )->GetWindowText( search );
-	theApp.search( search, m_orderix,  &m_ListCtrl );
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CMarriages::PreTranslateMessage(MSG* pMsg)
-{
-	int x=(int)pMsg->wParam;
 
-    if( pMsg->message==WM_KEYDOWN)
-    {
-		switch( x )
-		{
-		case VK_RETURN:
-//			listHtmlLine();
-			return TRUE;
-		case VK_ESCAPE:
-			CDialogEx::OnCancel();
-			break;
-		}
-	}
-	return CDialogEx::PreTranslateMessage(pMsg);
-}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CMarriages::OnNewtable()
+void CHtmlMarriages::OnNewtable()
 {
 //	SetWindowPos(&wndNoTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 	CDragonDlg dlg;
@@ -442,54 +416,19 @@ void CMarriages::OnNewtable()
 		OnMarriagesFile();
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-void CMarriages::PostNcDestroy()
-{
-	CDialog::PostNcDestroy();
-	if(m_pParent)
-	{		
-		((CDragonDlg*)m_pParent)->m_pMarriagesF = NULL;
-		((CDragonDlg*)m_pParent)->m_pMarriagesT = NULL;
-		((CDragonDlg*)m_pParent)->m_pMarriagesL = NULL;
-	}
-	delete this;
-}
-*/
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CMarriages::OnMarriagesFile()
+void CHtmlMarriages::OnMarriagesFile()
 {
-	CMarriages dlg;
+	CHtmlMarriages dlg;
 	dlg.m_familyNumber	= 0;
 	dlg.m_tableNumber	= 0;
 	dlg.m_lineNumber	= 0;
 	dlg.m_tableName		= L"";
 	dlg.DoModal();
 
-/*
-	CDragonDlg dlg;
-	if( !dlg.m_pMarriagesF )
-	{
-		dlg.m_pMarriagesF = new CMarriages(this);
-		dlg.m_pMarriagesF->m_familyNumber	= 0;
-		dlg.m_pMarriagesF->m_tableNumber	= 0;
-		dlg.m_pMarriagesF->m_lineNumber	= 0;
-		dlg.m_pMarriagesF->m_tableName		= L"";
-
-//		m_reloadMs = 1;
-
-		dlg.m_pMarriagesF->Create(CMarriages::IDD,GetDesktopWindow());
-		dlg.m_pMarriagesF->ShowWindow(SW_SHOW);
-	}
-	else
-	{
-		dlg.m_pMarriagesF->SetForegroundWindow();
-		dlg.m_pMarriagesF->ShowWindow(SW_RESTORE);
-	}
-*/
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CMarriages::OnMarriagesTable()
+void CHtmlMarriages::OnMarriagesTable()
 {
 	CSelectTableName dlgT;
 	int tableNumber;
@@ -501,49 +440,17 @@ void CMarriages::OnMarriagesTable()
 	tableName	= dlgT.m_tableNameSelected;
 	theApp.WriteProfileInt( L"Settings", L"tableNumber", tableNumber  );
 
-	CMarriages dlg;
+	CHtmlMarriages dlg;
 	dlg.m_familyNumber	= 0;
 	dlg.m_tableNumber	= 0;
 	dlg.m_lineNumber	= 0;
 	dlg.m_tableName		= L"";
 	dlg.DoModal();
 
-
-
-/*
-	CDragonDlg dlg;
-	if( !dlg.m_pMarriagesT )
-	{
-		tableNumber = theApp.GetProfileInt(	L"Settings", L"tableNumber", 0 );
-		if( dlgT.DoModal() == IDCANCEL ) 
-		{
-			return;
-		}
-		tableNumber = dlgT.m_tableNumberSelected;
-		tableName	= dlgT.m_tableNameSelected;
-		theApp.WriteProfileInt( L"Settings", L"tableNumber", tableNumber  );
-
-		dlg.m_pMarriagesT = new CMarriages(this);
-		dlg.m_pMarriagesT->m_familyNumber	= 0;
-		dlg.m_pMarriagesT->m_tableNumber	= tableNumber;
-		dlg.m_pMarriagesT->m_lineNumber	= 0;
-		dlg.m_pMarriagesT->m_tableName		= tableName;
-//		m_reloadMs = 2;
-
-
-		dlg.m_pMarriagesT->Create(CMarriages::IDD,GetDesktopWindow());
-		dlg.m_pMarriagesT->ShowWindow(SW_SHOW);
-	}
-	else
-	{
-		dlg.m_pMarriagesT->SetForegroundWindow();
-		dlg.m_pMarriagesT->ShowWindow(SW_RESTORE);
-	}
-*/
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CMarriages::OnMarriagesLine()
+void CHtmlMarriages::OnMarriagesLine()
 {
 	CGetString dlgL;
 	int lineNumber;
@@ -557,49 +464,18 @@ void CMarriages::OnMarriagesLine()
 	theApp.WriteProfileInt( L"Settings", L"lineNumber", lineNumber  );
 
 
-	CMarriages dlg;
+	CHtmlMarriages dlg;
 	dlg.m_familyNumber	= 0;
 	dlg.m_tableNumber	= 0;
 	dlg.m_lineNumber	= lineNumber;
 	dlg.DoModal();
 
-/*
-	CDragonDlg dlg;
-	if( !dlg.m_pMarriagesL )
-	{
-		lineNumber = theApp.GetProfileInt(	L"Settings", L"lineNumber", 0 );
-		dlgL.m_string.Format( L"%d", lineNumber ); 
-
-		dlgL.m_caption.Format( L"Add meg a %s fájlban lévõ sor sorszámát!", theApp.m_htmlFileName );
-		if( dlgL.DoModal() == IDCANCEL ) 
-		{
-			return;
-		}
-
-		lineNumber = _wtoi( dlgL.m_string );
-		theApp.WriteProfileInt( L"Settings", L"lineNumber", lineNumber  );
-
-		dlg.m_pMarriagesL = new CMarriages(this);
-		dlg.m_pMarriagesL->m_familyNumber	= 0;
-		dlg.m_pMarriagesL->m_tableNumber	= 0;
-		dlg.m_pMarriagesL->m_lineNumber		= lineNumber;
-//		m_reloadMs = 3;
-
-		dlg.m_pMarriagesL->Create(CMarriages::IDD,GetDesktopWindow());
-		dlg.m_pMarriagesL->ShowWindow(SW_SHOW);
-	}
-	else
-	{
-		dlg.m_pMarriagesL->SetForegroundWindow();		// ha az ablak másik ablak alatt van
-		dlg.m_pMarriagesL->ShowWindow( SW_RESTORE);		// ha az ablakot "bezártok" vagy levittük a toolbarra
-	}
-*/
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-LRESULT CMarriages::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
+LRESULT CHtmlMarriages::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 {
 	CPoint* point=(CPoint*) lParam;
     CMenu	Menu;
@@ -619,17 +495,50 @@ LRESULT CMarriages::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 	return TRUE;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CMarriages::OnHtmlEdit()
+void CHtmlMarriages::OnHtmlEdit()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
 	int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, 	L_LINE ) );
 	theApp.listHtmlLine( lineNumber );
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CMarriages::OnHtmlNotepad()
+void CHtmlMarriages::OnHtmlNotepad()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
 	CString lineNumber = m_ListCtrl.GetItemText( nItem, L_LINE );
 	if( !lineNumber.IsEmpty() ) 
 		theApp.editNotepad( lineNumber );
 }
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////// K E R E S É S /////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BOOL CHtmlMarriages::PreTranslateMessage(MSG* pMsg)
+{
+	if( pMsg->message==WM_KEYDOWN)
+	{
+		if( pMsg->wParam == VK_RETURN )
+		{
+			keress(0);
+			return true;			// mert az alsó return-re debug módban hibát jelez
+		}
+	}
+	return CDialogEx::PreTranslateMessage(pMsg);
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CHtmlMarriages::OnClickedKeress()
+{
+	keress(0);
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CHtmlMarriages::keress( int start )
+{
+	CString	search;
+	GetDlgItem( IDC_SEARCH )->GetWindowText( search );
+	theApp.keress( search, &m_ListCtrl, m_orderix, start );
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

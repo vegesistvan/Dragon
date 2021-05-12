@@ -58,6 +58,6 @@ public:
 	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
 	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnList();
-	afx_msg void OnClickedKeres();
+	afx_msg void OnClickedKeress();
 	afx_msg void OnClickedNext();
 };

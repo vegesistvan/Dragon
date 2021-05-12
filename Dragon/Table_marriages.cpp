@@ -136,7 +136,7 @@ void CTableMarriages::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_LIST, m_ListCtrl);
-	DDX_Control(pDX, IDC_KERES, colorKeres);
+	DDX_Control(pDX, IDC_STATIC_KERESS, colorKeres);
 	DDX_Control(pDX, IDC_NEXT, colorNext);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -163,7 +163,7 @@ BEGIN_MESSAGE_MAP(CTableMarriages, CDialogEx)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST, &CTableMarriages::OnCustomdrawList)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CTableMarriages::OnDblclkList)
 	
-	ON_STN_CLICKED(IDC_KERES, &CTableMarriages::OnClickedKeres)
+	ON_STN_CLICKED(IDC_STATIC_KERESS, &CTableMarriages::OnClickedKeress)
 	ON_STN_CLICKED(IDC_NEXT, &CTableMarriages::OnClickedNext)
 
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
@@ -606,41 +606,32 @@ void CTableMarriages::OnDblclkList(NMHDR *pNMHDR, LRESULT *pResult)
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	*pResult = 0;
 	OnEditUpdate();
-
-/*
-
-	if( m_columnsCount == 18 )
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////// K E R E S É S /////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BOOL CTableMarriages::PreTranslateMessage(MSG* pMsg)
+{
+	if( pMsg->message==WM_KEYDOWN)
 	{
-		ShowWindow( SW_HIDE );
-		CEditMarriage dlg;
-		dlg.m_rowid = m_ListCtrl.GetItemText( nItem, LIST_ROWID );
-		dlg.DoModal();
-		ShowWindow( SW_RESTORE );
-	}
-	else
-	{
-		int lineNumber = _wtoi( m_ListCtrl.GetItemText( nItem, L_LINENUMBER ) );
-		if( theApp.m_inputMode == GAHTML )
+		if( pMsg->wParam == VK_RETURN )
 		{
-			theApp.listHtmlLine( lineNumber );
+			keress(0);
+			return true;			// mert az alsó return-re debug módban hibát jelez
 		}
 	}
-*/
+	return CDialogEx::PreTranslateMessage(pMsg);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTableMarriages::OnClickedNext()
 {
 	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
-	if( nItem == -1 )
-	{
-		AfxMessageBox( L"Nincs kijelölve sor!" );
-		return;
-	}
-
 	keress( nItem + 1 );
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTableMarriages::OnClickedKeres()
+void CTableMarriages::OnClickedKeress()
 {
 	keress( 0 );
 }
@@ -649,39 +640,8 @@ void CTableMarriages::keress( int start )
 {
 	CString	search;
 	GetDlgItem( IDC_SEARCH )->GetWindowText( search );
-	if( search.IsEmpty() )
-	{
-		AfxMessageBox( L"Meg kell adni a keresendõ stringet!");
-		return;
-	}
-	int NAME = LIST_HLASTNAME;
-	if( m_orderix != 0 )
-		NAME = m_orderix;
-	theApp.keress( search, &m_ListCtrl, NAME, start );
+	theApp.keress( search, &m_ListCtrl, m_orderix, start );
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CTableMarriages::PreTranslateMessage(MSG* pMsg)
-{
-	int x=(int)pMsg->wParam;
-
-    if( pMsg->message==WM_KEYDOWN)
-    {
-		switch( x )
-		{
-		case VK_RETURN:
-			GetDlgItem( IDC_SEARCH )->GetWindowTextW( str );
-			if( str.GetLength() )
-				OnClickedKeres();
-			break;
-		case VK_ESCAPE:
-			CDialogEx::OnCancel();
-		}
-	}
-    return CWnd::PreTranslateMessage(pMsg);
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

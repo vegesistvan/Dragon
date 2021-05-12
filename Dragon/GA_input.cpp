@@ -127,7 +127,8 @@ torzs,\
 known_as,\
 arm,\
 joint,\
-folyt\
+folyt,\
+csalad\
 ";
 
 m_generationPrev = ' ';
@@ -231,13 +232,15 @@ bool CGaInput::inputFile()
 		}
 		else if( cLine.Left(2) == L"% " )			// %known_as A tableHeader/leszármazott beolvasása után egy külön sorban olvashatjuk be!!
 		{
+			m_known_as = getSecondWord( cLine );
 			if( m_tableAncestry )					// fejlécet követi
-				m_tableHeader.known_as = cLine;
+				m_tableHeader.known_as = m_known_as;
 			else									// leszármazottat követi
 			{
-				m_known_as = getSecondWord( cLine );
+//				m_known_as = getSecondWord( cLine );
 				m_known_as.Replace( ',', ' ' );			// % Aba, aaaaa
 				m_known_as.Trim() ;
+
 				if( m_known_as == L"N;" ) continue;
 				m_familyName = m_known_as;
 				updatePreviousDescendant( m_known_as );	// az elõzõ decendant know_as mezejébe updatei a "% nev"-et

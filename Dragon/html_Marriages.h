@@ -3,19 +3,19 @@
 #include "colorstatic.h"
 
 
-// CMarriages dialog
+// CHtmlMarriages dialog
 
-class CMarriages : public CDialogEx
+class CHtmlMarriages : public CDialogEx
 {
-	DECLARE_DYNAMIC(CMarriages)
+	DECLARE_DYNAMIC(CHtmlMarriages)
 	DECLARE_EASYSIZE
 
 public:
-	CMarriages(CWnd* pParent = NULL);   // standard constructor
-	virtual ~CMarriages();
+	CHtmlMarriages(CWnd* pParent = NULL);   // standard constructor
+	virtual ~CHtmlMarriages();
 
 // Dialog Data
-	enum { IDD = IDD_HTML_SPOUSES };
+	enum { IDD = IDD_HTML_MARRIAGES };
 
 	CWnd* m_pParent;
 
@@ -43,11 +43,12 @@ protected:
 	BOOL PreTranslateMessage(MSG* pMsg);
 //	virtual void PostNcDestroy();
 
-	void CMarriages::OnMarriagesFile();
-	void CMarriages::OnMarriagesTable();
-	void CMarriages::OnMarriagesLine();
+	void CHtmlMarriages::OnMarriagesFile();
+	void CHtmlMarriages::OnMarriagesTable();
+	void CHtmlMarriages::OnMarriagesLine();
 	void OnHtmlEdit();
 	void OnHtmlNotepad();
+	void keress( int start );
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnInitDialog();
@@ -61,6 +62,6 @@ public:
 	afx_msg void OnFilter();
 	afx_msg void OnUnfilter();
 	afx_msg void OnList();
-	afx_msg void OnChangeSearch();
-	
+	CColorStatic colorKeress;
+	afx_msg void OnClickedKeress();
 };
