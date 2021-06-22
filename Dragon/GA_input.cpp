@@ -147,6 +147,7 @@ bool CGaInput::inputFile()
 {
 	GENERATIONS	gen;	// a generáció, az apa és max 10 feleség azonoosítója, amit a v_genertion-ben õriz késõbbi felhasználásra
 	CString		caption;
+	int z;
 
 	if( m_rollToLineFrom )
 		caption.Format( L"A %s fájl beolvasása a %d sortól", theApp.m_htmlFileName, m_rollToLineFrom );
@@ -207,7 +208,8 @@ bool CGaInput::inputFile()
 
 		cLine.Replace( '\'', '|' );	 // a nevekben elõfordulhat az ' jel, amit az SQLite nem szeret
 		++m_lineNumber;
-
+		if( m_lineNumber == 22 )
+			z = 1;
 		if(  cLine.Left( 2 ) == L"%%" )			// tábla fejléc feldolgozása
 		{
 			if( m_rollToTable )					// ha megadott táblát akarunk beolvasni
@@ -235,14 +237,13 @@ bool CGaInput::inputFile()
 			m_known_as = getSecondWord( cLine );
 			if( m_tableAncestry )					// fejlécet követi
 				m_tableHeader.known_as = m_known_as;
-			else									// leszármazottat követi
+			else if( !m_known_as.IsEmpty() )									// leszármazottat követi
 			{
-//				m_known_as = getSecondWord( cLine );
 				m_known_as.Replace( ',', ' ' );			// % Aba, aaaaa
 				m_known_as.Trim() ;
 
 				if( m_known_as == L"N;" ) continue;
-				m_familyName = m_known_as;
+				m_familyName = m_known_as;  // ????
 				updatePreviousDescendant( m_known_as );	// az elõzõ decendant know_as mezejébe updatei a "% nev"-et
 			}
 		}
@@ -255,7 +256,7 @@ bool CGaInput::inputFile()
 				return false;
 			}
 
-			cLine = cleanHtmlTags( cLine );
+			cLine = cleanHtmlTags( m_lineNumber, cLine );
 			if( cLine.IsEmpty() ) continue;
 			
 			splitLine( cLine );

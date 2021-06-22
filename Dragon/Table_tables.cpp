@@ -147,6 +147,7 @@ BOOL CTableTables::OnInitDialog()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTableTables::fillTables()
 {
+	vColor.clear();
 	CString familyName;
 	if( m_filter.IsEmpty() )
 		m_command = L"SELECT rowid,* FROM tables ORDER BY familyName, titolo";
@@ -170,7 +171,9 @@ void CTableTables::setRow( int nItem )
 	CString titoloName;
 	CString titoloName1;
 
-	m_ListCtrl.SetItemData( nItem, 0 );
+//	m_ListCtrl.SetItemData( nItem, 0 );
+
+	vColor.push_back(0);
 	m_ListCtrl.SetItemText( nItem, T_ROWID,				theApp.m_recordset->GetFieldString( TABLES_ROWID ));
 	m_ListCtrl.SetItemText( nItem, T_FILENUMBER,		theApp.m_recordset->GetFieldString( TABLES_FILENUMBER ));
 	m_ListCtrl.SetItemText( nItem, T_FAMILYNUMBER,		theApp.m_recordset->GetFieldString( TABLES_FAMILYNUMBER ));
@@ -195,28 +198,34 @@ void CTableTables::setRow( int nItem )
 
 	m_ListCtrl.SetItemText( nItem, T_COMMENT,			theApp.m_recordset->GetFieldString( TABLES_COMMENT ) );
 	
-	titoloName.Format( L"%s%s", theApp.m_recordset->GetFieldString( TABLES_TITOLO ), theApp.m_recordset->GetFieldString( TABLES_FAMILY_NAME ) );
-	if( nItem > 0 )
+	if( !nItem )									// a 0. sor mindenképpen színes
+	{
+//		m_ListCtrl.SetItemData( nItem, 1 );
+		vColor.at( vColor.size() - 1) = 1;
+		m_colored = true;
+	}
+	else
 	{
 		theApp.m_recordset->MovePrevious();
 		titoloName1.Format( L"%s%s", theApp.m_recordset->GetFieldString( TABLES_TITOLO ), theApp.m_recordset->GetFieldString( TABLES_FAMILY_NAME ) );
 		theApp.m_recordset->MoveNext();
-	}
-	if( m_colored )				// az elõzõ sor szines
-	{
-		if( !nItem )
-			m_ListCtrl.SetItemData( nItem, 1 );
-		else if( titoloName == titoloName1 )
-			m_ListCtrl.SetItemData( nItem, 1 );
-		else
-			m_colored = false;
-	}
-	else
-	{
-		if( titoloName != titoloName1  )
+		titoloName.Format( L"%s%s", theApp.m_recordset->GetFieldString( TABLES_TITOLO ), theApp.m_recordset->GetFieldString( TABLES_FAMILY_NAME ) );
+		if( m_colored )								// ha az elõzõ szines volt
 		{
-			m_ListCtrl.SetItemData( nItem, 1 );
-			m_colored = true;
+			if( titoloName == titoloName1 )			// és azonos nevû, akkor ez is színes
+			//	m_ListCtrl.SetItemData( nItem, 1 );
+				vColor.at( vColor.size() - 1) = 1;
+			else									// na nem azonios nevõ, akkor nem színes
+				m_colored = false;
+		}
+		else										// ha az elõzõ nem volt színes
+		{
+			if( titoloName != titoloName1 )			// és a nevek sem egyemnlõek
+			{
+				vColor.at( vColor.size() - 1) = 1;
+			//	m_ListCtrl.SetItemData( nItem, 1 );	// akkor ez színes lesz
+				m_colored = true;
+			}
 		}
 	}
 }
@@ -579,28 +588,24 @@ void CTableTables::OnCustomdrawList(NMHDR *pNMHDR, LRESULT *pResult)
 	switch( pLVCD->nmcd.dwDrawStage )
 	{
 	case CDDS_PREPAINT:
-		pLVCD->clrTextBk = WHITE;
 		*pResult = CDRF_NOTIFYITEMDRAW;
 		break;
 	case CDDS_ITEMPREPAINT:
-		pLVCD->clrTextBk = WHITE;
 		*pResult = CDRF_NOTIFYSUBITEMDRAW;
 		break;
 	case CDDS_ITEMPREPAINT|CDDS_SUBITEM:
+		if( m_orderix == 8 )
+		{
+			nItem = pLVCD->nmcd.dwItemSpec;
+			//itemData = m_ListCtrl.GetItemData( nItem );
+			if( vColor.at(nItem) )
+				pLVCD->clrTextBk = YELLOW;
+		}
 		nCol = pLVCD->iSubItem;
 		if( nCol == T_DUMMY1 || nCol == T_DUMMY2 || nCol == T_DUMMY3 )
 		{
 			pLVCD->clrTextBk = RGB( 0,255,205);
 		}
-
-		if( m_orderix == 8 )
-		{
-			nItem = pLVCD->nmcd.dwItemSpec;
-			itemData = m_ListCtrl.GetItemData( nItem );
-			if( itemData == 1 )
-				pLVCD->clrTextBk = YELLOW;
-		}
-
 
 		*pResult = CDRF_DODEFAULT;
 		break;

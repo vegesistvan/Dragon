@@ -46,7 +46,7 @@ BOOL		isValidBrace( CString brace );
 
 CString		cleanCline( CString cLine );
 CString		cleanHtmlLine( CString cLine );
-CString		cleanHtmlTags( CString cLine );
+CString		cleanHtmlTags( int lineNumber, CString cLine );
 CString		packWords( CStringArray* A, int from, int db );
 void		setCreationTime( CString filespec );
 

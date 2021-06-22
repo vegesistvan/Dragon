@@ -108,6 +108,7 @@ CString CGaInput::insertDescendant( )
 {
 	d.source		= 1;
 	d.last_name		= m_familyName;
+	d.last_name		= m_tableHeader.familyName;
 //	d.titolo		= m_tableHeader.titolo;
 	d.rowid			= insertAny( &d );
 	m_rowidLastDescendant = d.rowid;
@@ -292,7 +293,7 @@ p->death_place,p->death_date,p->comment,p->father_id,p->mother_id,p->parentIndex
 p->tableRoman,p->arm,p->orderFather,p->orderMother,p->csalad,p->gap, numOfMarriages );
 
 
-    m_command.Format( L"INSERT INTO people (%s) VALUES (%s)", m_fieldsP, values );
+    m_command.Format( L"INSERT INTO people (%s) VALUES (%s)",                                                                                 m_fieldsP, values );
 	if( !theApp.execute( m_command ) ) return 0;
 
 	++theApp.m_cntPeople;

@@ -64,12 +64,12 @@ BOOL CCheckNames::OnInitDialog()
 	SetWindowTextW( caption );
 
 	CString info = L"\
-Alább olyan sorkat láthatunk a GA.html fájlból, amelyekbõl valamelyik ember család és/vagy keresztnevét nem sikerült \
+Alább olyan sorokat láthatunk a GA.html fájlból, amelyekbõl valamelyik ember család vagy keresztnevét nem sikerült \
 kibányászni. A hiányzó családnevet X, a hiányzó keresztnevet Y karakter jelzi a név oszlopban. Nekünk kell kitalánunk, \
 hogy melyik ember neve okozhatott problémát a programnak.\r\n\
 \r\n\
-A hiba okának megállapításában segítségünkre lehet a 'GA.html fájl ellenõrzése' menüpont, aholis egyes sorok \
-felbontását is kérhetjük, amélkül, hogy az az adatbázisba kerülne.\r\n\
+A hiba okának megállapításában segítségünkre lehet a 'GA.html fájl ellenõrzése' menüpont, ahol egyes sorok \
+felbontását is kérhetjük, anélkül, hogy az az adatbázisba kerülne.\r\n\
 \r\n\
 A hibákat többnyire az értelmezhetetlen keresztnevek okozzák, de más oka is lehet. Ha felismerjük a hibát és az javítható. akkor a \
 a jobb egérgombbal a kiválasztott sorra kattintva egy legördülõ menü jelenik meg, amibõl választhatjuk 'A sor szerkesztése' \n\
@@ -96,7 +96,7 @@ ill. 'A sor a Notepad-ben' funkciókat. Bármelyikban javíthatjuk a ga.html fájl m
 	CString cntS;
 	CString people;
 	CString name;
-
+	int z;
 
 	theApp.m_inputCode = GetInputCode( theApp.m_htmlFileSpec );
 
@@ -115,6 +115,9 @@ ill. 'A sor a Notepad-ben' funkciókat. Bármelyikban javíthatjuk a ga.html fájl m
 	{
 		cntS.Format( L"%d", i+1 );
 		lineNumber = theApp.m_recordset->GetFieldString( PEOPLE_LINENUMBER );
+		if( lineNumber == L"22" )
+			z = 1;
+
 		gaLine = theApp.getHtmlLine( lineNumber );
 
 		

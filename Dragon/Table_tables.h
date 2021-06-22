@@ -49,6 +49,8 @@ protected:
 	bool	m_colored;
 	bool	m_same;
 
+	std::vector<int> vColor;
+
 	void setRow( int nItem );
 	void editUpdate( CString tableNUmber );
 

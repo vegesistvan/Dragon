@@ -30,7 +30,9 @@ void CGaInput::processPeopleStr( CString cLine,  PEOPLE* any )
 
 	cLine.Trim();
 
-	if( (pos = cLine.Find('+') ) != - 1 )
+
+	
+ 	if( (pos = cLine.Find('+') ) != - 1 )
 	{
 		m_deathSubstr	= cLine.Mid( pos + 1 );		// halálozási blokk
 		cLine = cLine.Left( pos );
@@ -40,9 +42,18 @@ void CGaInput::processPeopleStr( CString cLine,  PEOPLE* any )
 		m_birthSubstr = cLine.Mid( pos + 1);		// születési blokk
 		cLine = cLine.Left( pos );
 	}
+/*
+	CString twoWords;
+	twoWords = getTwoWords( cLine );
+	if( (pos = twoWords.Find( ',' ) ) != -1 )
+	{
+		m_nameSubstr = cLine.Left( cLine.Find( ',') );
+		any->comment = cLine.Mid( cLine.Find( ',' ) + 1 );
+		any->comment.Trim();
+	}
+	else
+*/
 	m_nameSubstr = cLine;
-
-//	processNameSubstr( m_nameSubstr, m_birthSubstr, m_deathSubstr,  any );
 	processNameSubstr( any );
 	processPlaceDateComment( m_birthSubstr, &bb );
 	processPlaceDateComment( m_deathSubstr, &db );
@@ -167,7 +178,10 @@ void CGaInput::processNameSubstr( PEOPLE* any )
 	if( !m_birthSubstr.IsEmpty() || !m_deathSubstr.IsEmpty() && !iswdigit( posterior.GetAt(0) ) )
 		any->posterior = posterior;
 	else
-		any->comment = posterior;
+	{
+		if( !posterior.IsEmpty() )
+			any->comment = posterior;
+	}
 
 
 //// FULLNAME FELBONTÁSA ///////////////////////////////////////////////////

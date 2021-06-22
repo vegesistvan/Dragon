@@ -357,8 +357,8 @@ CString CRelatives::selectPeople( CString rowid )
 	str.Format( L"%s %s", (CString)str, profession ); 
 	str.TrimRight();
 
-	m_name.Format( L"%s %s", lastname, firstname );
-	m_name.Trim();
+//	m_name.Format( L"%s %s", lastname, firstname );
+//                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             	m_name.Trim();
 
 	return  str;
 }

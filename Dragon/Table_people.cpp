@@ -83,6 +83,7 @@ enum
 	L_COMMENT,
 	L_AG,
 	L_CSALAD,
+	L_FOLYT,
 };
 // MANUAL
 
@@ -636,7 +637,8 @@ void CTablePeople::createListColumns( )
 		m_ListCtrl.InsertColumn( L_DEATH_DATE,			L"ideje",			LVCFMT_LEFT,	 70,-1,COL_TEXT);
 		m_ListCtrl.InsertColumn( L_COMMENT,				L"leírás",			LVCFMT_LEFT,	600,-1,COL_TEXT);
 		m_ListCtrl.InsertColumn( L_AG,					L"ág",				LVCFMT_LEFT,	200,-1,COL_TEXT);
-		m_ListCtrl.InsertColumn( L_CSALAD,				L"család",			LVCFMT_LEFT,	100,-1,COL_TEXT);
+		m_ListCtrl.InsertColumn( L_CSALAD,				L"család õse",		LVCFMT_LEFT,	100,-1,COL_TEXT);
+		m_ListCtrl.InsertColumn( L_FOLYT,				L"folyt",			LVCFMT_LEFT,	 20,-1,COL_TEXT);
 	}
 	else if( theApp.m_inputMode == MANUAL )
 	{
@@ -879,6 +881,7 @@ void CTablePeople::addEntry()
 		push( m_recordset->GetFieldString( PEOPLE_COMMENT ) );
 		push( m_recordset->GetFieldString( PEOPLE_ARM ) );
 		push( m_recordset->GetFieldString( PEOPLE_CSALAD ) );
+		push( m_recordset->GetFieldString( PEOPLE_FOLYT ) );
 	}
 	else if( theApp.m_inputMode == MANUAL )
 	{

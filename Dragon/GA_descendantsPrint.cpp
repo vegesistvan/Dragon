@@ -475,7 +475,7 @@ void CGaDescendants::queryPeople( CString rowid, PPEOPLE* p )
 	p->father_id		= m_recordset.GetFieldString( PEOPLE_FATHER_ID );
 	p->first_name		= m_recordset.GetFieldString( PEOPLE_FIRST_NAME );
 	p->posterior		= m_recordset.GetFieldString( PEOPLE_POSTERIOR );
-	p->folyt			= m_recordset.GetFieldString( PEOPLE_FOLYT );
+	p->folyt			= m_recordset.GetFieldString(                                                                                                                     PEOPLE_FOLYT );
 	p->gap				= m_recordset.GetFieldString( PEOPLE_GAP );
 	p->generation		= m_recordset.GetFieldString( PEOPLE_GENERATION );
 	p->known_as			= m_recordset.GetFieldString( PEOPLE_KNOWN_AS );

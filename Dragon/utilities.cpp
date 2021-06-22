@@ -208,9 +208,10 @@ CString getSecondWord( CString str )
 	if( ( pos1 = str.Find( ' ' ) ) == -1 ) return L"";			// csak legfeljebb 1 szó van benne;
 	if( ( pos2 = str.Find( ' ', pos1+1 ) ) == -1 )
 	{
-		return( str.Mid( pos1+1 ) );			// csak 2 szó van benne
+		out = str.Mid( pos1+1 );			// csak 2 szó van benne
 	}
-	return( str.Mid( pos1+1, pos2-pos1-1 ) );
+	out = str.Mid( pos1+1, pos2-pos1-1 );
+	return( out );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString getTwoWords( CString str )
@@ -224,7 +225,7 @@ CString getTwoWords( CString str )
 	{
 		return( str );			// csak 2 szó van benne
 	}
-	return( str.Left( pos2 ) );
+	return( str.Left( pos2 -1 ) );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL isNumeric( CString word )
@@ -334,7 +335,7 @@ CString cleanHtmlLine( CString cLine )
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // A soremlés és más kiszûrése
-CString cleanHtmlTags( CString cLine )
+CString cleanHtmlTags( int lineNumber, CString cLine )
 {
 	CString str;
 	CString str1;
@@ -349,7 +350,7 @@ CString cleanHtmlTags( CString cLine )
 		str1 = cLine.Left( pos1 );
 		if( ( pos2 = cLine.Find( '>', pos1  ) ) == - 1 )
 		{
-			str.Format( L"A '<' karakter után nincs '>' karakter!!\n%s", cLine );
+			str.Format( L"A '<' karakter után nincs '>' karakter!!\nL%d %s", lineNumber, cLine );
 			AfxMessageBox( str, MB_ICONERROR );
 			return L"";
 		}
