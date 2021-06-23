@@ -96,9 +96,9 @@ void CGaInput::processNameSubstr( PEOPLE* any )
 	bool volt = false;
 	int numOfFirstNames = 0;
 
-	// parentIndex leszedése, ha van
+
 	int n = wordList(&A, m_nameSubstr, ' ', FALSE );
-		for( i = 0; i < n; ++i )
+	for( i = 0; i < n; ++i )
 	{
 		word = A[i];
 //		word.Replace( '?', ' ' );  // az egy szón belül a ? helyén maradjon space, hogy a Mária???Emese-féle neveket kezeni tudja!!
@@ -106,7 +106,7 @@ void CGaInput::processNameSubstr( PEOPLE* any )
 		A[i] = word;
 	}
 
-
+	// parentIndex leszedése, ha van
 	for( i = 0; i < n; ++i )
 	{
 		word = A[i];
@@ -137,6 +137,8 @@ void CGaInput::processNameSubstr( PEOPLE* any )
 		word = A[i];
 		word.Replace( ',', ' ' );						// a név után lehet vesszõ !!
 		word.Replace( '?', ' ' );
+		word.Remove( '(' );
+		word.Remove( ')' );
 		
 		word.TrimRight();
 		
