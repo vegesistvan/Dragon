@@ -52,11 +52,12 @@ void CGaDescendants::printBegining()
 	CString tags;
 	bool	ul = false;
 	int		child;
+
 	// a generációnak megfelelõ sor-kihúzás, visszatolás
 	if( m_gen > m_genPrev || m_genPrev == 0 )			// jobbra tolás, új sor generációja nagyobb, 
 	{
 		tags.Format( L"%s<li>", m_tag1 );
-		++cnt_ol;
+		++m_indent;
 		ul = true;
 	}
 	else if( m_gen == m_genPrev )						// azonos generáció
@@ -66,7 +67,7 @@ void CGaDescendants::printBegining()
 		for( UINT i = 0; i < (m_genPrev - m_gen ); ++i )
 		{
 			fwprintf( fl, L"%s\n", m_tag2 );				// anyiszor húzza vissza, amíg el nem éri a generációt
-			--cnt_ol;
+			--m_indent;
 		}
 		tags = L"<li>";
 	}
@@ -86,7 +87,7 @@ void CGaDescendants::printBegining()
 		m_familyName = p.last_name;
 	}
 
-	TCHAR	gen = TCHAR('A') + TCHAR( m_gen );	// a generációs karakter-jel ( A,B,C,D.....);
+	TCHAR gen = TCHAR( 'A' ) + TCHAR( m_indent - 1 );
 
 	if( m_numbering == SZLUHA )
 		str.Format( L"%s%c&diams;", tags, gen );			// gedcom és kézi bevitelnél nincs generáció, ezt úgy kell beletenni!!

@@ -131,7 +131,7 @@ Nõk leszármazottai:  %s\n\
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGaDescendants::closeHtml()
 {
-	for( int i =0; i < cnt_ol; ++i )
+	for( int i =0; i < m_indent; ++i )			// a kihúzások megszüntetése, vissza az alapvonalra
 		fwprintf( fl, L"%s\n", m_tag2 );
 	fwprintf( fl, L"</body>\n" );
 	fwprintf( fl, L"</html>" );

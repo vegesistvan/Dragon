@@ -131,7 +131,7 @@ protected:
 	
 	int	m_table_number;
 	
-	int cnt_ol;
+	int m_indent;
 	BOOL	m_join;		// összekapcsolja-e az elágazásokat?
 	BOOL	m_limited;	// TRUE: csak a nála nagyobb generációkat listázza
 	BOOL	WOMEN_DESCENDANT;

@@ -124,11 +124,11 @@ protected:
 
 	int		m_gen;
 	int		m_genPrev;
-	int		cnt_ol;
 	UINT	m_colorBgrnd;
 
 	CString m_tag1;		// <ol> vagy <ul>
 	CString m_tag2;		// </ol> vagy </ul>
+	int		m_indent;	// behúzások aktuális száma( <ol>/<il>-ek száma ) 
 
 	int		m_sex_id;
 	CString m_mother_index;

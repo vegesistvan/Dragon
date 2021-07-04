@@ -154,6 +154,7 @@ void CGaDescendants::OnBnClickedOk()
 	if( m_woman ) m_connect = true;
 
 	CDialogEx::OnOK();
+
 	if( m_rowid1.IsEmpty() )
 		treeTables();
 	else
@@ -200,7 +201,7 @@ void CGaDescendants::treePeople()
 	vDesc.push_back( desc );
 
 	m_genPrev	= 0;		// elõzõ kiírt generáció
-	cnt_ol		= 0;		// a behúzások pillanatny száma
+	m_indent		= 0;		// a behúzások pillanatny száma
 
 	descendants();
 	closeHtml();
@@ -277,7 +278,7 @@ void CGaDescendants::treeTables()
 
 		vDesc.clear();
 		vSerial.clear();
-		cnt_ol		= 0;
+		m_indent	= 0;
 		m_genPrev	= 0;
 
 		if( father_id.IsEmpty() || !father_id.Compare( L"0" ) )  // ha nincs apa, akkor magát az õst teszi be a vDesc-be
@@ -312,7 +313,7 @@ void CGaDescendants::treeTables()
 
 		if( theApp.v_tableNumbers.size() > 1 )
 		{
-			for( int i =0; i < cnt_ol; ++i )
+			for( int i =0; i < m_indent; ++i )
 				fwprintf( fl, L"%s\n", m_tag2 );
 			fwprintf( fl, L"<br><br><br>" );
 		}
@@ -337,6 +338,7 @@ void CGaDescendants::descendants()
 	CString rowid;
 	int generationsMax = 25;
 	m_gen = 0;
+	
 
 	if( m_numbering == SZLUHA ) // orderd list
 	{
@@ -357,7 +359,7 @@ void CGaDescendants::descendants()
 		{
 			if( m_gen > generationsMax )
 			{
-				for( int i =0; i < cnt_ol; ++i )
+				for( int i =0; i < m_indent; ++i )
 					fwprintf( fl, L"%s\n", m_tag2 );
 				str.Format( L"<br><br><font color='red'>%d-nál több generációt írt ki, már kezelhetetlen, ezért abbahagyom!!!</font>", generationsMax );
 				print( str );
@@ -382,7 +384,7 @@ void CGaDescendants::descendants()
 				--m_gen;
 			}
 		}
-		if( m_gen < 0 ) break;
+		if( m_gen < 0 ) break;			// nincs tovább!!!
 
 		// a kinyomtatott ember következõ, még ki nem nyomtatott gyerekét keresi
 		rowid = getNextChildRowid();

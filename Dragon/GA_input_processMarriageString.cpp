@@ -211,6 +211,8 @@ void CGaInput::processMarriageSubstrings()
 						v_marriages.at(i).sex_id = 1;
 					break;
 				}
+
+
 				ss.sex_id		= v_p.at(j).sex_id;
 				ss.title		= v_p.at(j).title;
 				ss.titolo		= v_p.at(j).titolo;

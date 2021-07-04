@@ -84,7 +84,7 @@ protected:
 	CString m_rowid_father;
 	CString m_htmlFile;
 
-	int		cnt_ol;
+//	int		m_indent;
 	int		m_insert;
 	FILE* fl;
 

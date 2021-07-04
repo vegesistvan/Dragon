@@ -64,6 +64,9 @@ void CGaInput::processDescendantSubstring( CString cLine )
 	cLine = str.Trim();
 
 	processPeopleStr( cLine, &d );
+
+	if( d.sex_id == 0 && ! v_marriages.size() ) d.sex_id = 1;	// ha a leszármazott keresztnevébõl nem lehet megállapítani
+																// nemét és házastársa sincs, akkor legyen férfi
 	desc.nameSubstr		= m_nameSubstr;
 	desc.birthSubstr	= m_birthSubstr;
 	desc.deathSubstr	= m_deathSubstr;
