@@ -388,10 +388,12 @@ BOOL CDragApp::InitInstance()
 	int y = (theApp._h - bmpHeight) / 2;
 
 	//	SetWindowPos( &wndBottom, x,y, bmpWidth + 16, bmpHeight + 60, SWP_NOREDRAW|SWP_HIDEWINDOW );
-	m_pMainWnd->SetWindowPos( m_pMainWnd, x, y, bmpWidth + 16, bmpHeight + 60, SWP_NOREDRAW | SWP_SHOWWINDOW);
+
 
 	// The one and only window has been initialized, so show and update it
 	m_pMainWnd->ShowWindow(SW_SHOW);
+	m_pMainWnd->SetWindowPos(m_pMainWnd, x, y, bmpWidth + 16, bmpHeight + 60, SWP_NOREDRAW | SWP_SHOWWINDOW);
+
 	m_pMainWnd->SetWindowText( m_caption );
 	m_pMainWnd->UpdateWindow();
 	return TRUE;

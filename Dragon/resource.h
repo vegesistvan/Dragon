@@ -4,7 +4,6 @@
 //
 #define IDC_CLEAR                       3
 #define IDD_ABOUTBOX                    100
-#define IDS_ABOUTBOX                    101
 #define IDP_OLE_INIT_FAILED             102
 #define IDD_DRAGON_DIALOG               103
 #define ID_D_LIST                       107
@@ -164,18 +163,18 @@
 #define IDR_UNITED_ENTRIES2             363
 #define IDD_SAVEFIRSTNAME               364
 #define IDD_UNITE_PARAM                 365
-#define IDR_FA                          366
-#define IDR_TREE                        367
 #define IDD_EDIT_COMMENT                368
 #define IDD_ASCENDANTS_PAINT            369
 #define IDC_COORDINATES                 370
 #define IDC_STATUS                      371
 #define IDD_SAME_COUPLES                372
-#define IDC_COORDINATES1                373
 #define IDR_CHECK_SAMESPOUSES           374
 #define IDR_SAME_COUPLES                375
+#define ID_CXHECK_MORESPOUSES           375
 #define IDR_DROPDOWN_SAMECOUPLES        376
+#define ID_CHECK_LIFETIME               376
 #define IDD_CHECK_GENERATIONS           377
+#define ID_CHECK_MORESPOUSES            377
 #define IDD_SAMEPEOPLE                  380
 #define IDD_DISPLAY_INFO                381
 #define IDD_FILTERLOOP                  384
@@ -551,9 +550,7 @@
 #define IDC_STATIC_ROWID                1794
 #define IDC_STATIC_R                    1795
 #define IDC_STATIC_L                    1796
-#define IDC_RICHEDIT21                  1798
 #define IDC_BUTTON_LINE                 1799
-#define IDC_COMBO1                      1800
 #define IDC_COMBO_HTMTXT                1800
 #define IDC_CHECK_SPOUSE                1801
 #define IDC_STATIC_INPUTVERSION         1802
@@ -580,7 +577,6 @@
 #define IDC_LINEAR_SQLITETABLE          1837
 #define IDC_LIST_FULL                   1839
 #define IDC_LIST_UNIQUE                 1840
-#define IDC_COORDINATER                 1846
 #define IDC_LISTCOLUMNS                 11044
 #define ID_EDIT_INSERT                  32771
 #define ID_EDIT_UPDATE                  32772
@@ -670,7 +666,6 @@
 #define ID_GROUPBY_BIRTHDATE            33829
 #define ID_GROUPBY_DEATHDATE            33832
 #define ID_GROUPBY_COMMENT              33834
-#define ID_BRACES                       33862
 #define ID_BRACKETS_ROUND               33865
 #define ID_BRACKETS_SQUARE              33866
 #define ID_FILTER_D_AG                  33873
@@ -898,7 +893,6 @@
 #define ID_GAHTML_ROUND_BRACKETS        34916
 #define ID_GAHTML_SQUARE_BRACKETS       34917
 #define ID_GAHTML_BRACES_BRACKETS       34918
-#define ID_CHECH_FOLYT                  34920
 #define ID_GAHTML_CHECH_FOLYT           34922
 #define ID_BRACKETS_BRACES              34923
 #define ID_EDIT_SORAGA                  34926
@@ -906,7 +900,6 @@
 #define ID_MARRAIGES2                   34930
 #define ID_ROKONOK                      34933
 #define ID_INFO_VERSION                 34937
-#define ID_INFORMATION_VARSION          34939
 #define ID_FUNCTIONS_KERESS             34940
 #define ID_FUNCTIONS_NEXT               34942
 #define ID_KERESS_BEGINNING             34946
@@ -932,7 +925,6 @@
 #define ID_NOTEPAD                      34971
 #define ID_DESCENDANTS_FILE             34972
 #define ID_DESCENDANTS_LINE             34974
-#define ID_BUTTON2                      34975
 #define ID_UNITE_SAMENAMENOT            34975
 #define ID_GEDCOM_LIST                  34975
 #define ID_SPOUSES_FILE                 34976
@@ -940,11 +932,9 @@
 #define ID_SPOUSES_LINE                 34978
 #define ID_HTML_INFO                    34979
 #define ID_UNITE_INFO                   34987
-#define ID_BUTTON4                      34988
 #define ID_UNION_SHOW                   34988
 #define ID_CHECK_SAMENAME_SAMEFATHERNAME 34988
 #define IDC_STYLE                       34992
-#define ID_BUTTON5                      34995
 #define ID_GEDCOM_INFO                  34995
 #define ID_CHECK_SAMENAME_SAMEBIRTH     34995
 #define ID_GEDCOM_LIST_TAB              34996
@@ -954,16 +944,13 @@
 #define ID_GEDCOM_FILTER                35001
 #define ID_CHECK_SAMENAME_SAMEMOTHERNAME 35002
 #define ID_CHECK_SAMENAME_SAMEDEATH     35003
-#define ID_CHECK_MORESPOUSES            35004
 #define ID_COUPLES_DIFFERENTWDATES      35005
 #define ID_CHECK_REFERENCES             35006
 #define ID_CHECK_UNREFERENCED           35007
 #define ID_CHECK_UNKNOWN_NAMES          35008
 #define ID_DATES_VALID                  35009
 #define ID_DATES_FAMILY                 35010
-#define ID_CHECK_LIFETIME               35011
 #define ID_CHECK_SPOUSEDATES            35012
-#define ID_BUTTON9                      35013
 #define ID_FATHERANDCHILD               35014
 #define ID_MOTHERANDCHILD               35015
 #define ID_BORN_AFTERMOTHERDEATH        35016
@@ -973,15 +960,16 @@
 #define ID_CHECK_SPOUSESEX              35020
 #define ID_CHECK_GENERATIONCODE         35022
 #define ID_CHECK_REPEATED_FAMILIES      35025
-#define ID_BUTTON16                     35026
+#define ID_BUTTON                       35028
+#define ID_BUTTON4                      35030
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        563
-#define _APS_NEXT_COMMAND_VALUE         35027
+#define _APS_NEXT_COMMAND_VALUE         35031
 #define _APS_NEXT_CONTROL_VALUE         1848
-#define _APS_NEXT_SYMED_VALUE           375
+#define _APS_NEXT_SYMED_VALUE           378
 #endif
 #endif

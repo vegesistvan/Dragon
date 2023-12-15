@@ -1,6 +1,10 @@
 #pragma once
 
-#define VERSION L"10.145"
+#define VERSION L"10.146"
+
+// 10. 146 2023.12.15
+// magyar nyelvû menü
+// képméretnek megfelelõ ablak megnyitása
 
 
 // 10. 145 2023.12.14

@@ -488,8 +488,7 @@
   <ItemGroup>
     <None Include="res\dragon.rc2" />
     <None Include="res\ribbon.mfcribbon-ms" />
-    <None Include="res\ribbon1.mfcribbon-ms" />
-  </ItemGroup>
+   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
   </ItemGroup>
