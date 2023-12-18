@@ -27,10 +27,23 @@
 #include "ListCtrlEx.h"
 #include "ProgressWnd.h"
 #include "MainFrm.h"
+#include "dragonView.h"
 
 // CDragApp:
 // See drag.cpp for the implementation of this class
 //
+
+enum
+{
+	CAT_DATABASE = 0,
+	CAT_TABLES,
+	CAT_CHECK1,
+	CAT_MERGE,
+	CAT_CHECK2,
+	CAT_GAHTML,
+	CAT_GEDCOM,
+	CAT_UTILITIES,
+};
 
 typedef struct
 {
@@ -185,6 +198,15 @@ public:
 	CString m_inputMode;
 	bool	m_snameEnough;
 
+	CMFCRibbonCategory* pCAT_DATABASE;
+	CMFCRibbonCategory* pCAT_TABLES;
+	CMFCRibbonCategory* pCAT_CHECK1;
+	CMFCRibbonCategory* pCAT_MERGE;
+	CMFCRibbonCategory* pCAT_CHECK2;
+	CMFCRibbonCategory* pCAT_GAHTML;
+	CMFCRibbonCategory* pCAT_GEDCOM;
+	CMFCRibbonCategory* pCAT_UTILITIES;
+
 	// SETUP VÁLTOZÓK //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	int m_fatherAgeMin;
 	int m_fatherAgeMax;
@@ -221,7 +243,7 @@ public:
 	std::vector<CString> v_tableNumbers;
 
 	CMainFrame* pM;
-
+	CDragonView* pW;
 
 	CString		str;
 	CString		m_command;
@@ -266,7 +288,6 @@ public:
 	const static COLORREF	m_colorWarning = RED;
 
 	int			m_time_start;
-
 
 	_int64 m_cntDeleted;
 	P pCurr;
@@ -401,13 +422,13 @@ public:
 	DECLARE_MESSAGE_MAP()
 	afx_msg void OnTableFirstNames();
 	afx_msg void OnUsermanual();
-	afx_msg void OnLanguages();
 	afx_msg void OnHusbandWife();
 	afx_msg void OnEmail();
 	afx_msg void OnGithub();
 
 	virtual int ExitInstance();
-	// Implementation
+
+
 	virtual void PreLoadState();
 	virtual void LoadCustomState();
 	virtual void SaveCustomState();
@@ -423,7 +444,6 @@ public:
 	afx_msg void OnTables();
 	afx_msg void OnInputfiles();
 	afx_msg void OnUniteSamename();
-	afx_msg void OnFamilies();
 	afx_msg void OnFullname();
 	afx_msg void OnNotepad();
 	afx_msg void OnBrowse();
@@ -466,7 +486,6 @@ public:
 	afx_msg void OnUpdateFullname(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateGithub(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateInputfiles(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateLanguages(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateListsAll(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateListsRowid(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateMarriages(CCmdUI* pCmdUI);
@@ -477,7 +496,6 @@ public:
 	afx_msg void OnUpdateSpousesFile(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateSpousesLine(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateSpousesTable(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateFamilies(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateTables(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateEmail(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateConv16to8(CCmdUI* pCmdUI);
@@ -545,5 +563,12 @@ public:
 	afx_msg void OnCsaladTorzs();
 	afx_msg void OnUpdateCheckRepeatedFamilies(CCmdUI* pCmdUI);
 	afx_msg void OnCheckRepeatedFamilies();
+	afx_msg void OnUpdateMarriageAll(CCmdUI* pCmdUI);
+	afx_msg void OnMarriageAll();
+	afx_msg void OnUpdateMarriageName(CCmdUI* pCmdUI);
+	afx_msg void OnMarriageName();
+	afx_msg void OnUpdateMarriageRowid(CCmdUI* pCmdUI);
+	afx_msg void OnMarriageRowid();
+	afx_msg void OnHelp();
 };
 extern CDragApp theApp;

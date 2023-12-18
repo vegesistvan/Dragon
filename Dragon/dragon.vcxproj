@@ -191,6 +191,7 @@
       <AdditionalDependencies>common.lib;version.lib</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <ShowProgress>NotSet</ShowProgress>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -488,7 +489,7 @@
   <ItemGroup>
     <None Include="res\dragon.rc2" />
     <None Include="res\ribbon.mfcribbon-ms" />
-   </ItemGroup>
+  </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
   </ItemGroup>

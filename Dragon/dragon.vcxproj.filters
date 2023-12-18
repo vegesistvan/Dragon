@@ -851,9 +851,6 @@
     <None Include="res\dragon.rc2">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="res\ribbon1.mfcribbon-ms">
-      <Filter>Resource Files</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

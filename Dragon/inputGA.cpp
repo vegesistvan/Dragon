@@ -561,8 +561,6 @@ bool CInputGA::inputFile()
 			theApp.showFile(textFilespec);
 	}
 	
-	
-	
 	CDialogEx::OnOK();
 	return true;
 }

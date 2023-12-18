@@ -65,6 +65,15 @@ void CTablePeople::OnDescendantsNew()
 	{
 		nItem = m_ListCtrl.GetNextSelectedItem(pos);
 		rowid = m_ListCtrl.GetItemText(nItem, G_ROWID);
+		m_command.Format(L"SELECT rowid FROM people WHERE father_id ='%s'", rowid);
+		if (!query(m_command)) return;
+		if (!m_recordset->RecordsCount())
+		{
+			str.Format(L"%s rowid bejegyzésnek nincs leszármoazottja", rowid);
+			AfxMessageBox(str);
+			return;
+		}
+
 		theApp.v_rowid.push_back(rowid);
 		if (theApp.m_inputMode == GAHTML)
 		{

@@ -1,7 +1,14 @@
 #pragma once
 
-#define VERSION L"10.146"
+#define VERSION L"10.148"
 
+// 10.148 2023.12.08
+// Ribbon javítgatása
+
+
+// 10.147 2023.12.17
+// Ribbon módosítása az adatbázis forrása alapján
+// 
 // 10. 146 2023.12.15
 // magyar nyelvû menü
 // képméretnek megfelelõ ablak megnyitása

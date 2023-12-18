@@ -29,7 +29,6 @@ BEGIN_MESSAGE_MAP(CDragApp, CWinAppEx)
 	ON_COMMAND(ID_OPEN, &CDragApp::OnOpen)
 	ON_COMMAND(ID_LISTS_ALL, &CDragApp::OnListsAll)
 	ON_COMMAND(ID_FIRSTNAMES, &CDragApp::OnFirstnames)
-	ON_COMMAND(ID_LANGUAGES, &CDragApp::OnLanguages)
 	ON_COMMAND(ID_INPUT_SZLUHA, &CDragApp::OnInputSzluha)
 	ON_COMMAND(ID_INFO_DB, &CDragApp::OnInfoDb)
 	ON_COMMAND(ID_MARRIAGES, &CDragApp::OnMarriages)
@@ -81,7 +80,6 @@ BEGIN_MESSAGE_MAP(CDragApp, CWinAppEx)
 	ON_UPDATE_COMMAND_UI(ID_FULLNAME, &CDragApp::OnUpdateFullname)
 	ON_UPDATE_COMMAND_UI(ID_GITHUB, &CDragApp::OnUpdateGithub)
 	ON_UPDATE_COMMAND_UI(ID_INPUTFILES, &CDragApp::OnUpdateInputfiles)
-	ON_UPDATE_COMMAND_UI(ID_LANGUAGES, &CDragApp::OnUpdateLanguages)
 	ON_UPDATE_COMMAND_UI(ID_LISTS_ALL, &CDragApp::OnUpdateListsAll)
 	ON_UPDATE_COMMAND_UI(ID_LISTS_ROWID, &CDragApp::OnUpdateListsRowid)
 	ON_UPDATE_COMMAND_UI(ID_MARRIAGES, &CDragApp::OnUpdateMarriages)
@@ -159,6 +157,13 @@ BEGIN_MESSAGE_MAP(CDragApp, CWinAppEx)
 		ON_COMMAND(ID_CSALAD_TORZS, &CDragApp::OnCsaladTorzs)
 		ON_UPDATE_COMMAND_UI(ID_CHECK_REPEATED_FAMILIES, &CDragApp::OnUpdateCheckRepeatedFamilies)
 		ON_COMMAND(ID_CHECK_REPEATED_FAMILIES, &CDragApp::OnCheckRepeatedFamilies)
+		ON_UPDATE_COMMAND_UI(ID_MARRIAGE_ALL, &CDragApp::OnUpdateMarriageAll)
+		ON_COMMAND(ID_MARRIAGE_ALL, &CDragApp::OnMarriageAll)
+		ON_UPDATE_COMMAND_UI(ID_MARRIAGE_NAME, &CDragApp::OnUpdateMarriageName)
+		ON_COMMAND(ID_MARRIAGE_NAME, &CDragApp::OnMarriageName)
+		ON_UPDATE_COMMAND_UI(ID_MARRIAGE_ROWID, &CDragApp::OnUpdateMarriageRowid)
+		ON_COMMAND(ID_MARRIAGE_ROWID, &CDragApp::OnMarriageRowid)
+		ON_COMMAND(ID_HELP, &CDragApp::OnHelp)
 		END_MESSAGE_MAP()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CDragApp::CDragApp() noexcept
@@ -233,9 +238,9 @@ BOOL CDragApp::InitInstance()
 	CSingleDocTemplate* pDocTemplate;
 	pDocTemplate = new CSingleDocTemplate(
 		IDR_MAINFRAME,
-		RUNTIME_CLASS(CDragDoc),
+		RUNTIME_CLASS(CDragonDoc),
 		RUNTIME_CLASS(CMainFrame),       // main SDI frame window
-		RUNTIME_CLASS(CDragView));
+		RUNTIME_CLASS(CDragonView));
 	if (!pDocTemplate)
 		return FALSE;
 	AddDocTemplate(pDocTemplate);
@@ -251,6 +256,19 @@ BOOL CDragApp::InitInstance()
 	// app was launched with /RegServer, /Register, /Unregserver or /Unregister.
 	if (!ProcessShellCommand(cmdInfo))
 		return FALSE;
+
+	pM = (CMainFrame*)AfxGetMainWnd();
+	pW = (CDragonView*)pM->GetActiveView();
+
+
+	pCAT_DATABASE = (CMFCRibbonCategory*)pM->m_wndRibbonBar.GetCategory(CAT_DATABASE);
+	pCAT_TABLES = (CMFCRibbonCategory*)pM->m_wndRibbonBar.GetCategory(CAT_TABLES);
+	pCAT_CHECK1 = (CMFCRibbonCategory*)pM->m_wndRibbonBar.GetCategory(CAT_CHECK1);
+	pCAT_MERGE = (CMFCRibbonCategory*)pM->m_wndRibbonBar.GetCategory(CAT_MERGE);
+	pCAT_CHECK2 = (CMFCRibbonCategory*)pM->m_wndRibbonBar.GetCategory(CAT_CHECK2);
+	pCAT_GAHTML = (CMFCRibbonCategory*)pM->m_wndRibbonBar.GetCategory(CAT_GAHTML);
+	pCAT_GEDCOM = (CMFCRibbonCategory*)pM->m_wndRibbonBar.GetCategory(CAT_GEDCOM);
+	pCAT_UTILITIES = (CMFCRibbonCategory*)pM->m_wndRibbonBar.GetCategory(CAT_UTILITIES);
 
 	mainDB = new CSqliteDB;
 	systemDB = new CSqliteDB;
@@ -304,7 +322,6 @@ BOOL CDragApp::InitInstance()
 		GlobalFree((HGLOBAL)lpVI);
 	}
 
-	pM = (CMainFrame*)AfxGetMainWnd();
 
 	m_version = VERSION;  // mégse azt használom, hanem a version.h-t
 
@@ -374,6 +391,7 @@ BOOL CDragApp::InitInstance()
 	m_motherAgeMin = GetProfileInt(L"Settigs", L"motherAgeMin", 16);
 	m_motherAgeMax = GetProfileInt(L"Settigs", L"motherAgeMax", 50);
 
+
 	HDC hdc = GetDC(NULL);
 	_w = GetDeviceCaps(hdc, HORZRES);
 	_h = GetDeviceCaps(hdc, VERTRES);
@@ -387,14 +405,12 @@ BOOL CDragApp::InitInstance()
 	int x = (theApp._w - bmpWidth) / 2;
 	int y = (theApp._h - bmpHeight) / 2;
 
-	//	SetWindowPos( &wndBottom, x,y, bmpWidth + 16, bmpHeight + 60, SWP_NOREDRAW|SWP_HIDEWINDOW );
-
-
 	// The one and only window has been initialized, so show and update it
 	m_pMainWnd->ShowWindow(SW_SHOW);
 	m_pMainWnd->SetWindowPos(m_pMainWnd, x, y, bmpWidth + 16, bmpHeight + 60, SWP_NOREDRAW | SWP_SHOWWINDOW);
 
 	m_pMainWnd->SetWindowText( m_caption );
+
 	m_pMainWnd->UpdateWindow();
 	return TRUE;
 }
@@ -517,6 +533,54 @@ BOOL CDragApp::openDatabase(bool same)
 		if (!getDBtype()) return FALSE;  // ha ugyanolyan nevû üres adatbázist nyit meg, akkor nem állítja át a bemeneti fájl változókat
 	}
 
+	if (theApp.m_inputMode == URES)
+	{
+		pM->m_wndRibbonBar.ShowCategory(CAT_DATABASE, true);
+		pM->m_wndRibbonBar.ShowCategory(CAT_TABLES, false);
+		pM->m_wndRibbonBar.ShowCategory(CAT_CHECK1, false);
+		pM->m_wndRibbonBar.ShowCategory(CAT_MERGE, false);
+		pM->m_wndRibbonBar.ShowCategory(CAT_CHECK2, false);
+		pM->m_wndRibbonBar.ShowCategory(CAT_GAHTML, true);
+		pM->m_wndRibbonBar.ShowCategory(CAT_GEDCOM, true);
+		pM->m_wndRibbonBar.ShowCategory(CAT_UTILITIES, false);
+		
+		pM->m_wndRibbonBar.SetActiveCategory(pCAT_DATABASE, false);
+	}
+	else if( theApp.m_inputMode == GAHTML )
+	{
+		pM->m_wndRibbonBar.ShowCategory(CAT_TABLES, true);
+		pM->m_wndRibbonBar.ShowCategory(CAT_CHECK1, true);
+		pM->m_wndRibbonBar.ShowCategory(CAT_MERGE, true);
+		pM->m_wndRibbonBar.ShowCategory(CAT_CHECK2, true);
+		pM->m_wndRibbonBar.ShowCategory(CAT_GAHTML, true);
+
+		pM->m_wndRibbonBar.ShowCategory(CAT_GEDCOM, false);
+		pM->m_wndRibbonBar.SetActiveCategory(pCAT_TABLES, false);
+
+	}
+	else if (theApp.m_inputMode == GEDCOM)
+	{
+		pM->m_wndRibbonBar.ShowCategory(CAT_TABLES, true);
+		pM->m_wndRibbonBar.ShowCategory(CAT_CHECK1, true);
+		pM->m_wndRibbonBar.ShowCategory(CAT_MERGE, true);
+		pM->m_wndRibbonBar.ShowCategory(CAT_CHECK2, true);
+		pM->m_wndRibbonBar.ShowCategory(CAT_GAHTML, false);
+
+		pM->m_wndRibbonBar.ShowCategory(CAT_GEDCOM, true);
+		pM->m_wndRibbonBar.SetActiveCategory(pCAT_TABLES, false);
+	}
+	else if (theApp.m_inputMode == MANUAL)
+	{
+		pM->m_wndRibbonBar.ShowCategory(CAT_TABLES, true);
+		pM->m_wndRibbonBar.ShowCategory(CAT_CHECK1, true);
+		pM->m_wndRibbonBar.ShowCategory(CAT_MERGE, true);
+		pM->m_wndRibbonBar.ShowCategory(CAT_CHECK2, true);
+		pM->m_wndRibbonBar.ShowCategory(CAT_GAHTML, false);
+
+		pM->m_wndRibbonBar.ShowCategory(CAT_GEDCOM, false );
+		pM->m_wndRibbonBar.SetActiveCategory(pCAT_TABLES, false);
+
+	}
 	if (theApp.m_inputMode != GAHTML)
 	{
 		// blbob db fájl megnyitása
@@ -1007,21 +1071,4 @@ void CDragApp::OnOpen()
 	createCaption();
 	m_pMainWnd->SetWindowText(m_caption);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

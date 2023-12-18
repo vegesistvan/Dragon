@@ -9,21 +9,22 @@
 // Copyright (C) Microsoft Corporation
 // All rights reserved.
 
-// dragonView.h : interface of the CDragView class
+// dragonView.h : interface of the CDragonView class
 //
 
 #pragma once
 
+#include "dragonDoc.h"
 
-class CDragView : public CView
+class CDragonView : public CView
 {
 protected: // create from serialization only
-	CDragView() noexcept;
-	DECLARE_DYNCREATE(CDragView)
+	CDragonView() noexcept;
+	DECLARE_DYNCREATE(CDragonView)
 
 // Attributes
 public:
-	CDragDoc* GetDocument() const;
+	CDragonDoc* GetDocument() const;
 
 // Operations
 public:
@@ -39,11 +40,11 @@ protected:
 	virtual void OnEndPrinting(CDC* pDC, CPrintInfo* pInfo);
 
 	CMainFrame* pM;
-	CDragView* pV;
+	CDragonView* pV;
 
 // Implementation
 public:
-	virtual ~CDragView();
+	virtual ~CDragonView();
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;
@@ -60,7 +61,7 @@ protected:
 };
 
 #ifndef _DEBUG  // debug version in dragonView.cpp
-inline CDragDoc* CDragView::GetDocument() const
-   { return reinterpret_cast<CDragDoc*>(m_pDocument); }
+inline CDragonDoc* CDragonView::GetDocument() const
+   { return reinterpret_cast<CDragonDoc*>(m_pDocument); }
 #endif
 

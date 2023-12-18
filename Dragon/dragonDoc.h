@@ -9,18 +9,18 @@
 // Copyright (C) Microsoft Corporation
 // All rights reserved.
 
-// dragonDoc.h : interface of the CDragDoc class
+// dragonDoc.h : interface of the CDragonDoc class
 //
 
 
 #pragma once
 
 
-class CDragDoc : public CDocument
+class CDragonDoc : public CDocument
 {
 protected: // create from serialization only
-	CDragDoc() noexcept;
-	DECLARE_DYNCREATE(CDragDoc)
+	CDragonDoc() noexcept;
+	DECLARE_DYNCREATE(CDragonDoc)
 
 // Attributes
 public:
@@ -39,7 +39,7 @@ public:
 
 // Implementation
 public:
-	virtual ~CDragDoc();
+	virtual ~CDragonDoc();
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;

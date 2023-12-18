@@ -39,8 +39,9 @@ public:
 	virtual void Dump(CDumpContext& dc) const;
 #endif
 
-protected:  // control bar embedded members
 	CMFCRibbonBar     m_wndRibbonBar;
+protected:  // control bar embedded members
+	
 	CMFCRibbonApplicationButton m_MainButton;
 	CMFCToolBarImages m_PanelImages;
 	CMFCRibbonStatusBar  m_wndStatusBar;

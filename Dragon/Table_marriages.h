@@ -66,6 +66,8 @@ public:
 	virtual ~CTableMarriages();
 	enum { IDD = IDD_TABLE_MARRIAGES };
 	CString	m_rowid;
+	int	m_what;
+
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support

@@ -39,6 +39,12 @@
 #include "checkMotherIndex.h"
 #include "checkBefore.h"
 #include "ConnectCsaladTorzs.h"
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////// T A B L E S ////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragApp::OnUpdateListsAll(CCmdUI* pCmdUI)
 {
@@ -73,6 +79,39 @@ void CDragApp::OnFullname()
 	dlg.DoModal();
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDragApp::OnUpdateMarriageAll(CCmdUI* pCmdUI)
+{
+
+}
+void CDragApp::OnMarriageAll()
+{
+	CTableMarriages dlg;
+	dlg.m_what = 1;
+	dlg.DoModal();
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDragApp::OnUpdateMarriageRowid(CCmdUI* pCmdUI)
+{
+
+}
+void CDragApp::OnMarriageRowid()
+{
+	CTableMarriages dlg;
+	dlg.m_what = 2;
+	dlg.DoModal();
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDragApp::OnUpdateMarriageName(CCmdUI* pCmdUI)
+{
+}
+void CDragApp::OnMarriageName()
+{
+	CTableMarriages dlg;
+	dlg.m_what = 3;
+	dlg.DoModal();
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragApp::OnUpdateFirstnames(CCmdUI* pCmdUI)
 {
 
@@ -82,20 +121,15 @@ void CDragApp::OnFirstnames()
 	CTableFirstnames dlg;
 	dlg.DoModal();
 }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragApp::OnUpdateLanguages(CCmdUI* pCmdUI)
-{
-
-}
-void CDragApp::OnLanguages()
-{
-	CLanguages dlg;
-	dlg.DoModal();
-}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////// D A T A B A S E  ////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragApp::OnUpdateInputSzluha(CCmdUI* pCmdUI)
 {
-	if (m_inputMode == GEDCOM || m_inputMode == MANUAL ) pCmdUI->Enable(FALSE);
+	if (m_inputMode != URES ) pCmdUI->Enable(FALSE);
 }
 void CDragApp::OnInputSzluha()
 {
@@ -104,11 +138,29 @@ void CDragApp::OnInputSzluha()
 
 	createCaption();
 	m_pMainWnd->SetWindowText(m_caption);
+	theApp.pM->m_wndRibbonBar.ShowCategory(CAT_TABLES, true);
+	theApp.pM->m_wndRibbonBar.ShowCategory(CAT_CHECK1, true);
+	theApp.pM->m_wndRibbonBar.ShowCategory(CAT_MERGE, true);
+	theApp.pM->m_wndRibbonBar.ShowCategory(CAT_CHECK2, true);
+	theApp.pM->m_wndRibbonBar.ShowCategory(CAT_GAHTML, true);
+	theApp.pM->m_wndRibbonBar.ShowCategory(CAT_GEDCOM, false);
+	theApp.pM->m_wndRibbonBar.ShowCategory(CAT_UTILITIES, true);
+
+
+
+	theApp.pM->m_wndRibbonBar.SetActiveCategory(pCAT_CHECK1, true);
+	theApp.pM->m_wndRibbonBar.SetActiveCategory(pCAT_MERGE, true);
+	theApp.pM->m_wndRibbonBar.SetActiveCategory(pCAT_CHECK2, true);
+	theApp.pM->m_wndRibbonBar.SetActiveCategory(pCAT_GAHTML, true);
+	theApp.pM->m_wndRibbonBar.SetActiveCategory(pCAT_UTILITIES, true);
+	theApp.pM->m_wndRibbonBar.SetActiveCategory(pCAT_TABLES, true);
+
+
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragApp::OnUpdateInputGedcom(CCmdUI* pCmdUI)
 {
-	if ( m_inputMode == GAHTML || m_inputMode == MANUAL )pCmdUI->Enable(FALSE);
+	if (m_inputMode != URES) pCmdUI->Enable(FALSE);
 }
 void CDragApp::OnInputGedcom()
 {
@@ -119,11 +171,24 @@ void CDragApp::OnInputGedcom()
 	theApp.m_inputMode = GEDCOM;
 	m_command.Format(L"INSERT INTO properties (inputVersion, inputMode) VALUES ('%s', '%s')", theApp.m_inputVersion, theApp.m_inputMode);
 	theApp.execute(m_command);
-	//	if (theApp.mainDB->IsConnected()) theApp.mainDB->Close();
-	//	theApp.openDatabase(true);
 
 	createCaption();
 	m_pMainWnd->SetWindowText(m_caption);
+	theApp.pM->m_wndRibbonBar.ShowCategory(CAT_TABLES, true);
+	theApp.pM->m_wndRibbonBar.ShowCategory(CAT_CHECK1, true);
+	theApp.pM->m_wndRibbonBar.ShowCategory(CAT_MERGE, true);
+	theApp.pM->m_wndRibbonBar.ShowCategory(CAT_CHECK2, true);
+	theApp.pM->m_wndRibbonBar.ShowCategory(CAT_GAHTML, false);
+	theApp.pM->m_wndRibbonBar.ShowCategory(CAT_GEDCOM, true);
+	theApp.pM->m_wndRibbonBar.ShowCategory(CAT_UTILITIES, true);
+
+
+	theApp.pM->m_wndRibbonBar.SetActiveCategory(pCAT_CHECK1, true);
+	theApp.pM->m_wndRibbonBar.SetActiveCategory(pCAT_MERGE, true);
+	theApp.pM->m_wndRibbonBar.SetActiveCategory(pCAT_CHECK2, true);
+	theApp.pM->m_wndRibbonBar.SetActiveCategory(pCAT_GEDCOM, true);
+	theApp.pM->m_wndRibbonBar.SetActiveCategory(pCAT_UTILITIES, true);
+	theApp.pM->m_wndRibbonBar.SetActiveCategory(pCAT_TABLES, true);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragApp::OnUpdateInputManual(CCmdUI* pCmdUI)
@@ -136,6 +201,19 @@ void CDragApp::OnInputManual()
 
 	dlg.m_rowid.Empty();
 	if (dlg.DoModal() == IDCANCEL) return;
+	theApp.pM->m_wndRibbonBar.ShowCategory(CAT_TABLES, true);
+	theApp.pM->m_wndRibbonBar.ShowCategory(CAT_CHECK1, true);
+	theApp.pM->m_wndRibbonBar.ShowCategory(CAT_MERGE, true);
+	theApp.pM->m_wndRibbonBar.ShowCategory(CAT_CHECK2, true);
+
+	theApp.pM->m_wndRibbonBar.ShowCategory(CAT_GAHTML, false);
+	theApp.pM->m_wndRibbonBar.ShowCategory(CAT_GEDCOM, false);
+	theApp.pM->m_wndRibbonBar.ShowCategory(CAT_UTILITIES, false);
+
+	theApp.pM->m_wndRibbonBar.SetActiveCategory(pCAT_CHECK1, true);
+	theApp.pM->m_wndRibbonBar.SetActiveCategory(pCAT_MERGE, true);
+	theApp.pM->m_wndRibbonBar.SetActiveCategory(pCAT_CHECK2, true);
+	theApp.pM->m_wndRibbonBar.SetActiveCategory(pCAT_TABLES, true);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragApp::OnInfoDb()
@@ -472,7 +550,7 @@ A szabálytalan GEDCOM fájlokból kiszûrhetjük a szabálytalan sorokat beolvasás el
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragApp::OnUpdateGedcomList(CCmdUI* pCmdUI)
 {
-	if (m_inputMode != GEDCOM) pCmdUI->Enable(FALSE);
+//	if (m_inputMode != GEDCOM) pCmdUI->Enable(FALSE);
 }
 void CDragApp::OnGedcomList()
 {
@@ -482,7 +560,7 @@ void CDragApp::OnGedcomList()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragApp::OnUpdateGedcomListTab(CCmdUI* pCmdUI)
 {
-	if (m_inputMode != GEDCOM) pCmdUI->Enable(FALSE);
+//	if (m_inputMode != GEDCOM) pCmdUI->Enable(FALSE);
 }
 void CDragApp::OnGedcomListTab()
 {
@@ -493,7 +571,7 @@ void CDragApp::OnGedcomListTab()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragApp::OnUpdateGedcomChain(CCmdUI* pCmdUI)
 {
-	if (m_inputMode != GEDCOM) pCmdUI->Enable(FALSE);
+//	if (m_inputMode != GEDCOM) pCmdUI->Enable(FALSE);
 }
 void CDragApp::OnGedcomChain()
 {
@@ -503,7 +581,7 @@ void CDragApp::OnGedcomChain()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragApp::OnUpdateGedcomFilter(CCmdUI* pCmdUI)
 {
-	if (m_inputMode != GEDCOM) pCmdUI->Enable(FALSE);
+//	if (m_inputMode != GEDCOM) pCmdUI->Enable(FALSE);
 }
 void CDragApp::OnGedcomFilter()
 {
@@ -513,7 +591,7 @@ void CDragApp::OnGedcomFilter()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragApp::OnUpdateGedcomKnownUnknown(CCmdUI* pCmdUI)
 {
-	if (m_inputMode != GEDCOM) pCmdUI->Enable(FALSE);
+//	if (m_inputMode != GEDCOM) pCmdUI->Enable(FALSE);
 }
 void CDragApp::OnGedcomKnownUnknown()
 {
@@ -523,7 +601,7 @@ void CDragApp::OnGedcomKnownUnknown()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragApp::OnUpdateGedcomLevel0(CCmdUI* pCmdUI)
 {
-	if (m_inputMode != GEDCOM) pCmdUI->Enable(FALSE);
+//	if (m_inputMode != GEDCOM) pCmdUI->Enable(FALSE);
 }
 void CDragApp::OnGedcomLevel0()
 {
@@ -736,7 +814,7 @@ void CDragApp::OnCheckWifeage()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragApp::OnUpdateCheckGenerationcode(CCmdUI* pCmdUI)
 {
-
+	if (m_inputMode != GAHTML) pCmdUI->Enable(FALSE);
 }
 void CDragApp::OnCheckGenerationcode()
 {
@@ -746,6 +824,7 @@ void CDragApp::OnCheckGenerationcode()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragApp::OnUpdateCheckMotherindex(CCmdUI* pCmdUI)
 {
+	if (m_inputMode != GAHTML) pCmdUI->Enable(FALSE);
 }
 void CDragApp::OnCheckMotherindex()
 {
@@ -792,3 +871,15 @@ void CDragApp::OnCheckRepeatedFamilies()
 	w.repeatedFamilies();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDragApp::OnHelp()
+{
+	if (_waccess(m_helpFileSpec, 0))
+	{
+		AfxMessageBox(L"Nincs a DragonHelp.chm fájl a program könyvtárában!");
+		return;
+	}
+	else
+	{
+		ShellExecute(NULL, L"open", m_helpFileSpec, NULL, NULL, SW_SHOWNORMAL);
+	}
+}

@@ -924,8 +924,8 @@
 #define ID_BROWSE                       34970
 #define ID_NOTEPAD                      34971
 #define ID_DESCENDANTS_FILE             34972
-#define ID_DESCENDANTS_LINE             34974
-#define ID_UNITE_SAMENAMENOT            34975
+#define ID_DESCENDANTS_LINE             34973
+#define ID_UNITE_SAMENAMENOT            34974
 #define ID_GEDCOM_LIST                  34975
 #define ID_SPOUSES_FILE                 34976
 #define ID_SPOUSES_TABLE                34977
@@ -961,14 +961,17 @@
 #define ID_CHECK_GENERATIONCODE         35022
 #define ID_CHECK_REPEATED_FAMILIES      35025
 #define ID_BUTTON                       35028
-#define ID_BUTTON4                      35030
+#define ID_MARRIAGE_ALL                 35037
+#define ID_MARRIAGE_ROWID               35038
+#define ID_MARRIAGE_NAME                35039
+#define ID_BUTTON2                      35040
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        563
-#define _APS_NEXT_COMMAND_VALUE         35031
+#define _APS_NEXT_RESOURCE_VALUE        564
+#define _APS_NEXT_COMMAND_VALUE         35041
 #define _APS_NEXT_CONTROL_VALUE         1848
 #define _APS_NEXT_SYMED_VALUE           378
 #endif

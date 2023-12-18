@@ -9,7 +9,7 @@
 // Copyright (C) Microsoft Corporation
 // All rights reserved.
 
-// dragonDoc.cpp : implementation of the CDragDoc class
+// dragonDoc.cpp : implementation of the CDragonDoc class
 //
 
 #include "pch.h"
@@ -30,20 +30,20 @@
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-IMPLEMENT_DYNCREATE(CDragDoc, CDocument)
+IMPLEMENT_DYNCREATE(CDragonDoc, CDocument)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BEGIN_MESSAGE_MAP(CDragDoc, CDocument)
+BEGIN_MESSAGE_MAP(CDragonDoc, CDocument)
 END_MESSAGE_MAP()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CDragDoc::CDragDoc() noexcept
+CDragonDoc::CDragonDoc() noexcept
 {
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CDragDoc::~CDragDoc()
+CDragonDoc::~CDragonDoc()
 {
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CDragDoc::OnNewDocument()
+BOOL CDragonDoc::OnNewDocument()
 {
 	if (!CDocument::OnNewDocument())
 		return FALSE;
@@ -54,7 +54,7 @@ BOOL CDragDoc::OnNewDocument()
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragDoc::Serialize(CArchive& ar)
+void CDragonDoc::Serialize(CArchive& ar)
 {
 	if (ar.IsStoring())
 	{
@@ -69,7 +69,7 @@ void CDragDoc::Serialize(CArchive& ar)
 #ifdef SHARED_HANDLERS
 
 // Support for thumbnails
-void CDragDoc::OnDrawThumbnail(CDC& dc, LPRECT lprcBounds)
+void CDragonDoc::OnDrawThumbnail(CDC& dc, LPRECT lprcBounds)
 {
 	// Modify this code to draw the document's data
 	dc.FillSolidRect(lprcBounds, RGB(255, 255, 255));
@@ -90,7 +90,7 @@ void CDragDoc::OnDrawThumbnail(CDC& dc, LPRECT lprcBounds)
 }
 
 // Support for Search Handlers
-void CDragDoc::InitializeSearchContent()
+void CDragonDoc::InitializeSearchContent()
 {
 	CString strSearchContent;
 	// Set search contents from document's data.
@@ -100,7 +100,7 @@ void CDragDoc::InitializeSearchContent()
 	SetSearchContent(strSearchContent);
 }
 
-void CDragDoc::SetSearchContent(const CString& value)
+void CDragonDoc::SetSearchContent(const CString& value)
 {
 	if (value.IsEmpty())
 	{
@@ -120,15 +120,15 @@ void CDragDoc::SetSearchContent(const CString& value)
 
 #endif // SHARED_HANDLERS
 
-// CDragDoc diagnostics
+// CDragonDoc diagnostics
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #ifdef _DEBUG
-void CDragDoc::AssertValid() const
+void CDragonDoc::AssertValid() const
 {
 	CDocument::AssertValid();
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragDoc::Dump(CDumpContext& dc) const
+void CDragonDoc::Dump(CDumpContext& dc) const
 {
 	CDocument::Dump(dc);
 }
