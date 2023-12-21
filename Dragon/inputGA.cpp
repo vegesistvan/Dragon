@@ -786,9 +786,7 @@ void CInputGA::peerHeritage()
 		{
 			if (iswalpha(peer[0]) )
 			{
-				if (peer == L"báró") peer = L"br";
-				else if (peer == L"gróf") peer = L"gr";
-				else if (peer == L"herceg")peer = L"hg";;
+				peer = getPeerFromString(peer); // ez a rövid fõnemesi címet adja vissza
 				// csak azok a gyerekek öröklik a fõnemnesi címet, akiknek saját joguk alapján nincs
 				m_command.Format(L"UPDATE people SET peer='%s' WHERE father_id ='%s' AND peer=''", peer, father_id);
 				if (!theApp.execute(m_command))return;
@@ -954,33 +952,19 @@ CString CInputGA::setPeer(PEOPLE* p)
 {
 	CString str;
 	CString peer;
-	int pos;
-
-	if (p->birth_date == L"1656.04.26")
-		pos = 1;
 
 	if (!p->comment.IsEmpty())
 	{
-		peer = getPeerFromComment(p->comment);
+		peer = getPeerFromString(p->comment);
 	}
-	if (peer.IsEmpty())
+	if (peer.IsEmpty() && !p->title.IsEmpty() )
 	{
-		peer = extractPeer(p->title);
+		peer = getPeerFromString(p->title); 
 	}
-	if (peer.IsEmpty())
+	if (peer.IsEmpty() && !p->posterior.IsEmpty() )
 	{
-		str = p->posterior;
-		if (str == L"gr" || str == L"õrgr" || str == L"br" || str == L"hg" || str == L"gróf" || str == L"õrgróf" || str == L"báró" || str == L"herceg")
-		{
-			peer = str;
-			p->posterior.Empty();
-		}
-		str = p->comment;
-		if (str == L"gr" || str == L"õrgr" || str == L"br" || str == L"hg" || str == L"gróf" || str == L"õrgróf" || str == L"báró" || str == L"herceg")
-		{
-			peer = str;
-			p->posterior.Empty();
-		}
+		peer = getPeerFromString(p->posterior);
+		if (!peer.IsEmpty()) p->posterior.Empty();
 	}
 	return peer;
 }
@@ -1139,7 +1123,7 @@ int CInputGA::getSuffix(CStringArray* A, int k )
 			word = A->GetAt(i);								// keresztnév utáni szó
 			if (isPeer(word))								// ez vagy peer
 			{
-				m_peer = getPeerFromComment( word );		// csak azért, hogy a gróf-gr stb legyen
+				m_peer = getPeerFromString( word );		// csak azért, hogy a gróf-gr stb legyen
 				++i;
 			}
 			if (isPeer(m_comment))

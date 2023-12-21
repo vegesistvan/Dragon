@@ -1,6 +1,9 @@
 #pragma once
 
-#define VERSION L"10.148"
+#define VERSION L"10.149"
+
+// 10.149 2023.12.21
+// Leszármazottakról 3 lista készül: SZLUHA, Lineáris, lineáris printable
 
 // 10.148 2023.12.08
 // Ribbon javítgatása

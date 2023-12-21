@@ -129,7 +129,7 @@ void CDragApp::OnFirstnames()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragApp::OnUpdateInputSzluha(CCmdUI* pCmdUI)
 {
-	if (m_inputMode != URES ) pCmdUI->Enable(FALSE);
+	if (m_inputMode == MANUAL ) pCmdUI->Enable(FALSE);
 }
 void CDragApp::OnInputSzluha()
 {
@@ -160,7 +160,7 @@ void CDragApp::OnInputSzluha()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragApp::OnUpdateInputGedcom(CCmdUI* pCmdUI)
 {
-	if (m_inputMode != URES) pCmdUI->Enable(FALSE);
+	if (m_inputMode == MANUAL ) pCmdUI->Enable(FALSE);
 }
 void CDragApp::OnInputGedcom()
 {

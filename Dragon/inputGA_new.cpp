@@ -66,7 +66,7 @@ bool CInputGA::splitNameSubstr( CString nameSubStr )
 			word = A->GetAt(i);
 			if (isPeer(word))								// ez vagy peer
 			{
-				m_peer = getPeerFromComment(word);		// csak azért, hogy a gróf-gr stb legyen
+				m_peer = getPeerFromString(word);		// csak azért, hogy a gróf-gr stb legyen
 				++i;
 			}
 

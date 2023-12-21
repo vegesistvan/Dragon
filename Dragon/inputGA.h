@@ -3,16 +3,13 @@
 #include "ColorStatic.h"
 #define TEST false  // beolvasás során kiírja a ga.htm sorok sorszámát debugolás céljából
 
-const POSTERIORS posteriors[] = {
-	L"br",\
-	L"gr",\
-	L"hg",\
-	L"õrgr",\
-	L"báró",\
-	L"gróf",\
-	L"õrgróf",\
-	L"herceg",\
-	L"dr"\
+
+const PEERS peers[] =
+{
+	{L"br", L"báró"},
+	{L"gr", L"gróf"},
+	{L"õrgr", L"õrgróf"},
+	{L"hg", L"herceg"}
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -108,15 +105,11 @@ public:
 	bool	insertEntries();
 	bool	inputFile();
 	void	splitLine( CString cLine);
-	bool	CInputGA::splitNameSubstr( CString nameSubStr );
 	void	splitTableHeader( CString cLine ); 
-	bool CInputGA::person(CString line, PEOPLE* p);
 	int		rollFile( CStdioFile* file );
 
-	void CInputGA::processNameSubstr(PEOPLE* any);
 	void	CInputGA::insertTableHeader();
 	void CInputGA::processSpouseSubstrings();
-//	void	processMarriageSubstrings();
 	CString CInputGA::processWedding( int ix);
 	CString CInputGA::cutBirthDeath(CString spouseSubstr);
 	void	processPlaceDateComment( CString placeDateComment, PLACE_DATE_BLOCK* ns );
@@ -193,10 +186,8 @@ protected:
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	int CInputGA::setGenCnt(CString line);
 
-	bool CInputGA::emptyDatabase();
 	bool CInputGA::setFatherMother();
-	bool CInputGA::setFatherMother1();
-
+	
 	bool CInputGA::isPeer(CString title);
 	CString getBranch( CString cLine );
 
@@ -228,13 +219,11 @@ protected:
 
 	void	processSpousesSpouses( int i, std::vector<PEOPLE>* v_p);
 	int		getSpouseOrder( std::vector<PEOPLE>* vp );
-
 	void CInputGA::setParentIndex();
 	CString	checkSex( CString sex_id );
 	void CInputGA::checkSexCouple( CString* sex1, CString* sex2);
 	CString setPeer( PEOPLE* p );
-	CString extractPeer( CString str );
-	CString getPeerFromComment(CString str);
+	CString getPeerFromString(CString str);
 	CString CInputGA::cleanHtmlTags(int lineNumber, CString cLine);
 
 
@@ -244,7 +233,6 @@ protected:
 
 public:
 	virtual BOOL OnInitDialog();
-//	virtual void OnFolderChange();
 	afx_msg void OnClickedStaticHtml();
 	afx_msg void OnClickedButtonFile();
 	afx_msg void OnClickedButtonFamily();

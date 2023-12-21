@@ -394,20 +394,10 @@ CString CAscendants::getPeopleString(int i)
 	//	name.Format(L"%s %s", last_name, first_name);
 
 	str.Empty();
-	if (m_peerPrint)
+	if (m_peerPrint && !peer.IsEmpty() )
 	{
-		if (peer == L"gróf")
-			peer = L"gr";
-		else if (peer == L"báró")
-			peer = L"br";
-		else if (peer == L"herceg")
-			peer = L"hg";
-
-		if (!peer.IsEmpty())
-		{
-			str = peer;
-			str += L" ";
-		}
+		str = peer;
+		str += L" ";
 	}
 	if (m_bold) str += L"<b>";
 	if (last_name != L"N;" && !titolo.IsEmpty()) { str += titolo; str += L" "; }

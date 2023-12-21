@@ -179,8 +179,8 @@ BOOL CDescendants::start()
 			if (p_html)
 			{
 				printVector(i);
-				linearTable(i);
-
+				linearTable(i, 1 );
+				linearTable(i, 2);
 			}
 			else
 				printVectorTxt(i);
@@ -322,7 +322,8 @@ bool CDescendants::tablesDescendants()  // listázandó táblák a theapp.v_tableNum
 		descendants();
 		multipleRowid();
 		printVector(i);
-		linearTable(i);
+		linearTable(i, 1);
+		linearTable(i, 2);
 		if (!p_oneFile)
 		{
 			closeHtml();

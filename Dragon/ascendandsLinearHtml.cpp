@@ -219,9 +219,11 @@ bool CAscendantsLinearTable::createHtmlFile(int which)
 	printOnly(L"html>body tbody.scrollContent {", which);
 	printOnly(L"	display: block;", which);
 	
-	if (which == FULL || which == UNIQUE )  // vagyis fix fejléc, nem nyomtatható
+	if (which == FULL || which == UNIQUE)  // vagyis fix fejléc, nem nyomtatható
+	{
 		str.Format(L"    height: %dpx;", height);
-	printOnly(str, which);
+		printOnly(str, which);
+	}
 
 
 	printOnly(L"	overflow: auto;", which);
@@ -296,7 +298,7 @@ bool CAscendantsLinearTable::createHtmlFile(int which)
 		printOnly(L"<th style=\"width: 35px\">ism.</th>", which);
 		printOnly(L"<th style=\"width: 55px\">apa</th>", which);
 		printOnly(L"<th style=\"width: 55px\">gyerek</th>", which);
-		printOnly(L"<th style=\"width: 55px\">felmenõ</th>", which);
+		printOnly(L"<th style=\"width: 55px\">id</th>", which);
 		str.Format(L"<th style=\"width: %dpx\">felmenõ</th>", width - (3 * 55 + 2 * 35));
 		printOnly(str, which);
 	}
@@ -358,7 +360,7 @@ bool CAscendantsLinearTable::createHtmlFile(int which)
 		printOnly(L"<th style=\"width: 55px\">anya</th>", which);
 		printOnly(L"<th style=\"width: 55px\">apa</th>", which);
 		printOnly(L"<th style=\"width: 55px\">gyerek</th>", which);
-		printOnly(L"<th style=\"width: 55px\">azonosító</th>", which);
+		printOnly(L"<th style=\"width: 55px\">id</th>", which);
 		str.Format(L"<th style=\"width: %dpx\">felmenõ</th>", width - (5 * 55 + 2 * 35));
 		printOnly(str, which);
 

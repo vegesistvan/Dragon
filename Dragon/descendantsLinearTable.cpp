@@ -5,15 +5,17 @@
 #include "descendantsParam.h"
 #include "Table_people_columns.h"
 #include "Table_tables.h"
+#include "build_defs.h"
 
-bool CDescendants::linearTable(int i)
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bool CDescendants::linearTable(int i, int which)
 {
-	int which = 1;
 	CString filename;
 	CString title;
 	CString familyName;
 	CString tableRoman;
 	CString descendantsTablePathName;
+	CString printableTablePathName;
 	int tableTop = 240;
 	int height = theApp._h - tableTop;			// 612   teljes: 1080  378  levonjuk a preTable-t
 	int width = theApp._w;
@@ -30,8 +32,16 @@ bool CDescendants::linearTable(int i)
 		title.Format(L"%s leszármazotti táblája", m_os);
 
 	filename = title;
-	descendantsTablePathName.Format(L"%s\\%s_%s.html", m_descendantsPath, filename, getTimeTag());
-	if (!openFileSpec(&fhDescTable, descendantsTablePathName, L"w+")) return false;
+	if (which == 1)
+	{
+		descendantsTablePathName.Format(L"%s\\%s_%s.html", m_descendantsPath, filename, getTimeTag());
+		if (!openFileSpec(&fhDescTable, descendantsTablePathName, L"w+")) return false;
+	}
+	else if( which == 2)
+	{
+		printableTablePathName.Format(L"%s\\%s_printable%s.html", m_descendantsPath, filename, getTimeTag());
+		if (!openFileSpec(&fhPrintable, printableTablePathName, L"w+")) return false;
+	}
 
 	printOnly(L"<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">", which);
 	printOnly(L"<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\"><head>", which);
@@ -132,18 +142,12 @@ bool CDescendants::linearTable(int i)
 	printOnly(L"	border: 1px solid #963;", which);
 	printOnly(L"	overflow: auto;", which);
 	printOnly(L"	width: device-width", which);
-//	if (which < 8)
-//	{
-//		str.Format(L"width: %dpx", width);  // ez számít!!
-//		printOnly(str, which);
-//	}
 	printOnly(L"}\n", which);
 
 
 	printOnly(L"/* Reset overflow value to hidden for all non-IE browsers. */", which);
 	printOnly(L"html>body div.tableContainer {", which);
 	printOnly(L"	overflow: hidden;", which);
-//	str.Format(L" height:  %dpx", height);
 	printOnly(L"}\n", which);
 
 	printOnly(L"/* set table header to a fixed position. WinIE 6.x only                                       */", which);
@@ -194,10 +198,11 @@ bool CDescendants::linearTable(int i)
 	printOnly(L"/* induced side effect is that child TDs no longer accept width: auto                     */", which);
 	printOnly(L"html>body tbody.scrollContent {", which);
 	printOnly(L"	display: block;", which);
-	str.Format(L"    height: %dpx;", height);
+	
+	if (which == 1 )  // vagyis fix fejléc, nem nyomtatható
+		str.Format(L"    height: %dpx;", height);
 	printOnly(str, which);
-
-
+	
 	printOnly(L"	overflow: auto;", which);
 	printOnly(L"	width: 100%", which);
 	printOnly(L"}\n", which);
@@ -254,7 +259,6 @@ bool CDescendants::linearTable(int i)
 	printOnly(L"html>body tbody.scrollContent td + td + td + td + td + td + td{", which);
 	str.Format(L"width: %dpx", width - (4 * 55 + 2 * 35 + 120));
 	printOnly(str, which);
-//	printOnly(L"	width: 1465px", which);
 	printOnly(L"}", which);
 
 
@@ -278,8 +282,6 @@ bool CDescendants::linearTable(int i)
 	str.Format(L"<th style=\"width: %dpx\">leszármazott</th>", width - (4 * 55 + 2 * 35));
 	printOnly(str, which);
 
-//	printOnly(L"<th style=\"width: 1470px\">leszármazott</th>", which);
-
 	printOnly(L"</tr>", which);
 	printOnly(L"</thead>", which);
 	printOnly(L"<tbody class=\"scrollContent\">", which);
@@ -293,11 +295,23 @@ bool CDescendants::linearTable(int i)
 	printOnly(L"<div><br/ ></div>\n", which);
 	printOnly(L"</body></html>\n", which);
 
-	fclose(fhDescTable);
-	ShellExecute(NULL, L"open", descendantsTablePathName, NULL, NULL, SW_SHOWNORMAL);
+
+
+	if (which == 1 )
+	{
+		fclose(fhDescTable);
+		ShellExecute(NULL, L"open", descendantsTablePathName, NULL, NULL, SW_SHOWNORMAL);
+	}
+	else if (which == 2)
+	{
+		fclose(fhPrintable);
+		ShellExecute(NULL, L"open", printableTablePathName, NULL, NULL, SW_SHOWNORMAL);
+	}
+
 
 	return true;
 }
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendants::dataTable(int i)
 {
@@ -462,18 +476,21 @@ CString CDescendants::getComplexDescription(int i)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendants::printOnly(CString str, int which)
 {
+	str.Replace('|', '\'');
+	str = UnicodeToUtf8(str);
 	switch (which)
 	{
 	case 0:
-		str.Replace('|', '\'');
-		str = UnicodeToUtf8(str);
 		fwprintf(fl, L"%s", str);  // a soreleji %-okat printelési karakterekenk értelmezné, ha közvetlenül nyomtatnánk!!! 
-		fflush(fl);
+//		fflush(fl);
 		break;
 	case 1:
-		str = UnicodeToUtf8(str);
 		fwprintf(fhDescTable, L"%s\n", str);
-		fflush(fhDescTable);
+//		fflush(fhDescTable);
+		break;
+	case 2:
+		fwprintf(fhPrintable, L"%s\n", str);
+//		fflush(fhDescTable);
 		break;
 	}
 }
@@ -484,4 +501,136 @@ TCHAR CDescendants::get_gABC(int g)
 	int ix = g / 26;		  // ix = 0, ha g kisebb mint 26, = 1 Ha nagyobb
 	gABC = TCHAR('A') + ix * 6 + g;   // 6 : a 'Z' és 'a' közötti karakterek száma,
 	return gABC;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bool CDescendants::printTopContainer(CString title, int which)
+{
+	int l = -37;
+	CString today;
+	today = getPresentDateTime();
+	CString yesno;
+	CString nok;
+	if (p_mother)
+		nok = L"igen";
+	else
+		nok = L"nem";
+
+	CString kihagy;
+	switch (p_repeated)
+	{
+	case 0:
+		kihagy = L"Nem hagyja aki az ismétlõdõ leszármazottakat.";
+		break;
+	case 1:
+		kihagy = L"Az elsõ leszármazottat kiírja, a többit elhagyja.";
+		break;
+	case 2:
+		kihagy = L"Ha az apja leszármazott, akkor kiírja, ha az anyja, akkor nem";
+	}
+
+	CString maxGen;
+	if (m_editGenMax.IsEmpty())
+		maxGen = L"minden generáció";
+	else
+		maxGen = m_editGenMax;
+
+	CString inputFile;
+	CString created;
+	m_command = L"SELECT filespec, created FROM filespec";
+	if (!theApp.query(m_command)) return false;
+	inputFile = theApp.m_recordset->GetFieldString(0);
+	created = theApp.m_recordset->GetFieldString(1);
+
+	CString dateDB = theApp.getFileCreationDate(theApp.m_dbPathName);
+
+	CString connect;
+	connect = p_connect ? L"igen" : L"nem";
+
+
+	//str.Format(L"<b><center>%s</center>\n<pre></b>\n", title);
+	str.Format(L"<b><center>%s</center></b><br>\n\n", title);
+	printOnly(str, which);
+	//	printOnly(L"<center><img src = \"dragon.jpg\" alt = \"Dragon\" width = \"100\" height = \"70\"></center>", which );
+
+	printOnly(L"<pre>", which);
+	str.Format(L"%*s Dragon v. %s", l, L"Program:", theApp.m_version);
+	printOnly(str, which);
+	str.Format(L"%*s %s", l, L"Dragon.exe készült:", MultiToUnicode(LPCSTR(BUILD)));
+	printOnly(str, which);
+
+	str.Format(L"%*s %s", l, L"Alapkönyvtár:", theApp.m_dbFolderPath);
+	printOnly(str, which);
+
+	str = L"ÜRES";
+	if (theApp.m_inputMode == MANUAL)
+		str = L"kézi adatbevitel";
+	else if (theApp.m_inputMode == GEDCOM)
+		str = L"GEDCOM fájl";
+	else if (theApp.m_inputMode = GAHTML)
+		str = L"GA.htm fájl";
+
+	str.Format(L"%*s %s", l, L"Adatbázis bemenete:", (CString)str);
+	printOnly(str, which);
+
+	if (theApp.m_inputMode == GAHTML || theApp.m_inputMode == GEDCOM)
+	{
+		str.Format(L"%*s %s %s", l, L"Bementi fájl készült:", created, inputFile);
+		printOnly(str, which);
+	}
+	str.Format(L"%*s %s %s", l, L"Adatbázis készült:", dateDB, theApp.m_dbFileName);
+	printOnly(str, which);
+	if (!theApp.m_inputVersion.IsEmpty() && theApp.m_inputVersion != theApp.m_version)
+	{
+		str.Format(L"%*s %s", l, L"Beolvasás programverziója:", theApp.m_inputVersion);
+		printOnly(str, which);
+	}
+	if (!theApp.m_uniteVersion.IsEmpty())
+	{
+		if (theApp.m_snameEnough)
+			yesno = L"igen";
+		else
+			yesno = L"nem";
+
+		str.Format(L"%*s %s", l, L"Azonos nevõ házaspárok összevonása:", yesno);
+		printOnly(str, which);
+		if (theApp.m_uniteVersion != theApp.m_version)
+		{
+			str.Format(L"%*s %s", l, L"Összevonás programverziója:", theApp.m_uniteVersion);
+			printOnly(str, which);
+		}
+	}
+
+	str.Format(L"%*s %s<br>", l, L"Lista készült:", theApp.getPresentDateTime());
+	printOnly(str, which);
+	str.Format(L"%*s %s", l, L"Generációk max száma:", maxGen);
+	printOnly(str, which);
+	str.Format(L"%*s %s", l, L"Elágazások összekötése:", connect);
+	printOnly(str, which);
+	str.Format(L"%*s %s", l, L"Nõk leszármazottai:", nok);
+	printOnly(str, which);
+
+	//	str.Format(L"%*s %s", l, L"Ismétlõdõk kihagyása:", kihagy);
+	//	printOnly(str, which );
+
+	CString sorrend;
+	switch (p_radioOrder)
+	{
+	case ORDER_INPUT:
+		sorrend = L"bementi sorrend";
+		break;
+	case ORDER_BIRTH:
+		sorrend = L"születési idõ";
+		break;
+	case ORDER_INCREASING:
+		sorrend = L"növekvõ hosszúságú leszármazotti szálak";
+		break;
+	case ORDER_DECREASING:
+		sorrend = L"csökkenõ hosszúságú leszármazotti szálak";
+		break;
+	}
+
+	str.Format(L"%*s %s", l, L"Sorrend:", sorrend);
+	printOnly(str, which);
+
+	printOnly(L"</pre>", which);
 }

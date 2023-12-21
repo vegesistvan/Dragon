@@ -321,7 +321,9 @@ typedef struct
 		CString date;
 	}MARRIAGE_INSERT;
 
+
 	typedef struct
 	{
-		CString posterior;
-	}POSTERIORS;
+		CString sh;
+		CString lg;
+	}PEERS;

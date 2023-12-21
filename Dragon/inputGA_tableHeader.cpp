@@ -69,13 +69,16 @@ void CInputGA::splitTableHeader(CString cLine)
 	++m_tableNumber;
 
 	m_peerHeader.Empty();
-	if (cLine.Find(L"báró+") == -1 && cLine.Find(L"báró") != -1)
-		m_peerHeader = L"báró";
-	if (cLine.Find(L"gróf+") == -1 && cLine.Find(L"gróf") != -1)
-		m_peerHeader = L"gróf";
-	if (cLine.Find(L"herceg+") == -1 && cLine.Find(L"herceg") != -1)
-		m_peerHeader = L"herceg";
-
+	CString peerP;
+	for (int i = 0; i < sizeof(peers); ++i)
+	{
+		peerP = peers[i].lg + L"+";
+		if (cLine.Find(peerP) == -1 && cLine.Find(peers[i].lg) != -1 )
+		{
+			m_peerHeader = peers[i].lg;
+			break;
+		}
+	}
 
 	// szögletes zárójelek tartalmának megõrzése és leszedése a cLine-ról
 	if ((pos1 = cLine.ReverseFind('[')) != -1)			// [] zárójelek leszedése

@@ -602,20 +602,11 @@ void CAscendantsLinearTable::getPeopleString(int i)
 	peer = m_recP->GetFieldString(DBP_PEER);
 
 	name.Empty();
-	if (m_peerPrint)
+	if (m_peerPrint && !peer.IsEmpty() )
 	{
-		if (peer == L"gróf")
-			peer = L"gr";
-		else if (peer == L"báró")
-			peer = L"br";
-		else if (peer == L"herceg")
-			peer = L"hg";
+		name = peer;
+		name += L" ";
 
-		if (!peer.IsEmpty())
-		{
-			name = peer;
-			name += L" ";
-		}
 	}
 	if (last_name != L"N;" && !titolo.IsEmpty()) { name += titolo; name += L" "; }
 	name += last_name;

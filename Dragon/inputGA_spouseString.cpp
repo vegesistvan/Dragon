@@ -769,26 +769,17 @@ void CInputGA::splitSubstrs( PEOPLE* any)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CInputGA::isPeer(CString p)
 {
-	if (p == L"gr" || p == L"br" || p == L"hg" || p == L"gróf" || p == L"báró" || p == L"herceg")
+	for (int i = 0; i < sizeof(peers); ++i)
 	{
-		return true;
+		if (p == peers[i].sh || p == peers[i].lg)
+			return true;
 	}
 	return false;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CInputGA::extractPeer(CString str)
-{
-	if (str == L"gr" || str == L"br" || str == L"hg" || str == L"gróf" || str == L"báró" || str == L"herceg")
-	{
-		return(str);
-	}
-	return L"";
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // kamaragróf, fõbányagróf az nem grófi cím!!!!
-CString CInputGA::getPeerFromComment(CString comment)
+CString CInputGA::getPeerFromString(CString comment)
 {
-	CString peer;
 	CStringArray A;
 	CString word;
 
@@ -797,31 +788,16 @@ CString CInputGA::getPeerFromComment(CString comment)
 	{
 		word = A[i];
 		word.Remove(',');
-		if (word == L"herceg")
-			peer = L"hg";
-		else if (word == L"gróf")
-			peer = L"gr";
-		else if (word == L"báró")
-			peer = L"br";
+		for (int j = 0; j < sizeof(peers); ++j)
+		{
+			if (word == peers[j].sh)
+				return word;
+			if (word == peers[j].lg)
+				return peers[j].sh;
+		}
 	}
-	return peer;
+	return L"";
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-bool CInputGA::findPeer(CString comment, CString peer)
-{
-	int pos;
-	CString date;
-
-	if ((pos = comment.Find(peer)) != -1 && pos > 2)
-	{
-		date = getPreviousWord2(comment, pos - 2);
-		if (isNumeric(date.Left(4)))
-			return true;
-	}
-	return false;
-}
-*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString getPreviousWord2(CString comment, int pos)
 {
@@ -893,25 +869,6 @@ bool CInputGA::isname(CString line, PEOPLE* p)
 			title += L" ";
 			A[i].Empty();
 		}
-
-
-		/*
-		A[i].Remove('?');
-		A[i].Trim();
-		if (!iswalpha(A[i][0])) return false;		// a név minden elemének betûvel kell kezdõdni
-
-		if (isPeer(A[i]))
-		{
-			m_peer = A[i];
-			A[i].Empty();
-		}
-		else if (isTitle(A[i]))
-		{
-			title += A[i];
-			title += L" ";
-			A[i].Empty();
-		}
-		*/
 	}
 	title.Trim();
 

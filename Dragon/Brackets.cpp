@@ -132,7 +132,7 @@ BOOL CBrackets::OnInitDialog()
 
 	m_ListCtrl.InsertColumn(ERRORX, L"error", LVCFMT_RIGHT, 60, -1, COL_HIDDEN);
 	m_ListCtrl.InsertColumn(LINENUMBER, L"line#", LVCFMT_RIGHT, 50, -1, COL_NUM);
-	m_ListCtrl.InsertColumn(LINE, L"ga.htm sor", LVCFMT_LEFT, 1400, -1, COL_TEXT);
+	m_ListCtrl.InsertColumn(LINE, L"ga.htm sor", LVCFMT_LEFT, 2000, -1, COL_TEXT);
 
 
 	fillVector();

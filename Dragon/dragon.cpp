@@ -581,7 +581,7 @@ BOOL CDragApp::openDatabase(bool same)
 		pM->m_wndRibbonBar.SetActiveCategory(pCAT_TABLES, false);
 
 	}
-	if (theApp.m_inputMode != GAHTML)
+//	if (theApp.m_inputMode != GAHTML)
 	{
 		// blbob db fájl megnyitása
 

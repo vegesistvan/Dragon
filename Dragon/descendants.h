@@ -232,6 +232,7 @@ protected:
 	FILE* text;
 	FILE* txtOut;
 	FILE* fhDescTable;
+	FILE* fhPrintable;
 
 	PPEOPLE p;
 	PPEOPLE s;
@@ -287,7 +288,7 @@ protected:
 	BOOL CDescendants::query(CString command);
 
 
-	bool CDescendants::linearTable(int i);
+	bool CDescendants::linearTable(int i, int which);
 	void CDescendants::dataTable(int i);
 	bool CDescendants::printTopContainer(CString title, int which);
 	void CDescendants::printOnly(CString str, int which);
