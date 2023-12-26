@@ -34,7 +34,6 @@ BEGIN_MESSAGE_MAP(CDragApp, CWinAppEx)
 	ON_COMMAND(ID_MARRIAGES, &CDragApp::OnMarriages)
 	ON_COMMAND(IDC_TABLES, &CDragApp::OnTables)
 	ON_COMMAND(ID_INPUTFILES, &CDragApp::OnInputfiles)
-	ON_COMMAND(ID_UNITE_SAMENAME, &CDragApp::OnUniteSamename)
 	ON_COMMAND(ID_LISTS_ROWID, &CDragApp::OnListsRowid)
 	ON_COMMAND(ID_FULLNAME, &CDragApp::OnFullname)
 	ON_COMMAND(ID_NOTEPAD, &CDragApp::OnNotepad)
@@ -60,13 +59,8 @@ BEGIN_MESSAGE_MAP(CDragApp, CWinAppEx)
 	ON_UPDATE_COMMAND_UI(ID_INPUT_SZLUHA, &CDragApp::OnUpdateInputSzluha)
 	ON_UPDATE_COMMAND_UI(ID_INPUT_MANUAL, &CDragApp::OnUpdateInputManual)
 	ON_UPDATE_COMMAND_UI(ID_INPUT_GEDCOM, &CDragApp::OnUpdateInputGedcom)
-	ON_COMMAND(ID_UNITE_SAMENAMENOT, &CDragApp::OnUniteSamenamenot)
-	ON_COMMAND(ID_UNITE_INFO, &CDragApp::OnUniteInfo)
-	ON_UPDATE_COMMAND_UI(ID_UNITE_SAMENAME, &CDragApp::OnUpdateUniteSamename)
-	ON_UPDATE_COMMAND_UI(ID_UNITE_SAMENAMENOT, &CDragApp::OnUpdateUniteSamenamenot)
 	ON_COMMAND(ID_UNION_SHOW, &CDragApp::OnUnionShow)
 	ON_UPDATE_COMMAND_UI(ID_UNION_SHOW, &CDragApp::OnUpdateUnionShow)
-	ON_UPDATE_COMMAND_UI(ID_UNITE_INFO, &CDragApp::OnUpdateUniteInfo)
 	ON_UPDATE_COMMAND_UI(ID_HTML_INFO, &CDragApp::OnUpdateHtmlInfo)
 	ON_UPDATE_COMMAND_UI(ID_BROWSE, &CDragApp::OnUpdateBrowse)
 	ON_UPDATE_COMMAND_UI(ID_NOTEPAD, &CDragApp::OnUpdateNotepad)
@@ -164,6 +158,8 @@ BEGIN_MESSAGE_MAP(CDragApp, CWinAppEx)
 		ON_UPDATE_COMMAND_UI(ID_MARRIAGE_ROWID, &CDragApp::OnUpdateMarriageRowid)
 		ON_COMMAND(ID_MARRIAGE_ROWID, &CDragApp::OnMarriageRowid)
 		ON_COMMAND(ID_HELP, &CDragApp::OnHelp)
+		ON_UPDATE_COMMAND_UI(ID_UNITE, &CDragApp::OnUpdateUnite)
+		ON_COMMAND(ID_UNITE, &CDragApp::OnUnite)
 		END_MESSAGE_MAP()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CDragApp::CDragApp() noexcept
@@ -629,30 +625,16 @@ void CDragApp::insertVersion(CString inputMode)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragApp::createCaption()
 {
-	m_caption.Format(L"Dragon v. %s", m_version);
-	if ( !m_inputVersion.IsEmpty() && m_inputVersion != m_version)
-		m_caption.Format(L"%s input:%s", (CString)m_caption, m_inputVersion);
-	if (!m_uniteVersion.IsEmpty() && m_uniteVersion != m_version)
-		m_caption.Format(L"%s unite:%s", (CString)m_caption, m_uniteVersion);
-
-	m_caption.Format(L"%s || %s", CString(m_caption), m_dbFileName);
-
+	m_caption.Format(L"Dragon v. %s (%s ", m_version, m_dbPathName);
 	if (m_inputMode == GAHTML)
-	{
-		m_caption.Format(L"%s || %s", (CString)m_caption, m_htmlPathName);
-		
-		if (!m_uniteVersion.IsEmpty())
-		{
-			if (m_snameEnough == 1)
-				m_caption.Format(L"%s || csak a névben azonos házaspárok összevonva", CString(m_caption));
-			else
-				m_caption.Format(L"%s || csak a névben azonos házaspárok nincsenek összevonva", CString(m_caption));
-		}
-	}
+		m_caption += m_htmlFileName; 
 	else if (m_inputMode == GEDCOM)
-	{
-		m_caption.Format(L"%s || %s", CString(m_caption), m_gedFileName);
-	}
+		m_caption += m_gedFileName;
+	else if (m_inputMode == MANUAL)
+		m_caption += L"kézi adatbevitel";
+	else if (m_inputMode == URES)
+		m_caption += L"üres adatbázis";
+	m_caption += L")";
 
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -778,7 +760,6 @@ bool CDragApp::getDBtype()
 		m_inputVersion = m_recordset->GetFieldString(PROP_INPUTVERSION);
 		m_uniteVersion = m_recordset->GetFieldString(PROP_UNITEVERSION);
 		m_inputMode = m_recordset->GetFieldString(PROP_INPUTMODE);
-		m_snameEnough = _wtoi(m_recordset->GetFieldString(PROP_SNAMEENOUGH));
 		if (m_inputMode.IsEmpty())
 		{
 			m_inputMode = MANUAL;
@@ -1071,4 +1052,5 @@ void CDragApp::OnOpen()
 	createCaption();
 	m_pMainWnd->SetWindowText(m_caption);
 }
+
 

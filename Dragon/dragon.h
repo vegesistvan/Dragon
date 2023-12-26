@@ -196,7 +196,6 @@ public:
 	CString m_inputVersion;
 	CString m_uniteVersion;
 	CString m_inputMode;
-	bool	m_snameEnough;
 
 	CMFCRibbonCategory* pCAT_DATABASE;
 	CMFCRibbonCategory* pCAT_TABLES;
@@ -570,5 +569,7 @@ public:
 	afx_msg void OnUpdateMarriageRowid(CCmdUI* pCmdUI);
 	afx_msg void OnMarriageRowid();
 	afx_msg void OnHelp();
+	afx_msg void OnUpdateUnite(CCmdUI* pCmdUI);
+	afx_msg void OnUnite();
 };
 extern CDragApp theApp;

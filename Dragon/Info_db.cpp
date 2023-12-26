@@ -62,9 +62,9 @@ void CInfoDb::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_INTEGRITYSYSTEM, colorIntegritySystem);
 
 	DDX_Control(pDX, IDC_INTEGRITY, colorIntegrity);
-	DDX_Control(pDX, IDC_INPUT, m_inputCtrl);
-	DDX_Control(pDX, IDC_UNITED, m_uniteCtrl);
-//	DDX_Control(pDX, IDC_STATIC_INPUTVERSION, m_inputVersionCtrl);
+
+
+
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -100,6 +100,7 @@ BOOL CInfoDb::OnInitDialog()
 	CString freeListCount;
 	CString integrity;
 	CString fileSpec;
+	CString version;
 	FILE*	fl;
 
 	fileSpec.Format( L"%s\\integrityError.txt", theApp.m_workingDirectory );
@@ -188,31 +189,15 @@ BOOL CInfoDb::OnInitDialog()
 	GetDlgItem( IDC_TABLES )->SetWindowTextW( tables );
 	GetDlgItem( IDC_MARRIAGES )->SetWindowTextW( marriages );
 
-	if (theApp.m_uniteVersion.IsEmpty() )
-		m_uniteCtrl.SetWindowTextW(L"Nem egyesített bejegyzések");
-	else
-	{
-		str.Format(L"Egyesítettett bejegyzések a %s programverzióval", theApp.m_uniteVersion);
-		m_uniteCtrl.SetWindowTextW( str );
-		if (theApp.m_snameEnough)
-			str = L"Csak a névben azon házaspárok összevonva.";
-		else
-			str = L"Csak a névben azonos házaspárok nincsenek összevonva.";
-		GetDlgItem(IDC_STATIC_ENOUGH)->SetWindowTextW(str);
+	version.Format(L"v. %s", theApp.m_uniteVersion);
+	GetDlgItem(IDC_UNITED_VERSION)->SetWindowTextW( version );
 
-
-
-	}
 	
-
-
-
 	CFileStatus status;
 	CString mtime(L"");
 	CString ctime(L"");
 	CString atime(L"");
 	CString size = 0;;
-	CString version;
 
 	if( CFile::GetStatus( theApp.m_dbPathName, status) )
 	{
@@ -227,30 +212,31 @@ BOOL CInfoDb::OnInitDialog()
 	GetDlgItem( IDC_MODIFIED )->SetWindowTextW( mtime );
 	GetDlgItem( IDC_ACCESSED )->SetWindowTextW( atime );
 
-	version.Format(L"a %s program verzióval", theApp.m_inputVersion);
+	version.Format(L"v. %s", theApp.m_inputVersion);
 	str = L"Üres adatbázis";
 	if (theApp.m_inputMode == MANUAL)
 		str = L"Kézi adatbevitel";
 	else if (theApp.m_inputMode == GAHTML)
 	{
 		if (CFile::GetStatus(theApp.m_htmlPathName, status))
-		mtime = status.m_mtime.Format(L"%Y.%m.%d %H:%M:%S");
-//		str.Format(L"GA.htm fájlból: %s  létrehozva: %s", theApp.m_htmlFileName, mtime );
-		str.Format(L"%s %s %s", theApp.m_htmlFileName, mtime, version );
+			mtime = status.m_mtime.Format(L"%Y.%m.%d %H:%M:%S");
+		str = theApp.m_htmlFileName;
 	}
 	else if (theApp.m_inputMode == GEDCOM)
 	{
 		if (CFile::GetStatus(theApp.m_gedPathName, status))
 			mtime = status.m_mtime.Format(L"%Y.%m.%d %H:%M:%S");
-		str.Format(L"%s %s %s", theApp.m_gedFileName, mtime, version);
+		str = theApp.m_gedFileName;
 	}
-	m_inputCtrl.SetWindowTextW(str);
-//	version.Format(L"a %s program verzióval", theApp.m_inputVersion);
-//	if( !str.IsEmpty() )
-//		m_inputVersionCtrl.SetWindowTextW(version);
+	if (theApp.m_inputMode == GAHTML || theApp.m_inputMode == GEDCOM)
+	{
+		GetDlgItem(IDC_INPUT_DATE)->SetWindowTextW(mtime);
+		GetDlgItem(IDC_INPUT_VERSION)->SetWindowTextW(version);
+		GetDlgItem(IDC_INPUT_FILE)->SetWindowTextW(str);
+	}
 
 
-	if (theApp.m_inputMode != GAHTML)
+//	if (theApp.m_inputMode != GAHTML)
 	{
 
 		if (CFile::GetStatus(theApp.m_blobPathName, status))

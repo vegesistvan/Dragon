@@ -384,12 +384,6 @@
     <ClInclude Include="uniteEntries.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="uniteParam.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="uniteParameters.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="uniteStructures.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -777,12 +771,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="uniteEntries.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="uniteParam.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="uniteParameters.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dragon_utilites.cpp">

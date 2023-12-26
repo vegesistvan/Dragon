@@ -100,7 +100,8 @@ BOOL CUnitedEntriesUnited::OnInitDialog()
 	m_ListCtrlU.InsertColumn(U_BIRTHM, L"birth", LVCFMT_LEFT, 70, -1, COL_TEXT);
 	m_ListCtrlU.InsertColumn(U_DEATHM, L"death", LVCFMT_LEFT, 70, -1, COL_TEXT);
 
-	m_ListCtrlU.InsertColumn(U_SPOUSES, L"házastársak", LVCFMT_LEFT, 700, -1, COL_TEXT);
+	m_ListCtrlU.InsertColumn(U_SPOUSES, L"házastársak", LVCFMT_LEFT, 1000, -1, COL_TEXT);
+	m_ListCtrlU.InsertColumn(U_CHILDREN, L"gyerekek", LVCFMT_LEFT, 1500, -1, COL_TEXT);
 
 	inputFile();
 	return TRUE;

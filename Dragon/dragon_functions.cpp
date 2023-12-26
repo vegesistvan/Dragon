@@ -258,56 +258,13 @@ void CDragApp::OnInputfiles()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragApp::OnUpdateUniteInfo(CCmdUI* pCmdUI)
-{
-	if (m_inputMode != GAHTML ) pCmdUI->Enable(FALSE);
-}
-void CDragApp::OnUniteInfo()
-{
-	CString text = L"\
-Az azonos nevû bejegyzések helyes összevonása alapvetõ a családi kapcsolatok létrehozására, a helyes leszármazotti és felmenõi listák elõállításához.\r\n\
-Sok esetben az azonos nevû bejegyzések csak a házastárs nevében egyeznek, további információ nem áll rendelkezésre annak eldöntéséhez, \
-hogy egyesíthetõek vagy sem. \r\n\
-Ebben az esetben egyes kapcsolatoknál az összevonás a helyes, más esetekben pedig az, hogy nem vonjuk össze ezeket a bejegyzéseket.\r\n\
-\r\n\
-Nincs tehát minden esetben helyes megoldás!\r\n\
-\r\n\
-Kétféle összevonási algoritmus között választhatunk:\r\n\
-\r\n\
-1. A csak a nevükben azonos házaspárok tagjait összevonja\r\n\
-2. A csak a nevükben azonos házaspárok tagjait nem vonja össze.\r\n\
-\r\n\
-Ha egy adott leszármazotti vagy felmenõi listánál azt látjuk, hogy hibás a lista, akkor megpróbálkozhatunk a másik összevonással. Elõfordulhat, hogy \
-más hibák keletkeznek a listában, de lehetséges, hogy megoldást ad a problémára.\r\n\
-\r\n\
-Akárhogy is választunk, az adatbázisban nagy valószínûséggel hibák lesznek, csak egy konkrét problémára remélhetünk megoldást a különbözõ algoritmusokkal!!!!!!!!!\
-";
-	AfxMessageBox(text, MB_ICONINFORMATION);
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragApp::OnUpdateUniteSamename(CCmdUI* pCmdUI)
+void CDragApp::OnUpdateUnite(CCmdUI* pCmdUI)
 {
 	if (m_inputMode != GAHTML || !m_uniteVersion.IsEmpty()) pCmdUI->Enable(FALSE);
 }
-void CDragApp::OnUniteSamename()
+void CDragApp::OnUnite()
 {
 	CUniteEntries unite;
-	unite.m_snameEnough = true;
-	if (!unite.parameteres())
-		return;
-	createCaption();
-	m_pMainWnd->SetWindowText(m_caption);
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDragApp::OnUpdateUniteSamenamenot(CCmdUI* pCmdUI)
-{
-	if (m_inputMode != GAHTML || !m_uniteVersion.IsEmpty()) pCmdUI->Enable(FALSE);
-}
-void CDragApp::OnUniteSamenamenot()
-{
-	CUniteEntries unite;
-	unite.m_snameEnough = false;
 	if (!unite.parameteres())
 		return;
 	createCaption();

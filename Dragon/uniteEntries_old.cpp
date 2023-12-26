@@ -84,15 +84,16 @@ bool CUniteEntries::parameteres()
 	{
 		return false;
 	}
-	m_snameEnough = dlgP.m_snameEnough;
+	m_snameEnough = dlgP.m_snameEnough;  // a hívásnál állítódik be!!!
 */
-	m_name = L"";
+	m_name = L"Abaffy Anna";
+	m_name.Empty();
 	m_loopMax = 3;
-	R1 = L"";
-	R2 = L"";
+	R1 = L"515";
+	R2 = L"350017";
 	m_algorithm = FAST;
 
-
+/*
 	if (!wcscmp(theApp.m_username, L"végesistvan"))
 	{
 		CUniteParameters dlg;
@@ -106,7 +107,7 @@ bool CUniteEntries::parameteres()
 		m_algorithm = dlg.m_algorithm;
 		m_snameEnough = dlg.m_snameEnough;
 	}
-
+*/
 	m_filenameTextU.Format(L"%sU.txt", theApp.m_dbFileTitle);
 	m_fileSpecTextU.Format(L"%s\\%s", theApp.m_dbFolderPath, m_filenameTextU);
 	if (!openFileSpec(&textU, m_fileSpecTextU, L"w+")) return false;
@@ -168,7 +169,8 @@ bool CUniteEntries::parameteres()
 			slow();
 			break;
 		case FAST:
-			fast();
+			if (!fast())
+				m_loop = m_loopMax;
 			break;
 		}
 		fclose(textN);
@@ -389,8 +391,7 @@ bool CUniteEntries::slow()
 
 				spouses += vspouses.nameBD.Trim();
 				spouses += L", ";
-
-
+				
 				vSpouses.push_back(vspouses);
 
 				m_rset2->MoveNext();
@@ -438,6 +439,7 @@ bool CUniteEntries::fast()
 	CString first_name;
 	int i;
 	int j;
+	int z;
 	m_term = false;
 
 	ENTRIES sEntries;
@@ -467,6 +469,10 @@ bool CUniteEntries::fast()
 			sEntries.rowid = rowid;
 			sEntries.name = name;
 			vEntries.push_back(sEntries);
+			if (name == L"Abaffy Anna")
+			{
+				z = 1;
+			}
 		}
 		m_rset->MoveNext();
 	}
@@ -481,16 +487,26 @@ bool CUniteEntries::fast()
 	{
 		if (vEntries.at(i).rowid.IsEmpty()) goto cont;			// törlésre került a korábbiakban összevonás során
 		name1 = vEntries.at(i).name;
-		/*
+		
 #ifndef _DEBUG
-		pWnd.SetText(name);
+		pWnd.SetText(name1);
 #endif
-		*/
+		
 		if (!m_name.IsEmpty())							// ha m_name-ben mneg van adva egy név, akkor csak azt próbálja összevonni.
 		{
 			if( m_name != name1.Left(m_name.GetLength() ) )		// csak vezeték nevet is meg lehet adni m_name-ben!!
 				goto cont;
 		}
+
+		if (name1 == L"Abaffy Anna")
+		{
+			z = 0;
+			z = 1;
+			m_name = name1.Left(m_name.GetLength());
+
+
+		}
+
 		for( j = i + 1; j < vEntries.size(); ++j )
 		{
 			name2 = vEntries.at(j).name;
@@ -546,6 +562,7 @@ BOOL CUniteEntries::push( CString rowid )
 	CString name;
 	CString lastname;
 	CString source;
+	CString spouse_id;
 	USPOUSES3 vspouses;
 	int pos;
 	int z;
@@ -632,6 +649,45 @@ BOOL CUniteEntries::push( CString rowid )
 		same.birthM.Empty();
 		same.deathM.Empty();
 	}
+	/*
+	//házastárs rowidja
+	if (same.sex_id == MAN)
+		m_command.Format(L"SELECT wife_id FROM marriages WHERE husband_id = '%s'", same.rowid);
+	else
+		m_command.Format(L"SELECT husband_id FROM marriages WHERE wife_id = '%s'", same.rowid);
+	if (!query(m_rset3, m_command)) return false;
+
+	spouse_id = m_rset3->GetFieldString(0);
+	*/
+	// gyerekek meghatározása
+
+	CString first;
+	CString birth;
+	CString death;
+	CString child;
+	CString children;
+	if (same.sex_id == MAN)
+		m_command.Format(L"SELECT first_name, birth_date, death_date FROM people WHERE father_id = '%s'", same.rowid );
+	else
+		m_command.Format(L"SELECT first_name, birth_date, death_date FROM people WHERE mother_id = '%s'", same.rowid );
+	if (!query(m_rset3, m_command)) return false;
+	for (int i = 0; i < m_rset3->RecordsCount(); ++i, m_rset3->MoveNext())
+	{
+		first = m_rset3->GetFieldString(0);
+		birth = m_rset3->GetFieldString(1);
+		death = m_rset3->GetFieldString(2);
+		if (birth.IsEmpty() && death.IsEmpty())
+			child = first;
+		else if (birth.IsEmpty())
+			child.Format(L"%s +%s", first, death);
+		else if (death.IsEmpty())
+			child.Format(L"%s *%s", first, birth);
+		else
+			child.Format(L"%s *%s +%s", first, birth, death);
+		children += child;
+		children += L",";
+	}
+	same.children = dropLastCharacter(children);
 
 	vSameNames.push_back(same);
 
@@ -640,9 +696,6 @@ BOOL CUniteEntries::push( CString rowid )
 
 
 
-	CString spouse_id;
-	CString birth;
-	CString death;
 	CString father_id;
 	CString mother_id;
 
@@ -763,7 +816,6 @@ BOOL CUniteEntries::processSameNames()
 	UINT group = 1;
 	UINT concordant;
 	bool newGroup = false;
-	bool L;
 	CString rowid1;
 	CString rowid2;
 	int z;
@@ -771,8 +823,13 @@ BOOL CUniteEntries::processSameNames()
 	//					vSameNames.at(i).status == 1,	tehát meg kell tartani
 	//                  alaphelyzetben tehát mindent meg kell tartani a 0 group-ban
 
-	if (vSameNames.at(0).name == L"Dubraviczky Mihály")
+	if (vSameNames.at(0).name == L"Abaffy Anna")
+	{
+		z = 0;
 		z = 1;
+		rowid1 = vSameNames.at(0).rowid;
+		newGroup = false;
+	}
 
 	std::sort(vSameNames.begin(), vSameNames.end(), sortBySourceU3);		// az azonosítás sorrendje fonotos! source= 1->4
 	for ( UINT i = 0; i < vSameNames.size() - 1; ++i)
@@ -783,36 +840,28 @@ BOOL CUniteEntries::processSameNames()
 		for (UINT j = i + 1; j < vSameNames.size(); ++j)
 		{
 			rowid2 = vSameNames.at(j).rowid;
-			if (rowid1 == R1 && rowid2 == R2 )
+			if (rowid1 == R1 && rowid2 == R2)
+			{
 				z = 1;
+			}
 
-
-			if (vSameNames.at(j).group) continue; // már csoporthoz tartozik, nem vizsgálja
+			if (vSameNames.at(j).group) continue;												// már csoporthoz tartozik, nem vizsgálja
 			if (vSameNames.at(i).source == L"1" && vSameNames.at(j).source == L"1") continue;	// 2 leszármazottatt nem lehet összevonni
 
-
-			concordant = identical(i, j);	// false = nem azonos, true: nincs ellentmondás és van egyezés
-			if (concordant )				// nincs ellentmondás
+			if ( identical( i, j ) )				// nincs ellentmondás
 			{
-				if (m_match || m_matchP || m_matchS)	// van egyezõ adat
-				{
-					vSameNames.at(i).group = group;		// csoportfõnök
-					vSameNames.at(j).group = group;		// i-vel azonos group;
-					vSameNames.at(j).status = 0;		// törölni kell 
-					newGroup = true;
-				}
+				vSameNames.at(i).group = group;		// csoportfõnök
+				vSameNames.at(j).group = group;		// i-vel azonos group;
+				vSameNames.at(j).status = 0;		// törölni kell 
+				newGroup = true;
 			}
 			else							// nem azonos
 			{
-				if ( (m_match || m_matchP || m_matchS) && S  )				// ellenmondás van, de van azonos adat is!!! A textM fájlba listázzuk!
+				if (m_match || m_matchP || m_matchS)				// ellenmondás van, de van azonos adat is!!! A textN fájlba listázzuk!
 				{
-					L = (m_matchP == 1) && F;
-					if ( !L )    // ha csak az apa neve azonos akkor azt nem egyesíti
-					{
-						listSameNames(textN, i);
-						listSameNames(textN, j);
-						emptyLine(textN);
-					}
+					listSameNames(textN, i);
+					listSameNames(textN, j);
+					emptyLine(textN);
 				}
 			}
 		}
@@ -853,6 +902,9 @@ bool CUniteEntries::identical(UINT i, UINT j)
 		z = 1;
 	}
 
+	if (rowid1 == 110618 || rowid2 == 110618 )
+		m_match = 1;
+
 	m_match = 0; // same az m_match-et növeli, ha azonos a két adat
 	m_matchP = 0;
 	m_matchS = 0;
@@ -861,28 +913,26 @@ bool CUniteEntries::identical(UINT i, UINT j)
 
 	B = same(a.birth, b.birth, &m_match);
 	D = same(a.death, b.death, &m_match);
-
 	F = same(a.father, b.father, &m_matchDummy);
 	FB = same(a.birthF, b.birthF, &m_matchP);
 	FD = same(a.deathF, b.deathF, &m_matchP);
-	
 	M = same(a.mother, b.mother, &m_matchDummy);
 	MB = same(a.birthM, b.birthM, &m_matchP);
 	MD = same(a.deathM, b.deathM, &m_matchP);
 
 	S = sameSpouses(i, j);
 
-
-	if( B == -1 || D == -1)	// ha a születési és halálozási dátum ellentmondó, akkor mindenképpen elutasítjuk
+	// azért csak az összes összehasonlítás után értékelünk, hogy m_match-nek és m_matchP-nek legyen értéke,
+	// hogy az ellentmonást tartalmazó, de egyezést is mutató bejegyzéseket elkülöníthessük a 3. listába
+	
+	if( B==-1 || D==-1 || F==-1|| FB==-1 || FD==-1 || M==-1 || MB==-1 || MD==-1 || S==-1 )	// bármi ellentmondás van
 		return false;
-	if( F == -1 || FB == -1 || FD == -1 || M == -1 || MB == -1 || MD == -1)	// ellentmondás van
-		return false;
-	if (S == -1)  // van azonos nevû házaspár, de ellentmondásos dátum is van
-		return false;
-
-	// az adatok ellentmondás mentessek, van-e legalább 1 dátum egyezés? 
+	
+	// az adatok ellentmondás mentessek
 	if (m_match || m_matchP || m_matchS)
-		return true;
+	{
+		return true;			// van legalább 1 egyezés
+	}
 	else
 		return false;
 }
@@ -904,8 +954,10 @@ int CUniteEntries::sameSpouses(int i1, int i2)
 	int z;
 	int ret = -1;
 
-	if (rowid1 == R1 && rowid2 == R2 )
+	if (rowid1 == R1 && rowid2 == R2)
+	{
 		z = 1;
+	}
 	vSpouses1.clear();
 	vSpouses2.clear();
 	for (UINT i = 0; i < vSpouses.size(); ++i)
@@ -950,7 +1002,7 @@ int CUniteEntries::oneSpouse(int i1, int i2)
 	CString father2;
 	CString mother1;
 	CString mother2;
-	bool nameDiff = false;
+//	bool nameDiff = false;
 	int retB;
 	int retD;
 
@@ -966,7 +1018,9 @@ int CUniteEntries::oneSpouse(int i1, int i2)
 	CString rowid2 = vSameNames.at(i2).rowid;
 
 	if (rowid1 == R1 && rowid2 == R2)
+	{
 		z = 2;
+	}
 	m_matchS = 0;
 	for (i = 0; i < vSpouses1.size(); ++i)			// a vSpouses1 vektor az elsõ bejegyzéshez tartozó házastársakat tartalmazza
 	{
@@ -984,11 +1038,6 @@ int CUniteEntries::oneSpouse(int i1, int i2)
 				death1 = vSpouses1.at(i).deathS;
 				death2 = vSpouses2.at(j).deathS;
 				retD = same(death1, death2, &m_matchS);
-
-				if (retB == 1 && retD == 1)			// születés és halál azonos
-					return 1;
-				if (retB == -1 || retD == -1)
-					return -1;
 
 				father1 = vSpouses1.at(i).father;
 				father2 = vSpouses2.at(j).father;
@@ -1014,16 +1063,23 @@ int CUniteEntries::oneSpouse(int i1, int i2)
 				death2 = vSpouses2.at(j).deathM;
 				retMD = same(death1, death2, &m_matchS);
 
+				if ( retB == -1 || retD == -1 || retF == -1 || retFB == -1 || retFD == -1 || retM == -1 || retMB == -1 || retMD == -1)
+					return -1;		// ellentmondás van közöttük
+
+				if ( childNameSame( i, j ) )
+				{
+					++m_matchS;
+				}
+
+
 				// pl. Rottal János-Thurzó Mária házaspárná ez fontos
 				if (m_snameEnough)			// ha elegendõ a házastárs nevének azonossága
 					++m_matchS;
 
-				if (retF == -1 || retFB == -1 || retFD == -1 || retM == -1 || retMB == -1 || retMD == -1)
-					return -1;		// ellentmondás van közöttük
-
 
 				if (m_matchS)  // a két házasastárs azonos, õket is egyesítésre kijelöli a vOthers vektorban.
 				{
+					// ezt nem használja semmire!!!
 					sOthers.rowid1 = vSpouses1.at(i).rowidS;
 					sOthers.source1 = vSpouses1.at(i).sourceS;
 					sOthers.rowid2 = vSpouses2.at(j).rowidS;
@@ -1031,11 +1087,11 @@ int CUniteEntries::oneSpouse(int i1, int i2)
 					sOthers.sex = vSpouses1.at(i).sex;
 					vOthers.push_back(sOthers);
 					return 1;			// van további azonosító, tehát elfogadjuk!
-					// ha sem ellentmondás sem azonosítás nincs, akkor tovább megy, hátha másik házastárssal sikeres lesz.
+					// ha sem ellentmondás sem azonosítás nincs, akkor tovább megy, hátha másik házastárssal sikeres lesz. 
 				}
 			}
-			else
-				nameDiff = true;
+//			else
+//				nameDiff = true;
 		}
 	}
 //	if (nameDiff)
@@ -1068,6 +1124,71 @@ int CUniteEntries::same(CString par1, CString par2, int* match)
 	}
 	return 0;
 	
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// van-e azonos nevû gyereke???
+bool CUniteEntries::childNameSame(int i, int j)
+{
+	CString rowidI = vSpouses1.at(i).rowid;
+	CString rowidJ = vSpouses2.at(j).rowid;
+
+	CString rowidS1 = vSpouses1.at(i).rowidS;
+	CString rowidS2 = vSpouses2.at(j).rowidS;
+
+	CString sex = vSpouses1.at(i).sex;  // ez a házastárs sex-e!! 
+	CString command1;
+	CString command2;
+	CString name1;
+	CString name2;
+	CString birth1;
+	CString birth2;
+	CString death1;
+	CString death2;
+	CString firstname1;
+	CString firstname2;
+	int retB;
+	int retD;
+
+	if (sex == MAN)
+	{
+		command1.Format(L"SELECT first_name, last_name, birth_date, death_date FROM people WHERE father_id == '%s'", rowidS1);
+		command2.Format(L"SELECT first_name, last_name, birth_date, death_date FROM people WHERE father_id == '%s'", rowidS2);
+	}
+	else
+	{
+		command1.Format(L"SELECT first_name, last_name, birth_date, death_date FROM people WHERE father_id == '%s'", rowidI);
+		command2.Format(L"SELECT first_name, last_name, birth_date, death_date FROM people WHERE father_id == '%s'", rowidJ);
+	}
+	if (!query( m_rset1, command1 )) return false;
+	if (!query( m_rset2, command2 )) return false;
+
+	m_matchC == 0;
+	for (int i = 0; i < m_rset1->RecordsCount(); ++i, m_rset1->MoveNext() )
+	{
+		firstname1 = m_rset1->GetFieldString(0);
+		name1.Format(L"%s %s", m_rset1->GetFieldString(1), m_rset1->GetFieldString(0));
+		birth1 = m_rset1->GetFieldString(2);
+		death1 = m_rset1->GetFieldString(3);
+	
+		for (int i = 0; i < m_rset2->RecordsCount(); ++i, m_rset2->MoveNext())
+		{
+			firstname2 = m_rset2->GetFieldString(0);
+			name2.Format(L"%s %s", m_rset2->GetFieldString(1), m_rset2->GetFieldString(0));
+			if (name1 == name2)
+			{
+
+				birth2 = m_rset2->GetFieldString(2);
+				death2 = m_rset2->GetFieldString(3);
+				retB = same(birth1, birth2, &m_matchC);
+				retD = same(death1, death2, &m_matchC);
+
+				if (retB == -1 || retD == -1)
+					return false;
+				return true;
+			}
+		}
+	}
+	return false;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CUniteEntries::uniteSamePeople()
@@ -1258,7 +1379,9 @@ bool CUniteEntries::deleteEntry(CString rowid1, CString rowid0, CString sex_id)
 	if (rowid1 == rowid0) return true;
 	
 	if (rowid0 == R2 && rowid1 == R1)
+	{
 		z = 1;
+	}
 
 
 	m_command.Format(L"DELETE FROM people WHERE rowid ='%s'", rowid0);
@@ -1577,14 +1700,14 @@ void CUniteEntries::listSameNames(FILE* fl, int i)
 %s\t%s\t%s\t%s\t%s\t%s\t\
 %s\t%s\t%s\t%s\t%s\t\
 %s\t%s\t%s\t%s\t%s\t\
-%s\t\
+%s\t%s\t\
 \n", \
 m_loop, x.group, x.match, x.status, \
 x.united, x.index, x.source, \
 x.line, x.rowid, x.name, x.sex_id, x.birth, x.death, \
 x.lineF, x.rowidF, x.father, x.birthF, x.deathF, \
 x.lineM, x.rowidM, x.mother, x.birthM, x.deathM,\
-x.spouses\
+x.spouses, x.children\
 );
 
 	fwprintf(fl, str);

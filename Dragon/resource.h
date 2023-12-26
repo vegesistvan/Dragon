@@ -2,7 +2,6 @@
 // Microsoft Visual C++ generated include file.
 // Used by dragon.rc
 //
-#define IDC_CLEAR                       3
 #define IDD_ABOUTBOX                    100
 #define IDP_OLE_INIT_FAILED             102
 #define IDD_DRAGON_DIALOG               103
@@ -100,7 +99,6 @@
 #define IDD_MESSAGE                     270
 #define IDR_RELATIVES                   276
 #define IDD_TABLE_IDENTICALPEOPLE       278
-#define IDD_HTM_BRACKETS                282
 #define IDR_SQUARE                      283
 #define IDR_ROUND                       284
 #define IDD_CHECK_PARAM4                285
@@ -162,7 +160,6 @@
 #define IDR_DROPDOWN_SPOUSE             362
 #define IDR_UNITED_ENTRIES2             363
 #define IDD_SAVEFIRSTNAME               364
-#define IDD_UNITE_PARAM                 365
 #define IDD_EDIT_COMMENT                368
 #define IDD_ASCENDANTS_PAINT            369
 #define IDC_COORDINATES                 370
@@ -213,7 +210,6 @@
 #define IDD_COMPARE_ASC                 492
 #define IDD_DESCENDANTS_PARAM           506
 #define IDD_NOTEPAD                     508
-#define IDD_UNITE_PARAMETERS            511
 #define IDD_UNITED_ENTRIES_UNITED       515
 #define IDR_UNITED_ENTRIES1             521
 #define IDR_DROPDOWN_UNITED_UNITED      523
@@ -539,23 +535,15 @@
 #define IDC_LIST_ERROR                  1768
 #define IDC_INPUT                       1779
 #define IDC_UNITED                      1780
-#define IDC_WARNING                     1780
 #define IDC_UNITED2                     1781
-#define IDC_ROWID1                      1781
-#define IDC_ROWID2                      1782
-#define IDC_COMBO_CYCLE                 1784
 #define IDC_MAPPA                       1791
-#define IDC_COMBO_ALGO                  1792
 #define IDC_STATIC_LINE                 1793
 #define IDC_STATIC_ROWID                1794
 #define IDC_STATIC_R                    1795
 #define IDC_STATIC_L                    1796
 #define IDC_BUTTON_LINE                 1799
 #define IDC_COMBO_HTMTXT                1800
-#define IDC_CHECK_SPOUSE                1801
 #define IDC_STATIC_INPUTVERSION         1802
-#define IDC_RADIO_ENOUGH                1804
-#define IDC_RADIO_NOTENOUGH             1805
 #define IDC_CHECK_COLOR                 1810
 #define IDC_STATIC_LINENUMBER           1811
 #define IDC_EDIT_LINENUMBER             1812
@@ -563,7 +551,9 @@
 #define IDC_EDIT_NUMBEROFLINES          1814
 #define IDC_CHECK_FIRST_BOLD            1816
 #define IDC_STATIC_ENOUGH               1818
+#define IDC_UNITED_ENOUGH               1818
 #define IDC_BOX_LINEAR                  1819
+#define IDC_INPUT_FILE                  1819
 #define IDC_LINEAR_TITLE                1820
 #define IDC_LINEAR                      1823
 #define IDC_CHECK_ABC                   1824
@@ -577,6 +567,9 @@
 #define IDC_LINEAR_SQLITETABLE          1837
 #define IDC_LIST_FULL                   1839
 #define IDC_LIST_UNIQUE                 1840
+#define IDC_INPUT_DATE                  1848
+#define IDC_INPUT_VERSION               1849
+#define IDC_UNITED_VERSION              1850
 #define IDC_LISTCOLUMNS                 11044
 #define ID_EDIT_INSERT                  32771
 #define ID_EDIT_UPDATE                  32772
@@ -972,7 +965,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        564
 #define _APS_NEXT_COMMAND_VALUE         35041
-#define _APS_NEXT_CONTROL_VALUE         1848
+#define _APS_NEXT_CONTROL_VALUE         1851
 #define _APS_NEXT_SYMED_VALUE           378
 #endif
 #endif

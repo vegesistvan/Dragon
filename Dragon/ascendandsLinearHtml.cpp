@@ -435,12 +435,6 @@ void CAscendantsLinearTable::printTopContainer(CString title, int which)
 	}
 	if (theApp.m_uniteVersion.IsEmpty())
 		str = "A bejegyzések nincsenek összevonva!!!\n";
-	else
-		if (theApp.m_snameEnough)
-			yesno = L"igen";
-		else
-			yesno = L"nem";
-	str.Format(L"%*s %s", l, L"Azonos nevõ házaspárok összevonása:", yesno);
 	printOnly(str, which);
 	if (theApp.m_uniteVersion != theApp.m_version)
 	{

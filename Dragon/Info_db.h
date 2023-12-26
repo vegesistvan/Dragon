@@ -44,9 +44,5 @@ public:
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 
 	CColorStatic colorIntegrity;
-	CStatic m_inputCtrl;
-	CStatic m_uniteCtrl;
-//	CStatic m_unitedCtrl2;
-	CStatic m_uniteCtrl2;
-//	CStatic m_inputVersionCtrl;
+
 };

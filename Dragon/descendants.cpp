@@ -65,7 +65,7 @@ void CTablePeople::OnDescendantsNew()
 	{
 		nItem = m_ListCtrl.GetNextSelectedItem(pos);
 		rowid = m_ListCtrl.GetItemText(nItem, G_ROWID);
-		m_command.Format(L"SELECT rowid FROM people WHERE father_id ='%s'", rowid);
+		m_command.Format(L"SELECT rowid FROM people WHERE father_id ='%s' OR mother_id='%s'", rowid, rowid);
 		if (!query(m_command)) return;
 		if (!m_recordset->RecordsCount())
 		{

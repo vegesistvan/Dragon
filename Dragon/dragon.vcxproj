@@ -327,8 +327,6 @@
     <ClInclude Include="unitedEntriesErrors.h" />
     <ClInclude Include="unitedEntriesUnited.h" />
     <ClInclude Include="uniteEntries.h" />
-    <ClInclude Include="uniteParam.h" />
-    <ClInclude Include="uniteParameters.h" />
     <ClInclude Include="uniteStructures.h" />
     <ClInclude Include="utilities_dragon.h" />
     <ClInclude Include="version.h" />
@@ -463,8 +461,6 @@
     <ClCompile Include="unitedEntriesUnited.cpp" />
     <ClCompile Include="unitedInfo.cpp" />
     <ClCompile Include="uniteEntries.cpp" />
-    <ClCompile Include="uniteParam.cpp" />
-    <ClCompile Include="uniteParameters.cpp" />
     <ClCompile Include="utilities_dragon.cpp" />
   </ItemGroup>
   <ItemGroup>

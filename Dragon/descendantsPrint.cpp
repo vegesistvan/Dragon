@@ -1167,13 +1167,6 @@ BOOL CDescendants::openHtml(CString file, CString title, UINT colorBgrnd)
 	}
 	if (!theApp.m_uniteVersion.IsEmpty() )
 	{
-		if (theApp.m_snameEnough)
-			yesno = L"igen";
-		else
-			yesno = L"nem";
-
-		str.Format(L"%*s %s\n", l, L"Azonos nevõ házaspárok összevonása:", yesno);
-		print(str);
 		if (theApp.m_uniteVersion != theApp.m_version)
 		{
 			str.Format(L"%*s %s\n", l, L"Összevonás programverziója:", theApp.m_uniteVersion);

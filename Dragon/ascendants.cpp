@@ -785,14 +785,10 @@ void CAscendants::printTopContainer(CString title, int which)
 		printOnly(str, which);
 	}
 	if (theApp.m_uniteVersion.IsEmpty())
+	{
 		str = "A bejegyzések nincsenek összevonva!!!\n";
-	else
-		if (theApp.m_snameEnough)
-			yesno = L"igen";
-		else
-			yesno = L"nem";
-	str.Format(L"%*s %s", l, L"Azonos nevõ házaspárok összevonása:", yesno);
-	printOnly(str, which);
+		printOnly(str, which);
+	}
 	if (theApp.m_uniteVersion != theApp.m_version)
 	{
 		str.Format(L"%*s %s", l, L"Összevonás programverziója:", theApp.m_uniteVersion);

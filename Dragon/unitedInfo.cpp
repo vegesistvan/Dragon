@@ -9,7 +9,7 @@ AZ EGYESÍTÉSI ELJÁRÁS EREDMÉNYEI\r\n\
 \r\n\
 Az adatokban lévõ hibák és hiányosságok hamis összevonásokat eredményezhetnek és szükséges összevonások kimaradhatnak az egyesítésbõl.\
 Ezért hibás leszármazotti és felmenõi listák keletkezhetnek. Ezért fontos, hogy áttekinsük mi történt az összevonás során, a felismerhetõ \
-hibákat javítsuk. Ezt segítik az itt megjelentetett listák, amelyeken betekinthetünk az egyesítési folyamatba.\r\n\
+hibákat javítsuk. Ezt segítik a megjelentetett listák, amelyeken betekinthetünk az egyesítési folyamatba.\r\n\
 \r\n\
 A bejegyzések egyesítési eljárásának eredményei 3 text fájlban keletkeznek, amelyek specifikációja az adatbázisban van megõrizve.\r\n\
 A 3 fájlt egymásután beolvassa, azok tartalmát listázza. Az ablak 3 fülének egyikével választható ki a megnézni kívánt lista, amely \
@@ -106,9 +106,8 @@ meghatározva. A házastárs szülõje és a házastárs további házastársa általában cs
 Tehát az õ azonosításuk csak a rokoni kapcsolaton keresztül lehetséges, ami viszont szintén nagyon szegényes, hiszen a szülõknek \
 csak egy gyereke, a további házastársnak pedig egyik házastársa van meghatározva. \
 Az õ aznosításuk a legproblematikusabb. \
-Egy ember különbözõ bejegyzéseit prioritási sorrendben képzeljük el, a várhatóan legtöbb adattal és rokonsággal rendelkezõ leszármazott \
-bejegyzése a legmagasabb, 1-es prioritású, 2-es a leszármazott házastársa, 3-as a leszármazott házastársának szülei, 4-es a leszármazott \
-házastársának további házastársa. Ennek a késõbbiekben lesz jelentõsége.\r\n\
+Egy ember különbözõ bejegyzéseit prioritási sorrendben vizsgálja  aprogram. A gyerekek számának sorrendjében, azon belül a bejegyzés rangjának \
+sorrendjében hasonlítja össze az azonos nevû bejegyzések adatait.\
 \r\n\
 Kívánatos, hogy az egy emberhez tartozó bejegyzéseket összevonjuk, vagyis minden embernek csak egy bejegyzése legyen, egy helyen lehessen \
 az adatok karbatartását biztonságosan végezni. A különbözõ rokoni kapcsolatokat pedig ezen bejegyzésre történõ hivatkozásokkal fejezzük ki. \
@@ -120,7 +119,7 @@ lesznek a gyerekek az egyesített apa és anya gyerekei.\r\n\
 A kis családi, szülõ-gyerek kapcsolatok csak a leszármazottak között van explicit módon kifejezve, \
 a házastársak közötti testvéri kapcsolatokat csak az azonos emberek bejegyzéseinek összevonása által tudjuk felépíteni.\r\n\
 \r\n\
-A GA.htm fájban gyakran hiányos adatok vannak, pl. egy férfi leszármazottnak nincs megadva az egyik felesége. \
+A bemeneti fájban gyakran hiányos adatok vannak, pl. egy férfi leszármazottnak nincs megadva az egyik felesége. \
 Ha ez a nõ szerepel egy másik bejegyzésben is, ahol meg van adva az a férje is ahol õ nem szerepel házastársként, akkor a férj az összevonással \
 megkapja a hiányzó feleségét is. \r\n\
 \r\n\
@@ -135,6 +134,7 @@ bejegyzés\tnév\tszületés\thalál\r\n\
 apa\t\tnév\t\születés\thalál\r\n\
 anya\t\tnév\tszületés\thalál\r\n\
 házastárs\t\tnév\tszületés\thalál\t\tapja: név\tszületés\thalál\t\tanyja: név\tszületés\thalál\r\n\
+gyerekek\t\tnév\tszületés\thalál\r\n\
 \r\n\
 Két bejegyzés fenti adatpárjainak összehasonlítása az alábbi eredményre vezethet:\r\n\
 \r\n\
@@ -159,15 +159,15 @@ a házastársakban adathibák vannak, hamis rokoni kapcsolatok jöhetnek létre. Csöb
 \r\n\
 Két bejegyzés összevonhatóságának szükséges feltétele a fenti adatok ellentmondás mentességee. Ha bármilyen ellentmondást találunk, \
 akkor a két bejegyzést nem vonjuk össze.\n\
-Az összevonáshoz - az ellentmondás mentességen kívül - még szükséges, hogy a rokonság neveinek azonosságán túl legalább egy dátumban \
-azonos is legyen a két bejegyzés. A házastársaknál csak az azonos nevû házastársakat vizsgáljuk, nem követeljük meg, hogy több \
+A házastársaknál csak az azonos nevû házastársakat vizsgáljuk, nem követeljük meg, hogy több \
 házastárs esetén mindkét bejegyzéshez minden házastárs kapcsolódjon. \
 Ezzel az engedménnyel lehetõvé tesszük, hogy a bemeneti GA.htm fájlban hiányzó vagy hiányosan megadott házastársú bejegyzéseket is \
 összevonhassunk.\r\n\
+A gyerekeket csak akkor vizsgáljuk, ha az eddigi vizsgálatok nem találtak azonos adatot. Ekkor is csak azt vizsgáljuk, hogy van-e azononos\
+nevû, dátumaikban ellentmondáést nem tartalmazó gyerekük.\
 \r\n\
-Minden gondosság dacára elõfordulhat hiba az összevonások során. Leginkább az, hogy azonos ember bejegyzésit nem vonjuk össze. \
-Az esetleg elmaradt összevonást utólag is el végezni: az emberek listáján kijelölt 2 bejegyzést a legördülõ menüben találhat összevonás \
-mûvelettel egyesíthetünk.\n\
+\r\n\
+\r\n\
 Nem gyõzõm hangsúlyozni, hogy hibás adatokkal nem lehet hibátlan összevonást végezni. Bármilyen nagy munka, a hibák kijavításának \
 kell megelõznie az összevonást!\r\n\
 \r\n\r\n\
@@ -185,13 +185,11 @@ Ha két bejegyzést összevonunk, akkor apjaikat és anyjaikat is összevonjuk, hisz 
 \r\n\
 A program ABC sorrendben végigfut az azonos nevû bejegyzések vizsgálatán, összevonásán, majd elõlrõl kezdi ezt a ciklust. \
 Ezt azért csinálja, mert elõfordulhat, hogy 2 azonos nevû bejegyzés összevonása azért nem történik meg az elsõ ciklusban, \
-mert az azonossá nyilvánításhoz szüksége lenne azonos nevû házastársa, de az adathiány miatt nincs. \
-Azonban még az elsõ ciklusban összevonhat azonos nevû bejegyzést, és a megtartott bejegyzés hozza magával \
-a törölt bejegyzések házastársait is. Ezek az esetek többnyire adat hiányra vagy adat hibára vezethetõk vissza és javítani kell. \
+mert az azonossá nyilvánításhoz szüksége valamely adata nincs meg, de az elsõ ciklusban összevonhat azonos nevû bejegyzést, \
+és a megtartott bejegyzés hozza magával a hiányzó adatot. \
+Elõfordulhat, hogy ezek az esetek adat hiányra vagy adat hibára vezethetõk vissza és javítani kell. \
 A második ciklusban összevont bejegyzéseket meg kell vizsgálni, miért nem történt  meg az egyesítés az 1. ciklusban.\r\n\
 \r\n\
-A paraméterek között megadhatunk egy nevet, akiknek a vizsgálatát és az azonosak egyesítését írjuk elõ. Ez kisérletezére \
-szolgáló funkció.\r\n\
 ";
 	CDisplayInfo dlgU;
 	dlgU.m_text = &info;

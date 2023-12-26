@@ -89,6 +89,8 @@ typedef struct
 	CString birthGM;
 	CString deathGM;
 
+	CString children;
+
 }USAME;
 typedef struct
 {
@@ -128,6 +130,8 @@ typedef struct
 	CString deathM;
 
 	CString spouses;
+	CString children;
+	int		numOfChildren;
 
 }USAME3;
 
@@ -158,4 +162,6 @@ typedef struct
 	CString spouses;		// az összse házastárs adataival együtt
 	CString lineF;
 	CString nameBD;
+
+	CString children;
 }USPOUSES3;

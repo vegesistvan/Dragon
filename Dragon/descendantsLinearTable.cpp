@@ -579,25 +579,16 @@ bool CDescendants::printTopContainer(CString title, int which)
 	}
 	str.Format(L"%*s %s %s", l, L"Adatbázis készült:", dateDB, theApp.m_dbFileName);
 	printOnly(str, which);
-	if (!theApp.m_inputVersion.IsEmpty() && theApp.m_inputVersion != theApp.m_version)
+//	if (!theApp.m_inputVersion.IsEmpty() && theApp.m_inputVersion != theApp.m_version)
 	{
 		str.Format(L"%*s %s", l, L"Beolvasás programverziója:", theApp.m_inputVersion);
 		printOnly(str, which);
 	}
-	if (!theApp.m_uniteVersion.IsEmpty())
-	{
-		if (theApp.m_snameEnough)
-			yesno = L"igen";
-		else
-			yesno = L"nem";
 
-		str.Format(L"%*s %s", l, L"Azonos nevõ házaspárok összevonása:", yesno);
+//	if (theApp.m_uniteVersion != theApp.m_version)
+	{
+		str.Format(L"%*s %s", l, L"Összevonás programverziója:", theApp.m_uniteVersion);
 		printOnly(str, which);
-		if (theApp.m_uniteVersion != theApp.m_version)
-		{
-			str.Format(L"%*s %s", l, L"Összevonás programverziója:", theApp.m_uniteVersion);
-			printOnly(str, which);
-		}
 	}
 
 	str.Format(L"%*s %s<br>", l, L"Lista készült:", theApp.getPresentDateTime());

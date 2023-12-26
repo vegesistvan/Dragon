@@ -39,6 +39,7 @@ enum
 	U_DEATHM,
 
 	U_SPOUSES,
+	U_CHILDREN,
 	U_COLUMNSCOUNT,
 };
 
@@ -92,8 +93,7 @@ protected:
 	void CUnitedEntries::keress(int start);
 	void CUnitedEntries::filter(int iter);
 	void CUnitedEntries::clearRichEdit();
-
-	
+		
 //	DECLARE_MESSAGE_MAP()
 
 public:

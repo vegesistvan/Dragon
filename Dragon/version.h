@@ -1,6 +1,9 @@
 #pragma once
 
-#define VERSION L"10.149"
+#define VERSION L"10.150"
+
+// 10.150 2023.12.26
+// A kétféle összevonás megszünt. Ha nincs egyforma adat, akkor közös gyerek azonosságával az összevonást elvégzi.
 
 // 10.149 2023.12.21
 // Leszármazottakról 3 lista készül: SZLUHA, Lineáris, lineáris printable

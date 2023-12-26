@@ -18,7 +18,6 @@ public:
 	bool	m_contracted;
 	CString R1;
 	CString R2;
-	bool	m_snameEnough;
 	bool    m_term;
 
 	bool CUniteEntries::parameteres();
@@ -68,6 +67,7 @@ protected:
 	int m_match;
 	int m_matchP;
 	int m_matchS;
+	int m_matchC;
 	int m_matchDummy;
 
 	// elõrható paraméterek
@@ -77,7 +77,6 @@ protected:
 	int m_loop;
 	bool m_modified;
 	bool m_deleted;
-	bool m_saved;
 
 	bool CUniteEntries::slow();
 	bool CUniteEntries::fast();
@@ -90,7 +89,7 @@ protected:
 	int CUniteEntries::same(CString par1, CString par2, int* match);
 	int CUniteEntries::sameSpouses( int i1, int i2);
 	int CUniteEntries::oneSpouse(int i1, int i2);
-	bool CUniteEntries::uniteSamePeople();
+	void CUniteEntries::uniteSamePeople();
 	bool CUniteEntries::deleteEntry(CString rowid1, CString rowid0, CString sex_id);
 	void CUniteEntries::deleteFromvEntries(CString rowid);
 	bool CUniteEntries::deleteSameMarriages();
@@ -98,6 +97,7 @@ protected:
 	void CUniteEntries::listSameNames( FILE* fl, int i);
 	void CUniteEntries::emptyLine(FILE* fl);
 	void CUniteEntries::whichHW();
+	bool CUniteEntries::childNameSame(int i, int j);
 
 
 	BOOL CUniteEntries::query( CSqliteDBRecordSet* r, CString command);
