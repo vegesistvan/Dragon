@@ -32,7 +32,7 @@ IMPLEMENT_DYNAMIC(CTableFirstnames, CDialogEx)
 CTableFirstnames::CTableFirstnames(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CTableFirstnames::IDD, pParent)
 {
-
+	m_firstname.Empty();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CTableFirstnames::~CTableFirstnames()
@@ -51,16 +51,15 @@ BEGIN_MESSAGE_MAP(CTableFirstnames, CDialogEx)
 	ON_BN_CLICKED(ID_EDIT_DELETE, &CTableFirstnames::OnClickedDelete )
 	ON_MESSAGE(WM_SET_COLUMN_COLOR, OnSetColumnColor)
 	ON_MESSAGE(WM_CLICKED_COLUMN, OnColumnSorted)
-//	ON_EN_CHANGE(IDC_SEARCH, &CTableFirstnames::OnChangeSearch)
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
 	ON_COMMAND(ID_LIST_SELECTED, &CTableFirstnames::OnListTable)
 	ON_COMMAND(ID_UNFILTER, &CTableFirstnames::OnUnfilter)
 	ON_COMMAND(ID_FILTER_INCIDENCE, &CTableFirstnames::OnFilterOccurance)
 	ON_COMMAND(ID_FILTER_MAN, &CTableFirstnames::OnFilterMan)
 	ON_COMMAND(ID_FILTER_WOMEN, &CTableFirstnames::OnFilterWomen)
-	ON_COMMAND(ID_MAN, &CTableFirstnames::OnMan)
-	ON_COMMAND(ID_MANANDWOMAN, &CTableFirstnames::OnBiSex)
-	ON_COMMAND(ID_WOMEN, &CTableFirstnames::OnWomen)
+//	ON_COMMAND(ID_MAN, &CTableFirstnames::OnMan)
+//	ON_COMMAND(ID_MANANDWOMAN, &CTableFirstnames::OnBiSex)
+//	ON_COMMAND(ID_WOMEN, &CTableFirstnames::OnWomen)
 	ON_COMMAND(ID_FILTER_BISEX, &CTableFirstnames::OnFilterBisex)
 	ON_COMMAND(ID_CHECK_USED, &CTableFirstnames::OnCheckUsed)
 	ON_COMMAND(ID_FILTER_CORRECT, &CTableFirstnames::OnFilterCorrect)
@@ -96,6 +95,7 @@ BOOL CTableFirstnames::OnInitDialog()
 
 	m_command = L"UPDATE firstnames SET sex_id='0' WHERE typeof(sex_id) = 'null'";
 	if(!theApp.executeSys(m_command)) return false;
+	
 
 	m_sexLast = 1;
 	OnUnfilter();
@@ -307,6 +307,7 @@ void CTableFirstnames::OnClickedDelete()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 LRESULT CTableFirstnames::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 {
+/*
 	CPoint* point=(CPoint*) lParam;
     CMenu	Menu;
 	CMenu*	pPopup;
@@ -321,7 +322,9 @@ LRESULT CTableFirstnames::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 		}
 		pPopup->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point->x,point->y,this);
     }
+*/
 	return TRUE;
+
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CTableFirstnames::firstNameExists( CString first_name )

@@ -7,9 +7,7 @@
 #include <algorithm>
 #include "displayInfo.h"
 #include "uniteEntries.h"
-#include "uniteParameters.h"
 #include "unitedEntries.h"
-#include "uniteParam.h"
 
 enum
 {
@@ -76,11 +74,11 @@ END_MESSAGE_MAP()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CUniteEntries::parameteres()
 {
-	m_name = L"Abaffy Anna";
+	m_name = L"Fényes Gyula";
 	m_name.Empty();
 	m_loopMax = 3;
-	R1 = L"515";
-	R2 = L"350017";
+	R1 = L"7125";
+	R2 = L"7142";
 	m_algorithm = FAST;
 
 	m_filenameTextU.Format(L"%sU.txt", theApp.m_dbFileTitle);
@@ -357,7 +355,6 @@ bool CUniteEntries::slow()
 				vspouses.birthM = p.birth;
 				vspouses.deathM = p.death;
 
-				//vspouses.nameBD = getNRBD( p.name, p.birth, p.death);
 				str = getNRBD( vspouses.nameS, vspouses.birthS, vspouses.deathS);
 				if (vspouses.father.IsEmpty() && vspouses.mother.IsEmpty())
 					vspouses.nameBD = str;
@@ -644,6 +641,8 @@ BOOL CUniteEntries::push( CString rowid )
 		first = m_rset3->GetFieldString(0);
 		birth = m_rset3->GetFieldString(1);
 		death = m_rset3->GetFieldString(2);
+		child = getNRBD(first, birth, death);
+/*
 		if (birth.IsEmpty() && death.IsEmpty())
 			child = first;
 		else if (birth.IsEmpty())
@@ -652,6 +651,7 @@ BOOL CUniteEntries::push( CString rowid )
 			child.Format(L"%s *%s", first, birth);
 		else
 			child.Format(L"%s *%s +%s", first, birth, death);
+*/
 		children += child;
 		children += L",";
 	}

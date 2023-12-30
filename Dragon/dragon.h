@@ -571,5 +571,6 @@ public:
 	afx_msg void OnHelp();
 	afx_msg void OnUpdateUnite(CCmdUI* pCmdUI);
 	afx_msg void OnUnite();
+	afx_msg void OnAverageLifespan();
 };
 extern CDragApp theApp;

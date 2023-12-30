@@ -61,6 +61,7 @@ typedef struct
 	CString numOfChildren;
 	CString rowid;
 	CString name;
+	CString sex_id;
 	CString birth;
 	CString death;
 	CString father_id;
@@ -126,12 +127,9 @@ protected:
 	bool CCompareEntries::getRelatives( CString sorszam, CString rowid, NONUNITED* n );
 	bool CCompareEntries::getPeople( CString rowid );
 	void CCompareEntries::displayData();
-	void CCompareEntries::listPeople(NONUNITED* n, int nItem);
-	void CCompareEntries::setSpouses(int i);
-	void CCompareEntries::pairSpouses();
+	void CCompareEntries::listPeople(NONUNITED* n, int nItem, int cnt);
 	void CCompareEntries::listSpouses();
 	void CCompareEntries::emptyLine();
-	void CCompareEntries::clearN(NONUNITED* n);
 	void CCompareEntries::setItem(CListCtrlEx* lc, int nItem, int X, CString item, TCHAR kar);
 
 	
@@ -156,4 +154,6 @@ public:
 
 	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnRokonok();
+	CListCtrlEx m_ListCtrl5;
+	CListCtrlEx m_ListCtrl6;
 };

@@ -59,6 +59,14 @@ CHtmlSpouses::CHtmlSpouses(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CHtmlSpouses::IDD, pParent)
 {
 	m_pParent = pParent;
+
+	m_familyNumber = 0;
+	m_tableNumber = 0;
+	m_tableName = L"";
+	m_numberOfTables = 0;
+	m_htmlFileName = theApp.m_htmlFileName;
+	m_htmlPathName = theApp.m_htmlPathName;
+	m_lineNumber = 0;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CHtmlSpouses::~CHtmlSpouses()

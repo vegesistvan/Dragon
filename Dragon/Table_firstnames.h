@@ -18,7 +18,7 @@ public:
 // Dialog Data
 	enum { IDD = IDD_TABLE_FIRSTNAMES };
 
-
+	CString m_firstname;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support

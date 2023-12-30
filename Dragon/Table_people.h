@@ -208,4 +208,5 @@ public:
 	CRichEditCtrl captionCtrl;
 	afx_msg void OnEditNotepad();
 	afx_msg void OnRokonok();
+	afx_msg void OnBirthDeath();
 };

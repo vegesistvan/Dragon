@@ -41,9 +41,12 @@ void CInputGA::processSpouseSubstrings()
 		m_weddingNameSubstr = cutBirthDeath(spouseSubstr);
 	
 		// spouseSubstr-rõl le kell venni az esetleges esküvõ helyét és dátumát
-		m_nameSubstr = processWedding(i);  
-		splitSubstrs(&s);   
+//		m_nameSubstr = processWedding(i);
+		processSpouse( &s);  
+	//	splitSubstrs(&s);   
 
+		v_marriages.at(i).place = m_weddingPlace;
+		v_marriages.at(i).date = m_weddingDate;
 		v_marriages.at(i).nameSubstr = m_nameSubstr;
 		v_marriages.at(i).birthSubstr = m_birthSubstr;
 		v_marriages.at(i).deathSubstr = m_deathSubstr;
@@ -374,9 +377,10 @@ void CInputGA::checkSexCouple( CString* sex1, CString* sex2 )
 	*sex1 = sexid1;
 	*sex2 = sexid2;
 }
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // (=)Prince George, Alberta 1955.10.31 Téglási Nagy Irén * 1929.01.04
-CString CInputGA::processWedding( int ix)
+CString CInputGA::processWedding(int ix)
 {
 	PEOPLE dummy;
 	CStringArray A;
@@ -393,8 +397,10 @@ CString CInputGA::processWedding( int ix)
 	CString item1;
 	CString item2;
 	CString item3;
+	CString datum;
 
 	int n = splitCString(m_weddingNameSubstr, ' ', false, &A);
+
 	for (i = 0; i < n; ++i)
 	{
 		if ((db = isWeddingDate(&A, i, &date)))   // van dátum
@@ -408,28 +414,68 @@ CString CInputGA::processWedding( int ix)
 					++db;
 				}
 			}
-			if (!i)		// dátummal kezdõdik, place nincs
+			if (i == 0)		// dátummal kezdõdik, place nincs
 			{
-				
+
 				date = packWords(&A, i, db);
 				v_marriages.at(ix).date = date;
 				nameSubstr = packWords(&A, i + db, n - i - db);
 				return nameSubstr;
 			}
-			if (i < 2)
+			else if (i == 1 && n > 2)
 			{
-				date = packWords(&A, i, db);
-				v_marriages.at(ix).date = date;
-				v_marriages.at(ix).place = A[0];
-				nameSubstr = packWords(&A, i + 1, n - i - 1);
-				nameSubstr = packWords(&A, i + db, n - i - db);
+				if (iswupper(A[0].GetAt(0)))
+				{
+					if (iswupper(A[2].GetAt(0)) && iswupper(A[3].GetAt(0)))
+					{
+						nameSubstr = packWords(&A, 2, n - 1 - db);
+						date = packWords(&A, 1, db);
+						v_marriages.at(ix).date = date;
+						v_marriages.at(ix).place = A[0];
+						return nameSubstr;
+					}
+					else if ((isTitle(A[2]) || isPeer(A[2])) && iswupper(A[3].GetAt(0)))
+					{
+						nameSubstr = packWords(&A, 2, n - 1 - db);
+						date = packWords(&A, 1, db);
+						v_marriages.at(ix).date = date;
+						v_marriages.at(ix).place = A[0];
+						return nameSubstr;
+					}
+				}
+
+			}
+			//else if (i < 2)
+			//{
+			//	date = packWords(&A, i, db);
+			//	v_marriages.at(ix).date = date;
+			//	v_marriages.at(ix).place = A[0];
+			//	nameSubstr = packWords(&A, i + 1, n - i - 1);
+			//	nameSubstr = packWords(&A, i + db, n - i - db);
+			//	return nameSubstr;
+			//}
+			else if (i == 2 && n > 4)
+			{
+				if (iswupper(A[0].GetAt(0)) && iswupper(A[1].GetAt(0)) && iswupper(A[3].GetAt(0)) && iswupper(A[4].GetAt(0)))
+				{
+					nameSubstr = packWords(&A, 3, n - 2 - db);
+					date = packWords(&A, 2, db);
+					v_marriages.at(ix).date = date;
+					v_marriages.at(ix).place = packWords(&A, 0, 2);
+					return nameSubstr;
+				}
+			}
+			else if (i > 2)
+			{
+				nameSubstr = m_weddingNameSubstr;
 				return nameSubstr;
 			}
 
-			nameSubstr = packWords(&A, i+db, n - db + 1); // ez nem biztos, hogy people, ezért kell a isname
-//			if( nameSubstr.IsEmpty())		// nincs megadva a házstárs neve, legyen N N Ez nem biztosm, hoyg helyes!!!!!!!!!!!!!!!!!!!!!!!!!!
-//				nameSubstr = L"N N";
-			if( isname(  nameSubstr, &dummy) )
+
+			nameSubstr = packWords(&A, i + db, n - db + 1); // ez nem biztos, hogy people, ezért kell a isname
+			//			if( nameSubstr.IsEmpty())		// nincs megadva a házstárs neve, legyen N N Ez nem biztosm, hoyg helyes!!!!!!!!!!!!!!!!!!!!!!!!!!
+			//				nameSubstr = L"N N";
+			if (isname(nameSubstr, &dummy))
 			{
 				if (i)  // van a dátum elõtt valami,
 				{
@@ -437,10 +483,10 @@ CString CInputGA::processWedding( int ix)
 					if (place == L"kb") place.Empty();
 				}
 				nameSubstr = packWords(&A, i + db, n - i - db);
-//				if (nameSubstr.IsEmpty())		// nincs megadva a házstárs neve, legyen N N, Ez nem biztos, hogy helyes!!!!!!!!!!!!!!!!!!!!
-//					nameSubstr = L"N N";
+				//				if (nameSubstr.IsEmpty())		// nincs megadva a házstárs neve, legyen N N, Ez nem biztos, hogy helyes!!!!!!!!!!!!!!!!!!!!
+				//					nameSubstr = L"N N";
 			}
-			else 
+			else
 			{
 				date.Empty();		// a dátum után nem név következik, akkor a date nem a házasságkötés dátuma
 			}
@@ -478,7 +524,7 @@ CString CInputGA::processWedding( int ix)
 		{
 			// elválasztja a helyet és a nevet vagy
 			// elváasztja nevet és a posteriort
-   			if (i < 3 && getLastCharacter(A[i]) == ',' && !iswlower(A[i][0]))
+			if (i < 3 && getLastCharacter(A[i]) == ',' && !iswlower(A[i][0]))
 			{
 				A[i].Remove(',');
 				word = A[i];
@@ -510,7 +556,7 @@ CString CInputGA::processWedding( int ix)
 		if (nameSubstr.IsEmpty())
 			nameSubstr = m_weddingNameSubstr;
 	}
-	v_marriages.at(ix).place = place;	
+	v_marriages.at(ix).place = place;
 	v_marriages.at(ix).date = date;
 	return nameSubstr;
 }
@@ -841,6 +887,7 @@ bool CInputGA::isname(CString line, PEOPLE* p)
 	CString name;
 	CString comment;
 
+	m_nameSubstr.Empty();
 
 	m = wordList(&A, line, ' ', false);
 	if (m < 2) return false;		// egy név legalább 2 tagból áll
@@ -861,6 +908,7 @@ bool CInputGA::isname(CString line, PEOPLE* p)
 		if (isPeer(word) )
 		{
 			m_peer = word;
+			p->peer = word;
 			A[i].Empty();
 		}
 		else if (isTitle(word) )
@@ -871,11 +919,23 @@ bool CInputGA::isname(CString line, PEOPLE* p)
 		}
 	}
 	title.Trim();
+	p->title = title;
 
 	name = packWords(&A, 0, n);
 	n = wordList(&A, name, ' ', false);
-
-
+	if (n == 2)
+	{
+		str = theApp.isFirstName(A[1]);
+		if( !str.IsEmpty())
+		{
+			p->sex_id = str;
+			p->first_name = A[1];
+			p->last_name = A[0];
+			m_nameSubstr = line;
+			return true;
+		}
+		return false;
+	}
 	// = Kovács Adél, 
 	for (i = 0; i < n; ++i)
 	{
@@ -908,18 +968,18 @@ bool CInputGA::isname(CString line, PEOPLE* p)
 		return false;
 
 	p->titolo		= titolo;
-	p->title		= title;
+//	p->title		= title;
 	p->last_name	= last_name;
 	p->first_name	= first_name;
 	p->sex_id		= sex;
-	if (p->peer.IsEmpty())
-		p->peer = m_peer;
+//	if (p->peer.IsEmpty())
+//		p->peer = m_peer;
 	if( p->posterior.IsEmpty())
 		p->posterior = m_posterior;
 	if (p->comment.IsEmpty())
 		p->comment = m_comment;
 
-
+	m_nameSubstr = line;
 	return true;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1032,4 +1092,112 @@ CString CInputGA::cutBirthDeath( CString spouseSubstr )
 		spouseSubstr = spouseSubstr.Left(pos);
 	}
 	return spouseSubstr;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CInputGA::processNameSubstr( CString nameSubstr, PEOPLE* s)
+{
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// (=)Prince George, Alberta 1955.10.31 Téglási Nagy Irén * 1929.01.04
+void CInputGA::processSpouse(PEOPLE* s)
+{
+	CStringArray A;
+	CString nameSubstr;
+	CString word;
+	CString date;
+	int i;
+	int pos;
+	int db;
+	int n = splitCString(m_weddingNameSubstr, ' ', false, &A);
+
+	for (i = 0; i < n; ++i)
+	{
+		if ((db = isWeddingDate(&A, i, &date)))   // van dátum
+		{
+			if (i)
+			{
+				word = A[i - 1];
+				if (word == L"kb")
+				{
+					--i;
+					++db;
+				}
+			}
+			break;
+		}
+	}
+	if (db == 0)  // nincs dátum,  Még mindig lehet "place, nameSubstr"
+	{
+		m_weddingDate.Empty();
+		processPlaceNameSubstr( m_weddingNameSubstr, s );	
+		return;
+	}
+
+	date = packWords(&A, i, db);  // van dátum
+	nameSubstr = packWords(&A, i + db, n - i - db);
+	if (i == 0)		// dátummal kezdõdik, place nincs, ez a weddingDate;
+	{
+		m_weddingPlace.Empty();
+		m_weddingDate = date;
+		isname(nameSubstr, s);
+	}
+	else if (i == 1)	// dátum a 2. szó
+	{
+		m_weddingPlace = A[0];
+		m_weddingDate = date;
+		isname(nameSubstr, s);
+	}
+	else  // dátum a 3. vagy sokadikabb szó
+	{
+		if (isname(m_weddingNameSubstr, s))  // elején van?
+		{
+			m_weddingDate.Empty();
+			m_weddingPlace.Empty();
+			m_nameSubstr = m_weddingNameSubstr;
+			return;
+		}
+		processPlaceNameSubstr( nameSubstr, s);  // nameSubstr a dátum utáni string
+	}
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CInputGA::processPlaceNameSubstr(CString placeName, PEOPLE* s)
+{
+	CString str2;
+	bool ret;
+	if ((ret = isname(placeName, s)))  // névvel kezdõdött a string, nincs place
+	{
+		m_weddingPlace.Empty();
+		return;
+	}
+	CStringArray A;
+	int n = wordList(&A, placeName, ' ', false);
+
+	for (int i = 1; i < n-2; ++i)
+	{
+		str = splitStringAt(placeName, i, &str2);
+		if (isname(str2, s))  // ha nincs place, akkor felbontotta a nevet, str a place
+		{
+			m_weddingPlace = str;
+			return;
+		}
+	}
+	// a dátum után nem név van, akkor biztos elõtte van
+	m_weddingPlace.Empty();
+	m_nameSubstr = m_weddingNameSubstr;
+	isname(m_weddingNameSubstr, s);
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CString CInputGA::splitStringAt(CString str, int at, CString* str2)
+{
+	CStringArray A;
+
+	int n = wordList(&A, str, ' ', false);
+
+	CString str1;
+	if( at < n )
+		*str2 = packWords(&A, at, n - at);
+	str1 = packWords(&A, 0, at);
+	return str1;
 }

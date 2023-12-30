@@ -15,6 +15,7 @@
 #include "pch.h"
 #include "framework.h"
 #include <control.h>
+#include <afxcview.h>
 
 // SHARED_HANDLERS can be defined in an ATL project implementing preview, thumbnail
 // and search filter handlers and allows sharing of document code with that project.
@@ -65,14 +66,15 @@ BOOL CDragonView::PreCreateWindow(CREATESTRUCT& cs)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragonView::OnInitialUpdate()
 {
+
 	CView::OnInitialUpdate();
 	pM = (CMainFrame*)AfxGetMainWnd();
+
 	// Az ablak helyének és méretének meghatározása., beállítása
 	int bmpWidth = 1024;
 	int bmpHeight = 678;
 	//	bmpWidth = 1916;
 	//	bmpHeight = 884;
-	
 
 	// The one and only window has been initialized, so show and update it
 //	ShowWindow(SW_SHOW);
@@ -125,17 +127,18 @@ void CDragonView::OnDraw(CDC* pDC )
 //	image.StretchBlt(pMDC->m_hDC, 250, 0, m_w-500, m_h, 0, 0, image.GetWidth(), image.GetHeight(), SRCCOPY);
 	image.StretchBlt(pMDC->m_hDC, 0, 0, m_w, m_h, 0, 0, image.GetWidth(), image.GetHeight(), SRCCOPY);
 //	image.StretchBlt(pMDC->m_hDC, x0, y0, rcZoom.Width(), rcZoom.Height(), 0, 0, image.GetWidth(), image.GetHeight(), SRCCOPY);
-/*
-	CImage new_image;
-	new_image.Attach((HBITMAP)(*pb));
-	new_image.Save(_T("D:\\Másik.jpg"));
-	new_image.Detach();
-*/
+
+//	CImage new_image;
+//	new_image.Attach((HBITMAP)(*pb));
+//	new_image.Save(_T("D:\\Másik.jpg"));
+//	new_image.Detach();
+
 	BitBlt(*pDC, 0, 0, rcClient.Width(), rcClient.Height(), pMDC->m_hDC, 0, 0, SRCCOPY);
 
 //	CPicture pic(ID_MYPIC); // load pic 
 //	CRect rc(0,0,0,0);      // use default rc  
 //	pic.Render(pDC, rc);    // display it
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

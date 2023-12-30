@@ -1,6 +1,10 @@
 #pragma once
 
-#define VERSION L"10.150"
+#define VERSION L"10.151"
+
+// 10.150 2023.12.XX
+// Ismeretlen keresztnevek vizsgálatának, bevitelének átalakítása.
+// Házastársdak felbontásának átalakítása
 
 // 10.150 2023.12.26
 // A kétféle összevonás megszünt. Ha nincs egyforma adat, akkor közös gyerek azonosságával az összevonást elvégzi.

@@ -243,6 +243,7 @@
     <ClInclude Include="checkSpousesDiff.h" />
     <ClInclude Include="checkSpousesSex.h" />
     <ClInclude Include="checkUnreferencedItems.h" />
+    <ClInclude Include="CListView.h" />
     <ClInclude Include="compareAscendants.h" />
     <ClInclude Include="compareEntries.h" />
     <ClInclude Include="ConnectCsaladTorzs.h" />
@@ -372,6 +373,7 @@
     <ClCompile Include="checkSpousesDiff.cpp" />
     <ClCompile Include="checkSpousesSex.cpp" />
     <ClCompile Include="checkUnreferencedItems.cpp" />
+    <ClCompile Include="CListView.cpp" />
     <ClCompile Include="compareAscendans.cpp" />
     <ClCompile Include="compareEntries.cpp" />
     <ClCompile Include="ConnectCsaladTorzs.cpp" />

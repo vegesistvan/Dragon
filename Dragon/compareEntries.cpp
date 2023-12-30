@@ -85,6 +85,8 @@ void CCompareEntries::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_LIST2, m_ListCtrl2);
 	DDX_Control(pDX, IDC_LIST3, m_ListCtrl3);
 	DDX_Control(pDX, IDC_LIST4, m_ListCtrl4);
+	DDX_Control(pDX, IDC_LIST5, m_ListCtrl5);
+	DDX_Control(pDX, IDC_LIST6, m_ListCtrl6);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CCompareEntries, CDialogEx)
@@ -226,7 +228,30 @@ void CCompareEntries::createScreen()
 	m_ListCtrl4.InsertColumn(NM, L"anyja", LVCFMT_LEFT, 150, -1, COL_TEXT);
 	m_ListCtrl4.InsertColumn(BM, L"", LVCFMT_LEFT, 75, -1, COL_NUM);
 	m_ListCtrl4.InsertColumn(DM, L"", LVCFMT_LEFT, 80, -1, COL_NUM);
-	
+
+
+	m_ListCtrl5.SortByHeaderClick(TRUE);
+	m_ListCtrl5.KeepSortOrder(TRUE);
+	m_ListCtrl5.SetExtendedStyle(m_ListCtrl5.GetExtendedStyle() | LVS_EX_GRIDLINES);
+	m_ListCtrl5.DeleteAllItems();
+	m_ListCtrl5.InsertColumn(0, L"s", LVCFMT_RIGHT, 20, -1, COL_NUM);
+	m_ListCtrl5.InsertColumn(1, L"line", LVCFMT_RIGHT, 70, -1, COL_HIDDEN);
+	m_ListCtrl5.InsertColumn(2, L"rowid", LVCFMT_LEFT, 60, -1, COL_TEXT);
+	m_ListCtrl5.InsertColumn(3, L"", LVCFMT_LEFT, 300, -1, COL_TEXT);
+	m_ListCtrl5.InsertColumn(4, L"", LVCFMT_LEFT, 75, -1, COL_NUM);
+	m_ListCtrl5.InsertColumn(5, L"", LVCFMT_LEFT, 80, -1, COL_NUM);
+
+	m_ListCtrl6.SortByHeaderClick(TRUE);
+	m_ListCtrl6.KeepSortOrder(TRUE);
+	m_ListCtrl6.SetExtendedStyle(m_ListCtrl6.GetExtendedStyle() | LVS_EX_GRIDLINES);
+	m_ListCtrl6.DeleteAllItems();
+	m_ListCtrl6.InsertColumn(0, L"s", LVCFMT_RIGHT, 20, -1, COL_NUM);
+	m_ListCtrl6.InsertColumn(1, L"line", LVCFMT_RIGHT, 70, -1, COL_HIDDEN);
+	m_ListCtrl6.InsertColumn(2, L"rowid", LVCFMT_LEFT, 60, -1, COL_TEXT);
+	m_ListCtrl6.InsertColumn(3, L"", LVCFMT_LEFT, 300, -1, COL_TEXT);
+	m_ListCtrl6.InsertColumn(4, L"", LVCFMT_LEFT, 75, -1, COL_NUM);
+	m_ListCtrl6.InsertColumn(5, L"", LVCFMT_LEFT, 80, -1, COL_NUM);
+
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CCompareEntries::getRelatives(CString sorszam, CString rowid, NONUNITED* n)
@@ -235,8 +260,6 @@ bool CCompareEntries::getRelatives(CString sorszam, CString rowid, NONUNITED* n)
 	CString spouse_id;
 	CString name;
 
-
-	clearN( n);
 	// emberünk
 	if (!getPeople(rowid))
 	{
@@ -355,48 +378,18 @@ bool CCompareEntries::getRelatives(CString sorszam, CString rowid, NONUNITED* n)
 		vS.push_back(nu);
 		theApp.m_recordset->MoveNext();
 	}
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCompareEntries::clearN(NONUNITED* n)
-{
-	n->birth.Empty();
-	n->source.Empty();
-	n->birthF.Empty();
-	n->birthGF.Empty();
-	n->birthGF2.Empty();
-	n->birthGM.Empty();
-	n->birthGM2.Empty();
-	n->birthM.Empty();
-	n->death.Empty();
-	n->deathF.Empty();
-	n->deathGF.Empty();
-	n->deathGF2.Empty();
-	n->deathGM.Empty();
-	n->deathGM2.Empty();
-	n->deathM.Empty();
-	n->father.Empty();
-	n->grandfather.Empty();
-	n->grandfather2.Empty();
-	n->grandmother.Empty();
-	n->grandmother2.Empty();
-	n->line.Empty();
-	n->lineF.Empty();
-	n->lineGF.Empty();
-	n->lineGF2.Empty();
-	n->lineGM.Empty();
-	n->lineGM2.Empty();
-	n->lineM.Empty();
-	n->mother.Empty();
-	n->name.Empty();
-	n->printed = false;
-	n->rowid.Empty();
-	n->rowidF.Empty();
-	n->rowidGF.Empty();
-	n->rowidGF2.Empty();
-	n->rowidGM.Empty();
-	n->rowidGM2.Empty();
-	n->rowidM.Empty();
-	n->sorszam.Empty();
+
+	// gyerekei
+
+	m_command.Format(L"SELECT first_name, last_name, birth_date, death_date FROM people WHERE father_id = '%s' OR mother_id = '%s'", rowid, rowid );
+	if (!theApp.query(m_command)) return false;
+
+
+	for (UINT i = 0; i < theApp.m_recordset->RecordsCount(); ++i)
+	{
+
+
+	}
 
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -413,7 +406,7 @@ bool CCompareEntries::getPeople( CString rowid )
 
 //	if (rowid.IsEmpty() || rowid == L"0") return true;
 	
-	m_command.Format(L"SELECT linenumber, last_name, first_name, birth_date, death_date, father_id, mother_id, source FROM people WHERE rowid='%s'", rowid );
+	m_command.Format(L"SELECT linenumber, last_name, first_name, birth_date, death_date, father_id, mother_id, source, sex_id FROM people WHERE rowid='%s'", rowid );
 	if (!theApp.query1(m_command)) return false;
 
 	if (!theApp.m_recordset1->RecordsCount()) return false;
@@ -429,19 +422,20 @@ bool CCompareEntries::getPeople( CString rowid )
 	p.father_id = theApp.m_recordset1->GetFieldString(5);
 	p.mother_id = theApp.m_recordset1->GetFieldString(6);
 	p.source = theApp.m_recordset1->GetFieldString(7);
+	p.sex_id = theApp.m_recordset1->GetFieldString(8);
 	return true;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCompareEntries::displayData()
 {
 	nItemS = 0;
-	listPeople(&n1, 0);
-	listPeople(&n2, 1);
+	listPeople(&n1, 0, 1);
+	listPeople(&n2, 1, 2);
 
 	listSpouses();
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CCompareEntries::listPeople(NONUNITED * n, int nItem)
+void CCompareEntries::listPeople(NONUNITED * n, int nItem, int cnt)
 {
 	m_ListCtrl1.InsertItem( nItem, n->sorszam);
 	m_ListCtrl1.SetItemText(nItem, X, n->source); 
@@ -510,6 +504,70 @@ void CCompareEntries::listPeople(NONUNITED * n, int nItem)
 	setItem(&m_ListCtrl3, nItem, BM, n->birthGM2, '*');
 	setItem(&m_ListCtrl3, nItem, DM, n->deathGM2, '+');
 	m_ListCtrl3.SetItemData(nItem, m_col);
+
+	m_command.Format(L"SELECT rowid, lineNumber, source, first_name, last_name, birth_date, death_date FROM people WHERE father_id = '%s' OR mother_id = '%s' ORDER BY first_name", n->rowid, n->rowid);
+	if (!theApp.query(m_command)) return;
+
+	CString name;
+	CString birth;
+	CString death;
+	
+	if (cnt == 1)
+	{
+		int nItem5 = 0;
+		for (UINT i = 0; i < theApp.m_recordset->RecordsCount(); ++i)
+		{
+
+			m_ListCtrl5.InsertItem(nItem5, theApp.m_recordset->GetFieldString(2) );
+			m_ListCtrl5.SetItemText(nItem5, 1, theApp.m_recordset->GetFieldString(1));
+			m_ListCtrl5.SetItemText(nItem5, 2, theApp.m_recordset->GetFieldString(0));
+
+			name.Format(L"%s %s", theApp.m_recordset->GetFieldString(4), theApp.m_recordset->GetFieldString(3));
+			m_ListCtrl5.SetItemText(nItem5, 3, name);
+			birth = theApp.m_recordset->GetFieldString(5);
+			if (!birth.IsEmpty())
+			{
+				str.Format(L"*%s", birth);
+				m_ListCtrl5.SetItemText(nItem5, 4, str);
+			}
+			death = theApp.m_recordset->GetFieldString(6);
+			if (!death.IsEmpty())
+			{
+				str.Format(L"*%s", death);
+				m_ListCtrl5.SetItemText(nItem5, 5, str);
+			}
+			theApp.m_recordset->MoveNext();
+			++nItem5;
+		}
+	}
+	else
+	{
+		int nItem6 = 0;
+		for (UINT i = 0; i < theApp.m_recordset->RecordsCount(); ++i)
+		{
+
+			m_ListCtrl6.InsertItem(nItem6, theApp.m_recordset->GetFieldString(2));
+			m_ListCtrl6.SetItemText(nItem6, 1, theApp.m_recordset->GetFieldString(1));
+			m_ListCtrl6.SetItemText(nItem6, 2, theApp.m_recordset->GetFieldString(0));
+
+			name.Format(L"%s %s", theApp.m_recordset->GetFieldString(4), theApp.m_recordset->GetFieldString(3));
+			m_ListCtrl6.SetItemText(nItem6, 3, name);
+			birth = theApp.m_recordset->GetFieldString(5);
+			if (!birth.IsEmpty())
+			{
+				str.Format(L"*%s", birth);
+				m_ListCtrl6.SetItemText(nItem6, 4, str);
+			}
+			death = theApp.m_recordset->GetFieldString(6);
+			if (!death.IsEmpty())
+			{
+				str.Format(L"*%s", death);
+				m_ListCtrl6.SetItemText(nItem6, 5, str);
+			}
+			theApp.m_recordset->MoveNext();
+			++nItem6;
+		}
+	}
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCompareEntries::setItem(CListCtrlEx* lc, int nItem, int X, CString item, TCHAR kar)

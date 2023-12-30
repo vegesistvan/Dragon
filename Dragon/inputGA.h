@@ -165,6 +165,8 @@ protected:
 	CString fname;
 	CString ext;
 	
+	CString m_weddingDate;
+	CString m_weddingPlace;
 
 	bool CInputGA::isNameNew(CString line, CString* before, PEOPLE* p, CString* after );
 
@@ -226,7 +228,10 @@ protected:
 	CString getPeerFromString(CString str);
 	CString CInputGA::cleanHtmlTags(int lineNumber, CString cLine);
 
-
+	void CInputGA::processSpouse(PEOPLE* s);
+	void CInputGA::processPlaceNameSubstr(CString placeName, PEOPLE* s);
+	void CInputGA::processNameSubstr(CString nameSubstr, PEOPLE* s);
+	CString CInputGA::splitStringAt(CString str, int at, CString* str2);
 
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	DECLARE_MESSAGE_MAP()

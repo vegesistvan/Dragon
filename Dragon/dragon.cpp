@@ -160,6 +160,7 @@ BEGIN_MESSAGE_MAP(CDragApp, CWinAppEx)
 		ON_COMMAND(ID_HELP, &CDragApp::OnHelp)
 		ON_UPDATE_COMMAND_UI(ID_UNITE, &CDragApp::OnUpdateUnite)
 		ON_COMMAND(ID_UNITE, &CDragApp::OnUnite)
+		ON_COMMAND(ID_AVERAGE_LIFESPAN, &CDragApp::OnAverageLifespan)
 		END_MESSAGE_MAP()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CDragApp::CDragApp() noexcept
@@ -1052,5 +1053,70 @@ void CDragApp::OnOpen()
 	createCaption();
 	m_pMainWnd->SetWindowText(m_caption);
 }
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDragApp::OnAverageLifespan()
+{
+	typedef struct
+	{
+		int century;
+		int lifeSpan;
+		int db;
+	}LIFESPAN;
+	std::vector<LIFESPAN> vLife;
+	LIFESPAN life;
+	int birth;
+	int death;
+	int century;
+	int lifeSpan;
+	bool uj;
+	FILE* flAv;
+	CString filePathName;
+	filePathName.Format(L"%s\\averageLifeSpan_%s.text", m_workingDirectory, getTimeTag());
 
+	if (!openFileSpec(&flAv, filePathName, L"w+")) return;
+	fwprintf(flAv, L"Átlagos élettartam évszázadonként\n\n");
 
+	m_command = L"SELECT birth_date, death_date FROM people WHERE length(birth_date)!=0 AND length(death_date)!=0 ORDER BY birth_date";
+	if (!query(m_command)) return;
+
+	for (int i = 0; i < m_recordset->RecordsCount(); ++i, m_recordset->MoveNext())
+	{
+		str = m_recordset->GetFieldString(0);
+		if (!isNumeric(str) || (str.GetLength()) < 4) continue;
+		birth = _wtoi( str.Left(4) );
+		str = m_recordset->GetFieldString(1);
+		if (!isNumeric(str) || (str.GetLength()) < 4) continue;
+		death = _wtoi(str.Left(4));
+		if (birth > death) continue;
+		if (999 < birth && birth < 2024 && 999 < death && death < 2024)
+		{
+			lifeSpan = death - birth;
+			century = birth / 100;
+
+			uj = false;
+			for (int j = 0; j < vLife.size(); ++j)
+			{
+				if (vLife.at(j).century == century)
+				{
+					vLife.at(j).lifeSpan += lifeSpan;
+					++vLife.at(j).db;
+					uj = true;
+					break;
+				}
+			}
+			if (uj) continue;
+			life.century = century;
+			life.db = 1;
+			life.lifeSpan = lifeSpan;
+			vLife.push_back(life);
+		}
+	}
+	fwprintf(flAv, L"%6s %5s %s\n", L"évsz.", L"átlag", L"db");
+	for (int i = 0; i < vLife.size(); ++i)
+	{
+		str.Format(L"%5d. %5d %d\n", vLife.at(i).century + 1, vLife.at(i).lifeSpan / vLife.at(i).db, vLife.at(i).db);
+		fwprintf(flAv, str);
+	}
+	fclose(flAv);
+	showFile(filePathName);
+}

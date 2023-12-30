@@ -18,6 +18,7 @@ public:
 
 	CString m_rowid;
 	CString m_firstname;
+	int		m_RadioSex;
 	BOOL	m_uj;
 	int		m_sexLast;
 
@@ -27,7 +28,7 @@ protected:
 	CString str;
 	CString m_command;
 	int		m_language_id;
-	int m_RadioSex;
+	
 	CColorStatic colorLanguage;
 	CColorStatic colorStatic;
 	DECLARE_MESSAGE_MAP()

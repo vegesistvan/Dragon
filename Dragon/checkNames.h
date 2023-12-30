@@ -44,9 +44,14 @@ protected:
 public:
 	virtual BOOL OnInitDialog();
 //	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
-	afx_msg void OnList();
+//	afx_msg void OnList();
 	afx_msg void OnDblclkList(NMHDR* pNMHDR, LRESULT* pResult);
-	afx_msg void OnFirstnames();
+	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
+//	afx_msg void OnFirstnames();
 private:
 	CColorStatic colorAttention;
+public:
+	afx_msg void OnEditKersztnev();
+	afx_msg void OnEditNotepad();
+	afx_msg void OnEditSplit();
 };

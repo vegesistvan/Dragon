@@ -149,6 +149,7 @@ ON_COMMAND(ID_KEKULE, &CTablePeople::OnKekule)
 ON_COMMAND(ID_DESCENDANTS_NEW, &CTablePeople::OnDescendantsNew)
 ON_COMMAND(ID_EDIT_NOTEPAD, &CTablePeople::OnEditNotepad)
 ON_COMMAND(ID_ROKONOK, &CTablePeople::OnRokonok)
+ON_COMMAND(ID_BIRTH_DEATH, &CTablePeople::OnBirthDeath)
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CTablePeople::OnInitDialog()
@@ -485,6 +486,13 @@ void CTablePeople::OnGivenname()
 		m_filter.Format( L"people WHERE first_name='%s' AND last_name='%s'", dlg._firstname, dlg._lastname );
 	}
 	fillTable( 0 );
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTablePeople::OnBirthDeath()
+{
+	m_filterText = L"Születési és halálozási dátum is meg van adva";
+	m_filter = L"people WHERE length(birth_date) != 0 AND length(death_date) != 0";
+	fillTable(0);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTablePeople::OnFilterNodescendant()
@@ -1761,3 +1769,5 @@ void CTablePeople::OnRokonok()
 	}
 	dlg.DoModal();
 }
+
+

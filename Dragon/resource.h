@@ -50,7 +50,6 @@
 #define IDD_COLUMNSLIST                 195
 #define IDR_TABLE_TABLES                196
 #define IDD_COMPARE_ENTRIES             199
-#define IDR_FIRSTNAMES                  200
 #define ID_VIEW_APPLOOK_WIN_2000        201
 #define ID_VIEW_APPLOOK_OFF_XP          202
 #define ID_VIEW_APPLOOK_WIN_XP          203
@@ -199,7 +198,6 @@
 #define IDD_INPUTGA                     435
 #define IDD_ASCENDANTS                  436
 #define IDD_KEKULE                      437
-#define IDD_ASCENDANTS_OLD              439
 #define IDR_DROPDOWN_DBP_HTML           482
 #define IDR_DROPDOWN_RELATION_HTML      483
 #define IDR_BRACKETS                    487
@@ -226,6 +224,7 @@
 #define IDR_DROPDOWN_ASCENDANTS         552
 #define IDR_ASCENDANTS_LINEAR           553
 #define IDR_ASCENDANTS_PAINT            557
+#define IDR_DROPDOWN_CHECKNAMES         564
 #define IDC_LIST                        1000
 #define IDC_LAST_NAME                   1002
 #define IDC_FIRST_NAME                  1003
@@ -551,7 +550,6 @@
 #define IDC_EDIT_NUMBEROFLINES          1814
 #define IDC_CHECK_FIRST_BOLD            1816
 #define IDC_STATIC_ENOUGH               1818
-#define IDC_UNITED_ENOUGH               1818
 #define IDC_BOX_LINEAR                  1819
 #define IDC_INPUT_FILE                  1819
 #define IDC_LINEAR_TITLE                1820
@@ -570,6 +568,8 @@
 #define IDC_INPUT_DATE                  1848
 #define IDC_INPUT_VERSION               1849
 #define IDC_UNITED_VERSION              1850
+#define IDC_LIST5                       1851
+#define IDC_LIST6                       1852
 #define IDC_LISTCOLUMNS                 11044
 #define ID_EDIT_INSERT                  32771
 #define ID_EDIT_UPDATE                  32772
@@ -593,15 +593,11 @@
 #define ID_EXPORT_ALL                   33068
 #define ID_EXPORT_SELECTED              33069
 #define ID_DISPLAY_TABLES               33114
-#define ID_UDATE_REPLACE                33136
 #define ID_LIST_SELECTED                33156
 #define ID_CHECK_USED                   33190
 #define ID_DESCENDANT_FILE              33193
 #define ID_FILTER_INCIDENCE             33256
 #define ID_FILTER_WOMEN                 33259
-#define ID_MAN                          33265
-#define ID_WOMEN                        33266
-#define ID_MANANDWOMAN                  33267
 #define ID_FILTER_BISEX                 33269
 #define ID_DESCENDANT_TABLE             33275
 #define ID_SPOUSES_SEX                  33278
@@ -958,14 +954,22 @@
 #define ID_MARRIAGE_ROWID               35038
 #define ID_MARRIAGE_NAME                35039
 #define ID_BUTTON2                      35040
+#define ID_AVERAGE_LIFESPAN             35040
+#define ID_MEGJELEN35041                35041
+#define ID_BIRTH_DEATH                  35042
+#define ID_EDIT_KERSZTN35043            35043
+#define ID_EDIT_KERSZTNEV               35044
+#define ID_EDIT_GA                      35045
+#define ID_EDIT_GA35046                 35046
+#define ID_EDIT_SPLIT                   35047
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        564
-#define _APS_NEXT_COMMAND_VALUE         35041
-#define _APS_NEXT_CONTROL_VALUE         1851
+#define _APS_NEXT_RESOURCE_VALUE        565
+#define _APS_NEXT_COMMAND_VALUE         35048
+#define _APS_NEXT_CONTROL_VALUE         1853
 #define _APS_NEXT_SYMED_VALUE           378
 #endif
 #endif
