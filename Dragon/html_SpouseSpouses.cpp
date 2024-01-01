@@ -113,7 +113,7 @@ BOOL CSpouseSpouses::OnInitDialog()
 	m_orderix = 0;
 
 	fillTable();
-
+	ShowWindow(SW_MAXIMIZE);
 
 	return TRUE;
 }

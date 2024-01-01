@@ -212,6 +212,8 @@ void CInputGA::clearAll()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CInputGA::clearPeople(PEOPLE* p)
 {
+	*p = { 0 };
+/*
 	p->rowid.Empty();
 	p->fileNumber = 0;
 	p->familyNumber = 0;
@@ -253,6 +255,7 @@ void CInputGA::clearPeople(PEOPLE* p)
 	p->whichChildMother = 1;
 	p->numOfSpouses = 0;
 	p->numOfChildren = 0;
+*/
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CInputGA::splitToSubstr(CString line)

@@ -2,7 +2,7 @@
 
 #define VERSION L"10.151"
 
-// 10.150 2023.12.XX
+// 10.151 2024.01.XX
 // Ismeretlen keresztnevek vizsgálatának, bevitelének átalakítása.
 // Házastársdak felbontásának átalakítása
 

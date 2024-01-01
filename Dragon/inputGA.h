@@ -93,7 +93,6 @@ public:
 	int		m_tableNumber;
 	int		m_lineNumber;
 
-	bool CInputGA::isKivetel(CString word);
 	int CInputGA::getSuffix(CStringArray* A, int k );
 	bool CInputGA::isname(CString line, PEOPLE* p);
 	int CInputGA::isTitle(CString word);
@@ -110,7 +109,6 @@ public:
 
 	void	CInputGA::insertTableHeader();
 	void CInputGA::processSpouseSubstrings();
-	CString CInputGA::processWedding( int ix);
 	CString CInputGA::cutBirthDeath(CString spouseSubstr);
 	void	processPlaceDateComment( CString placeDateComment, PLACE_DATE_BLOCK* ns );
 	void	splitSubstrs( PEOPLE* any );
@@ -230,7 +228,6 @@ protected:
 
 	void CInputGA::processSpouse(PEOPLE* s);
 	void CInputGA::processPlaceNameSubstr(CString placeName, PEOPLE* s);
-	void CInputGA::processNameSubstr(CString nameSubstr, PEOPLE* s);
 	CString CInputGA::splitStringAt(CString str, int at, CString* str2);
 
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support

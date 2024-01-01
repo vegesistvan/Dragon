@@ -110,6 +110,7 @@ BOOL CHtmlDescendants::OnInitDialog()
 	fillTable();
 
 	m_orderix = 1;
+	ShowWindow(SW_MAXIMIZE);
 	return TRUE;  // return TRUE unless you set the focus to a control
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

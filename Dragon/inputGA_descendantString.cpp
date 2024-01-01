@@ -359,58 +359,60 @@ bool CInputGA::setFatherMother()
 	else  // a tábla további leszármazottainak szülei a vGenerations vektorból állapíthatóak meg
 	{
 		int ix;
-
-		ix = v_generations.size() - 1;
-		if (d.generation < m_generationPrev)  // ha visszalép a generation, akkor törli a nála nagyaobb generációs bejegyzéseket
+		if (v_generations.size())
 		{
-			while (ix && d.generation < v_generations.at(ix).gen)
+			ix = v_generations.size() - 1;
+			if (d.generation < m_generationPrev)  // ha visszalép a generation, akkor törli a nála nagyaobb generációs bejegyzéseket
 			{
-				v_generations.pop_back();
-				--ix;
+				while (ix && d.generation < v_generations.at(ix).gen)
+				{
+					v_generations.pop_back();
+					--ix;
+				}
+			}
+			if (!m_rollToLine && ix < 0)
+			{
+				AfxMessageBox(L"Generációs probléma!!");
+				return false;
+			}
+
+			for (ix = v_generations.size() - 1; ix >= 0; --ix)	// hátulról elõre keresi az elõzõ generációt, aki a szülõ
+			{
+				if (v_generations.at(ix).gen < d.generation)
+					break;
+			}
+			if (ix != -1)										// az elõzõ ciklusban megtalálta az apát/anyát
+			{
+				if (v_generations.at(ix).descendant_sex_id == MAN)					// szülõ sex_id-ja
+				{
+					d.father_id = v_generations.at(ix).descendant_id;				// leszedi az apa azonosítóját
+					if (d.parentIndex <= v_generations.at(ix).numOfSpouses)			// anya ismert ?
+						d.mother_id = v_generations.at(ix).spouse_id[d.parentIndex - 1];  // ismert
+				}
+				else																// ha a nõk leszármazottait is nyilvántartjuk
+				{
+					d.mother_id = v_generations.at(ix).descendant_id;
+					if (d.parentIndex <= v_generations.at(ix).numOfSpouses)			// anya ismert ?
+						d.father_id = v_generations.at(ix).spouse_id[d.parentIndex - 1];  // ismert
+				}
 			}
 		}
-		if ( !m_rollToLine && ix < 0)
-		{
-			AfxMessageBox(L"Generációs probléma!!");
-			return false;
-		}
-		
-		for (ix = v_generations.size() - 1; ix >= 0; --ix)	// hátulról elõre keresi az elõzõ generációt, aki a szülõ
-		{
-			if (v_generations.at(ix).gen < d.generation)
-				break;
-		}
-		if (ix != -1)										// az elõzõ ciklusban megtalálta az apát/anyát
-		{
-			if (v_generations.at(ix).descendant_sex_id == MAN)					// szülõ sex_id-ja
-			{
-				d.father_id = v_generations.at(ix).descendant_id;				// leszedi az apa azonosítóját
-				if (d.parentIndex <= v_generations.at(ix).numOfSpouses)			// anya ismert ?
-					d.mother_id = v_generations.at(ix).spouse_id[d.parentIndex - 1];  // ismert
-			}
-			else																// ha a nõk leszármazottait is nyilvántartjuk
-			{
-				d.mother_id = v_generations.at(ix).descendant_id;
-				if (d.parentIndex <= v_generations.at(ix).numOfSpouses)			// anya ismert ?
-					d.father_id = v_generations.at(ix).spouse_id[d.parentIndex - 1];  // ismert
-			}
-		}
-	}
-	if (d.father_id == L"0")
-		d.father_id.Empty();
-	if (d.mother_id == L"0")
-		d.mother_id.Empty();
+		if (d.father_id == L"0")
+			d.father_id.Empty();
+		if (d.mother_id == L"0")
+			d.mother_id.Empty();
 
 
-	if (!d.father_id.IsEmpty() )
-	{
-		m_command.Format(L"UPDATE people SET numOfChildren = numOfChildren + 1 WHERE rowid = '%s'", d.father_id);
-		if (!theApp.execute(m_command)) return false;
-	}
-	if (!d.mother_id.IsEmpty() )
-	{
-		m_command.Format(L"UPDATE people SET numOfChildren = numOfChildren + 1 WHERE rowid = '%s'", d.mother_id);
-		if (!theApp.execute(m_command)) return false;
+		if (!d.father_id.IsEmpty())
+		{
+			m_command.Format(L"UPDATE people SET numOfChildren = numOfChildren + 1 WHERE rowid = '%s'", d.father_id);
+			if (!theApp.execute(m_command)) return false;
+		}
+		if (!d.mother_id.IsEmpty())
+		{
+			m_command.Format(L"UPDATE people SET numOfChildren = numOfChildren + 1 WHERE rowid = '%s'", d.mother_id);
+			if (!theApp.execute(m_command)) return false;
+		}
 	}
 	return true;
 }

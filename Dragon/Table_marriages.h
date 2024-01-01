@@ -87,7 +87,6 @@ protected:
 
 	CString m_filter;
 	CString m_filterText;
-//	CWnd* m_pParent;
 
 	void	enableMenu( BOOL flag );
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
@@ -167,4 +166,7 @@ public:
 	CRichEditCtrl m_RichEditCtrl;
 	afx_msg void OnInfo();
 	afx_msg void OnMarrigeGedcom();
+	afx_msg void OnGroupMdate();
+	afx_msg void OnGroupMplace();
+
 };

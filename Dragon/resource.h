@@ -225,6 +225,7 @@
 #define IDR_ASCENDANTS_LINEAR           553
 #define IDR_ASCENDANTS_PAINT            557
 #define IDR_DROPDOWN_CHECKNAMES         564
+#define IDR_TABLE_MARRIAGES             565
 #define IDC_LIST                        1000
 #define IDC_LAST_NAME                   1002
 #define IDC_FIRST_NAME                  1003
@@ -962,13 +963,23 @@
 #define ID_EDIT_GA                      35045
 #define ID_EDIT_GA35046                 35046
 #define ID_EDIT_SPLIT                   35047
+#define ID_MEGJELEN35048                35048
+#define ID_K35049                       35049
+#define ID_K35050                       35050
+#define ID_K35051                       35051
+#define ID_K35052                       35052
+#define ID_GROUP_MPLACE                 35053
+#define ID_GROUP_MDATA                  35054
+#define ID_GROUP_MDATE                  35055
+#define ID_GROUP_HUSBAND                35056
+#define ID_GROUP_WIFE                   35057
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        565
-#define _APS_NEXT_COMMAND_VALUE         35048
+#define _APS_NEXT_RESOURCE_VALUE        566
+#define _APS_NEXT_COMMAND_VALUE         35058
 #define _APS_NEXT_CONTROL_VALUE         1853
 #define _APS_NEXT_SYMED_VALUE           378
 #endif

@@ -121,6 +121,8 @@ BEGIN_MESSAGE_MAP(CTableMarriages, CDialogEx)
 	ON_COMMAND(ID_MARRIAGES_SPOUSES, &CTableMarriages::OnMarriagesSpouses)
 	ON_COMMAND(ID_INFO, &CTableMarriages::OnInfo)
 	ON_COMMAND(ID_MARRIGE_GEDCOM, &CTableMarriages::OnMarrigeGedcom)
+	ON_COMMAND(ID_GROUP_MDATE, &CTableMarriages::OnGroupMdate)
+	ON_COMMAND(ID_GROUP_MPLACE, &CTableMarriages::OnGroupMplace)
 END_MESSAGE_MAP()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CTableMarriages::OnInitDialog()
@@ -229,6 +231,7 @@ united\
 		OnAllMarriages();
 		break;
 	}
+	ShowWindow(SW_MAXIMIZE);
 	return TRUE;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -336,6 +339,19 @@ void CTableMarriages::On10wifes()
 	m_numOfSpouses = 10;
 	m_filter.Format(L"WHERE p.numOfSpouses='%d'", m_numOfSpouses);
 	m_filterText.Format(L"%d házasságot kötött férfiak", m_numOfSpouses);
+	listMarriages();
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////1
+void CTableMarriages::OnGroupMdate()
+{
+	m_filter = L"GROUP BY m.date";
+	m_filterText = L"Különbözõ házasságkötési dátumok";
+	listMarriages();
+}
+void CTableMarriages::OnGroupMplace()
+{
+	m_filter = L"GROUP BY m.place";
+	m_filterText = L"Különbözõ házasságkötési helyek";
 	listMarriages();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////1
@@ -1005,3 +1021,5 @@ void CTableMarriages::OnMarrigeGedcom()
 		theApp.editNotepad(theApp.m_gedPathName, lineNumber);
 
 }
+
+
