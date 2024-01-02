@@ -71,6 +71,7 @@ BOOL CUnitedEntries::OnInitDialog()
 	m_ceU.Create(IDD_UNITED_ENTRIES_UNITED, this);
 	m_ceD.Create(IDD_UNITED_ENTRIES_DIFFERENT, this);
 	m_ceE.Create(IDD_UNITED_ENTRIES_ERRORS, this);
+	m_ceX.Create(IDD_UNITED_ENTRIES_X, this);
 
 	int i = 0;
 
@@ -86,6 +87,8 @@ BOOL CUnitedEntries::OnInitDialog()
 	m_TabCtrl.InsertItem(i, L"Különbözõek");
 	++i;
 	m_TabCtrl.InsertItem(i, L"Hibák");
+	++i;
+	m_TabCtrl.InsertItem(i, L"Kérdéses");
 
 	attachDialogs();
 
@@ -95,7 +98,7 @@ BOOL CUnitedEntries::OnInitDialog()
 	m_title0 = L"Azonos nevû bejegyzések, amelyek között vannak egyesítettek";
 	m_title1 = L"Azonos nevû bejegyzések, amelyek között nincsenek egyesítettek";
 	m_title2 = L"Azonos nevû bejegyzések, amelyek között vannak azonos és ellentmondó adatpárok";
-
+	m_title3 = L"Azonos nevû bejegyzések, amelyek között nincs ellentmondás, de nem is egyesítettek";
 	
 	m_RichEditCtrl.SetWindowTextW(m_title0);
 	m_RichEditCtrl.SetSel(0, -1);
@@ -123,6 +126,7 @@ BOOL CUnitedEntries::attachDialogs()
 	m_ceU.SetWindowPos(&wndTop, nX, nY, nXc, nYc, SWP_SHOWWINDOW);
 	m_ceD.SetWindowPos(&wndTop, nX, nY, nXc, nYc, SWP_HIDEWINDOW);
 	m_ceE.SetWindowPos(&wndTop, nX, nY, nXc, nYc, SWP_HIDEWINDOW);
+	m_ceX.SetWindowPos(&wndTop, nX, nY, nXc, nYc, SWP_HIDEWINDOW);
 
 	m_ListCtrl	= &(m_ceU.m_ListCtrlU);
 	vPeople		= &(m_ceU.vPeople);
@@ -150,6 +154,7 @@ void CUnitedEntries::OnSelchangeTab(NMHDR* pNMHDR, LRESULT* pResult)
 		m_ceU.ShowWindow(SW_SHOW);
 		m_ceD.ShowWindow(SW_HIDE);
 		m_ceE.ShowWindow(SW_HIDE);
+		m_ceX.ShowWindow(SW_HIDE);
 
 		menu->LoadMenuW(IDR_UNITED_ENTRIES0);
 		m_title = m_title0;
@@ -162,6 +167,7 @@ void CUnitedEntries::OnSelchangeTab(NMHDR* pNMHDR, LRESULT* pResult)
 		m_ceD.ShowWindow(SW_SHOW);
 		m_ceU.ShowWindow(SW_HIDE);
 		m_ceE.ShowWindow(SW_HIDE);
+		m_ceX.ShowWindow(SW_HIDE);
 
 		menu->LoadMenuW(IDR_UNITED_ENTRIES1);
 		m_title = m_title1;
@@ -173,9 +179,22 @@ void CUnitedEntries::OnSelchangeTab(NMHDR* pNMHDR, LRESULT* pResult)
 		m_ceE.ShowWindow(SW_SHOW);
 		m_ceU.ShowWindow(SW_HIDE);
 		m_ceD.ShowWindow(SW_HIDE);
+		m_ceX.ShowWindow(SW_HIDE);
 
 		menu->LoadMenuW(IDR_UNITED_ENTRIES2);
 		m_title = m_title2;
+		break;
+	case 3:
+		m_ListCtrl = &(m_ceX.m_ListCtrlX);
+		vPeople = &(m_ceX.vPeople);
+
+		m_ceX.ShowWindow(SW_SHOW);
+		m_ceE.ShowWindow(SW_HIDE);
+		m_ceU.ShowWindow(SW_HIDE);
+		m_ceD.ShowWindow(SW_HIDE);
+
+		menu->LoadMenuW(IDR_UNITED_ENTRIES1);
+		m_title = m_title3;
 		break;
 	}
 	SetMenu(menu);
@@ -332,21 +351,5 @@ void CUnitedEntries::clearRichEdit()
 	pEdit->SetSel(0, -1);
 	pEdit->Clear();
 	pEdit->EmptyUndoBuffer();
-	/*
-
-	CRect rc;
-	CWnd* pW = this->GetDlgItem(IDC_RICHEDIT);
-
-	CPaintDC dc(this); 
-
-	pW->GetWindowRect(&rc);
-	this->ScreenToClient(&rc);
-
-	COLORREF colour = ::GetSysColor(COLOR_3DFACE);
-	HBRUSH hbr = CreateSolidBrush(colour);
-
-	FillRect( dc, &rc, hbr );
-	*/
-
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

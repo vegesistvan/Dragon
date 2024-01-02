@@ -393,6 +393,9 @@
     <ClInclude Include="CListView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="unitedEntriesX.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dragon.cpp">
@@ -786,6 +789,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CListView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="unitedEntriesX.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

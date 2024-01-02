@@ -93,6 +93,9 @@ bool CUniteEntries::parameteres()
 	str.Format( L"Azonos nevû de egyetlen összevonást sem tartalmazó bejegyzések a %s adatbázisból\n", theApp.m_dbFileName );
 	fwprintf(textD, str );
 
+	m_filenameTextX.Format(L"%sX.txt", theApp.m_dbFileTitle);
+	m_fileSpecTextX.Format(L"%s\\%s", theApp.m_dbFolderPath, m_filenameTextX);
+	
 	m_filenameTextN.Format(L"%sN.txt", theApp.m_dbFileTitle);
 	m_fileSpecTextN.Format(L"%s\\%s", theApp.m_dbFolderPath, m_filenameTextN);
 
@@ -136,6 +139,10 @@ bool CUniteEntries::parameteres()
 		str.Format(L"Azonos nevû, egyezõ és különbözõ adatokat is tartalmazó bejegyzések, amelyek nem lettek összevonva\n" );
 		fwprintf(textN, str );
 
+		if (!openFileSpec(&textX, m_fileSpecTextX, L"w+")) return false;
+		str.Format(L"Azonos nevû, ellentmondás mentes, de nem összevonható bejegyzések a %s adatbázisból\n", theApp.m_dbFileName);
+		fwprintf(textX, str);
+
 		switch (m_algorithm)
 		{
 		case SLOW:
@@ -147,15 +154,18 @@ bool CUniteEntries::parameteres()
 			break;
 		}
 		fclose(textN);
+		fclose(textX);
 		++m_loop;
-		theApp.insertIntoFiles(m_filenameTextU, UNITED_FILE);
-		theApp.insertIntoFiles(m_filenameTextD, DIFFERENT_FILE);
-		theApp.insertIntoFiles(m_filenameTextN, ERROR_FILE);
+
 		if (!m_modified) break;		// nincs összevont ember, vége a programnak
 	}
 	fclose(textU);
 	fclose(textD);
 
+	theApp.insertIntoFiles(m_filenameTextU, UNITED_FILE);
+	theApp.insertIntoFiles(m_filenameTextD, DIFFERENT_FILE);
+	theApp.insertIntoFiles(m_filenameTextN, ERROR_FILE);
+	theApp.insertIntoFiles(m_filenameTextX, X_FILE);
 
 	CUnitedEntries dlg;
 	dlg.DoModal();
@@ -505,11 +515,19 @@ cont:	pWnd.StepIt();
 		}
 	}
 	pWnd.DestroyWindow();
-	if (m_term) return false;
-
+	if (m_term)
+	{
+		theApp.execute(L"COMMIT");
+		return false;
+	}
 	if (vSameNames.size())
+	{
 		if (!processSameNames())
+		{
+			theApp.execute(L"COMMIT");
 			return false;
+		}
+	}
 	theApp.execute(L"COMMIT");
 	deleteSameMarriages();
 
@@ -781,11 +799,14 @@ BOOL CUniteEntries::getPeople( CString rowid )
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CUniteEntries::processSameNames()
 {
+
+	if (vSameNames.size() < 2) return false;
 	UINT group = 1;
 	UINT concordant;
 	bool newGroup = false;
 	CString rowid1;
 	CString rowid2;
+	int ret;
 	int z;
 	// alapbeállítás:	vSameNames.at(i).group == 0;	ebben a csoportban maradnak azok a bejegyzések, amelyek nem azonosak egyetlen más bejegyzéssel sem 
 	//					vSameNames.at(i).status == 1,	tehát meg kell tartani
@@ -801,7 +822,7 @@ BOOL CUniteEntries::processSameNames()
 
 //	std::sort(vSameNames.begin(), vSameNames.end(), sortBySourceU3);		// az azonosítás sorrendje fonotos! source= 1->4
 
-
+	int questionable = 0;
 	std::sort(vSameNames.begin(), vSameNames.end(), sortByCS);		// az azonosítás sorrendje fonotos! source= 1->4
 	for ( UINT i = 0; i < vSameNames.size() - 1; ++i)
 	{
@@ -819,14 +840,15 @@ BOOL CUniteEntries::processSameNames()
 			if (vSameNames.at(j).group) continue;												// már csoporthoz tartozik, nem vizsgálja
 			if (vSameNames.at(i).source == L"1" && vSameNames.at(j).source == L"1") continue;	// 2 leszármazottatt nem lehet összevonni
 
-			if ( identical( i, j ) )				// nincs ellentmondás
+			ret = identical(i, j);				// nincs ellentmondás
+			if( ret == 1)
 			{
 				vSameNames.at(i).group = group;		// csoportfõnök
 				vSameNames.at(j).group = group;		// i-vel azonos group;
 				vSameNames.at(j).status = 0;		// törölni kell 
 				newGroup = true;
 			}
-			else							// nem azonos
+			else if (ret == -1)
 			{
 				if (m_match || m_matchP || m_matchS)				// ellenmondás van, de van azonos adat is!!! A textN fájlba listázzuk!
 				{
@@ -835,6 +857,11 @@ BOOL CUniteEntries::processSameNames()
 					emptyLine(textN);
 				}
 			}
+			else if( ret == 0 )					// nincs ellentmondás, de azonosadat sincs;
+			{
+				++questionable;
+			}
+
 		}
 		if (newGroup)
 		{
@@ -842,9 +869,6 @@ BOOL CUniteEntries::processSameNames()
 		}
 	}
 	std::sort(vSameNames.begin(), vSameNames.end(), sortByGStatus);
-//	saveValues();	// A megtartandó bejegyzésbe átvisszük amit akarunk
-
-//	uniteSamePeople();
 	if (group > 1)
 	{
 		saveValues();	// A megtartandó bejegyzésbe átvisszük amit akarunk
@@ -853,7 +877,10 @@ BOOL CUniteEntries::processSameNames()
 	}
 	else
 	{
-		listPeople(textD);	// nem volt összevonás
+		if (questionable)
+			listPeople(textX);
+		else
+			listPeople(textD);	// nem volt összevonás
 	}
 	return true;
 }
@@ -863,7 +890,7 @@ BOOL CUniteEntries::processSameNames()
 //	 return false - valamely adatpárban ellentmondás van
 //          true - nincs ellentmondás
 
-bool CUniteEntries::identical(UINT i, UINT j)
+int CUniteEntries::identical(UINT i, UINT j)
 {
 
 	vOthers.clear();
@@ -903,15 +930,15 @@ bool CUniteEntries::identical(UINT i, UINT j)
 	// hogy az ellentmonást tartalmazó, de egyezést is mutató bejegyzéseket elkülöníthessük a 3. listába
 	
 	if( B==-1 || D==-1 || F==-1|| FB==-1 || FD==-1 || M==-1 || MB==-1 || MD==-1 || S==-1 )	// bármi ellentmondás van
-		return false;
+		return -1;
 	
 	// az adatok ellentmondás mentessek
 	if (m_match || m_matchP || m_matchS)
 	{
-		return true;			// van legalább 1 egyezés
+		return 1;			// van legalább 1 egyezés
 	}
 	else
-		return false;
+		return 0;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Az azonos nevû rowid1 és rowid 2 emberk házastársai a vSpouses vektorban vannak, amely az összes azonos nevû

@@ -5,6 +5,7 @@
 #include "unitedEntriesUnited.h"
 #include "unitedEntriesDifferent.h"
 #include "unitedEntriesErrors.h"
+#include "unitedEntriesX.h"
 #include "ColorStatic.h"
 #include "ListCtrlEx.h"
 
@@ -65,6 +66,7 @@ protected:
 	CString m_title0;
 	CString m_title1;
 	CString m_title2;
+	CString m_title3;
 
 	CTabCtrl		m_TabCtrl;
 	CColorStatic	colorCaption;
@@ -88,6 +90,7 @@ protected:
 	CUnitedEntriesDifferent		m_ceD;
 	CUnitedEntriesUnited		m_ceU;
 	CUnitedEntriesErrors		m_ceE;
+	CUnitedEntriesX				m_ceX;
 
 	BOOL CUnitedEntries::attachDialogs();
 	void CUnitedEntries::keress(int start);

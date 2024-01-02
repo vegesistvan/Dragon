@@ -1,6 +1,10 @@
 #pragma once
 
-#define VERSION L"10.153"
+#define VERSION L"10.155"
+
+// 10.155 2024.01.02 Összevonáskor 4. táblában vannak ellentmondás mentes, de nem egyesíthetõ bejegyzések
+
+// 10.154 2024.01.02 Házastársak születési és halálozási  dátumának javítása a beolvasáskor
 
 // 10.153 2024.01.02 Kézi összevonás javítása
 

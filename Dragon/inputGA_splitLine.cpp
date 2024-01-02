@@ -277,26 +277,3 @@ void CInputGA::splitToSubstr(CString line)
 	m_nameSubstr = line;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-CString CInputGA::cutBirthDeath(CString line, CString *birthdeath )
-{
-	CString b;
-	CString d;
-	int		pos;
-	if ((pos = line.Find('*')) != -1)
-	{
-		m_birthSubstr = line.Mid(pos);
-		line = line.Left(pos - 1);
-
-	}
-	if ((pos = line.Find('+')) != -1)
-	{
-		m_deathSubstr = line.Mid(pos);
-		line = line.Left(pos-1);
-	}
-	str.Format(L"%s %s", m_birthSubstr, m_deathSubstr );
-	str.Trim();
-	*birthdeath = str;
-	return line;
-}
-*/

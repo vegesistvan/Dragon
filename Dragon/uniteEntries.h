@@ -26,15 +26,22 @@ protected:
 	CString m_command;
 		
 	CString m_fileSpecTextU;
-	CString m_fileSpecTextD;
-	CString m_fileSpecTextN;
 	CString m_filenameTextU;
+
+	CString m_fileSpecTextD;
 	CString m_filenameTextD;
+
+	CString m_fileSpecTextN;
 	CString m_filenameTextN;
+
+	CString m_fileSpecTextX;
+	CString m_filenameTextX;
+
 
 	FILE* textU;
 	FILE* textD;
 	FILE* textN;
+	FILE* textX;
 
 	CSqliteDBRecordSet* m_rset;
 	CSqliteDBRecordSet* m_rset1;
@@ -83,7 +90,7 @@ protected:
 	BOOL CUniteEntries::push(CString rowid );
 	BOOL CUniteEntries::processSameNames();
 	BOOL CUniteEntries::getPeople(CString rowid);
-	bool CUniteEntries::identical(UINT i, UINT j);
+	int CUniteEntries::identical(UINT i, UINT j);
 
 	bool CUniteEntries::saveValues();
 	int CUniteEntries::same(CString par1, CString par2, int* match);

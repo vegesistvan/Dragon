@@ -38,6 +38,22 @@ void CInputGA::processSpouseSubstrings()
 		spouseSubstr = cutParentsSposuses(i);	// házastárs szüleinek levélasztésa (v_marriges->spouseSubstr és v_marriges->relativeSubstr
 		m_weddingNameSubstr = cutBirthDeath(spouseSubstr);
 
+		PLACE_DATE_BLOCK bb;
+		PLACE_DATE_BLOCK db;
+
+		processPlaceDateComment(m_birthSubstr, &bb);
+		processPlaceDateComment(m_deathSubstr, &db);
+
+		s.birth_place = bb.place;
+		s.birth_date = bb.date;
+		if (!bb.comment.IsEmpty())
+			s.comment = bb.comment;
+
+		s.death_place = db.place;
+		s.death_date = db.date;
+		if (!db.comment.IsEmpty())
+			s.comment = db.comment;
+
 		processSpouse( &s);  
 		
 
