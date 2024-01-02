@@ -1,6 +1,10 @@
 #pragma once
 
-#define VERSION L"10.151"
+#define VERSION L"10.153"
+
+// 10.153 2024.01.02 Kézi összevonás javítása
+
+// 10.152 2024.01.01 A fõnemesi cím összevonása
 
 // 10.151 2024.01.XX
 // Ismeretlen keresztnevek vizsgálatának, bevitelének átalakítása.

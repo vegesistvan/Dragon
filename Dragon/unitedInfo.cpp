@@ -59,7 +59,7 @@ Egy sorra kattintva a legördülõ menübõl az alábbiak között választhatunk:\r\n\
 - Bejegyzés a htm fájlban\r\n\
 - 2 kijelölt bejegyzés a html fájlban\r\n\
 - 2 kijelölt bejegyzés rokoságának összehasonlítása\r\n\
-- 2 kijelölt bejegyzés összevonása\r\n\
+- Kijelölt bejegyzések összevonása\r\n\
 - A kijelölt név szerinti szûrés\r\n\
 \r\n\
 Ez utóbbi funkciót úgy ajánlott használni, hogy elõszõr szürjük a listát a 2. iterációra, majd kijüljük a kívánt nevet és hívjuk \
@@ -71,6 +71,7 @@ AZONOS NEVÛ BEJEGYZÉSEK, AMELYEK KÖZÖTT NINCSENEK EGYESÍTÉSEK\r\n\
 Itt a legördülõ menüben értelemszerûen csak az az elsõ két menüpont található:\r\n\
 - Bejegyzés megmutatás a htm fájlban a NotePad++-ban\r\n\
 - 2 kijelölt bejegyzés rokoságának összehasonlítása\r\n\
+- Kijelölt bejegyzések összevonása\r\n\
 \r\n\
 AZONOS NEVÛ BEJEGYZÉSEK, AMELYEK KÖZÖTT VANNAK AZONOS ÉS ELLENTMONDÓ ADATPÁROK\r\n\
 \r\n\
@@ -84,6 +85,13 @@ A a legördülõ menüben található funkciók:\r\n\
 \r\n\
 Ezek a funkciók segítséget nyújtanak a htm fájl javításában.\r\n\
 \r\n\
+KIJELÖLT BEJEGYZÉSEK ÖSSZEVONÁSA\r\n\
+\r\n\
+Ha az összevonási eljárás az azonosítási kritériumok nem teljesülése miatt nem vont össze bejegyzéseket, de valahonnan tudni véljük, hogy \
+azok összevonandóak lennének, akkor azokat itt összevonhatjuk.\
+<r><n>\
+Ki kell jelölni az akárhány összevonandó bejegyzést és a legördülõ menübõl indítani a \"Kijelölt bejegyzések összevonása\" funkciót.\
+A legkisebb típusú bejegyzést tartja meg, a többit törli. A törölt bejegyzésre hivatkásokat átirányítja a megtartott bejegyzésre.\
 ";
 	CDisplayInfo dlg;
 	dlg.m_text = &info;

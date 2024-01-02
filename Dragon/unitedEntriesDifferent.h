@@ -28,6 +28,7 @@ protected:
 	bool CUnitedEntriesDifferent::inputFile();
 	void CUnitedEntriesDifferent::push(int i);
 	void CUnitedEntriesDifferent::pushLine(int i);
+	void CUnitedEntriesDifferent::saveData(CString rowidKeep, CString rowidDel);
 	
 	DECLARE_MESSAGE_MAP()
 	afx_msg void OnDblclkList(NMHDR* pNMHDR, LRESULT* pResult);

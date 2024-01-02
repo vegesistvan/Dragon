@@ -458,6 +458,7 @@ void CUnitedEntriesUnited::OnUnite2()
 
 	CString rowidDel;
 	int ix;
+	int base;
 	
 	for (int i = 1; i < vUnite.size(); ++i)
 	{
@@ -482,10 +483,10 @@ void CUnitedEntriesUnited::OnUnite2()
 		if (!theApp.execute(m_command)) return;
 
 		// törölt bejegyzés törlése
-		ix = nItem * U_COLUMNSCOUNT;
+		base = nItem * U_COLUMNSCOUNT;
 		for (int j = 0; j < U_COLUMNSCOUNT; ++j)
 		{
-			ix += j;
+			ix = base + j;
 			vPeople.at(ix) = L" ";
 		}
 	}

@@ -74,7 +74,7 @@ END_MESSAGE_MAP()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CUniteEntries::parameteres()
 {
-	m_name = L"Fényes Gyula";
+	m_name = L"Abhortis Mária";
 	m_name.Empty();
 	m_loopMax = 3;
 	R1 = L"7125";
@@ -842,13 +842,19 @@ BOOL CUniteEntries::processSameNames()
 		}
 	}
 	std::sort(vSameNames.begin(), vSameNames.end(), sortByGStatus);
-	saveValues();	// A megtartandó bejegyzésbe átvisszük amit akarunk
+//	saveValues();	// A megtartandó bejegyzésbe átvisszük amit akarunk
 
-	uniteSamePeople();
-	if (group > 1 )
+//	uniteSamePeople();
+	if (group > 1)
+	{
+		saveValues();	// A megtartandó bejegyzésbe átvisszük amit akarunk
+		uniteSamePeople();
 		listPeople(textU);	// volt összevonás
+	}
 	else
+	{
 		listPeople(textD);	// nem volt összevonás
+	}
 	return true;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1402,7 +1408,8 @@ bool CUniteEntries::saveValues()
 	int z;
 	if (vSameNames.at(0).name == L"Andreánszky Zsuzsa")
 		z = 1;
-	CString rowid;
+	CString rowidI;
+	CString rowidJ;
 	CString itemI;
 	CString itemJ;
 	CString mark = L" ^^^";
@@ -1411,86 +1418,99 @@ bool CUniteEntries::saveValues()
 	int j;
 	int spouseIndexI;
 	int spouseIndexJ;
+	
 	for ( i = 0; i < vSameNames.size(); ++i)
 	{
 		//megkeresi a követketõ  megtartandó bejegyzését
 		if (vSameNames.at(i).status == 1 )
 		{
 			group = vSameNames.at(i).group;
-			rowid = vSameNames.at(i).rowid;   // megtartandó bejegyzés
-			if (rowid == L"26433")
+			rowidI = vSameNames.at(i).rowid;   // megtartandó bejegyzés
+			if (rowidI == L"26433")
 				z = i;
 			for( j = i; j < vSameNames.size(); ++j )
 			{
+				rowidJ = vSameNames.at(j).rowid;
 				if( group == vSameNames.at(j).group && !vSameNames.at(j).status ) // az azonos csoportba tartozó törlendõ bejegyzést keresi 
 				{
 
+					itemI = vSameNames.at(i).peer;
+					itemJ = vSameNames.at(j).peer;
+					if (itemI.GetLength() < itemJ.GetLength())
+					{
+						m_command.Format(L"UPDATE people SET peer='%s' WHERE rowid = '%s'", itemJ, rowidI);
+						if (!theApp.execute(m_command)) return false;
+						vSameNames.at(i).peer += mark;
+					}
+			
 					itemI = vSameNames.at(i).titolo;
 					itemJ = vSameNames.at(j).titolo;
 					if (itemI.GetLength() < itemJ.GetLength())
 					{
-						m_command.Format(L"UPDATE people SET titolo='%s' WHERE rowid = '%s'", itemJ, rowid);
+						m_command.Format(L"UPDATE people SET titolo='%s' WHERE rowid = '%s'", itemJ, rowidI);
 						if (!theApp.execute(m_command)) return false;
+						vSameNames.at(i).titolo += mark;
 					}
-
+					
 					if (vSameNames.at(i).rowidF.IsEmpty() && !vSameNames.at(j).rowidF.IsEmpty() )
 					{
-						m_command.Format(L"UPDATE people SET father_id='%s' WHERE rowid = '%s'", vSameNames.at(j).rowidF, rowid);
+						m_command.Format(L"UPDATE people SET father_id='%s' WHERE rowid = '%s'", vSameNames.at(j).rowidF, rowidI);
 						if (!theApp.execute(m_command)) return false;
 						vSameNames.at(i).father += mark;
 					}
+					
 					if (vSameNames.at(i).rowidM.IsEmpty() && !vSameNames.at(j).rowidM.IsEmpty())
 					{
-						m_command.Format(L"UPDATE people SET mother_id='%s' WHERE rowid = '%s'", vSameNames.at(j).rowidM, rowid);
+						m_command.Format(L"UPDATE people SET mother_id='%s' WHERE rowid = '%s'", vSameNames.at(j).rowidM, rowidI);
 						if (!theApp.execute(m_command)) return false;
-						vSameNames.at(i).mother += mark;					}
-
-
+						vSameNames.at(i).mother += mark;					
+					}
+					
 					itemI = vSameNames.at(i).birth;
 					itemJ = vSameNames.at(j).birth;
 					if (itemI.GetLength() < itemJ.GetLength())
 					{
-						m_command.Format(L"UPDATE people SET birth_date='%s' WHERE rowid = '%s'", itemJ, rowid);
+						m_command.Format(L"UPDATE people SET birth_date='%s' WHERE rowid = '%s'", itemJ, rowidI);
 						if (!theApp.execute(m_command)) return false;
 						vSameNames.at(i).birth += mark;
 					}
-
+					
 					itemI = vSameNames.at(i).death;
 					itemJ = vSameNames.at(j).death;
 					if (itemI.GetLength() < itemJ.GetLength())
 					{
-						m_command.Format(L"UPDATE people SET death_date='%s' WHERE rowid = '%s'", itemJ, rowid);
+						m_command.Format(L"UPDATE people SET death_date='%s' WHERE rowid = '%s'", itemJ, rowidI);
 						if (!theApp.execute(m_command)) return false;
 						vSameNames.at(i).death += mark;
 					}
-
+					
 					itemI = vSameNames.at(i).birthPlace;
 					itemJ = vSameNames.at(j).birthPlace;
 					if (itemI.GetLength() < itemJ.GetLength())
 					{
-						m_command.Format(L"UPDATE people SET birth_place='%s' WHERE rowid = '%s'", itemJ, rowid);
+						m_command.Format(L"UPDATE people SET birth_place='%s' WHERE rowid = '%s'", itemJ, rowidI);
 						if (!theApp.execute(m_command)) return false;
 						vSameNames.at(i).birthPlace += mark;
 					}
-
+					
 					itemI = vSameNames.at(i).deathPlace;
 					itemJ = vSameNames.at(j).deathPlace;
 					if (itemI.GetLength() < itemJ.GetLength())
 					{
-						m_command.Format(L"UPDATE people SET death_place='%s' WHERE rowid = '%s'", itemJ, rowid);
+						m_command.Format(L"UPDATE people SET death_place='%s' WHERE rowid = '%s'", itemJ, rowidI);
 						if (!theApp.execute(m_command)) return false;
 						vSameNames.at(i).deathPlace += mark;
 					}
-
+					
 					itemI = vSameNames.at(i).comment;
 					itemJ = vSameNames.at(j).comment;
 					if (itemI.GetLength() < itemJ.GetLength())
 					{
-						m_command.Format(L"UPDATE people SET comment='%s' WHERE rowid = '%s'", itemJ, rowid);
+						m_command.Format(L"UPDATE people SET comment='%s' WHERE rowid = '%s'", itemJ, rowidI);
 						if (!theApp.execute(m_command)) return false;
 						vSameNames.at(i).comment += mark;
 					}
-
+					
 					itemI = vSameNames.at(i).birthF;
 					itemJ = vSameNames.at(j).birthF;
 					if (itemI.GetLength() < itemJ.GetLength())
@@ -1499,7 +1519,7 @@ bool CUniteEntries::saveValues()
 						if (!theApp.execute(m_command)) return false;
 						vSameNames.at(i).birthF += mark;
 					}
-
+					
 					itemI = vSameNames.at(i).deathF;
 					itemJ = vSameNames.at(j).deathF;
 					if (itemI.GetLength() < itemJ.GetLength())
@@ -1534,8 +1554,6 @@ bool CUniteEntries::saveValues()
 						m_command.Format(L"UPDATE people SET spouseIndex='%d' WHERE rowid = '%s'", spouseIndexJ, vSameNames.at(i).rowidM);
 						if (!theApp.execute(m_command)) return false;
 					}
-
-
 				}
 			}
 		}
