@@ -1,6 +1,8 @@
 #pragma once
 
-#define VERSION L"10.155"
+#define VERSION L"10.156"
+
+// 10.156 2024.01.04 Szóközök javítása a leszármazotti listán. Az összevonás->Kérdéses bejegyzések táblában színezés
 
 // 10.155 2024.01.02 Összevonáskor 4. táblában vannak ellentmondás mentes, de nem egyesíthetõ bejegyzések
 

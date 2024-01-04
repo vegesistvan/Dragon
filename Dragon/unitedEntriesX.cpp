@@ -34,8 +34,9 @@ void CUnitedEntriesX::DoDataExchange(CDataExchange* pDX)
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CUnitedEntriesX, CDialogEx)
-	ON_NOTIFY(NM_DBLCLK, IDC_LIST_DIFFERENT, &CUnitedEntriesX::OnDblclkList)
-
+	ON_NOTIFY(NM_DBLCLK, IDC_LIST_X, &CUnitedEntriesX::OnDblclkList)
+	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST_X, &CUnitedEntriesX::OnCustomdrawList)
+	
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CUnitedEntriesX::OnHtmlNotepad)
 	ON_COMMAND(ID_COMPARE_2PEOPLE, &CUnitedEntriesX::OnCompare2People)
@@ -49,51 +50,52 @@ BOOL CUnitedEntriesX::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
+	m_rgbX[0] = RGB(255, 255, 204);
+	m_rgbX[1] = RGB(204,255,255);
+	m_rgbX[2] = RGB(229,204,255);
+	m_rgbX[3] = RGB(255,204,204);
+	m_rgbX[4] = RGB(204,204,255);
+
+
 	pParent = GetParent();
 
-if (pParent == NULL)
-{
-	AfxMessageBox(L"alma");
-}
+	m_ListCtrlX.KeepSortOrder(TRUE);
+	m_ListCtrlX.SetExtendedStyle(m_ListCtrlX.GetExtendedStyle() | LVS_EX_GRIDLINES);
 
+	m_ListCtrlX.InsertColumn(U_DUMMY, L"", LVCFMT_RIGHT, 35, -1, COL_NUM);
+	m_ListCtrlX.InsertColumn(U_LOOP, L"loop", LVCFMT_RIGHT, 35, -1, COL_NUM);
+	m_ListCtrlX.InsertColumn(U_GROUP, L"gr", LVCFMT_RIGHT, 30, -1, COL_NUM);
+	m_ListCtrlX.InsertColumn(U_MATCH, L"m#", LVCFMT_RIGHT, 30, -1, COL_HIDDEN);
+	m_ListCtrlX.InsertColumn(U_STATUS, L"st", LVCFMT_RIGHT, 30, -1, COL_NUM);
 
-m_ListCtrlX.KeepSortOrder(TRUE);
-m_ListCtrlX.SetExtendedStyle(m_ListCtrlX.GetExtendedStyle() | LVS_EX_GRIDLINES);
+	m_ListCtrlX.InsertColumn(U_UNITED, L"u", LVCFMT_LEFT, 20, -1, COL_NUM);
+	m_ListCtrlX.InsertColumn(U_SOURCE, L"s", LVCFMT_RIGHT, 20, -1, COL_NUM);
+	m_ListCtrlX.InsertColumn(U_INDEX, L"i", LVCFMT_RIGHT, 20, -1, COL_NUM);
 
-m_ListCtrlX.InsertColumn(U_DUMMY, L"", LVCFMT_RIGHT, 35, -1, COL_HIDDEN);
-m_ListCtrlX.InsertColumn(U_LOOP, L"loop", LVCFMT_RIGHT, 35, -1, COL_NUM);
-m_ListCtrlX.InsertColumn(U_GROUP, L"gr", LVCFMT_RIGHT, 30, -1, COL_NUM);
-m_ListCtrlX.InsertColumn(U_MATCH, L"m#", LVCFMT_RIGHT, 30, -1, COL_HIDDEN);
-m_ListCtrlX.InsertColumn(U_STATUS, L"st", LVCFMT_RIGHT, 30, -1, COL_NUM);
+	m_ListCtrlX.InsertColumn(U_LINE, L"line#", LVCFMT_RIGHT, 50, -1, COL_NUM);
+	m_ListCtrlX.InsertColumn(U_ROWID, L"rowid", LVCFMT_RIGHT, 60, -1, COL_NUM);
+	m_ListCtrlX.InsertColumn(U_NAME, L"ember", LVCFMT_LEFT, 150, -1, COL_TEXT);
+	m_ListCtrlX.InsertColumn(U_SEX_ID, L"sex", LVCFMT_LEFT, 30, -1, COL_TEXT);
+	m_ListCtrlX.InsertColumn(U_BIRTH, L"birth", LVCFMT_LEFT, 70, -1, COL_TEXT);
+	m_ListCtrlX.InsertColumn(U_DEATH, L"death", LVCFMT_LEFT, 70, -1, COL_TEXT);
 
-m_ListCtrlX.InsertColumn(U_UNITED, L"u", LVCFMT_LEFT, 20, -1, COL_NUM);
-m_ListCtrlX.InsertColumn(U_SOURCE, L"s", LVCFMT_RIGHT, 20, -1, COL_NUM);
-m_ListCtrlX.InsertColumn(U_INDEX, L"i", LVCFMT_RIGHT, 20, -1, COL_NUM);
+	m_ListCtrlX.InsertColumn(U_LINEF, L"line", LVCFMT_RIGHT, 50, -1, COL_HIDDEN);
+	m_ListCtrlX.InsertColumn(U_ROWIDF, L"rowid", LVCFMT_RIGHT, 60, -1, COL_NUM);
+	m_ListCtrlX.InsertColumn(U_FATHER, L"apa", LVCFMT_LEFT, 150, -1, COL_TEXT);
+	m_ListCtrlX.InsertColumn(U_BIRTHF, L"birth", LVCFMT_LEFT, 70, -1, COL_TEXT);
+	m_ListCtrlX.InsertColumn(U_DEATHF, L"death", LVCFMT_LEFT, 70, -1, COL_TEXT);
 
-m_ListCtrlX.InsertColumn(U_LINE, L"line#", LVCFMT_RIGHT, 50, -1, COL_NUM);
-m_ListCtrlX.InsertColumn(U_ROWID, L"rowid", LVCFMT_RIGHT, 60, -1, COL_NUM);
-m_ListCtrlX.InsertColumn(U_NAME, L"ember", LVCFMT_LEFT, 150, -1, COL_TEXT);
-m_ListCtrlX.InsertColumn(U_SEX_ID, L"sex", LVCFMT_LEFT, 30, -1, COL_TEXT);
-m_ListCtrlX.InsertColumn(U_BIRTH, L"birth", LVCFMT_LEFT, 70, -1, COL_TEXT);
-m_ListCtrlX.InsertColumn(U_DEATH, L"death", LVCFMT_LEFT, 70, -1, COL_TEXT);
+	m_ListCtrlX.InsertColumn(U_LINEM, L"", LVCFMT_RIGHT, 50, -1, COL_HIDDEN);
+	m_ListCtrlX.InsertColumn(U_ROWIDM, L"rowid", LVCFMT_RIGHT, 60, -1, COL_NUM);
+	m_ListCtrlX.InsertColumn(U_MOTHER, L"anya", LVCFMT_LEFT, 150, -1, COL_TEXT);
+	m_ListCtrlX.InsertColumn(U_BIRTHM, L"birth", LVCFMT_LEFT, 70, -1, COL_TEXT);
+	m_ListCtrlX.InsertColumn(U_DEATHM, L"death", LVCFMT_LEFT, 70, -1, COL_TEXT);
 
-m_ListCtrlX.InsertColumn(U_LINEF, L"line", LVCFMT_RIGHT, 50, -1, COL_HIDDEN);
-m_ListCtrlX.InsertColumn(U_ROWIDF, L"rowid", LVCFMT_RIGHT, 60, -1, COL_NUM);
-m_ListCtrlX.InsertColumn(U_FATHER, L"apa", LVCFMT_LEFT, 150, -1, COL_TEXT);
-m_ListCtrlX.InsertColumn(U_BIRTHF, L"birth", LVCFMT_LEFT, 70, -1, COL_TEXT);
-m_ListCtrlX.InsertColumn(U_DEATHF, L"death", LVCFMT_LEFT, 70, -1, COL_TEXT);
+	m_ListCtrlX.InsertColumn(U_SPOUSES, L"házastársak", LVCFMT_LEFT, 1000, -1, COL_TEXT);
+	m_ListCtrlX.InsertColumn(U_CHILDREN, L"gyerekek", LVCFMT_LEFT, 1500, -1, COL_TEXT);
 
-m_ListCtrlX.InsertColumn(U_LINEM, L"", LVCFMT_RIGHT, 50, -1, COL_HIDDEN);
-m_ListCtrlX.InsertColumn(U_ROWIDM, L"rowid", LVCFMT_RIGHT, 60, -1, COL_NUM);
-m_ListCtrlX.InsertColumn(U_MOTHER, L"anya", LVCFMT_LEFT, 150, -1, COL_TEXT);
-m_ListCtrlX.InsertColumn(U_BIRTHM, L"birth", LVCFMT_LEFT, 70, -1, COL_TEXT);
-m_ListCtrlX.InsertColumn(U_DEATHM, L"death", LVCFMT_LEFT, 70, -1, COL_TEXT);
-
-m_ListCtrlX.InsertColumn(U_SPOUSES, L"házastársak", LVCFMT_LEFT, 1000, -1, COL_TEXT);
-m_ListCtrlX.InsertColumn(U_CHILDREN, L"gyerekek", LVCFMT_LEFT, 1500, -1, COL_TEXT);
-
-inputFile();
-return TRUE;
+	inputFile();
+	return TRUE;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CUnitedEntriesX::inputFile()
@@ -115,7 +117,7 @@ bool CUnitedEntriesX::inputFile()
 
 	if (_waccess(fileSpec, 0))
 	{
-		str.Format(L"CUnitedEntriesUnited\n%s fájl nem létezik!", fileSpec);
+		str.Format(L"%s fájl nem létezik!", fileSpec);
 		AfxMessageBox(str, MB_ICONERROR);
 		return false;
 	}
@@ -135,7 +137,7 @@ bool CUnitedEntriesX::inputFile()
 
 	vPeople.clear();
 
-	str = L"Egyesített bejegyzések beolvasása...";
+	str = L"Kérdéses bejegyzések beolvasása...";
 
 	CProgressWnd wndP(NULL, str);
 	wndP.GoModal();
@@ -188,10 +190,7 @@ void CUnitedEntriesX::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 	NMLVCUSTOMDRAW* pLVCD = reinterpret_cast<NMLVCUSTOMDRAW*>(pNMHDR);
 
 	int nItem;
-	int colorIndex;
-	UINT rgbColor;
-	int group;
-	int status;
+	int rgbcolor = WHITE;
 
 	*pResult = 0;
 
@@ -205,17 +204,12 @@ void CUnitedEntriesX::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 		break;
 	case CDDS_ITEMPREPAINT | CDDS_SUBITEM:
 		nItem = pLVCD->nmcd.dwItemSpec;
-		group = _wtoi(m_ListCtrlX.GetItemText(nItem, U_GROUP));
-		status = _wtoi(m_ListCtrlX.GetItemText(nItem, U_STATUS));
-		if (group == 0) rgbColor = WHITE;			// változatlan marad
-		else if (status == 0) rgbColor = GRAY;		// RGB(224, 224, 224); 		// törlendõ
-		else										// egyesített bejegyzés, színe ciklikusan változik a néven belül
+		rgbcolor = _wtoi(m_ListCtrlX.GetItemText(nItem, U_DUMMY));
+		if (rgbcolor )
 		{
-			--group;
-			colorIndex = group % m_numOfColors;
-			rgbColor = m_rgb[colorIndex];
+			rgbcolor = m_rgbX[rgbcolor];
+			pLVCD->clrTextBk = rgbcolor;
 		}
-		pLVCD->clrTextBk = rgbColor;
 		*pResult = CDRF_DODEFAULT;
 		break;
 	}
@@ -251,7 +245,7 @@ void CUnitedEntriesX::OnDblclkList(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	int nItem = pNMItemActivate->iItem;
-
+/*
 	CString status = m_ListCtrlX.GetItemText(nItem, U_STATUS);
 	if (status.IsEmpty()) return;  // üres sor
 
@@ -260,7 +254,7 @@ void CUnitedEntriesX::OnDblclkList(NMHDR* pNMHDR, LRESULT* pResult)
 		AfxMessageBox(L"A bejegyzést már töröltük!");
 		return;
 	}
-
+*/
 
 	CRelatives  dlg;
 	dlg.m_rowid = m_ListCtrlX.GetItemText(nItem, U_ROWID);
@@ -446,6 +440,9 @@ void CUnitedEntriesX::OnUnite()
 	CString sex_id = vUnite.at(0).sex_id;
 
 	CString rowidDel;
+	CString rowidH;
+	CString rowidW;
+	CString rowidC;
 	int ix;
 	int base;
 
@@ -455,11 +452,15 @@ void CUnitedEntriesX::OnUnite()
 		rowidDel = vUnite.at(i).rowid;
 		// gyerekek szüleinek update-elése
 		if (sex_id == MAN)
+		{
 			m_command.Format(L"UPDATE people SET father_id = '%s' WHERE father_id='%s'", rowidKeep, rowidDel);
+			if (!theApp.execute(m_command)) return;
+		}
 		else
+		{
 			m_command.Format(L"UPDATE people SET mother_id = '%s' WHERE mother_id='%s'", rowidKeep, rowidDel);
-		if (!theApp.execute(m_command)) return;
-
+			if (!theApp.execute(m_command)) return;
+		}
 		// házassági bejegyzések törlése
 		if (sex_id == MAN)
 			m_command.Format(L"DELETE FROM marriages WHERE husband_id ='%s'", rowidDel);
@@ -470,6 +471,47 @@ void CUnitedEntriesX::OnUnite()
 		// törlendõ bejegyzés törlése
 		m_command.Format(L"DELETE FROM people WHERE rowid ='%s'", rowidDel);
 		if (!theApp.execute(m_command)) return;
+
+		// gyerekek átvitele a másik házastárshoz
+		if (sex_id == MAN)
+		{
+			m_command.Format(L"SELECT wife_id FROM marriages WHERE husband_id = '%s'", rowidKeep);
+			if (!theApp.query(m_command)) return;
+			if (theApp.m_recordset->RecordsCount() == 1)
+			{
+				rowidW = theApp.m_recordset->GetFieldString(0);		// házastárs rowidja
+				// gyerekek rowid-ja
+				m_command.Format(L"SELECT rowid FROM people WHERE father_id == '%s'", rowidKeep);
+				if (!theApp.query(m_command)) return;
+				for (int j = 0; j < theApp.m_recordset->RecordsCount(); ++j)
+				{
+					rowidC = theApp.m_recordset->GetFieldString(0);
+					m_command.Format(L"UPDATE people SET mother_id = '%s' WHERE rowid= '%s'", rowidW, rowidC);
+					if (!theApp.execute(m_command)) return;
+					theApp.m_recordset->MoveNext();
+				}
+			}
+		}
+		else
+		{
+			m_command.Format(L"SELECT husband_id FROM marriages WHERE wife_id = '%s'", rowidKeep);
+			if (!theApp.query(m_command)) return;
+			if (theApp.m_recordset->RecordsCount() == 1)
+			{
+				rowidH = theApp.m_recordset->GetFieldString(0);		// házastárs rowidja
+				// gyerekek rowid-ja
+				m_command.Format(L"SELECT rowid FROM people WHERE mother_id == '%s'", rowidKeep);
+				if (!theApp.query(m_command)) return;
+				for (int j = 0; j < theApp.m_recordset->RecordsCount(); ++j)
+				{
+					rowidC = theApp.m_recordset->GetFieldString(0);
+					m_command.Format(L"UPDATE people SET father_id = '%s' WHERE rowid= '%s'", rowidH, rowidC );
+					if (!theApp.execute(m_command)) return;
+					theApp.m_recordset->MoveNext();
+				}
+			}
+		}
+
 
 		// törölt bejegyzés törlése
 		base = nItem * U_COLUMNSCOUNT;

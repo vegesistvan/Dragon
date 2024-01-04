@@ -226,8 +226,7 @@
 #define IDR_ASCENDANTS_PAINT            557
 #define IDR_DROPDOWN_CHECKNAMES         564
 #define IDR_TABLE_MARRIAGES             565
-#define IDD_UNITEDX                     566
-#define IDD_UNITED_ENTRIES_X            566
+#define IDD_UNITED_ENTRIES_X            568
 #define IDC_LIST                        1000
 #define IDC_LAST_NAME                   1002
 #define IDC_FIRST_NAME                  1003
@@ -981,7 +980,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        568
+#define _APS_NEXT_RESOURCE_VALUE        569
 #define _APS_NEXT_COMMAND_VALUE         35058
 #define _APS_NEXT_CONTROL_VALUE         1854
 #define _APS_NEXT_SYMED_VALUE           383

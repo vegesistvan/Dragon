@@ -65,13 +65,7 @@ void CDescendants::printVector( int i )
 
 		printBegining(i);	// html kódok és generáció elkészítése; 
 		people = getComplexDescription(i);
-
-		if (!p.folyt.IsEmpty() && p_folyt)
-		{
-			str += L"%%%folyt ";
-			str += p.folyt;
-		}
-
+		
 		print(people);
 
 		m_genPrev = vDesc.at(i).g;

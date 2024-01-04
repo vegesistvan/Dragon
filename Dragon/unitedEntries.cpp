@@ -98,7 +98,7 @@ BOOL CUnitedEntries::OnInitDialog()
 	m_title0 = L"Azonos nevû bejegyzések, amelyek között vannak egyesítettek";
 	m_title1 = L"Azonos nevû bejegyzések, amelyek között nincsenek egyesítettek";
 	m_title2 = L"Azonos nevû bejegyzések, amelyek között vannak azonos és ellentmondó adatpárok";
-	m_title3 = L"Azonos nevû bejegyzések, amelyek között nincs ellentmondás, de nem is egyesítettek";
+	m_title3 = L"Azonos nevû bejegyzések, amelyek között vannak ellentmondás mentes, de nem egyesítettek";
 	
 	m_RichEditCtrl.SetWindowTextW(m_title0);
 	m_RichEditCtrl.SetSel(0, -1);
@@ -131,7 +131,6 @@ BOOL CUnitedEntries::attachDialogs()
 	m_ListCtrl	= &(m_ceU.m_ListCtrlU);
 	vPeople		= &(m_ceU.vPeople);
 	vFiltered	= &(m_ceU.vFiltered);
-
 
 	return TRUE;
 }
@@ -193,7 +192,7 @@ void CUnitedEntries::OnSelchangeTab(NMHDR* pNMHDR, LRESULT* pResult)
 		m_ceU.ShowWindow(SW_HIDE);
 		m_ceD.ShowWindow(SW_HIDE);
 
-		menu->LoadMenuW(IDR_UNITED_ENTRIES1);
+		menu->LoadMenuW(IDR_UNITED_ENTRIES2);
 		m_title = m_title3;
 		break;
 	}

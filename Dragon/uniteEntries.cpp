@@ -62,7 +62,7 @@ CUniteEntries::CUniteEntries()
 	m_rset4 = new CSqliteDBRecordSet;
 
 	nItem = 0;
-
+	m_cnt = 1;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CUniteEntries::~CUniteEntries()
@@ -74,7 +74,7 @@ END_MESSAGE_MAP()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CUniteEntries::parameteres()
 {
-	m_name = L"Abhortis Mária";
+	m_name = L"Abaffy Sándor";
 	m_name.Empty();
 	m_loopMax = 3;
 	R1 = L"7125";
@@ -826,6 +826,7 @@ BOOL CUniteEntries::processSameNames()
 	std::sort(vSameNames.begin(), vSameNames.end(), sortByCS);		// az azonosítás sorrendje fonotos! source= 1->4
 	for ( UINT i = 0; i < vSameNames.size() - 1; ++i)
 	{
+		vSameNames.at(i).rgbcolor = 0;
 		if (vSameNames.at(i).group) continue; // már csoporthoz tartozik, nem vizsgálja
 		rowid1 = vSameNames.at(i).rowid;
 		newGroup = false;
@@ -859,6 +860,10 @@ BOOL CUniteEntries::processSameNames()
 			}
 			else if( ret == 0 )					// nincs ellentmondás, de azonosadat sincs;
 			{
+//				listSameNames(textX, i);
+//				listSameNames(textX, j);
+//				emptyLine(textX);
+
 				++questionable;
 			}
 
@@ -878,7 +883,8 @@ BOOL CUniteEntries::processSameNames()
 	else
 	{
 		if (questionable)
-			listPeople(textX);
+			examine();
+//			listPeople(textX);
 		else
 			listPeople(textD);	// nem volt összevonás
 	}
@@ -1612,14 +1618,14 @@ void CUniteEntries::listSameNames(FILE* fl, int i)
 	x = vSameNames.at(i);
 
 	str.Format(L"\
-0\t%d\t%d\t%d\t%d\t\
+%d\t%d\t%d\t%d\t%d\t\
 %d\t%s\t%s\t\
 %s\t%s\t%s\t%s\t%s\t%s\t\
 %s\t%s\t%s\t%s\t%s\t\
 %s\t%s\t%s\t%s\t%s\t\
 %s\t%s\t\
 \n", \
-m_loop, x.group, x.match, x.status, \
+x.rgbcolor,m_loop, x.group, x.match, x.status, \
 x.united, x.index, x.source, \
 x.line, x.rowid, x.name, x.sex_id, x.birth, x.death, \
 x.lineF, x.rowidF, x.father, x.birthF, x.deathF, \
@@ -1712,4 +1718,75 @@ void CUniteEntries::whichHW()
 	}
 	pWnd.DestroyWindow();
 	theApp.execute(L"COMMIT");
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CUniteEntries::examine()
+{
+	USAME3 I;
+	USAME3 J;
+	int pos;
+	int selected;
+	CStringArray A;
+	int n;
+	CString spouse;
+	CString spousesJ;
+	std::vector<USAME3> vS;
+
+	for (int i = 0; i < vSameNames.size(); ++i)
+	{
+		I = vSameNames.at(i);
+		// megkersi a potenciálisan egyesíthatõ bejegyzést
+		if (I.birth.IsEmpty() && I.death.IsEmpty() && I.birthF.IsEmpty() && I.deathF.IsEmpty() && I.birthM.IsEmpty() && I.deathM.IsEmpty()&&I.father.IsEmpty()&& I.mother.IsEmpty()&&!I.spouses.IsEmpty() )
+		{
+			vS.push_back(I);			// megelõlegezi a kiválasztást
+			spouse = getTwoWords(I.spouses);
+			selected = 0;
+			for (int j = 0; j < vSameNames.size(); ++j)
+			{
+				if (j == i) continue;
+				J = vSameNames.at(j);
+				if ( !J.spouses.IsEmpty())
+				{
+					// azonos nevû házaspár keresése	
+					spousesJ = J.spouses;
+					n = wordList(&A, I.spouses, ',', false);
+					for (int k = 0; k < n; ++k)
+					{
+						if ((pos = J.spouses.Find(spouse)) != -1)
+						{
+							vS.push_back(J);
+							vSameNames.at(i).rgbcolor = m_cnt;
+							vSameNames.at(j).rgbcolor = m_cnt;
+							++selected;
+							break;
+						}
+					}
+				}
+			}
+			if (!selected)
+			{
+				vS.pop_back();		// eldobja a megelõlegezett bejegyzést
+			}
+			else
+			{
+				++m_cnt;
+				if (m_cnt > 4) m_cnt = 1;
+			}
+		}
+	}
+	listPeople(textX);
+
+/*
+	if (vS.size())
+	{
+		vSameNames.clear();
+		{
+			for (int i = 0; i < vS.size(); ++i)
+			{
+				vSameNames.push_back(vS.at(i));
+			}
+			listPeople(textX);
+		}
+	}
+*/
 }

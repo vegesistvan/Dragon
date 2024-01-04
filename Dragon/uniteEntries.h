@@ -77,6 +77,7 @@ protected:
 	int m_matchC;
 	int m_matchDummy;
 
+	int m_cnt;
 	// elõrható paraméterek
 	
 
@@ -105,7 +106,7 @@ protected:
 	void CUniteEntries::emptyLine(FILE* fl);
 	void CUniteEntries::whichHW();
 	bool CUniteEntries::childNameSame(int i, int j);
-
+	void CUniteEntries::examine();
 
 	BOOL CUniteEntries::query( CSqliteDBRecordSet* r, CString command);
 

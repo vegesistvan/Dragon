@@ -22,8 +22,7 @@ public:
 
 	CListCtrlEx m_ListCtrlX;
 	std::vector<TCHAR*> vPeople;
-	std::vector<TCHAR*> vFiltered;
-	std::vector<UNITE_ENTRIES> vUnite;
+
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	bool CUnitedEntriesX::inputFile();
@@ -31,11 +30,14 @@ protected:
 	void CUnitedEntriesX::pushLine(int i);
 	bool CUnitedEntriesX::contractSameItems();
 
+
 	
+	std::vector<TCHAR*> vFiltered;
+	std::vector<UNITE_ENTRIES> vUnite;
 
 	UINT	m_rgb[13];
-	int		m_numOfColors;
-
+	const int m_numOfColors = 5;
+	
 	CWnd* pParent;
 	
 	virtual BOOL OnInitDialog();
@@ -44,6 +46,8 @@ protected:
 	CString m_command;
 	CString str;
 	CStringArray A;
+
+	COLORREF m_rgbX[5];
 
 	DECLARE_MESSAGE_MAP()
 

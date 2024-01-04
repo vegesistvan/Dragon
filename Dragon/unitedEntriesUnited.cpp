@@ -50,7 +50,7 @@ BEGIN_MESSAGE_MAP(CUnitedEntriesUnited, CDialogEx)
 	ON_COMMAND(ID_HTML_NOTEPAD, &CUnitedEntriesUnited::OnHtmlNotepad)
 	ON_COMMAND(ID_COMPARE_2PEOPLE, &CUnitedEntriesUnited::OnCompare2People)
 	ON_COMMAND(ID_FILTER_BY_NAME, &CUnitedEntriesUnited::OnFilterByName)
-	ON_COMMAND(ID_UNITE2, &CUnitedEntriesUnited::OnUnite2)
+	ON_COMMAND(ID_UNITE2, &CUnitedEntriesUnited::OnUnite)
 	ON_COMMAND(ID_COMPARE_ASCENDANTS, &CUnitedEntriesUnited::OnCompareAscendants)
 	ON_COMMAND(ID_FILTER_BY_MOTHER, &CUnitedEntriesUnited::OnFilterByMother)
 END_MESSAGE_MAP()
@@ -428,7 +428,7 @@ void CUnitedEntriesUnited::pushLine(int i)
 	}
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CUnitedEntriesUnited::OnUnite2()
+void CUnitedEntriesUnited::OnUnite()
 {
 	POSITION pos = m_ListCtrlU.GetFirstSelectedItemPosition();
 	UNITE_ENTRIES unite;

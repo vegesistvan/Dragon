@@ -16,6 +16,7 @@ typedef struct
 	CString rowid;
 	CString	sex_id;
 	int		source;
+	CString rowidS;
 }UNITE_ENTRIES;
 
 typedef struct

@@ -53,7 +53,7 @@ public:
 
 	void atvett();
 	afx_msg void OnFilterByName();
-	afx_msg void OnUnite2();
+	afx_msg void OnUnite();
 	afx_msg void OnCompareAscendants();
 	afx_msg void OnFilterByMother();
 };

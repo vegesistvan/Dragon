@@ -453,6 +453,8 @@ CString CDescendants::getComplexDescription(int i)
 	CString csalad;
 	CString folyt;
 
+	people.Trim();
+	people += L" ";
 	people += spouses;
 	people.Trim();
 
