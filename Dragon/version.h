@@ -1,6 +1,8 @@
 #pragma once
 
-#define VERSION L"10.156"
+#define VERSION L"10.157"
+
+// 10 .157 2024.01.08 Leszárm,azotti lineáris táblában testvérek egymás után következnek.
 
 // 10.156 2024.01.04 Szóközök javítása a leszármazotti listán. Az összevonás->Kérdéses bejegyzések táblában színezés
 

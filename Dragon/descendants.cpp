@@ -98,6 +98,9 @@ BOOL CDescendants::start()
 	CString title;
 	vDesc.clear();
 	
+	m_listedP = 0;
+	m_listedD = 0;
+
 
 
 	for (int i = 0; i < theApp.v_rowid.size(); ++i)
@@ -181,6 +184,9 @@ BOOL CDescendants::start()
 				printVector(i);
 				linearTable(i, 1 );
 				linearTable(i, 2);
+				linearTable2(i, 1);
+				linearTable2(i, 2);
+
 			}
 			else
 				printVectorTxt(i);
@@ -209,6 +215,9 @@ bool CDescendants::tablesDescendants()  // listázandó táblák a theapp.v_tableNum
 	CString tableRoman;
 	CString father_id;
 	CString rowid;
+	m_listedP = 0;
+	m_listedD = 0;
+
 
 	if (!parameters()) return false;
 
@@ -324,6 +333,8 @@ bool CDescendants::tablesDescendants()  // listázandó táblák a theapp.v_tableNum
 		printVector(i);
 		linearTable(i, 1);
 		linearTable(i, 2);
+		linearTable2(i, 1);
+		linearTable2(i, 2);
 		if (!p_oneFile)
 		{
 			closeHtml();
@@ -877,7 +888,7 @@ CString CDescendants::getNextChildRowid( UINT i )
 		if (p_connect)
 		{
 			if( p_radioOrder == ORDER_BIRTH)
-				m_command.Format(L"SELECT rowid FROM people WHERE mother_id='%s' ORDER BY perentIndex, birth_date", parent_id);
+				m_command.Format(L"SELECT rowid FROM people WHERE mother_id='%s' ORDER BY parentIndex, birth_date", parent_id);
 			else
 				m_command.Format(L"SELECT rowid FROM people WHERE mother_id='%s' ORDER BY linenumber", parent_id);
 		}
@@ -1031,6 +1042,17 @@ BOOL CDescendants::query(CString command)
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BOOL CDescendants::query2(CString command)
+{
+	if (rs2.Query(command, theApp.mainDB))
+	{
+		str.Format(L"%s\n%s", command, rs2.GetLastError());
+		AfxMessageBox(str);
+		return FALSE;
+	}
+	return TRUE;
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CDescendants::queryP(CString command)
 {
 	if (rsP.Query(command, theApp.mainDB))
@@ -1080,7 +1102,7 @@ void CDescendants::printGAline()
 
 	printBegining( vDesc.size()-1);	// html kódok és generáció elkészítése; 
 //	printDescendant(vDesc.size() - 1 );
-	desc = createDescendant(vDesc.size() - 1);
+	desc = createDescendant(vDesc.size() - 1, true );
 //	print(str);
 	spouses = createSpouses(vDesc.size()-1);
 //	print(str);

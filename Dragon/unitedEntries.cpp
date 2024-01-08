@@ -56,6 +56,7 @@ BOOL CUnitedEntries::OnInitDialog()
 	
 	m_comboCtrl.AddString( L"anya:" );
 	m_comboCtrl.AddString( L"ember:" );
+	m_comboCtrl.AddString( L"házastárs:");
 	m_comboCtrl.SetCurSel(1);
 
 	m_RichEditCtrl.GetSelectionCharFormat(cf);
@@ -242,10 +243,19 @@ void CUnitedEntries::keress(int start)
 {
 	CString	search;
 	m_SearchCtrl.GetWindowTextW(search);
-	if( m_comboCtrl.GetCurSel() == 0 )
+	int curSel = m_comboCtrl.GetCurSel();
+	switch (curSel)
+	{
+	case 0:
 		theApp.keress(search, m_ListCtrl, U_MOTHER, start, true);
-	else
-		theApp.keress(search, m_ListCtrl, U_NAME, start, true );
+		break;
+	case 1:
+		theApp.keress(search, m_ListCtrl, U_NAME, start, true);
+		break;
+	case 2:
+		theApp.keress(search, m_ListCtrl, U_SPOUSES, start, false);
+		break;
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

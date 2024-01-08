@@ -169,7 +169,7 @@ void CDragApp::editNotepad( CString file, CString lineNumber )
 	}
 	CString	fileSpec;
 	fileSpec.Format( L"\"%s\" -n%s -alwaysOnTop -nosession", file, lineNumber );
-	fileSpec.Format(L"%s -n%s -alwaysOnTop -nosession", file, lineNumber);
+	fileSpec.Format(L"\"%s\" -n%s -alwaysOnTop -nosession", file, lineNumber);
 	ShellExecute(NULL,L"open",m_editorFileName, fileSpec, m_editorFolderPath,SW_SHOW);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

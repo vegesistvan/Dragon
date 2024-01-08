@@ -610,6 +610,11 @@ BOOL CDragApp::openDatabase(bool same)
 		WriteProfileString(L"dragon", L"m_blobFileName", m_blobFileName);
 		WriteProfileString(L"dragon", L"m_blobPathName", m_blobPathName); // jó adatbázis, eltenni
 	}
+
+
+
+
+
 	createCaption();
 	pWin.DestroyWindow();
 	return TRUE;

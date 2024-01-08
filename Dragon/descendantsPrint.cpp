@@ -34,8 +34,6 @@ void CDescendants::printVector( int i )
 		m_tag2 = L"</ul>\n";
 	}
 
-	m_listedP = 0;
-	m_listedD = 0;
 	m_indent = 0;
 	m_genPrev = 0;
 
@@ -64,7 +62,7 @@ void CDescendants::printVector( int i )
 		if (!p_mother && vDesc.at(i).parentSex == WOMAN) continue;
 
 		printBegining(i);	// html kódok és generáció elkészítése; 
-		people = getComplexDescription(i);
+		people = getComplexDescription(i, true );
 		
 		print(people);
 
@@ -202,7 +200,7 @@ CString CDescendants::getTableHeader()
 	return(str);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CDescendants::createDescendant(int i)
+CString CDescendants::createDescendant(int i, bool parentIndex )
 {
 	CString name;
 	CString line;
@@ -210,7 +208,7 @@ CString CDescendants::createDescendant(int i)
 	CString rang;
 	CString lastname;
 	CString comment;
-	int parentIndex;
+//	int parentIndex;
 	int motherIndex;
 	int z;
 	int j;
@@ -242,12 +240,6 @@ CString CDescendants::createDescendant(int i)
 
 	if (i && vDesc.at(vDesc.at(i).parentIndex).numOfSpouses > 1)  // csak az kaphat motherIndexet, akinek az apjának több felesége volt
 	{
-		/*
-		if (vDesc.at(vDesc.at(i).parentIndex).sex == WOMAN)
-			p.parentIndex = _wtoi(p.whichHusband);
-		else
-			p.parentIndex = _wtoi(p.whichWife);
-		*/
 		last = vLMX.size() - 1;
 		if (last == -1 || vLMX.at(last).g < vDesc.at(i).g)		// magasabb generációban van
 		{
@@ -268,73 +260,22 @@ CString CDescendants::createDescendant(int i)
 		last = vLMX.size() - 1;
 		
 
-		if (vLMX.at(last).lastMotherIndex != p.parentIndex)   // ha az utoljára kiírt motherIndex más, akkor ezt kiírja
+		
+		if (parentIndex)
 		{
-			if( p.parentIndex==1)
-				str.Format(L" ;/%d", p.parentIndex);
-			else
-				str.Format(L"/%d", p.parentIndex);
-			name += str;
-			vLMX.at(last).lastMotherIndex = p.parentIndex;
-		}
-
-	}
-	
-	/*
-	if (i && vDesc.at(vDesc.at(i).parentIndex).numOfSpouses > 1)  // csak az kaphat motherIndexet, akinek az apjának több felesége volt
-	{
-		if (vDesc.at(vDesc.at(i).parentIndex).sex == MAN)  // csak az apa leszármozattai kapnak anya indexet!!
-		{
-			last = vLMX.size() - 1;
-			if (last == -1 || vLMX.at(last).g < vDesc.at(i).g)		// magasabb generációban van
+			if (vLMX.at(last).lastMotherIndex != p.parentIndex)   // ha az utoljára kiírt motherIndex más, akkor ezt kiírja
 			{
-				lmx.g = vDesc.at(i).g;
-				lmx.lastMotherIndex = p.parentIndex -1;
-				vLMX.push_back(lmx);
-			}
-			else													// alacsonyabb generációban van
-			{
-				// megkeresi saját generációjának utoljára listázott motherIndex-ét
-				j = vLMX.size() - 1;
-				for (j = vLMX.size() - 1; j > 0; --j)
-				{
-					if (vLMX.at(j).g > vDesc.at(i).g) // a nagyobb generációk eldobása
-						vLMX.pop_back();
-				}
-			}
-			last = vLMX.size() - 1;
-			if (vLMX.at(last).lastMotherIndex < p.parentIndex)   // ha az utoljára kiírt motherIndex más, akkor ezt kiírja
-			{
-				str.Format(L"/%d", p.parentIndex);
+				if (p.parentIndex == 1)
+					str.Format(L" ;/%d", p.parentIndex);
+				else
+					str.Format(L"/%d", p.parentIndex);
 				name += str;
 				vLMX.at(last).lastMotherIndex = p.parentIndex;
 			}
 		}
+
 	}
-	*/
-
-
-
-
-	/*
-	// ha apjának több felesége volt (aki anya), akkor az anya sorszámának kiírása
-	if (vDesc.at(vDesc.at(i).parentIndex).numOfSpouses > 1)
-	{
-		parentIndex = vDesc.at(vDesc.at(i).parentIndex).parentIndex;
-		parentIndex = vDesc.at(i).parentIndex;
-		if (p.parentIndex && p.parentIndex != parentIndex) // csak akkor írja ki a parentIndex-et, ha változik
-		{
-		//	vDesc.at(vDesc.at(i).parentIndex).parentIndex = p.parentIndex;
-			if (p_numbering == SZLUHA || p_numbering == TUP)
-			{
-				str.Format(L"/%d", p.parentIndex);
-				name += str;
-			}
-			else if (p_numbering == VIL)
-				fwprintf(fl, L"%d. ", p.parentIndex);
-		}
-	}
-	*/
+	
 	if( p.comment.GetAt(0) != ',' )
 		name += L" ";
 
@@ -393,43 +334,6 @@ CString CDescendants::createDescendant(int i)
 	++m_listedD;
 	return(line);
 }
-/*
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendants::printSpouses(int i)
-{
-	CString rowid = vDesc.at(i).rowid;
-	CString rowidS;
-	CString place;
-	CString date;
-	CString spouse_id;
-
-	if (p.sex_id == MAN)
-		m_command.Format(L"SELECT place, date, wife_id FROM marriages WHERE husband_id='%s' ORDER BY whichWife", rowid);
-	else
-		m_command.Format(L"SELECT place, date, husband_id FROM marriages WHERE wife_id='%s' ORDER BY whichHusband", rowid);
-	if (!queryM(m_command)) return;
-
-	int numberOfSpouses = rsM.RecordsCount();
-
-	vFullname.clear();
-	for (int i = 0; i < numberOfSpouses; ++i, rsM.MoveNext())
-	{
-		place = rsM.GetFieldString(0);
-		date = rsM.GetFieldString(1);
-		spouse_id = rsM.GetFieldString(2);
-		if (!spouse_id.IsEmpty() && spouse_id.Compare(L"0"))
-		{
-			queryPeople(spouse_id, &s);   // házastárs adatainak beolvasása
-			printMarriage(place, date, i, numberOfSpouses);
-			printSpouse();				// kiírás elõtt ellenõrzi, hogy szerepel-e ilyen névem már kiírt házastárs. Ha igen, akkor színezi
-			vFullname.push_back(s.fullname);	// vFullname-en gyûjti a már kilistázott házastársak nevét
-			printSpRelatives();
-		}
-	}
-	fwprintf(fl, L"\n");
-	fflush(fl);
-}
-*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CDescendants::createSpouses(int i)
 {
@@ -483,32 +387,6 @@ CString CDescendants::createSpouses(int i)
 //	fflush(fl);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-void CDescendants::printMarriage(CString place, CString date, int i, int numberOfSpouses)
-{
-	CString marriage;
-
-	if (numberOfSpouses > 1)
-		str.Format(L" %d=", i + 1);
-	else
-		str = L" =";
-
-	marriage = getColoredString(str, p_specStyle);
-
-	if (!place.IsEmpty())
-	{
-		marriage += place;
-		marriage += L" ";
-	}
-	if (!date.IsEmpty())
-	{
-		marriage += date;
-		marriage += L" ";
-	}
-	print(marriage);
-}
-*/
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CDescendants::createMarriage(CString place, CString date, int i, int numberOfSpouses)
 {
 	CString marriage;
@@ -532,93 +410,6 @@ CString CDescendants::createMarriage(CString place, CString date, int i, int num
 	}
 	return marriage;
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-// a házastárs listázados blokkját elkészíti
-void CDescendants::printSpouse()
-{
-	CString spouse;
-	CString fullname;
-	CString lastname = s.last_name;
-
-	if (p_capitalName)
-		lastname = convertNameToUpper(lastname);
-	if (p_checkBold)
-		lastname.Format(L"<b>%s</b>", lastname);
-	if (lastname != L"N;" && !s.titolo.IsEmpty() && s.peer.IsEmpty())
-	{
-		fullname += s.titolo;
-		fullname += L" ";
-	}
-	if (!s.last_name.IsEmpty())
-	{
-		fullname += lastname;
-		fullname += L" ";
-	}
-	if (!s.other_names.IsEmpty())
-	{
-		fullname += L"_(";
-		fullname += s.other_names;
-		fullname += L") ";
-	}
-	if (!s.first_name.IsEmpty())
-	{
-		fullname += s.first_name;
-	}
-	fullname.Trim();
-	fullname = getColoredString(fullname, p_otherNameStyle);
-
-	// Ellenõrti, hogy ilyen néven már listázott-e házastársat. Ha igen, akkoe színezi
-	for (int i = 0; i < vFullname.size(); ++i)
-	{
-		if (s.fullname == vFullname.at(i))
-		{
-			fullname = getColoredString(fullname, PIROS);   //!!!!!!!!!!!!!!!!!!
-			break;
-		}
-	}
-
-	if (!s.title.IsEmpty())
-	{
-		fullname.Format(L"%s %s", s.title, (CString)fullname);
-	}
-	if (!s.peer.IsEmpty())
-	{
-		fullname.Format(L"%s %s", s.peer, (CString)fullname);
-	}
-
-	if (!s.posterior.IsEmpty())
-	{
-		fullname += L" ";
-		fullname += s.posterior;
-		if (p_checkCRLF)
-			fullname += L"\n";
-	}
-	fullname.Trim();
-	spouse = fullname;
-
-	//	m_birth = s.birth_date;
-	str = getPlaceDateBlock(s.birth_place, s.birth_date, L"*");
-	if (!str.IsEmpty())
-		spouse.Format(L"%s %s", (CString)spouse, str);
-
-	str = getPlaceDateBlock(s.death_place, s.death_date, L"+");
-	if (!str.IsEmpty())
-		spouse.Format(L"%s %s", (CString)spouse, str);
-
-	str = getColoredString(s.comment, p_commentStyle);
-	if (!str.IsEmpty())
-	{
-		if (s.comment.GetAt(0) == ',')
-			spouse.Format(L"%s%s", (CString)spouse, str);
-		else
-			spouse.Format(L"%s %s", (CString)spouse, str);
-	}
-
-	++m_listedP;
-	print(spouse);
-}
-*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // a házastárs listázados blokkját elkészíti
 CString CDescendants::createSpouse()
@@ -704,110 +495,7 @@ CString CDescendants::createSpouse()
 	++m_listedP;
 	return spouse;
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-// a házastárs személyleíró blokkját elkészíti, a neveket bold-dal kiemnelve
-void CDescendants::printSpRelatives()
-{
-	CString father(L"");
-	CString mother(L"");
-	CString parents;
-	int		numOfSpouses;
-	CString spouse_id;
-	CString order;
-	CString spouseSpouse;
-	int pos;
 
-	if (!s.father_id.IsEmpty() && s.father_id != L"0")
-	{
-		queryPeople(s.father_id, &sf);
-		sf.first_name.Replace('-', ' ');
-		str = getFirstWord(sf.first_name);
-
-		father = getColoredString(str, p_otherNameStyle);
-		//		if (!sf.peer.IsEmpty())
-		//			father.Format(L"%s %s", sf.peer, (CString)father);
-
-
-	}
-	if (!s.mother_id.IsEmpty() && s.mother_id != L"0")
-	{
-		queryPeople(s.mother_id, &sm);
-		mother = getLastFirst(&sm);
-		mother.Trim();
-	}
-
-	if (!father.IsEmpty() && !mother.IsEmpty())		// ( apa és anya is meg van adva )
-	{
-		parents.Format(L" (%s-%s", father, mother);
-		++m_listedP;
-		++m_listedP;
-	}
-
-	if (!father.IsEmpty() && mother.IsEmpty())
-	{
-		if (s.sex_id == MAN)
-			parents.Format(L" (%s fia", father);
-		else
-			parents.Format(L" (%s lánya", father);
-		++m_listedP;
-	}
-
-	if (father.IsEmpty() && !mother.IsEmpty())
-	{
-		if (s.sex_id == MAN)
-			parents.Format(L" (%s fia", mother);
-		else
-			parents.Format(L" (%s lánya", mother);
-		++m_listedP;
-	}
-
-
-	if (s.sex_id == MAN)
-		m_command.Format(L"SELECT wife_id, whichWife  FROM marriages WHERE husband_id='%s' ORDER BY whichWife", s.rowid); // a házastárs házastársai
-	else
-		m_command.Format(L"SELECT husband_id, whichHusband FROM marriages WHERE wife_id='%s' ORDER BY whichHusband", s.rowid); // a házastárs házastársai
-	if (!query(m_command)) return;
-	numOfSpouses = rs.RecordsCount();
-	if (numOfSpouses > 1)
-	{
-		vSpouseIndex.clear();
-		for (int i = 0; i < numOfSpouses; ++i, rs.MoveNext())
-		{
-			spouse_id = rs.GetFieldString(0);
-			order = rs.GetFieldString(1);
-			order.Format(L"%d", i + 1);
-			queryPeople(spouse_id, &ss);
-			if (ss.rowid != p.rowid)		// a GA sorban szereplõ házastársat kihagyja
-			{
-				spouseSpouse = getLastFirst(&ss);
-
-				//spouseSpouse.Format(L"%s %s", ss.peer, (CString)spouseSpouse);
-				// spouseSpouse.Trim();
-				if (parents.GetLength())
-					parents += L", ";
-				else
-					parents = L" (";
-
-				str.Format(L"%sf. %s", order, spouseSpouse);
-				if (voltmar(order))
-				{
-					str = getColoredString(str, PIROS);
-				}
-				++m_listedP;
-				parents += str;
-				vSpouseIndex.push_back(order);
-			}
-		}
-	}
-	if (!parents.IsEmpty())
-	{
-		parents.TrimRight();
-		parents += L")";
-	}
-	print(parents);
-}
-*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // a házastárs személyleíró blokkját elkészíti, a neveket bold-dal kiemnelve
 CString CDescendants::createSpRelatives()
@@ -947,7 +635,7 @@ void CDescendants::queryPeople(CString rowid, PPEOPLE* p)
 	p->posterior = rsP.GetFieldString(DBP_POSTERIOR);
 	p->folyt = rsP.GetFieldString(DBP_FOLYT);
 	p->gap = rsP.GetFieldString(DBP_GAP);
-	//	p->generation		= m_r.GetFieldString( DBP_GENERATION );
+	p->generation	= rsP.GetFieldString( DBP_GENERATION );
 	p->last_name = rsP.GetFieldString(DBP_LAST_NAME);
 	p->lineNumber = rsP.GetFieldString(DBP_LINENUMBER);
 	p->mother_id = rsP.GetFieldString(DBP_MOTHER_ID);

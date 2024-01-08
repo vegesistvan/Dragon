@@ -6,9 +6,15 @@
 #include "Table_people_columns.h"
 #include "Table_tables.h"
 #include "build_defs.h"
+#include <algorithm>
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bool sortById(const DN::DESC& d1, const DN::DESC& d2 )
+{
+	return(d1.id < d2.id );
+}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CDescendants::linearTable(int i, int which)
+bool CDescendants::linearTable2(int i, int which)
 {
 	CString filename;
 	CString title;
@@ -19,17 +25,20 @@ bool CDescendants::linearTable(int i, int which)
 	int tableTop = 240;
 	int height = theApp._h - tableTop;			// 612   teljes: 1080  378  levonjuk a preTable-t
 	int width = theApp._w;
-	
+
+	m_familyName.Empty();
+	m_cnt = 0;
+
 	if (theApp.v_tableNumbers.size())
 	{
 		m_command.Format(L"SELECT familyName, tableHeader, tableRoman FROM tables WHERE rowid ='%s'", theApp.v_tableNumbers.at(i));
 		if (!query(m_command)) return false;
 		familyName = rs.GetFieldString(0);
 		tableRoman = rs.GetFieldString(2);
-		title.Format(L"%s %s leszármazotti tábla", familyName, tableRoman);
+		title.Format(L"%s %s leszármazotti tábla2", familyName, tableRoman);
 	}
 	else
-		title.Format(L"%s leszármazotti táblája", m_os);
+		title.Format(L"%s leszármazotti táblája2", m_os);
 
 	filename = title;
 	if (which == 1)
@@ -37,7 +46,7 @@ bool CDescendants::linearTable(int i, int which)
 		descendantsTablePathName.Format(L"%s\\%s_%s.html", m_descendantsPath, filename, getTimeTag());
 		if (!openFileSpec(&fhDescTable, descendantsTablePathName, L"w+")) return false;
 	}
-	else if( which == 2)
+	else if (which == 2)
 	{
 		printableTablePathName.Format(L"%s\\%s_printable%s.html", m_descendantsPath, filename, getTimeTag());
 		if (!openFileSpec(&fhPrintable, printableTablePathName, L"w+")) return false;
@@ -51,7 +60,7 @@ bool CDescendants::linearTable(int i, int which)
 	printOnly(L"<meta http-equiv=\"language\" content=\"en-us\"/>", which);
 	printOnly(L"<script type=\"text/javascript\">", which);
 	printOnly(L"<meta name=\"viewport\" content =\"width=device-width, initial-scale=1\">", which);
-//	printOnly(L"<!--", which);
+	//	printOnly(L"<!--", which);
 	printOnly(L"/\* http://www.alistapart.com/articles/zebratables/ */", which);
 	printOnly(L"function removeClassName (elem, className) {", which);
 	printOnly(L"	elem.className = elem.className.replace(className, \"\").trim();", which);
@@ -93,7 +102,7 @@ bool CDescendants::linearTable(int i, int which)
 	printOnly(L"</script>", which);
 
 	printOnly(L"<style type=\"text/css\">", which);
-//	printOnly(L"<!--", which);
+	//	printOnly(L"<!--", which);
 	printOnly(L"/* Terence Ordona, portal[AT]imaputz[DOT]com         */", which);
 	printOnly(L"/* http://creativecommons.org/licenses/by-sa/2.0/    */\n", which);
 
@@ -198,11 +207,11 @@ bool CDescendants::linearTable(int i, int which)
 	printOnly(L"/* induced side effect is that child TDs no longer accept width: auto                     */", which);
 	printOnly(L"html>body tbody.scrollContent {", which);
 	printOnly(L"	display: block;", which);
-	
-	if (which == 1 )  // vagyis fix fejléc, nem nyomtatható
+
+	if (which == 1)  // vagyis fix fejléc, nem nyomtatható
 		str.Format(L"    height: %dpx;", height);
 	printOnly(str, which);
-	
+
 	printOnly(L"	overflow: auto;", which);
 	printOnly(L"	width: 100%", which);
 	printOnly(L"}\n", which);
@@ -227,13 +236,13 @@ bool CDescendants::linearTable(int i, int which)
 	printOnly(L"	padding: 2px 3px 3px 4px", which);
 	printOnly(L"}\n", which);
 
-	
+
 	printOnly(L"/* define width of TD elements: 1st, 2nd, and 3rd respectively.          */", which);
 	printOnly(L"/* All other non-IE browsers.                                            */", which);
 	printOnly(L"/* http://www.w3.org/TR/REC-CSS2/selector.html#adjacent-selectors        */", which);
 
 	printOnly(L"html>body tbody.scrollContent td {", which);
-	printOnly(L"	width: 35px", which);
+	printOnly(L"	width: 20px", which);
 	printOnly(L"}\n", which);
 
 	printOnly(L"html>body tbody.scrollContent td + td {", which);
@@ -249,7 +258,7 @@ bool CDescendants::linearTable(int i, int which)
 	printOnly(L"}", which);
 
 	printOnly(L"html>body tbody.scrollContent td + td + td + td + td{", which);
-	printOnly(L"	width: 55px", which);
+	printOnly(L"	width: 20px", which);
 	printOnly(L"}", which);
 
 	printOnly(L"html>body tbody.scrollContent td + td + td + td + td + td{", which);
@@ -257,7 +266,11 @@ bool CDescendants::linearTable(int i, int which)
 	printOnly(L"}", which);
 
 	printOnly(L"html>body tbody.scrollContent td + td + td + td + td + td + td{", which);
-	str.Format(L"width: %dpx", width - (4 * 55 + 2 * 35 + 120));
+	printOnly(L"	width: 55px", which);
+	printOnly(L"}", which);
+
+	printOnly(L"html>body tbody.scrollContent td + td + td + td + td + td + td + td{", which);
+	str.Format(L"width: %dpx", width - (4 * 55 + 35 + + 2*20 + 120));
 	printOnly(str, which);
 	printOnly(L"}", which);
 
@@ -265,7 +278,7 @@ bool CDescendants::linearTable(int i, int which)
 	printOnly(L"</style>", which);
 	printOnly(L"</head><body>\n", which);
 
-	printTopContainer(title, which);
+	printTopContainer2(title, which);
 	printOnly(L"<br><br>", which);
 
 	printOnly(L"<div id=\"tableContainer\" class=\"tableContainer\">", which);
@@ -273,20 +286,21 @@ bool CDescendants::linearTable(int i, int which)
 	printOnly(L"<thead class=\"fixedHeader\">", which);
 	printOnly(L"<tr>", which);
 
-	printOnly(L"<th style=\"width: 35px\">#</th>", which);
-	printOnly(L"<th style=\"width: 35px\">ism.</th>", which);
-	printOnly(L"<th style=\"width: 55px\">testvér<br>db</th>", which);
-	printOnly(L"<th style=\"width: 55px\">szülõ<br>#</th>", which);
+	printOnly(L"<th style=\"width: 20px\">I</th>", which);
+	printOnly(L"<th style=\"width: 35px\">id</th>", which);
+	printOnly(L"<th style=\"width: 55px\">gyerek<br>id</th>", which);
+	printOnly(L"<th style=\"width: 55px\">szülõ<br>id</th>", which);
+	printOnly(L"<th style=\"width: 20px\">A</th>", which);
 	printOnly(L"<th style=\"width: 55px\">gyerek<br>db</th>", which);
 	printOnly(L"<th style=\"width: 55px\">generáció<br>-sorszám</th>", which);
-	str.Format(L"<th style=\"width: %dpx\">leszármazott</th>", width - (4 * 55 + 2 * 35));
+	str.Format(L"<th style=\"width: %dpx\">leszármazott</th>", width - (4 * 55 + 35 + 2*20 ));
 	printOnly(str, which);
 
 	printOnly(L"</tr>", which);
 	printOnly(L"</thead>", which);
 	printOnly(L"<tbody class=\"scrollContent\">", which);
 
-	dataTable(which);
+	dataTable3(which);
 
 	printOnly(L"</tbody>", which);
 	printOnly(L"</table>", which);
@@ -297,7 +311,7 @@ bool CDescendants::linearTable(int i, int which)
 
 
 
-	if (which == 1 )
+	if (which == 1)
 	{
 		fclose(fhDescTable);
 		ShellExecute(NULL, L"open", descendantsTablePathName, NULL, NULL, SW_SHOWNORMAL);
@@ -313,16 +327,16 @@ bool CDescendants::linearTable(int i, int which)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendants::dataTable(int i)
+void CDescendants::dataTable2(int which)
 {
+	DN::DESC desc;
+	CString rowid;
 	CString people;
 	CString tableheader;
 	CString tableNumber;
 	CString namePrev;
 	CString name;
 	CString family;
-	CString idF;
-	CString idD;
 	CString	numOfChildren;
 	CString numOfSib;
 	CString gen;
@@ -336,7 +350,6 @@ void CDescendants::dataTable(int i)
 	m_listedD = 0;
 	m_indent = 0;
 
-	m_familyName.Empty();
 	vLMX.clear();		// a generáció utolsó kiírt motherIndexe
 	vSerial.clear();
 	vSerial.push_back(1);
@@ -346,9 +359,60 @@ void CDescendants::dataTable(int i)
 	wndP.SetRange(0, vDesc.size());
 	wndP.SetPos(0);
 
-	DN::DESC desc;
-	int which = 1;
+	// Az id kitöltése, hogy a tényleges listában meh tudja adni a gyerek id-jét
+	for (int i = 0; i < vDesc.size(); ++i)
+	{
+		vDesc.at(i).printed = false;
+		vDesc.at(i).printedS = false;
+		vDesc.at(i).id = -1;
+	}
 	
+	// lejátsza a listázást, hogy a gyerek id-t meghatározza
+	m_cnt = 0;
+	for (int i = 0; i < vDesc.size(); ++i)
+	{
+		desc = vDesc.at(i);
+		if (desc.hidden) continue;   // apa bejegyzése, aki más táblában szerepel
+		if (p_repeated != 0 && desc.status == 2) continue;	// ismétlõdõ bejegyzés, amit nem ki akarunk kiírni
+		if (!desc.printed)
+		{
+			// szülõ
+			vDesc.at(i).printed = true;
+			vDesc.at(i).id = m_cnt;		// saját id;
+			++m_cnt;
+//		}
+//		if (!desc.printedC)
+//		{
+
+			vDesc.at(i).printedS = true;
+			// gyerekek
+			if( desc.parentSex == MAN )
+				m_command.Format(L"SELECT rowid FROM people WHERE father_id='%s' ORDER BY parentIndex", desc.rowid);
+			else
+				m_command.Format(L"SELECT rowid FROM people WHERE mother_id ='%s' ORDER BY parentIndex", desc.rowid);
+			if (!query2(m_command)) return;
+			for (int j = i; j < rs2.RecordsCount(); ++j, rs2.MoveNext())
+			{
+				rowid = rs2.GetFieldString(0);
+				for (int j = 0; j < vDesc.size(); ++j)
+				{
+					if (vDesc.at(j).rowid == rowid)
+					{
+						vDesc.at(j).printed = true;
+						vDesc.at(j).id = m_cnt;		
+						++m_cnt;
+						break;
+					}
+				}
+			}
+		}
+	}
+	///////////////////////////////////////////
+	for (int i = 0; i < vDesc.size(); ++i)
+	{
+		vDesc.at(i).printed = false;
+		vDesc.at(i).printedS = false;
+	}
 
 	for (int i = 0; i < vDesc.size(); ++i)
 	{
@@ -357,97 +421,246 @@ void CDescendants::dataTable(int i)
 		if (wndP.Cancelled()) break;
 
 		desc = vDesc.at(i);
-
 		if (desc.hidden) continue;   // apa bejegyzése, aki más táblában szerepel
 
 		if (p_repeated != 0 && desc.status == 2) continue;	// ismétlõdõ bejegyzés, amit nem ki akarunk kiírni
-
-		queryPeople(desc.rowid, &p);
-
-		if (!p_mother && desc.parentSex == WOMAN) continue;
-
-		people = getComplexDescription(i, true);
-
-		gen = get_gABC( desc.g );
-		idD.Format(L"%3s-%-4d", gen, desc.childorder );
-
-
-		if( desc.fatherIndex != -1 )
-			idF.Format(L"%d", desc.fatherIndex);
-		else
-			idF.Empty();
-
-		if (desc.numOfChildren > 0)
-			numOfChildren.Format(L"%d", desc.numOfChildren );
-		else
-			numOfChildren.Empty();
-
-		if (desc.fatherIndex > 0)
+		if (!desc.printed)
 		{
-			temp = vDesc.at(desc.fatherIndex).numOfChildren - 1;
-			if (temp > 0)
-				numOfSib.Format(L"%d", vDesc.at(desc.fatherIndex).numOfChildren - 1);
+			printDesc(i, which);
+			vDesc.at(i).printed = true;
+//		}
+//		if( !desc.printedC )
+//		{
+			vDesc.at(i).printedS = true;
+			if( desc.parentSex == MAN )
+				m_command.Format(L"SELECT rowid FROM people WHERE father_id='%s' ORDER BY parentIndex", desc.rowid);
 			else
-				numOfSib.Empty();
+				m_command.Format(L"SELECT rowid FROM people WHERE mother_id ='%s' ORDER BY parentIndex", desc.rowid);
+			if (!query2(m_command)) return;
+			for (int j = i; j < rs2.RecordsCount(); ++j, rs2.MoveNext())
+			{
+				rowid = rs2.GetFieldString(0);
+				for (int j = 0; j < vDesc.size(); ++j)
+				{
+					if (vDesc.at(j).rowid == rowid)
+					{
+						printDesc(j, which);
+						vDesc.at(j).printed = true;
+						break;
+					}
+				}
+			}
 		}
-		else
-			numOfSib.Empty();
-
-
-		if (desc.cntRep)
-			rep.Format(L"%d", desc.cntRep);
-		else
-			rep.Empty();
-
-
-
-		if (p_lastname == 2 && m_familyName != p.last_name )  // kiemelt családnév
-		{
-			str = getTableHeader();
-			family = getColoredString( str, KEK);
-	
-			str.Format(L"<td>%s</td>", L"");
-			printOnly(L"<tr>", which);
-			printOnly(str, which);
-			printOnly(str, which);
-			printOnly(str, which);
-			printOnly(str, which);
-			printOnly(str, which);
-			printOnly(str, which);
-			name.Format(L"<td>%s</td>", family );
-			printOnly(name, which);
-			printOnly(L"</tr>", which);
-		}
-		m_familyName = p.last_name;
-
-		printOnly(L"<tr>", which);
-		str.Format(L"<td><center>%d</center></td>", i);
-		printOnly(str, which);
-		str.Format(L"<td><center>%s</center></td>", rep );
-		printOnly(str, which);
-		str.Format(L"<td><center>%s</center></td>", numOfSib );
-		printOnly(str, which);
-		str.Format(L"<td><center>%s</center></td>", idF);
-		printOnly(str, which);
-		str.Format(L"<td><center>%s</center></td>", numOfChildren );
-		printOnly(str, which);
-		str.Format(L"<td><center>%s</center></td>", idD );
-		printOnly(str, which);
-
-		str.Format(L"<td>%s</td>", people );
-		printOnly(str, which);
-		printOnly(L"</tr>", which);
-
-		gPrev = desc.g;
 	}
-
 	wndP.DestroyWindow();
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CDescendants::getComplexDescription(int i, bool parentIndex )
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDescendants::dataTable3(int which)
 {
-	CString people		= createDescendant(i, parentIndex );
-	CString spouses		= createSpouses(i);
+	DN::DESC desc;
+	CString rowidF;
+	CString rowid;
+	CString people;
+	CString tableheader;
+	CString tableNumber;
+	CString namePrev;
+	CString name;
+	CString family;
+	CString	numOfChildren;
+	CString numOfSib;
+	CString gen;
+	CString rep;
+	int temp;
+
+	int gcnt = 0;
+	int gPrev = 0;
+
+	m_listedP = 0;
+	m_listedD = 0;
+	m_indent = 0;
+
+	vLMX.clear();		// a generáció utolsó kiírt motherIndexe
+	vSerial.clear();
+	vSerial.push_back(1);
+	str.Format(L"%s leszármazottainak listázása...", m_os);
+	CProgressWnd wndP(NULL, str);
+	wndP.GoModal();
+	wndP.SetRange(0, vDesc.size());
+	wndP.SetPos(0);
+
+	// Az id kitöltése, hogy a tényleges listában meh tudja adni a gyerek id-jét
+	for (int i = 0; i < vDesc.size(); ++i)
+	{
+		vDesc.at(i).printed = false;
+		vDesc.at(i).printedS = false;
+		vDesc.at(i).id = -1;
+	}
+
+	// lejátsza a listázást, hogy a sorrendet meghatározza (id = 0,1,2,....)
+	int cnt = 0;
+	for (int i = 0; i < vDesc.size(); ++i)
+	{
+		desc = vDesc.at(i);
+		if (desc.hidden || (p_repeated != 0 && desc.status == 2))
+		{
+			vDesc.at(i).id = -1;
+			continue;				// ismétlõdõ bejegyzés, amit nem ki akarunk kiírni
+		}
+		if (!desc.printed)
+		{
+			// nég nem írtuk ki, most ki fogjuk írni testéreivel együtt.
+			vDesc.at(i).printed = true;
+			vDesc.at(i).id = cnt;		// saját id;
+			++cnt;
+			rowidF = vDesc.at(i).rowidF;
+
+			// testvérei, akiknek azonos az apjuk
+			for (int j = i+1; j < vDesc.size(); ++j)
+			{
+				if (vDesc.at(j).rowidF == rowidF )
+				{
+					vDesc.at(j).printed = true;
+					vDesc.at(j).id = cnt;
+					++cnt;
+				}
+			}
+		}
+	}
+	std::sort(vDesc.begin(), vDesc.end(), sortById );
+
+	for (int i = 0; i < vDesc.size(); ++i)
+	{
+		wndP.SetPos(i);
+		wndP.PeekAndPump();
+		if (wndP.Cancelled()) break;
+
+		desc = vDesc.at(i);
+		if (desc.id < 0) continue;
+
+		printDesc(i, which);
+	}
+	wndP.DestroyWindow();
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDescendants::printDesc( int i, int which  )
+{
+	DN::DESC desc = vDesc.at(i);
+
+	CString people;
+	CString name;
+	CString family;
+
+	CString idF;
+	CString idD;
+	CString idC;
+	CString ixM;
+	CString	numOfChildren;
+	CString gen;
+	CString rep;
+
+	int numOfSpouses;
+	int pos;
+
+	int gcnt = 0;
+	int gPrev = 0;
+
+	vLMX.clear();		// a generáció utolsó kiírt motherIndexe
+	vSerial.clear();
+	vSerial.push_back(1);
+
+	queryPeople(desc.rowid, &p);
+	if (!p_mother && desc.parentSex == WOMAN) return;
+
+	people = getComplexDescription(i, false );
+
+	gen = get_gABC(desc.g);
+	idD.Format(L"%3s-%-4d", gen, desc.childorder);
+
+	idF.Empty();
+	for (int j = 0; j < vDesc.size(); ++j)
+	{
+		if ( vDesc.at(j).rowid == desc.rowidF )
+		{
+			idF.Format(L"%d", vDesc.at(j).id );
+			numOfSpouses = vDesc.at(j).numOfSpouses;
+			break;
+		}
+	}
+
+	idC.Empty();
+	for (int j = 0; j < vDesc.size(); ++j)
+	{
+		if (vDesc.at(j).rowidF == desc.rowid )
+		{
+			idC.Format(L"%d", vDesc.at(j).id);
+			break;
+		}
+	}
+
+	numOfChildren.Empty();
+	if (desc.numOfChildren > 0)
+		numOfChildren.Format(L"%d", desc.numOfChildren);
+
+	rep.Empty();
+	if (desc.cntRep)
+		rep.Format(L"%d", desc.cntRep);
+
+	ixM.Empty();
+	if( numOfSpouses > 1 )
+	{
+		if (desc.motherIndex)
+			ixM.Format(L"%d", desc.motherIndex);
+	}
+
+	if (p_lastname == 2 && m_familyName != p.last_name)  // kiemelt családnév
+	{
+		str = getTableHeader();
+		family = getColoredString(str, KEK);
+
+		str.Format(L"<td>%s</td>", L"");
+		printOnly(L"<tr>", which);
+		printOnly(str, which);
+		printOnly(str, which);
+		printOnly(str, which);
+		printOnly(str, which);
+		printOnly(str, which);
+		printOnly(str, which);
+		printOnly(str, which);
+		name.Format(L"<td>%s</td>", family);
+		printOnly(name, which);
+		printOnly(L"</tr>", which);
+	}
+	m_familyName = p.last_name;
+
+	printOnly(L"<tr>", which);
+	str.Format(L"<td><center>%s</center></td>", rep);
+	printOnly(str, which);
+	str.Format(L"<td><center>%d</center></td>", desc.id);
+	printOnly(str, which);
+	str.Format(L"<td><center>%s</center></td>", idC);
+	printOnly(str, which);
+	str.Format(L"<td><center>%s</center></td>", idF);
+	printOnly(str, which);
+	str.Format(L"<td><center>%s</center></td>", ixM );
+	printOnly(str, which);
+	str.Format(L"<td><center>%s</center></td>", numOfChildren);
+	printOnly(str, which);
+	str.Format(L"<td><center>%s</center></td>", idD);
+	printOnly(str, which);
+
+	str.Format(L"<td>%s</td>", people);
+	printOnly(str, which);
+	printOnly(L"</tr>", which);
+
+//	++m_cnt;
+	vDesc.at(i).printed = true;
+	gPrev = desc.g;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CString CDescendants::getComplexDescription2(int i, bool parentIndex )
+{
+	CString people = createDescendant(i, parentIndex );
+	CString spouses = createSpouses(i);
 	CString arm;
 	CString csalad;
 	CString folyt;
@@ -475,7 +688,7 @@ CString CDescendants::getComplexDescription(int i, bool parentIndex )
 	return people;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendants::printOnly(CString str, int which)
+void CDescendants::printOnly2(CString str, int which)
 {
 	str.Replace('|', '\'');
 	str = UnicodeToUtf8(str);
@@ -483,20 +696,20 @@ void CDescendants::printOnly(CString str, int which)
 	{
 	case 0:
 		fwprintf(fl, L"%s", str);  // a soreleji %-okat printelési karakterekenk értelmezné, ha közvetlenül nyomtatnánk!!! 
-//		fflush(fl);
+		//		fflush(fl);
 		break;
 	case 1:
 		fwprintf(fhDescTable, L"%s\n", str);
-//		fflush(fhDescTable);
+		//		fflush(fhDescTable);
 		break;
 	case 2:
 		fwprintf(fhPrintable, L"%s\n", str);
-//		fflush(fhDescTable);
+		//		fflush(fhDescTable);
 		break;
 	}
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TCHAR CDescendants::get_gABC(int g)
+TCHAR CDescendants::get_gABC2(int g)
 {
 	TCHAR gABC;
 	int ix = g / 26;		  // ix = 0, ha g kisebb mint 26, = 1 Ha nagyobb
@@ -504,7 +717,7 @@ TCHAR CDescendants::get_gABC(int g)
 	return gABC;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CDescendants::printTopContainer(CString title, int which)
+bool CDescendants::printTopContainer2(CString title, int which)
 {
 	int l = -37;
 	CString today;
@@ -580,13 +793,13 @@ bool CDescendants::printTopContainer(CString title, int which)
 	}
 	str.Format(L"%*s %s %s", l, L"Adatbázis készült:", dateDB, theApp.m_dbFileName);
 	printOnly(str, which);
-//	if (!theApp.m_inputVersion.IsEmpty() && theApp.m_inputVersion != theApp.m_version)
+	//	if (!theApp.m_inputVersion.IsEmpty() && theApp.m_inputVersion != theApp.m_version)
 	{
 		str.Format(L"%*s %s", l, L"Beolvasás programverziója:", theApp.m_inputVersion);
 		printOnly(str, which);
 	}
 
-//	if (theApp.m_uniteVersion != theApp.m_version)
+	//	if (theApp.m_uniteVersion != theApp.m_version)
 	{
 		str.Format(L"%*s %s", l, L"Összevonás programverziója:", theApp.m_uniteVersion);
 		printOnly(str, which);
@@ -603,7 +816,7 @@ bool CDescendants::printTopContainer(CString title, int which)
 
 	//	str.Format(L"%*s %s", l, L"Ismétlõdõk kihagyása:", kihagy);
 	//	printOnly(str, which );
-/*
+
 	CString sorrend;
 	switch (p_radioOrder)
 	{
@@ -620,9 +833,12 @@ bool CDescendants::printTopContainer(CString title, int which)
 		sorrend = L"csökkenõ hosszúságú leszármazotti szálak";
 		break;
 	}
-
 	str.Format(L"%*s %s", l, L"Sorrend:", sorrend);
 	printOnly(str, which);
-*/
+	str.Format(L"<br>%*s I - ismétlõdõ leszármazottak sorszáma", l, L"Oszlopok:");
+	printOnly(str, which);
+	str.Format(L"%*s A - anya index", l, L" ");
+	printOnly(str, which);
+
 	printOnly(L"</pre>", which);
 }

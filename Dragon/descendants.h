@@ -24,6 +24,7 @@ namespace DN
 		int order;			// 1,2,3,4,5... a leszármazotti sor hosszúság szerinti sorszámok. 1 a leghosszabb. 
 		CString rowid;
 		CString rowidF;		// apa rowid-ja
+		CString rowidM;		// anya rowid-ja
 		CString name;
 		CString sex;
 		int numOfSpouses;
@@ -39,7 +40,9 @@ namespace DN
 		int numOfRep;
 		int status;			// 0: alaphelyzet, listázandó (fekete)  1: ismétlõdõ elsõ bejegyzés, listázandó 2 (kék): ismétlõdõ második bejegyzés, nem listázandó(piros)
 		int length;			// összes leszármazottainak száma
-
+		bool printed;		// bejegyzés kiírva
+		bool printedS;		// testvérek kliírva
+		int	id;				// a lineáris listézásnál a bejegyzés id-je;
 	}DESC;
 
 
@@ -109,6 +112,7 @@ typedef struct
 	CString tableNumber;
 	CString tableRoman;	// a tábla fejléc római száma
 	CString	source;				// az ember típusa 1=leszármazott, 2=házastársa, 3=házastárs apja, 4=házastárs anyja, 5=házastárs további házastársa
+	CString generation;
 	CString	sex_id;				// 1=férfi, 2= nõ
 	CString peer;
 	CString title;
@@ -135,6 +139,8 @@ typedef struct
 	CString fullname;
 	CString whichHusband;
 	CString whichWife;
+	CString printed;
+	CString printedC;
 } PPEOPLE;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class CDescendants : public CWnd
@@ -146,6 +152,7 @@ public:
 	virtual ~CDescendants();
 	BOOL CDescendants::start();
 	bool CDescendants::tablesDescendants();  // listázandó táblák a theapp.v_tableNumbers vektorban
+	bool CDescendants::linearTable2(int i, int which);
 	CString m_rowid;
 protected:
 
@@ -221,11 +228,13 @@ protected:
 	int	m_givup;
 	int m_maxDesc;
 	bool m_canceled;
+	int m_cnt;
 	FILE* orderTxt;
 	CString m_orderFileTitle;
 	CString m_orderPathName;
 
 	CSqliteDBRecordSet rs;
+	CSqliteDBRecordSet rs2;
 	CSqliteDBRecordSet rsP;
 	CSqliteDBRecordSet rsM;
 	FILE* fl;
@@ -274,7 +283,7 @@ protected:
 	void CDescendants::printTxt(CString str);
 	void CDescendants::printBeginingTxt(int i);
 	void CDescendants::printDescendantTxt(int i);
-	CString CDescendants::createDescendant(int i);
+	CString CDescendants::createDescendant(int i, bool parentIndex );
 	void CDescendants::printSpousesTxt(int i);
 	void CDescendants::printMarriageTxt(CString place, CString date, int i, int numberOfSpouses);
 	void CDescendants::printSpouseTxt();
@@ -286,6 +295,7 @@ protected:
 	BOOL CDescendants::queryM(CString command);
 
 	BOOL CDescendants::query(CString command);
+	BOOL CDescendants::query2(CString command);
 
 
 	bool CDescendants::linearTable(int i, int which);
@@ -296,12 +306,22 @@ protected:
 	CString CDescendants::createMarriage(CString place, CString date, int i, int numberOfSpouses);
 	CString CDescendants::createSpouse();
 	CString CDescendants::createSpRelatives();
-	CString CDescendants::getComplexDescription(int i);
+	CString CDescendants::getComplexDescription(int i, bool parentIndex );
 	TCHAR CDescendants::get_gABC(int g);
 
 	void CDescendants::order_vDesc();
 	void CDescendants::printvLen();
 	void CDescendants::print_vDesc();
+
+	void CDescendants::dataTable2(int i);
+	void CDescendants::dataTable3(int which);
+	CString CDescendants::getComplexDescription2(int i, bool parentIndex);
+	void CDescendants::printOnly2(CString str, int which);
+	TCHAR CDescendants::get_gABC2(int g);
+	bool CDescendants::printTopContainer2(CString title, int which);
+
+	void CDescendants::printDesc( int i, int which );
+
 
 	// descendantsOld változói
 	int m_genPeer;

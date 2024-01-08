@@ -794,6 +794,9 @@
     <ClCompile Include="unitedEntriesX.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="descendantsLinearTable2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="dragon.rc">

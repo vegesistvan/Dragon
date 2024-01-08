@@ -74,7 +74,7 @@ END_MESSAGE_MAP()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CUniteEntries::parameteres()
 {
-	m_name = L"Abaffy Sándor";
+	m_name = L"Almásy József";
 	m_name.Empty();
 	m_loopMax = 3;
 	R1 = L"7125";
@@ -660,19 +660,10 @@ BOOL CUniteEntries::push( CString rowid )
 		birth = m_rset3->GetFieldString(1);
 		death = m_rset3->GetFieldString(2);
 		child = getNRBD(first, birth, death);
-/*
-		if (birth.IsEmpty() && death.IsEmpty())
-			child = first;
-		else if (birth.IsEmpty())
-			child.Format(L"%s +%s", first, death);
-		else if (death.IsEmpty())
-			child.Format(L"%s *%s", first, birth);
-		else
-			child.Format(L"%s *%s +%s", first, birth, death);
-*/
 		children += child;
-		children += L",";
+		children += L", ";
 	}
+	children.TrimRight();
 	same.children = dropLastCharacter(children);
 	same.numOfChildren = m_rset3->RecordsCount();
 	vSameNames.push_back(same);
@@ -759,10 +750,12 @@ BOOL CUniteEntries::push( CString rowid )
 		else
 			vspouses.nameBD.Format(L"%s (%s-%s)", sbd, fbd, mbd );
 
-		spouses += vspouses.nameBD.Trim();
-		spouses += L", ";
-
-
+		// összegyûjti a házastársat, ha az még nem szerepel
+		if ((pos = spouses.Find(sbd)) == -1)
+		{
+			spouses += vspouses.nameBD.Trim();
+			spouses += L", ";
+		}
 		vSpouses.push_back(vspouses);
 
 		m_rset3->MoveNext();
@@ -1745,18 +1738,23 @@ void CUniteEntries::examine()
 			{
 				if (j == i) continue;
 				J = vSameNames.at(j);
-				if ( !J.spouses.IsEmpty())
+				if ( !J.spouses.IsEmpty() )
 				{
 					// azonos nevû házaspár keresése	
 					spousesJ = J.spouses;
-					n = wordList(&A, I.spouses, ',', false);
-					for (int k = 0; k < n; ++k)
+ 					n = wordList(&A, I.spouses, ',', false);
+                    for (int k = 0; k < n; ++k)
 					{
 						if ((pos = J.spouses.Find(spouse)) != -1)
 						{
 							vS.push_back(J);
-							vSameNames.at(i).rgbcolor = m_cnt;
-							vSameNames.at(j).rgbcolor = m_cnt;
+							if (vSameNames.at(j).rgbcolor != 0)
+								vSameNames.at(i).rgbcolor = vSameNames.at(j).rgbcolor;
+							else
+							{
+								vSameNames.at(i).rgbcolor = m_cnt;
+								vSameNames.at(j).rgbcolor = m_cnt;
+							}
 							++selected;
 							break;
 						}

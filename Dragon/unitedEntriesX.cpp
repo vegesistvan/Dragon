@@ -511,7 +511,8 @@ void CUnitedEntriesX::OnUnite()
 				}
 			}
 		}
-
+		m_command.Format(L"UPDATE people SET united=united+1 WHERE rowid ='%s'", rowidKeep);
+		if (!theApp.execute(m_command)) return;
 
 		// törölt bejegyzés törlése
 		base = nItem * U_COLUMNSCOUNT;
@@ -521,6 +522,7 @@ void CUnitedEntriesX::OnUnite()
 			vPeople.at(ix) = L" ";
 		}
 	}
+
 	m_ListCtrlX.DeleteAllItems();
 	m_ListCtrlX.SetItemCountEx(vPeople.size() + 1);
 	m_ListCtrlX.AttachDataset(&vPeople);
