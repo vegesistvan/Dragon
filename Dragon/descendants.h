@@ -43,6 +43,7 @@ namespace DN
 		bool printed;		// bejegyzés kiírva
 		bool printedS;		// testvérek kliírva
 		int	id;				// a lineáris listézásnál a bejegyzés id-je;
+		int index;			// eredeti index (lineáris táblánát használjuk)
 	}DESC;
 
 
@@ -224,11 +225,13 @@ protected:
 	int m_actGen;
 	int m_gen;
 	int m_gMax;			// a listázott generációl száma
+	bool gflag = true;
 	bool m_printed;
 	int	m_givup;
 	int m_maxDesc;
 	bool m_canceled;
 	int m_cnt;
+	CString genPrev;
 	FILE* orderTxt;
 	CString m_orderFileTitle;
 	CString m_orderPathName;

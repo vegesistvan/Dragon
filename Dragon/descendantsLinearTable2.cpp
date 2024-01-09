@@ -28,6 +28,7 @@ bool CDescendants::linearTable2(int i, int which)
 
 	m_familyName.Empty();
 	m_cnt = 0;
+	genPrev.Empty();
 
 	if (theApp.v_tableNumbers.size())
 	{
@@ -473,8 +474,7 @@ void CDescendants::dataTable3(int which)
 	int temp;
 
 	int gcnt = 0;
-	int gPrev = 0;
-
+	
 	m_listedP = 0;
 	m_listedD = 0;
 	m_indent = 0;
@@ -495,7 +495,7 @@ void CDescendants::dataTable3(int which)
 		vDesc.at(i).printedS = false;
 		vDesc.at(i).id = -1;
 	}
-
+/*
 	// lejátsza a listázást, hogy a sorrendet meghatározza (id = 0,1,2,....)
 	int cnt = 0;
 	for (int i = 0; i < vDesc.size(); ++i)
@@ -526,6 +526,63 @@ void CDescendants::dataTable3(int which)
 			}
 		}
 	}
+*/
+	std::vector<DN::DESC> vD1;
+	std::vector<DN::DESC> vD2;
+	int cnt;
+	int g = 1;
+
+	for (int i = 0; i < vDesc.size(); ++i)
+	{
+		desc = vDesc.at(i);
+		if (desc.hidden || (p_repeated != 0 && desc.status == 2))
+		{
+			vDesc.at(i).printed = true;
+			vDesc.at(i).id = -1;
+		}
+	}
+
+		
+	// õs  ( lehet több A generáció is )
+	cnt = 0;
+
+
+	vD1.clear();
+	vDesc.at(0).id = cnt;
+	++cnt;
+	vDesc.at(0).printed = true;
+	vD1.push_back(vDesc.at(0));
+
+	// vD1-k már ki vannak írva, a gyerekeiken kell végigmenni, akiket vD2-be gyûjtünk
+	while( true )
+	{
+		vD2.clear();
+		for (int i = 0; i < vD1.size(); ++i)
+		{
+			desc = vD1.at(i);
+			rowidF = vD1.at(i).rowid;		
+			for (int j = 0; j < desc.numOfChildren; ++j)
+			{
+				// gyerekeiket keressük
+				for (int k = i+1; k < vDesc.size(); ++k)
+				{
+					if (vDesc.at(k).printed) continue;
+					if (vDesc.at(k).rowidF == rowidF)
+					{
+						vDesc.at(k).printed = true;
+						vDesc.at(k).id = cnt;		// saját id;
+						++cnt;
+						vD2.push_back(vDesc.at(k));
+					}
+				}
+			}
+		}
+		vD1 = vD2;
+		if (!vD1.size()) break;
+	}
+
+
+
 	std::sort(vDesc.begin(), vDesc.end(), sortById );
 
 	for (int i = 0; i < vDesc.size(); ++i)
@@ -557,13 +614,12 @@ void CDescendants::printDesc( int i, int which  )
 	CString	numOfChildren;
 	CString gen;
 	CString rep;
-
+	
 	int numOfSpouses;
 	int pos;
 
 	int gcnt = 0;
-	int gPrev = 0;
-
+	
 	vLMX.clear();		// a generáció utolsó kiírt motherIndexe
 	vSerial.clear();
 	vSerial.push_back(1);
@@ -632,7 +688,16 @@ void CDescendants::printDesc( int i, int which  )
 	}
 	m_familyName = p.last_name;
 
-	printOnly(L"<tr>", which);
+//	printOnly(L"<tr>", which);
+	if ( gen != genPrev)
+		gflag = !gflag;
+
+	if (gflag)
+		printOnly(L"<tr style=\"background-color: #fff;\">", which);
+	else
+		printOnly(L"<tr style=\"background-color: #eee;\">", which);
+
+
 	str.Format(L"<td><center>%s</center></td>", rep);
 	printOnly(str, which);
 	str.Format(L"<td><center>%d</center></td>", desc.id);
@@ -654,7 +719,7 @@ void CDescendants::printDesc( int i, int which  )
 
 //	++m_cnt;
 	vDesc.at(i).printed = true;
-	gPrev = desc.g;
+	genPrev = gen;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CDescendants::getComplexDescription2(int i, bool parentIndex )
