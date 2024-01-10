@@ -39,11 +39,10 @@ namespace DN
 		int cntRep;
 		int numOfRep;
 		int status;			// 0: alaphelyzet, listázandó (fekete)  1: ismétlõdõ elsõ bejegyzés, listázandó 2 (kék): ismétlõdõ második bejegyzés, nem listázandó(piros)
-		int length;			// összes leszármazottainak száma
+		int id2;			// rendezés utáni id
 		bool printed;		// bejegyzés kiírva
-		bool printedS;		// testvérek kliírva
 		int	id;				// a lineáris listézásnál a bejegyzés id-je;
-		int index;			// eredeti index (lineáris táblánát használjuk)
+		int nOfD;			// a bejegyzés leszármazottainak száma
 	}DESC;
 
 
@@ -82,6 +81,12 @@ typedef struct
 	int g;
 	int lastMotherIndex;
 }LMX;
+
+typedef struct
+{
+	int i;
+
+}SIB;
 
 const ATTRIB attrib[] =
 {
@@ -174,25 +179,24 @@ protected:
 	
 	bool m_log;
 	bool p_html;			// true: html lista készül, false: text fájl készül
-
-	int p_numbering;
-	int p_descStyle;
-	int p_otherNameStyle;
-	int p_commentStyle;
-	int p_specStyle;
+	int  p_numbering;
+	int  p_descStyle;
+	int  p_otherNameStyle;
+	int  p_commentStyle;
+	int  p_specStyle;
 	bool p_capitalName;
 	bool p_checkBold;
 	bool p_folyt;
-	int	p_radioCode;
-	int p_repeated;
+	int	 p_radioCode;
+	int  p_repeated;
 	bool p_repeatedColor;
 	bool p_oneFile;
 	bool p_connect;
 	bool p_mother;
-	UINT	p_colorBgrnd;
+	UINT p_colorBgrnd;
 	bool p_print;		// azonnal nyomtassa ki a leszármazottat, a már szükségtelen rekordokat dobja el a vDesc-bõl. Ez hiba kereséshez jó.
 	bool p_checkCRLF;
-	int	p_radioOrder;
+	int	 p_radioOrder;
 ///////////////////////////////////////////////
 //	int m_folyt_db;
 	int m_cntRepeated;  // az ismétlõdõ leszármazottak száma
@@ -218,6 +222,7 @@ protected:
 	std::vector<CString>vRowid;			// már listázott házastársak neve
 	std::vector<LMX>vLMX;				// a generáció utolsó kiírt motherIndexe a leszármazotti listában
 	std::vector<DN::LEN>* vLenOu;
+	std::vector<int> vSib;
 
 	DN::PEO peoS;
 	
@@ -231,6 +236,7 @@ protected:
 	int m_maxDesc;
 	bool m_canceled;
 	int m_cnt;
+	int m_iPrev;;
 	CString genPrev;
 	FILE* orderTxt;
 	CString m_orderFileTitle;
@@ -315,15 +321,9 @@ protected:
 	void CDescendants::order_vDesc();
 	void CDescendants::printvLen();
 	void CDescendants::print_vDesc();
-
-	void CDescendants::dataTable2(int i);
-	void CDescendants::dataTable3(int which);
-	CString CDescendants::getComplexDescription2(int i, bool parentIndex);
-	void CDescendants::printOnly2(CString str, int which);
-	TCHAR CDescendants::get_gABC2(int g);
-	bool CDescendants::printTopContainer2(CString title, int which);
-
 	void CDescendants::printDesc( int i, int which );
+	void CDescendants::numOfDesc();
+	int CDescendants::sort_vDesc();
 
 
 	// descendantsOld változói

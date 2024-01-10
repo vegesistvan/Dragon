@@ -265,9 +265,9 @@ CString CDescendants::createDescendant(int i, bool parentIndex )
 		{
 			if (vLMX.at(last).lastMotherIndex != p.parentIndex)   // ha az utoljára kiírt motherIndex más, akkor ezt kiírja
 			{
-				if (p.parentIndex == 1)
-					str.Format(L" ;/%d", p.parentIndex);
-				else
+//				if (p.parentIndex == 1)
+//					str.Format(L" ;/%d", p.parentIndex);
+//				else
 					str.Format(L"/%d", p.parentIndex);
 				name += str;
 				vLMX.at(last).lastMotherIndex = p.parentIndex;
@@ -401,6 +401,8 @@ CString CDescendants::createMarriage(CString place, CString date, int i, int num
 	if (!place.IsEmpty())
 	{
 		marriage += place;
+		if (date.IsEmpty())
+			marriage += L",";
 		marriage += L" ";
 	}
 	if (!date.IsEmpty())
@@ -674,6 +676,7 @@ CString CDescendants::getPlaceDateBlock(CString place, CString date, CString jel
 	if (!place.IsEmpty() || !date.IsEmpty())
 	{
 		block = jel;
+		block = getColoredString(jel, p_specStyle );
 		if (!place.IsEmpty())
 		{
 			block += place;

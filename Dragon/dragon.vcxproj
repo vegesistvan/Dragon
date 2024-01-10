@@ -381,7 +381,6 @@
     <ClCompile Include="Date.cpp" />
     <ClCompile Include="descendants.cpp" />
     <ClCompile Include="descendantsLinearTable.cpp" />
-    <ClCompile Include="descendantsLinearTable2.cpp" />
     <ClCompile Include="descendantsParam.cpp" />
     <ClCompile Include="descendantsPrint.cpp" />
     <ClCompile Include="descendantsPrintTxt.cpp" />

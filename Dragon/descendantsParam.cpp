@@ -13,19 +13,19 @@ IMPLEMENT_DYNAMIC(CDescendantsParam, CDialogEx)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CDescendantsParam::CDescendantsParam(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_DESCENDANTS_PARAM, pParent)
-	, m_checkConnect(true)		// táblákat összekösse-e
+	, m_checkConnect(true)			// táblákat összekösse-e
 	, m_checkMother(false)			// nõk leszármazottait listázza-e
 	, m_checkCapital(false)
 	, m_checkBold(FALSE)
 	, m_comboOtherName(1)			// más náv bold
-	, m_comboSpec(0)			// speciális karakterek (*+=) bold
-	, m_comboComment(2)		// comment bold
+	, m_comboSpec(0)				// speciális karakterek (*+=) bold
+	, m_comboComment(2)				// comment bold
 	, m_comboKiemeltAttrib(3)		// leszármazott kiemelt családneve
 	, m_comboFontSize(3)
 
 	, m_radioNumbering(TUPP)		// milyen számozási rendszer legyen (0,1,2) SZLUHA/VIL/TUP
 
-	, m_tableNumber(L"")		// tablenumber, ha a táblázat leszármazotti listáját kérjük
+	, m_tableNumber(L"")			// tablenumber, ha a táblázat leszármazotti listáját kérjük
 	, m_editWidth(L"képernyõ")
 	, m_printed(FALSE)
 	, m_checkFolyt(FALSE)

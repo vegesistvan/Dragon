@@ -1,6 +1,8 @@
 #pragma once
 
-#define VERSION L"10.158"
+#define VERSION L"10.159"
+
+// 10.159 2024.01.10 Lineáris l.táblában a generációs hossz. ;/1 megszüntetése. Kisebb javítások
 
 // 10.158 2024.01.09 Lineáris leszármazotti lista sorrendjének javítása (generációk egyben vannak )
 // 

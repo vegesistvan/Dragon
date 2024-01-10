@@ -10,6 +10,7 @@
 #include "Table_tables.h"
 #include "Table_people.h"
 
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool sortByOrder(const DN::DESC& v1, const DN::DESC& v2)
 {
@@ -159,7 +160,6 @@ BOOL CDescendants::start()
 		desc.cntRep = 0;
 		desc.order = 0;
 		desc.original = 0;
-		desc.length = 0;
 		desc.fatherIndex = -1;  // nincs apja
 		vDesc.clear();
 		vDesc.push_back(desc);
@@ -178,15 +178,13 @@ BOOL CDescendants::start()
 		else
 		{
 			descendants();
+			numOfDesc();
 			multipleRowid();
 			if (p_html)
 			{
 				printVector(i);
-				linearTable(i, 1 );
+				linearTable(i, 1);
 				linearTable(i, 2);
-				linearTable2(i, 1);
-				linearTable2(i, 2);
-
 			}
 			else
 				printVectorTxt(i);
@@ -315,7 +313,6 @@ bool CDescendants::tablesDescendants()  // listázandó táblák a theapp.v_tableNum
 		desc.name = peoS.name;
 		desc.cntRep = 0;
 		desc.order = 0;
-		desc.length = 0;
 		desc.fatherIndex = -1;  // ez nem biztos!!!!!!!!
 
 		vDesc.clear();
@@ -333,8 +330,6 @@ bool CDescendants::tablesDescendants()  // listázandó táblák a theapp.v_tableNum
 		printVector(i);
 		linearTable(i, 1);
 		linearTable(i, 2);
-		linearTable2(i, 1);
-		linearTable2(i, 2);
 		if (!p_oneFile)
 		{
 			closeHtml();
@@ -442,7 +437,6 @@ void CDescendants::descendants()
 		desc.g = vDesc.at(i).g + 1;		// apja generációjánál 1-el nagyobb
 		desc.fatherIndex = i;
 		desc.status = 0;
-		desc.length = 0;
 		
 		vDesc.at(i).procChildren += 1;		// a most feldolgozott testvéreinek száma nõ egyet
 		desc.childorder = vDesc.at(i).procChildren;
@@ -476,23 +470,7 @@ void CDescendants::descendants()
 		}
 	}
 	wndP.DestroyWindow();
-	
-	CString rowidF;
-	for (int i = vDesc.size() - 1; i >= 0; --i)
-	{
-		rowidF = vDesc.at(i).rowidF;
-		for (int j = 0; j < vDesc.size(); ++j)
-		{
-			if (vDesc.at(j).rowid == rowidF && vDesc.at(j).length == 0 )  // megvan az apa
-			{
-				vDesc.at(j).length = i - j + 1;
-			}
-		}
-	}
-//	print_vDesc();
 
-
-//	i = m_folyt_db;
 	if( p_radioOrder == ORDER_INCREASING || p_radioOrder == ORDER_DECREASING ) //  leszármazotti szál növekvõ vagy csökkenõ sorrendjét kérjük
 		order_vDesc();
 	
@@ -505,7 +483,7 @@ void CDescendants::print_vDesc()
 
 	for (int i = 0; i < vDesc.size(); ++i)
 	{
-		fwprintf(text, L"%4d. %6s %6s %5d %-40s\n", i, vDesc.at(i).rowid, vDesc.at(i).rowidF, vDesc.at(i).length, vDesc.at(i).name );
+		fwprintf(text, L"%4d. %6s %6s %5d %-40s\n", i, vDesc.at(i).rowid, vDesc.at(i).rowidF, vDesc.at(i).nOfD, vDesc.at(i).name );
 	}
 	fclose(text);
 	theApp.showFile(fileSpec);
@@ -1145,263 +1123,6 @@ bool CDescendants::rowidExist()
 	vRowid.push_back(p.rowid);
 	return false;
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-/*
-void CDescendants::order_vDesc()
-{
-	int i;
-	int gMax = 1;
-	int ix = 0;	// leszármazott indexe	
-	int order = 0;
-
-	while (gMax != 0)		// amíg talál nem sorszámozott sort 
-	{
-		gMax = 0;
-		++order;
-		// megkeresi a legnagyobb mégnem sorszámozott generációt. Ennek indexe az ix.
-		for ( i = 1; i < vDesc.size(); ++i)
-		{
-			if (vDesc.at(i).order == 0 && vDesc.at(i).g >= gMax)		// == is kell, hogy az utolsó testvérig elmenjen
-			{
-				gMax = vDesc.at(i).g;
-				ix = i;
-			}
-		}
-		// Ha tálát még nem sorszámozott generációt, akkor azt és annak felmenõit besorszámozza
-		if (gMax != 0)
-		{
-			// testvéreket besorszámozza
-			for ( int j = ix; j > 0; --j)  // visszafele megy
-			{
-				if ( vDesc.at(ix).fatherIndex == vDesc.at(j).fatherIndex )
-					vDesc.at(j).order = order;
-			}
-			// felmenõket besorszámozza
-			while (ix > 0)
-			{
-				vDesc.at(ix).order = order;
-				ix = vDesc.at(ix).fatherIndex;
-			}
-		}
-	}
-	std::sort(vDesc.begin(), vDesc.end(), sortByOrder);
-}
-*/
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// A vDesc vector rendezése a leszármazotti szálak hossza szerint
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// A vLen vectorba kigyûjti a leszármazotti szakaszok hosszát.
-// A vLen vektort kívánság szerint rendezi.
-// A vDesc vektorba átvezeti a sorrendet, majd ennek megfelelõen rendezi azt.
-// 
-// Csak adott ember leszármozattaira mûködik, tábla leszármazottaira nem!!!
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-void CDescendants::order_vDesc()
-{
-	int i;
-	int g = 1;
-	int maxLen;
-	int order;
-	std::vector< DN::LEN > vLen;
-	DN::LEN len;
-
-	// a ciklushoz felhasznált változók:
-	// g - vizsgált generáció
-
-
-		// A vLen vectorba kigyûjti a leszármazotti szakaszok hosszát
-	len.ixFirst = 1;
-	g = vDesc.at(0).g + 1;  // Az elsõ generációnál 1-el nagyobbat keres 
-	for (i = 2; i < vDesc.size(); ++i)
-	{
-		if (vDesc.at(i).g <= g)
-		{
-			len.ixLast = i - 1;
-			len.length = len.ixLast - len.ixFirst + 1;
-			vLen.push_back(len);
-			len.ixFirst = i;
-		}
-	}
-
-	len.ixLast = i - 1;
-	len.length = len.ixLast - len.ixFirst + 1;
-	vLen.push_back(len);
-
-
-	// A vLen vektort kívánság szerint rendezi
-	if (p_radioOrder == ORDER_INCREASING)
-		std::sort(vLen.begin(), vLen.end(), sortByLengthAsc);
-	else
-		std::sort(vLen.begin(), vLen.end(), sortByLengthDesc);
-
-
-	// A vDesc vektorba átvezeti a sorendet, majd ennek megfelelõen rendezi azt
-	for (int i = 0; i < vLen.size(); ++i)
-	{
-		for (int j = vLen.at(i).ixFirst; j <= vLen.at(i).ixLast; ++j)
-		{
-			vDesc.at(j).order = i + 1;
-		}
-	}
-	std::sort(vDesc.begin(), vDesc.end(), sortByOrder);
- }
-*/
-/*
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendants::order_vDesc()
-{
-	int i;
-	int g = 1;
-
-	int ixFirst;		// a vDesc index-tartománya, amelyben rendezünk
-	int ixLast;
-	int maxLen;
-	int order;
-	int b;
-	int e;
-	
-	std::vector< DN::LEN > vLen1;
-	std::vector< DN::LEN > vLen2;
-
-	std::vector<DN::LEN>* vLenIn;
-	std::vector<DN::LEN>* vLenTemp;		// vLenI  és vLenOu váltásához átmeneti cím
-
-	DN::LEN len;
-	m_orderFileTitle = L"order";
-	m_orderPathName;
-	m_orderPathName.Format(L"%s\\%s_%s.txt", m_descendantsPath, m_orderFileTitle, getTimeTag());
-
-	if (!openFileSpec(&orderTxt, m_orderPathName, L"w+")) return;
-
-
-	// A legnagyobb generáció beállítása és 
-	// a generációk számától függõ szorzó beállítása úgy, hogy 
-
-	int gMax		= 1;
-	int multiplyer	= 1;	// a vizsgált generácira vonatkozó szorzó
-	for (int i = 0; i < vDesc.size(); ++i)
-	{
-		if (vDesc.at(i).g > gMax)
-		{
-			gMax = vDesc.at(i).g;
-			multiplyer *= 10;
-		}
-	}
-
-
-
-	// a ciklushoz felhasznált változók:
-	// g - vizsgált generáció
-
-	// A vLen vectorba kigyûjti a leszármazotti szakaszok hosszát
-//		g = vDesc.at(0).g + 1;  // Az elõírt generáció alatti generációkat vizsgálja
-	
-	vLenIn = &vLen1;
-	vLenOu = &vLen2;
-
-	bool found;
-	len.ixFirst = 0;
-	len.ixLast = vDesc.size() - 1;
-	len.order = 1;
-	vLenOu->push_back(len);
-	printvLen(0);
-
-	for (g = 0; g < 2; ++g)
-	{
-		vLenTemp = vLenIn;
-		vLenIn = vLenOu;
-		vLenOu = vLenTemp;
-		vLenOu->clear();
-
-		// minden intervallumon végigmegy
-		for (int i = 0; i < vLenIn->size(); ++i)
-		{
-			ixFirst = vLenIn->at(i).ixFirst;
-			ixLast = vLenIn->at(i).ixLast;
-			found = false;
-			if( ixFirst != ixLast )
-			{
-				// Egy intervallumon belül végigmegy a vDesc-en és 'g' generációt keres
-				for (int j = ixFirst; j <= ixLast; ++j)
-				{
-					// az elsõ "g" generációt kertesi
-					if (vDesc.at(j).g == g)
-					{
-						ixFirst = j;
-						for (int k = j + 1; k <= ixLast; ++k)
-						{
-							// A következõ "g" genráció-t keresi és ha talált elteszi az intervellum-ot és a  hosszát
-							if (vDesc.at(k).g == g)			
-							{
-								len.ixFirst = ixFirst;
-								len.ixLast = k - 1;
-								len.order = (len.ixLast - len.ixFirst + 1) * multiplyer;
-								if (len.order != 0)
-									vLenOu->push_back(len);
-								ixFirst = k + 1;
-								found = true;
-								break;
-							}
-						}
-						if ( !found )			// csak 1 db "g" generációt talált, elteszi 
-						{
-							len.ixFirst = ixFirst;
-							len.ixLast = ixFirst;
-							len.order = multiplyer;
-							vLenOu->push_back(len);
-							++ixFirst;
-						}
-					}
-				}
-			}
-//			if (!found)
-			{
-				len.ixFirst = ixFirst;
-				len.ixLast = ixLast;
-				len.order = (len.ixLast - len.ixFirst + 1) * multiplyer;
-				vLenOu->push_back(len);
-			}
-		}
-		printvLen(g);
-	}
-	
-
-	b = vLenOu->at(0).ixFirst - 1;
-	e = vLenOu->at(vLenOu->size() - 1).ixLast + 1;
-	b = 0;
-	e = vDesc.size() -1;
-
-	// A vLen vektort kívánság szerint rendezi
-	if (p_radioOrder == ORDER_INCREASING)
-	{
-		vLenOu->at(0).order = INT_MIN;  // az õs mindenképpen az elejére kerüljön
-		std::sort(vLenOu->begin(), vLenOu->end(), sortByOrderAsc);
-	}
-	else
-	{
-		vLenOu->at(0).order = INT_MAX;
-		std::sort(vLenOu->begin(), vLenOu->end(), sortByOrderDesc);
-	}
-
-
-	// A vDesc vektorba átvezeti a sorrendet, majd ennek megfelelõen rendezi azt
-	for (int i = 0; i < vLenOu->size(); ++i)
-	{
-		for (int j = vLenOu->at(i).ixFirst; j <= vLenOu->at(i).ixLast; ++j)
-		{
-			vDesc.at(j).order = i + 1;
-		}
-	}
-	std::sort(vDesc.begin(), vDesc.end(), sortByOrder);
-
-	printvLen();
-
-	fclose(orderTxt);
-	theApp.showFile(m_orderPathName);
-}
-*/
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendants::printvLen()
 {
@@ -1648,4 +1369,53 @@ void CDescendants::order_vDesc()
 	}
 
 
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDescendants::numOfDesc()
+{
+	CString rowidF;
+	m_iPrev = 0;
+	int g;
+	int j = 0;
+	int i1;
+	int i2;
+	int bottom = vDesc.size();
+
+
+	// alaphelyzet
+	for (int i = 0; i < vDesc.size(); ++i)
+		vDesc.at(i).nOfD = 0;
+
+	// leszármazottak számának (nOfD) számolása minden bejegyzéshez
+	vDesc.at(0).nOfD = vDesc.size() - 1;
+	for (int i = 0; i < vDesc.size(); ++i)
+	{
+		rowidF = vDesc.at(i).rowid;
+		g = vDesc.at(i).g;
+		vSib.clear();
+		for (j = i + 1; j < vDesc.size(); ++j)
+		{
+			if (vDesc.at(j).g <= g)
+			{
+				bottom = j;
+				break;
+			}
+			// gyerekek indexe
+			if (vDesc.at(j).rowidF == rowidF)
+			{
+				vSib.push_back(j);
+			}
+		}
+		if (j == vDesc.size())
+			bottom = vDesc.size();
+		if (vSib.size())
+		{
+			for (j = 0; j < vSib.size() - 1; ++j)
+			{
+				vDesc.at(vSib.at(j)).nOfD = vSib.at(j + 1) - vSib.at(j) - 1;
+			}
+			vDesc.at(vSib.at(j)).nOfD = bottom - vSib.at(j) - 1;
+		}
+
+	}
 }

@@ -605,9 +605,6 @@
     <ClCompile Include="descendants.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="descendantsLinearTable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="descendantsParam.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -794,7 +791,7 @@
     <ClCompile Include="unitedEntriesX.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="descendantsLinearTable2.cpp">
+    <ClCompile Include="descendantsLinearTable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

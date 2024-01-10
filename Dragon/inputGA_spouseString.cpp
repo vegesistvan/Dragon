@@ -891,8 +891,12 @@ void CInputGA::processSpouse(PEOPLE* s)
 	int db;
 	int n = splitCString(m_weddingNameSubstr, ' ', false, &A);
 
-	if ( isname(m_weddingNameSubstr, s))
+	if (isname(m_weddingNameSubstr, s))
+	{
+		m_weddingPlace.Empty();
+		m_weddingDate.Empty();
 		return;								// névvel kezdõdik
+	}
 
 	for (i = 0; i < n; ++i)
 	{
