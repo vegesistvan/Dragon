@@ -73,7 +73,7 @@ BOOL CAscendantsPaint::OnInitDialog()
 	GRID = false;	
 	CONNECT = true;
 	PRINT = false;
-	NAME = true;
+	NAME = false;
 
 	m_gMax = 0;
 	m_kMax = 0;
@@ -237,6 +237,7 @@ void CAscendantsPaint::OnPaint()
 		}
 		if (i && CONNECT)
 		{
+			SelectObject(memDC, penWhite);
 			k = vGKR->at(i).k/2;
 			for (int j = 0; j < vGKR->size(); ++j)
 			{

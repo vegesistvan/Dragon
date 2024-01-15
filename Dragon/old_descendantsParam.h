@@ -12,13 +12,13 @@ enum
 
 };
 
-class CDescendantsParam : public CDialogEx
+class CDescendantsParamOld : public CDialogEx
 {
-	DECLARE_DYNAMIC(CDescendantsParam)
+	DECLARE_DYNAMIC(CDescendantsParamOld)
 
 public:
-	CDescendantsParam(CWnd* pParent = nullptr);   // standard constructor
-	virtual ~CDescendantsParam();
+	CDescendantsParamOld(CWnd* pParent = nullptr);   // standard constructor
+	virtual ~CDescendantsParamOld();
 
 // Dialog Data
 #ifdef AFX_DESIGN_TIME
@@ -30,25 +30,25 @@ protected:
 
 	CString str;
 
-	void CDescendantsParam::setParameters();
-	void CDescendantsParam::OnClickedDefault();
-	void CDescendantsParam::updateParameters();
-	void CDescendantsParam::updateRadioDName();
-	void CDescendantsParam::updateRepeated();
-	void CDescendantsParam::updateRadioNumbering();
-	void CDescendantsParam::OnClickedCheckConnect();
-	void CDescendantsParam::OnClickedCheckWoman();
-	void CDescendantsParam::OnClickedCheckFolyt();
-	void CDescendantsParam::OnClickedCheckCapital();
-	void CDescendantsParam::OnClickedSzluha();
-	void CDescendantsParam::OnVillers();
-	void CDescendantsParam::OnTupigny();
-	void CDescendantsParam::OnClickedRadioNofamilyname();
-	void CDescendantsParam::OnRadioFamilyname();
-	void CDescendantsParam::OnRadioFamilynameup();
-	void CDescendantsParam::OnClickedStaticBackground();
-	void CDescendantsParam::OnBnClickedOk();
-	void CDescendantsParam::colorFrame(CPaintDC* dc, int IDC, COLORREF color);
+	void CDescendantsParamOld::setParameters();
+	void CDescendantsParamOld::OnClickedDefault();
+	void CDescendantsParamOld::updateParameters();
+	void CDescendantsParamOld::updateRadioDName();
+	void CDescendantsParamOld::updateRepeated();
+	void CDescendantsParamOld::updateRadioNumbering();
+	void CDescendantsParamOld::OnClickedCheckConnect();
+	void CDescendantsParamOld::OnClickedCheckWoman();
+	void CDescendantsParamOld::OnClickedCheckFolyt();
+	void CDescendantsParamOld::OnClickedCheckCapital();
+	void CDescendantsParamOld::OnClickedSzluha();
+	void CDescendantsParamOld::OnVillers();
+	void CDescendantsParamOld::OnTupigny();
+	void CDescendantsParamOld::OnClickedRadioNofamilyname();
+	void CDescendantsParamOld::OnRadioFamilyname();
+	void CDescendantsParamOld::OnRadioFamilynameup();
+	void CDescendantsParamOld::OnClickedStaticBackground();
+	void CDescendantsParamOld::OnBnClickedOk();
+	void CDescendantsParamOld::colorFrame(CPaintDC* dc, int IDC, COLORREF color);
 
 	DECLARE_MESSAGE_MAP()
 public:

@@ -29,7 +29,6 @@
 #define IDD_INPUT_GEDCOM                145
 #define IDD_TABLE_FIRSTNAMES            147
 #define IDD_MORESPOUSES                 148
-#define IDD_EDIT_TEXT                   149
 #define IDD_TITLES                      150
 #define IDD_SELECTGENERATION            151
 #define IDD_GAERRORS                    152
@@ -119,7 +118,6 @@
 #define IDD_EDIT_MARRIAGE               319
 #define IDD_UNITED_ENTRIES              320
 #define IDR_HTMLINES                    322
-#define IDD_DESCENDANTS_OLD             323
 #define IDD_GET_MARRIAGE                324
 #define IDD_CHECK_FATHERDEATH           325
 #define IDR_CHECK_NAMES                 326
@@ -173,7 +171,12 @@
 #define ID_CHECK_MORESPOUSES            377
 #define IDD_SAMEPEOPLE                  380
 #define IDD_DISPLAY_INFO                381
+#define IDD_DESCENDANTS_NEW             383
+#define IDD_DESCENDANTS_LINEARTABLE     383
 #define IDD_FILTERLOOP                  384
+#define IDD_DESCENDANTS_FULL            385
+#define IDD_DESCENDATS_UNIQUE           386
+#define IDD_DESCENDANTS_UNIQUE          386
 #define IDR_CHECK_DATES                 387
 #define IDR_RIBBON                      388
 #define IDD_CONTRACTED_COUPLES          389
@@ -207,6 +210,7 @@
 #define IDR_DROPDOWN_MARRIAGES_GA       491
 #define IDD_COMPARE_ASC                 492
 #define IDD_DESCENDANTS_PARAM           506
+#define IDD_DESCENDANTS                 507
 #define IDD_NOTEPAD                     508
 #define IDD_UNITED_ENTRIES_UNITED       515
 #define IDR_UNITED_ENTRIES1             521
@@ -227,6 +231,7 @@
 #define IDR_DROPDOWN_CHECKNAMES         564
 #define IDR_TABLE_MARRIAGES             565
 #define IDD_UNITED_ENTRIES_X            568
+#define IDR_DESCENDANTS_LINEAR          574
 #define IDC_LIST                        1000
 #define IDC_LAST_NAME                   1002
 #define IDC_FIRST_NAME                  1003
@@ -258,7 +263,6 @@
 #define IDC_STATIC_PARENT               1056
 #define IDC_PARENT                      1057
 #define IDC_EDIT                        1059
-#define IDC_EDITTEXT                    1060
 #define IDC_EDIT_K                      1060
 #define IDC_COMBO_TYPE                  1064
 #define IDC_COMBO                       1065
@@ -958,6 +962,7 @@
 #define ID_MARRIAGE_NAME                35039
 #define ID_BUTTON2                      35040
 #define ID_AVERAGE_LIFESPAN             35040
+#define ID_DESCENDANT_NEW               35040
 #define ID_MEGJELEN35041                35041
 #define ID_BIRTH_DEATH                  35042
 #define ID_EDIT_KERSZTN35043            35043
@@ -975,14 +980,16 @@
 #define ID_GROUP_MDATE                  35055
 #define ID_GROUP_HUSBAND                35056
 #define ID_GROUP_WIFE                   35057
+#define ID_LESZ35058                    35058
+#define ID_INDENTED_LIST                35059
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        569
-#define _APS_NEXT_COMMAND_VALUE         35058
+#define _APS_NEXT_RESOURCE_VALUE        577
+#define _APS_NEXT_COMMAND_VALUE         35060
 #define _APS_NEXT_CONTROL_VALUE         1854
-#define _APS_NEXT_SYMED_VALUE           383
+#define _APS_NEXT_SYMED_VALUE           387
 #endif
 #endif

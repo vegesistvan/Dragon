@@ -149,16 +149,16 @@ typedef struct
 	CString printedC;
 } PPEOPLE;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class CDescendants : public CWnd
+class CDescendantsOld : public CWnd
 {
-	DECLARE_DYNAMIC(CDescendants)
+	DECLARE_DYNAMIC(CDescendantsOld)
 
 public:
-	CDescendants();
-	virtual ~CDescendants();
-	BOOL CDescendants::start();
-	bool CDescendants::tablesDescendants();  // listázandó táblák a theapp.v_tableNumbers vektorban
-	bool CDescendants::linearTable2(int i, int which);
+	CDescendantsOld();
+	virtual ~CDescendantsOld();
+	BOOL CDescendantsOld::start();
+	bool CDescendantsOld::tablesDescendants();  // listázandó táblák a theapp.v_tableNumbers vektorban
+	bool CDescendantsOld::linearTable2(int i, int which);
 	CString m_rowid;
 protected:
 
@@ -258,72 +258,72 @@ protected:
 	PPEOPLE sm;
 	PPEOPLE ss;
 
-	bool CDescendants::parameters();
-	void CDescendants::descendants();
-	void CDescendants::descendantsOld();
-	CString CDescendants::getNextChildRowid(UINT i);
-	BOOL CDescendants::openHtml(CString file, CString title, UINT colorBgrnd);
-	void CDescendants::createStyle();
-	void CDescendants::closeHtml();
-	void CDescendants::queryPeople(CString rowid, PPEOPLE* p);
-	void CDescendants::print(CString str);
-	void CDescendants::printBegining( int i);
-	void CDescendants::printDescendant(int i);
+	bool CDescendantsOld::parameters();
+	void CDescendantsOld::descendants();
+	void CDescendantsOld::descendantsOld();
+	CString CDescendantsOld::getNextChildRowid(UINT i);
+	BOOL CDescendantsOld::openHtml(CString file, CString title, UINT colorBgrnd);
+	void CDescendantsOld::createStyle();
+	void CDescendantsOld::closeHtml();
+	void CDescendantsOld::queryPeople(CString rowid, PPEOPLE* p);
+	void CDescendantsOld::print(CString str);
+	void CDescendantsOld::printBegining( int i);
+	void CDescendantsOld::printDescendant(int i);
 
-	void CDescendants::printSpouses(int i);
-	void CDescendants::printMarriage(CString place, CString date, int i, int numberOfSpouses);
-	void CDescendants::printSpouse();
-	void CDescendants::printSpRelatives();
-	CString CDescendants::getLastFirst(PPEOPLE* p);
-	bool CDescendants::voltmar(CString index);
-	void CDescendants::printVector(int i);
-	int CDescendants::getNumberOfChildren(CString rowid, CString sex_id);
-	void CDescendants::listDescendants();
-	void CDescendants::multipleRowid();
-	void CDescendants::multipleRowid0();
-	void CDescendants::signeD(int i, int j);
-	CString CDescendants::getTableHeader();
-	CString CDescendants::getPlaceDateBlock(CString place, CString date, CString jel);
-	CString CDescendants::getColoredString(CString str, int index);
+	void CDescendantsOld::printSpouses(int i);
+	void CDescendantsOld::printMarriage(CString place, CString date, int i, int numberOfSpouses);
+	void CDescendantsOld::printSpouse();
+	void CDescendantsOld::printSpRelatives();
+	CString CDescendantsOld::getLastFirst(PPEOPLE* p);
+	bool CDescendantsOld::voltmar(CString index);
+	void CDescendantsOld::printVector(int i);
+	int CDescendantsOld::getNumberOfChildren(CString rowid, CString sex_id);
+	void CDescendantsOld::listDescendants();
+	void CDescendantsOld::multipleRowid();
+	void CDescendantsOld::multipleRowid0();
+	void CDescendantsOld::signeD(int i, int j);
+	CString CDescendantsOld::getTableHeader();
+	CString CDescendantsOld::getPlaceDateBlock(CString place, CString date, CString jel);
+	CString CDescendantsOld::getColoredString(CString str, int index);
 
-	void CDescendants::printVectorTxt(int i);
-	bool CDescendants::openTxt(CString file, CString title);
-	void CDescendants::closeTxt();
-	void CDescendants::printTxt(CString str);
-	void CDescendants::printBeginingTxt(int i);
-	void CDescendants::printDescendantTxt(int i);
-	CString CDescendants::createDescendant(int i, bool parentIndex );
-	void CDescendants::printSpousesTxt(int i);
-	void CDescendants::printMarriageTxt(CString place, CString date, int i, int numberOfSpouses);
-	void CDescendants::printSpouseTxt();
-	void CDescendants::printSpRelativesTxt();
+	void CDescendantsOld::printVectorTxt(int i);
+	bool CDescendantsOld::openTxt(CString file, CString title);
+	void CDescendantsOld::closeTxt();
+	void CDescendantsOld::printTxt(CString str);
+	void CDescendantsOld::printBeginingTxt(int i);
+	void CDescendantsOld::printDescendantTxt(int i);
+	CString CDescendantsOld::createDescendant(int i, bool parentIndex );
+	void CDescendantsOld::printSpousesTxt(int i);
+	void CDescendantsOld::printMarriageTxt(CString place, CString date, int i, int numberOfSpouses);
+	void CDescendantsOld::printSpouseTxt();
+	void CDescendantsOld::printSpRelativesTxt();
 
-	bool CDescendants::queryR(CString rowid);
+	bool CDescendantsOld::queryR(CString rowid);
 
-	BOOL CDescendants::queryP(CString command);
-	BOOL CDescendants::queryM(CString command);
+	BOOL CDescendantsOld::queryP(CString command);
+	BOOL CDescendantsOld::queryM(CString command);
 
-	BOOL CDescendants::query(CString command);
-	BOOL CDescendants::query2(CString command);
+	BOOL CDescendantsOld::query(CString command);
+	BOOL CDescendantsOld::query2(CString command);
 
 
-	bool CDescendants::linearTable(int i, int which);
-	void CDescendants::dataTable(int i);
-	bool CDescendants::printTopContainer(CString title, int which);
-	void CDescendants::printOnly(CString str, int which);
-	CString CDescendants::createSpouses(int i);
-	CString CDescendants::createMarriage(CString place, CString date, int i, int numberOfSpouses);
-	CString CDescendants::createSpouse();
-	CString CDescendants::createSpRelatives();
-	CString CDescendants::getComplexDescription(int i, bool parentIndex );
-	TCHAR CDescendants::get_gABC(int g);
+	bool CDescendantsOld::linearTable(int i, int which);
+	void CDescendantsOld::dataTable(int i);
+	bool CDescendantsOld::printTopContainer(CString title, int which);
+	void CDescendantsOld::printOnly(CString str, int which);
+	CString CDescendantsOld::createSpouses(int i);
+	CString CDescendantsOld::createMarriage(CString place, CString date, int i, int numberOfSpouses);
+	CString CDescendantsOld::createSpouse();
+	CString CDescendantsOld::createSpRelatives();
+	CString CDescendantsOld::getComplexDescription(int i, bool parentIndex );
+	TCHAR CDescendantsOld::get_gABC(int g);
 
-	void CDescendants::order_vDesc();
-	void CDescendants::printvLen();
-	void CDescendants::print_vDesc();
-	void CDescendants::printDesc( int i, int which );
-	void CDescendants::numOfDesc();
-	int CDescendants::sort_vDesc();
+	void CDescendantsOld::order_vDesc();
+	void CDescendantsOld::printvLen();
+	void CDescendantsOld::print_vDesc();
+	void CDescendantsOld::printDesc( int i, int which );
+	void CDescendantsOld::numOfDesc();
+	int CDescendantsOld::sort_vDesc();
 
 
 	// descendantsOld változói
@@ -332,8 +332,8 @@ protected:
 	CString m_sexidPrev;
 
 
-	void CDescendants::printGAline();
-	bool CDescendants::rowidExist();
+	void CDescendantsOld::printGAline();
+	bool CDescendantsOld::rowidExist();
 
 	DECLARE_MESSAGE_MAP()
 public:

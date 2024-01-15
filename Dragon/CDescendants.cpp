@@ -4,15 +4,12 @@
 #include "pch.h"
 #include "Dragon.h"
 #include "afxdialogex.h"
-#include "descendantsParam.h"
-#include "descendants.h"
+#include "CDescendants.h"
 
-// CDescendatsP dialog
-
-IMPLEMENT_DYNAMIC(CDescendantsParam, CDialogEx)
+IMPLEMENT_DYNAMIC(CDescendants, CDialogEx)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CDescendantsParam::CDescendantsParam(CWnd* pParent /*=nullptr*/)
-	: CDialogEx(IDD_DESCENDANTS_PARAM, pParent)
+CDescendants::CDescendants(CWnd* pParent /*=nullptr*/)
+	: CDialogEx(IDD_DESCENDANTS, pParent)
 	, m_checkConnect(true)			// táblákat összekösse-e
 	, m_checkMother(false)			// nõk leszármazottait listázza-e
 	, m_checkCapital(false)
@@ -23,7 +20,7 @@ CDescendantsParam::CDescendantsParam(CWnd* pParent /*=nullptr*/)
 	, m_comboKiemeltAttrib(3)		// leszármazott kiemelt családneve
 	, m_comboFontSize(3)
 
-	, m_radioNumbering(TUPP)		// milyen számozási rendszer legyen (0,1,2) SZLUHA/VIL/TUP
+	, m_radioNumbering(DE::TUPP)		// milyen számozási rendszer legyen (0,1,2) SZLUHA/VIL/TUP
 
 	, m_tableNumber(L"")			// tablenumber, ha a táblázat leszármazotti listáját kérjük
 	, m_editWidth(L"képernyõ")
@@ -38,11 +35,11 @@ CDescendantsParam::CDescendantsParam(CWnd* pParent /*=nullptr*/)
 {
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CDescendantsParam::~CDescendantsParam()
+CDescendants::~CDescendants()
 {
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsParam::DoDataExchange(CDataExchange* pDX)
+void CDescendants::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Check(pDX, IDC_CHECK_CONNECT, m_checkConnect);
@@ -67,9 +64,9 @@ void CDescendantsParam::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_STATIC_NUM, colorNum);
 	DDX_Control(pDX, IDC_STATIC_PRINT, colorPrint);
 	DDX_Control(pDX, IDC_STATIC_ATTRIB, colorAttrib);
-	DDX_Control(pDX, IDC_STATIC_FAMILY_INLINE, colorFamilyInline);
-	DDX_Control(pDX, IDC_STATIC_FAMILYNAME_NO, colorFamilynameNo);
-	DDX_Control(pDX, IDC_STATIC_FAMILYNAME_UP, colorFamilynameUp);
+//	DDX_Control(pDX, IDC_STATIC_FAMILY_INLINE, colorFamilyInline);
+//	DDX_Control(pDX, IDC_STATIC_FAMILYNAME_NO, colorFamilynameNo);
+//	DDX_Control(pDX, IDC_STATIC_FAMILYNAME_UP, colorFamilynameUp);
 	DDX_Text(pDX, IDC_GENMAX, m_editGenMax);
 
 	DDX_Radio(pDX, IDC_RADIO_ONE, m_radioOne);
@@ -84,47 +81,47 @@ void CDescendantsParam::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_ORDER_TXT, colorOrder);
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BEGIN_MESSAGE_MAP(CDescendantsParam, CDialogEx)
+BEGIN_MESSAGE_MAP(CDescendants, CDialogEx)
 
-	ON_BN_CLICKED(IDC_SZLUHA, &CDescendantsParam::OnClickedSzluha)
-	ON_COMMAND(IDC_TUPIGNY, &CDescendantsParam::OnTupigny)
-	ON_COMMAND(IDC_VILLERS, &CDescendantsParam::OnVillers)
+	ON_BN_CLICKED(IDC_SZLUHA, &CDescendants::OnClickedSzluha)
+	ON_COMMAND(IDC_TUPIGNY, &CDescendants::OnTupigny)
+	ON_COMMAND(IDC_VILLERS, &CDescendants::OnVillers)
 
-	ON_BN_CLICKED(IDC_CHECK_WOMAN, &CDescendantsParam::OnClickedCheckWoman)
-	ON_BN_CLICKED(IDC_CHECK_CONNECT, &CDescendantsParam::OnClickedCheckConnect)
+	ON_BN_CLICKED(IDC_CHECK_WOMAN, &CDescendants::OnClickedCheckWoman)
+	ON_BN_CLICKED(IDC_CHECK_CONNECT, &CDescendants::OnClickedCheckConnect)
 
-	ON_BN_CLICKED(IDC_CHECK_CAPITAL, &CDescendantsParam::OnClickedCheckCapital)
-	ON_STN_CLICKED(IDC_STATIC_BACKGROUND, &CDescendantsParam::OnClickedStaticBackground)
-	ON_BN_CLICKED(IDC_RADIO_NOFAMILYNAME, &CDescendantsParam::OnClickedRadioNofamilyname)
-	ON_COMMAND(IDC_RADIO_FAMILYNAME, &CDescendantsParam::OnRadioFamilyname)
-	ON_COMMAND(IDC_RADIO_FAMILYNAMEUP, &CDescendantsParam::OnRadioFamilynameup)
-	ON_BN_CLICKED(IDC_CHECK_FOLYT, &CDescendantsParam::OnClickedCheckFolyt)
+	ON_BN_CLICKED(IDC_CHECK_CAPITAL, &CDescendants::OnClickedCheckCapital)
+	ON_STN_CLICKED(IDC_STATIC_BACKGROUND, &CDescendants::OnClickedStaticBackground)
+	ON_BN_CLICKED(IDC_RADIO_NOFAMILYNAME, &CDescendants::OnClickedRadioNofamilyname)
+	ON_COMMAND(IDC_RADIO_FAMILYNAME, &CDescendants::OnRadioFamilyname)
+	ON_COMMAND(IDC_RADIO_FAMILYNAMEUP, &CDescendants::OnRadioFamilynameup)
+	ON_BN_CLICKED(IDC_CHECK_FOLYT, &CDescendants::OnClickedCheckFolyt)
 
-	ON_BN_CLICKED(IDC_DEFAULT, &CDescendantsParam::OnClickedDefault)
-	ON_BN_CLICKED(IDOK, &CDescendantsParam::OnBnClickedOk)
+	ON_BN_CLICKED(IDC_DEFAULT, &CDescendants::OnClickedDefault)
+	ON_BN_CLICKED(IDOK, &CDescendants::OnBnClickedOk)
 
-	ON_BN_CLICKED(IDC_REPEATED_ALL, &CDescendantsParam::OnClickedRepeatedAll)
-	ON_COMMAND(IDC_REPEATED_FIRST, &CDescendantsParam::OnRepeatedFirst)
-	ON_COMMAND(IDC_REPEATED_FATHER, &CDescendantsParam::OnRepeatedFather)
+	ON_BN_CLICKED(IDC_REPEATED_ALL, &CDescendants::OnClickedRepeatedAll)
+	ON_COMMAND(IDC_REPEATED_FIRST, &CDescendants::OnRepeatedFirst)
+	ON_COMMAND(IDC_REPEATED_FATHER, &CDescendants::OnRepeatedFather)
 
 	ON_WM_PAINT()
-	ON_BN_CLICKED(IDC_CHECK_BOLD, &CDescendantsParam::OnClickedCheckBold)
-	ON_BN_CLICKED(IDC_ORDER_INPUT, &CDescendantsParam::OnClickedOrderInput)
-	ON_COMMAND(IDC_ORDER_LENGTH, &CDescendantsParam::OnOrderLength)
-	ON_COMMAND(IDC_ORDER_DECREASING, &CDescendantsParam::OnOrderDecreasing)
-	ON_COMMAND(IDC_ORDER_BIRTH, &CDescendantsParam::OnOrderBirth)
+	ON_BN_CLICKED(IDC_CHECK_BOLD, &CDescendants::OnClickedCheckBold)
+	ON_BN_CLICKED(IDC_ORDER_INPUT, &CDescendants::OnClickedOrderInput)
+	ON_COMMAND(IDC_ORDER_LENGTH, &CDescendants::OnOrderLength)
+	ON_COMMAND(IDC_ORDER_DECREASING, &CDescendants::OnOrderDecreasing)
+	ON_COMMAND(IDC_ORDER_BIRTH, &CDescendants::OnOrderBirth)
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CDescendantsParam::OnInitDialog()
+BOOL CDescendants::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	for (int i = 0; i < sizeof(attrib) / sizeof(ATTRIB); ++i)
+	for (int i = 0; i < sizeof(DE::attrib) / sizeof(DE::ATTRIB); ++i)
 	{
-		m_combo_DAttrib.InsertString(i, attrib[i].text);
-		m_combo_OtherName.InsertString(i, attrib[i].text);
-		m_combo_spec.InsertString(i, attrib[i].text);
-		m_combo_comment.InsertString(i, attrib[i].text);
+		m_combo_DAttrib.InsertString(i, DE::attrib[i].text);
+		m_combo_OtherName.InsertString(i, DE::attrib[i].text);
+		m_combo_spec.InsertString(i, DE::attrib[i].text);
+		m_combo_comment.InsertString(i, DE::attrib[i].text);
 		//		m_combo_KiemeltAttrib.InsertString(i, attrib[i].text);
 	}
 	for (INT i = 0; i < 6; ++i)
@@ -176,7 +173,7 @@ BOOL CDescendantsParam::OnInitDialog()
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsParam::setParameters()
+void CDescendants::setParameters()
 {
 	m_checkConnect = theApp.GetProfileInt(L"dragon", L"m_checkConnect", 0);
 	m_checkMother = theApp.GetProfileInt(L"dragon", L"m_checkMother", 1);
@@ -207,7 +204,7 @@ void CDescendantsParam::setParameters()
 	m_radioOrder = theApp.GetProfileInt(L"dragon", L"m_radioOrder", WHITE);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsParam::OnClickedDefault()
+void CDescendants::OnClickedDefault()
 {
 	m_comboHtmlTxt.SetCurSel(0);
 	m_checkConnect = true;
@@ -217,13 +214,14 @@ void CDescendantsParam::OnClickedDefault()
 	m_checkBold = false;
 	m_checkCRLF = false;
 	m_radioOne = true;
-	
+	m_folyt = false;
+
 	m_editWidth = L"0";
 	m_editGenMax.Empty();
 
 	m_repeatedColor = false;
 	m_radioDNameX = 2;
-	m_radioNumbering = SZLUHA;
+	m_radioNumbering = DE::SZLUHA;
 	m_radioOrder = 0;
 
 	m_comboDAttrib = 1;
@@ -251,7 +249,7 @@ void CDescendantsParam::OnClickedDefault()
 	GetDlgItem(IDC_COMBO_SPEC)->EnableWindow(true);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsParam::updateParameters()
+void CDescendants::updateParameters()
 {
 	m_combo_OtherName.SetCurSel(m_comboOtherName);
 	m_combo_spec.SetCurSel(m_comboSpec);
@@ -270,7 +268,7 @@ void CDescendantsParam::updateParameters()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsParam::updateRadioDName()
+void CDescendants::updateRadioDName()
 {
 	if (m_radioDNameX == 0)									// leszármazott családnevét nem írjuk ki
 	{
@@ -303,15 +301,15 @@ void CDescendantsParam::updateRadioDName()
 	}
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsParam::updateRadioNumbering()
+void CDescendants::updateRadioNumbering()
 {
-	if (m_radioNumbering == SZLUHA)
+	if (m_radioNumbering == DE::SZLUHA)
 	{
 		((CButton*)GetDlgItem(IDC_SZLUHA))->SetCheck(TRUE);
 		((CButton*)GetDlgItem(IDC_VILLERS))->SetCheck(FALSE);
 		((CButton*)GetDlgItem(IDC_TUPIGNY))->SetCheck(FALSE);
 	}
-	else if (m_radioNumbering == VIL)
+	else if (m_radioNumbering == DE::VIL)
 	{
 		((CButton*)GetDlgItem(IDC_SZLUHA))->SetCheck(FALSE);
 		((CButton*)GetDlgItem(IDC_VILLERS))->SetCheck(TRUE);
@@ -326,7 +324,7 @@ void CDescendantsParam::updateRadioNumbering()
 	UpdateData(TOSCREEN);
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsParam::updateRepeated()
+void CDescendants::updateRepeated()
 {
 	switch (m_repeated)
 	{
@@ -347,7 +345,7 @@ void CDescendantsParam::updateRepeated()
 	}
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsParam::OnClickedCheckConnect()
+void CDescendants::OnClickedCheckConnect()
 {
 	if (m_checkMother)					// ha nõk lszrámazoittait is listázzuk, akkor mindenképpen összekötés kell
 	{
@@ -356,7 +354,7 @@ void CDescendantsParam::OnClickedCheckConnect()
 	}
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsParam::OnClickedCheckWoman()
+void CDescendants::OnClickedCheckWoman()
 {
 	m_checkMother = !m_checkMother;				// ha a nõk cgyerekeit is listázni akarjuk, akkor a táblákat is össze kell kötni!!
 	if (m_checkMother)
@@ -366,17 +364,17 @@ void CDescendantsParam::OnClickedCheckWoman()
 	}
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsParam::OnClickedCheckFolyt()
+void CDescendants::OnClickedCheckFolyt()
 {
 	m_checkFolyt = !m_checkFolyt;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsParam::OnClickedCheckCapital()
+void CDescendants::OnClickedCheckCapital()
 {
 	m_checkCapital = !m_checkCapital;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsParam::OnClickedCheckBold()
+void CDescendants::OnClickedCheckBold()
 {
 	m_checkBold = !m_checkBold;
 	if (m_checkBold == true)
@@ -408,51 +406,51 @@ void CDescendantsParam::OnClickedCheckBold()
 	UpdateData(TOSCREEN);
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsParam::OnClickedSzluha()
+void CDescendants::OnClickedSzluha()
 {
-	m_radioNumbering = SZLUHA;
+	m_radioNumbering = DE::SZLUHA;
 	updateRadioNumbering();
 }
-void CDescendantsParam::OnVillers()
+void CDescendants::OnVillers()
 {
-	m_radioNumbering = VIL;
+	m_radioNumbering = DE::VIL;
 	updateRadioNumbering();
 }
-void CDescendantsParam::OnTupigny()
+void CDescendants::OnTupigny()
 {
-	m_radioNumbering = TUP;
+	m_radioNumbering = DE::TUP;
 	updateRadioNumbering();
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsParam::OnClickedRadioNofamilyname()
+void CDescendants::OnClickedRadioNofamilyname()
 {
 	m_radioDNameX = 0;
 	updateRadioDName();
 }
-void CDescendantsParam::OnRadioFamilyname()
+void CDescendants::OnRadioFamilyname()
 {
 	m_radioDNameX = 1;
 	updateRadioDName();
 }
-void CDescendantsParam::OnRadioFamilynameup()
+void CDescendants::OnRadioFamilynameup()
 {
 	m_radioDNameX = 2;
 	updateRadioDName();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsParam::OnClickedRepeatedAll()
+void CDescendants::OnClickedRepeatedAll()
 {
 	m_repeated = 0;
 	updateRepeated();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsParam::OnRepeatedFirst()
+void CDescendants::OnRepeatedFirst()
 {
 	m_repeated = 1;
 	updateRepeated();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsParam::OnRepeatedFather()
+void CDescendants::OnRepeatedFather()
 {
 	m_repeated = 2;
 	updateRepeated();
@@ -460,7 +458,7 @@ void CDescendantsParam::OnRepeatedFather()
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsParam::OnClickedStaticBackground()
+void CDescendants::OnClickedStaticBackground()
 {
 	CMFCColorDialog dlgColors;
 	dlgColors.SetCurrentColor(WHITE);
@@ -472,7 +470,7 @@ void CDescendantsParam::OnClickedStaticBackground()
 	m_colorBgrnd = GetRValue(bgn) << 16 | GetGValue(bgn) << 8 | GetBValue(bgn);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsParam::OnBnClickedOk()
+void CDescendants::OnBnClickedOk()
 {
 	UpdateData(FROMSCREEN);
 
@@ -523,10 +521,12 @@ void CDescendantsParam::OnBnClickedOk()
 	theApp.WriteProfileInt(L"dragon", L"m_checkCRLF", m_checkCRLF);
 	theApp.WriteProfileInt(L"dragon", L"m_radioOne", m_radioOne);
 
-	CDialogEx::OnOK();
+	create_vDesc();
+
+//	CDialogEx::OnOK();
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsParam::OnPaint()
+void CDescendants::OnPaint()
 {
 	CPaintDC dc(this);
 	COLORREF	color = LIGHTBLUE;
@@ -542,7 +542,7 @@ void CDescendantsParam::OnPaint()
 	
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsParam::colorFrame(CPaintDC* dc, int IDC, COLORREF color)
+void CDescendants::colorFrame(CPaintDC* dc, int IDC, COLORREF color)
 {
 	CRect rc;
 
@@ -565,23 +565,51 @@ void CDescendantsParam::colorFrame(CPaintDC* dc, int IDC, COLORREF color)
 	dc->Rectangle(&rc);
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsParam::OnClickedOrderInput()
+void CDescendants::OnClickedOrderInput()
 {
-	m_radioOrder = ORDER_INPUT;
+	m_radioOrder = DE::ORDER_INPUT;
 }
-void CDescendantsParam::OnOrderBirth()
+void CDescendants::OnOrderBirth()
 {
-	m_radioOrder = ORDER_BIRTH;
+	m_radioOrder = DE::ORDER_BIRTH;
 }
-void CDescendantsParam::OnOrderLength()
+void CDescendants::OnOrderLength()
 {
-	m_radioOrder = ORDER_INCREASING;
+	m_radioOrder = DE::ORDER_INCREASING;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsParam::OnOrderDecreasing()
+void CDescendants::OnOrderDecreasing()
 {
-	m_radioOrder = ORDER_DECREASING;
+	m_radioOrder = DE::ORDER_DECREASING;
 }
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CString CDescendants::getComplexDescription(int i, bool parentIndex)
+{
+	CString people = createDescendant(i, parentIndex);
+	CString spouses = createSpouses(i);
+	CString arm;
+	CString csalad;
+	CString folyt;
 
+	people.Trim();
+	people += L" ";
+	people += spouses;
+	people.Trim();
 
-
+	if (!p.arm.IsEmpty())
+	{
+		arm.Format(L" <font color='blue'>[%s]</font>", p.arm);
+		people += arm;
+	}
+	if (!p.csalad.IsEmpty())
+	{
+		csalad.Format(L" <font color='blue'>[%s]</font>", p.csalad);
+		people += csalad;
+	}
+	if (!p.folyt.IsEmpty() && p_folyt)
+	{
+		folyt.Format(L"<font color='blue'> %c%c%c folyt %s</font>", '%', '%', '%', p.folyt);
+		people += folyt;
+	}
+	return people;
+}

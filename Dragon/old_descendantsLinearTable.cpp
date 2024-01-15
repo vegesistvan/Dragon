@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "Dragon.h"
 #include "afxdialogex.h"
-#include "descendants.h"
-#include "descendantsParam.h"
+#include "old_descendants.h"
+#include "old_descendantsParam.h"
 #include "Table_people_columns.h"
 #include "Table_tables.h"
 #include "build_defs.h"
@@ -14,13 +14,13 @@ bool sortBynOfD(const DN::DESC& d1, const DN::DESC& d2)
 	return(d1.nOfD < d2.nOfD);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool sortById(const DN::DESC& d1, const DN::DESC& d2 )
+bool sortById2(const DN::DESC& d1, const DN::DESC& d2 )
 {
 	return(d1.id < d2.id );
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CDescendants::linearTable(int i, int which)
+bool CDescendantsOld::linearTable(int i, int which)
 {
 	CString filename;
 	CString title;
@@ -341,7 +341,7 @@ bool CDescendants::linearTable(int i, int which)
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendants::dataTable(int which)
+void CDescendantsOld::dataTable(int which)
 {
 	DN::DESC desc;
 	CString rowidF;
@@ -372,6 +372,7 @@ void CDescendants::dataTable(int which)
 	wndP.GoModal();
 	wndP.SetRange(0, vDesc.size());
 	wndP.SetPos(0);
+
 
 	// Az id kitöltése, hogy a tényleges listában meh tudja adni a gyerek id-jét
 	for (int i = 0; i < vDesc.size(); ++i)
@@ -430,7 +431,7 @@ void CDescendants::dataTable(int which)
 		if (!vD1.size()) break;
 	}
 
-	std::sort(vDesc.begin(), vDesc.end(), sortById );
+	std::sort(vDesc.begin(), vDesc.end(), sortById2 );
 	for (int i = 0; i < vDesc.size(); ++i)
 	{
 		wndP.SetPos(i);
@@ -443,11 +444,12 @@ void CDescendants::dataTable(int which)
 		printDesc(i, which);
 	}
 
+	/*
 	int gPrev = -1;
 	int ordPrev = 0;
 	int ix1 = 0;		// rendezendõ bejegyzések elsõ elemének indexe
 	int ix2;			// rendezendõ bejegyzések utolsó elemének indexe
-	for (int i = 0; i > vDesc.size(); ++i)
+	for (int i = 0; i < vDesc.size(); ++i)
 	{
 		if (vDesc.at(i).g != gPrev || vDesc.at(i).childorder != ordPrev + 1)
 		{
@@ -461,10 +463,11 @@ void CDescendants::dataTable(int which)
 			ordPrev = vDesc.at(i).childorder;
 		}
 	}
+	*/
 	wndP.DestroyWindow();
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendants::printDesc( int i, int which  )
+void CDescendantsOld::printDesc( int i, int which  )
 {
 	DN::DESC desc = vDesc.at(i);
 
@@ -589,7 +592,7 @@ void CDescendants::printDesc( int i, int which  )
 	genPrev = gen;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CDescendants::getComplexDescription(int i, bool parentIndex )
+CString CDescendantsOld::getComplexDescription(int i, bool parentIndex )
 {
 	CString people = createDescendant(i, parentIndex );
 	CString spouses = createSpouses(i);
@@ -620,7 +623,7 @@ CString CDescendants::getComplexDescription(int i, bool parentIndex )
 	return people;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendants::printOnly(CString str, int which)
+void CDescendantsOld::printOnly(CString str, int which)
 {
 	str.Replace('|', '\'');
 	str = UnicodeToUtf8(str);
@@ -641,7 +644,7 @@ void CDescendants::printOnly(CString str, int which)
 	}
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TCHAR CDescendants::get_gABC(int g)
+TCHAR CDescendantsOld::get_gABC(int g)
 {
 	TCHAR gABC;
 	int ix = g / 26;		  // ix = 0, ha g kisebb mint 26, = 1 Ha nagyobb
@@ -649,7 +652,7 @@ TCHAR CDescendants::get_gABC(int g)
 	return gABC;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CDescendants::printTopContainer(CString title, int which)
+bool CDescendantsOld::printTopContainer(CString title, int which)
 {
 	int l = -37;
 	CString today;
@@ -779,7 +782,7 @@ bool CDescendants::printTopContainer(CString title, int which)
 	printOnly(L"</pre>", which);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int CDescendants::sort_vDesc()
+int CDescendantsOld::sort_vDesc()
 {
 	int gPrev = -1;
 	int ordPrev = 0;

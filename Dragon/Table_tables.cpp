@@ -6,7 +6,8 @@
 #include "Table_tables.h"
 #include "afxdialogex.h"
 #include "EditTable.h"
-#include "descendants.h"
+#include "old_descendants.h"
+#include "CDescendants.h"
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -562,6 +563,8 @@ void CTableTables::OnDescendantsTable()  // Kijelölt táblák listája
 		rowid = m_ListCtrl.GetItemText(nItem, 1);
 		theApp.v_tableNumbers.push_back(rowid);
 	}
-	CDescendants desc;
-	desc.tablesDescendants();
+//	CDescendantsOld desc;
+//	desc.tablesDescendants();
+	CDescendants dlg;
+	dlg.DoModal();
 }

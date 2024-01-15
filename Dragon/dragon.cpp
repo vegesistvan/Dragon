@@ -203,7 +203,6 @@ BOOL CDragApp::InitInstance()
 
 	EnableTaskbarInteraction(FALSE);
 
-	// AfxInitRichEdit2() is required to use RichEdit control
 	AfxInitRichEdit2();
 
 	setlocale(LC_CTYPE, "Hungarian_Hungary.1250");

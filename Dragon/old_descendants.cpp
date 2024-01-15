@@ -4,8 +4,8 @@
 #include "pch.h"
 #include "Dragon.h"
 #include "afxdialogex.h"
-#include "descendants.h"
-#include "descendantsParam.h"
+#include "old_descendants.h"
+#include "old_descendantsParam.h"
 #include "Table_people_columns.h"
 #include "Table_tables.h"
 #include "Table_people.h"
@@ -28,8 +28,8 @@ bool sortByOrderAsc(const DN::LEN& v1, const DN::LEN& v2)
 	return(v1.order < v2.order);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-IMPLEMENT_DYNAMIC(CDescendants, CWnd)
-CDescendants::CDescendants()
+IMPLEMENT_DYNAMIC(CDescendantsOld, CWnd)
+CDescendantsOld::CDescendantsOld()
 {
 	m_descendantsPath.Format(L"%s\\descendants_%s", theApp.m_workingDirectory, theApp.m_dbFileTitle);
 	if (_waccess(m_descendantsPath, 0))
@@ -38,11 +38,11 @@ CDescendants::CDescendants()
 	m_log = false;			// nyomtassa-e a vektorokat?
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CDescendants::~CDescendants()
+CDescendantsOld::~CDescendantsOld()
 {
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BEGIN_MESSAGE_MAP(CDescendants, CWnd)
+BEGIN_MESSAGE_MAP(CDescendantsOld, CWnd)
 END_MESSAGE_MAP()
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -84,12 +84,12 @@ void CTablePeople::OnDescendantsNew()
 		else
 			theApp.v_tableNumbers.push_back( L"1" );
 	}
-	CDescendants desc;
+	CDescendantsOld desc;
 	desc.start();
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CDescendants::start()
+BOOL CDescendantsOld::start()
 {
 	if (!parameters()) return false;
 
@@ -203,7 +203,7 @@ BOOL CDescendants::start()
 	return TRUE;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CDescendants::tablesDescendants()  // listázandó táblák a theapp.v_tableNumbers vektorban
+bool CDescendantsOld::tablesDescendants()  // listázandó táblák a theapp.v_tableNumbers vektorban
 {
 	CString file;
 	CString title;
@@ -346,7 +346,7 @@ bool CDescendants::tablesDescendants()  // listázandó táblák a theapp.v_tableNum
 	return true;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendants::descendants()
+void CDescendantsOld::descendants()
 {
 	CString rowid;
 	int i;
@@ -476,7 +476,7 @@ void CDescendants::descendants()
 	
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendants::print_vDesc()
+void CDescendantsOld::print_vDesc()
 {
 	CString fileSpec;
 	fileSpec = theApp.openTextFile(&text, L"vDesc", L"w+");
@@ -491,7 +491,7 @@ void CDescendants::print_vDesc()
 
 /*
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendants::descendants()
+void CDescendantsOld::descendants()
 {
 	CString rowid;
 	int i;
@@ -644,7 +644,7 @@ void CDescendants::descendants()
 */
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendants::descendantsOld()
+void CDescendantsOld::descendantsOld()
 {
 	DN::DESC desc;
 	CString rowid;
@@ -741,7 +741,7 @@ void CDescendants::descendantsOld()
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendants::listDescendants()
+void CDescendantsOld::listDescendants()
 {
 	CString fileSpec;
 	fileSpec = theApp.openTextFile(&fl, L"vDesc", L"w+");
@@ -754,7 +754,7 @@ void CDescendants::listDescendants()
 	theApp.showFile(fileSpec);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CDescendants::queryR(CString rowid)
+bool CDescendantsOld::queryR(CString rowid)
 {
 	int z;
 	
@@ -815,7 +815,7 @@ bool CDescendants::queryR(CString rowid)
 	return true;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int CDescendants::getNumberOfChildren(CString rowid, CString sex_id)
+int CDescendantsOld::getNumberOfChildren(CString rowid, CString sex_id)
 {
 	if (sex_id == MAN)
 	{
@@ -836,7 +836,7 @@ int CDescendants::getNumberOfChildren(CString rowid, CString sex_id)
 	return(_wtoi(rs.GetFieldString(0)));
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CDescendants::getNextChildRowid( UINT i )
+CString CDescendantsOld::getNextChildRowid( UINT i )
 {
 	CString parent_id = vDesc.at(i).rowid;
 	UINT	ixChild = vDesc.at(i).procChildren;	// leszármazott ixChild-adik gyerekét keresi  
@@ -891,9 +891,9 @@ CString CDescendants::getNextChildRowid( UINT i )
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CDescendants::parameters()
+bool CDescendantsOld::parameters()
 {
-	CDescendantsParam dlg;
+	CDescendantsParamOld dlg;
 	if (dlg.DoModal() == IDCANCEL) return false;
 
 	m_editGenMax = dlg.m_editGenMax;
@@ -925,7 +925,7 @@ bool CDescendants::parameters()
 
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendants::multipleRowid()
+void CDescendantsOld::multipleRowid()
 {
 	CString rowid;
 	int g;
@@ -988,7 +988,7 @@ void CDescendants::multipleRowid()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // i-tõl kezdve minden leszármazottat ( saját és magasabb generációkat) megtart
 // j-tõl kezdve minden leszármazottat ( saját és magasabb generációkat) kihagy
-void CDescendants::signeD( int i, int j )
+void CDescendantsOld::signeD( int i, int j )
 {
 	int g = vDesc.at(i).g;
 	for (int k = i; k < vDesc.size(); ++k)
@@ -1009,7 +1009,7 @@ void CDescendants::signeD( int i, int j )
 	}
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CDescendants::query(CString command)
+BOOL CDescendantsOld::query(CString command)
 {
 	if (rs.Query(command, theApp.mainDB))
 	{
@@ -1020,7 +1020,7 @@ BOOL CDescendants::query(CString command)
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CDescendants::query2(CString command)
+BOOL CDescendantsOld::query2(CString command)
 {
 	if (rs2.Query(command, theApp.mainDB))
 	{
@@ -1031,7 +1031,7 @@ BOOL CDescendants::query2(CString command)
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CDescendants::queryP(CString command)
+BOOL CDescendantsOld::queryP(CString command)
 {
 	if (rsP.Query(command, theApp.mainDB))
 	{
@@ -1042,7 +1042,7 @@ BOOL CDescendants::queryP(CString command)
 	return TRUE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CDescendants::queryM(CString command)
+BOOL CDescendantsOld::queryM(CString command)
 {
 	if (rsM.Query(command, theApp.mainDB))
 	{
@@ -1055,7 +1055,7 @@ BOOL CDescendants::queryM(CString command)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ix a kiirandó leszármazott indexe a vDesc vektorban
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendants::printGAline()
+void CDescendantsOld::printGAline()
 {
 	//	fwprintf( fl, L"%d %d %d %d\n", vDesc.at(ix).childrenPrinted, vDesc.at(ix).gen, vDesc.at(ix).numOfChildren, vDesc.size() );
 
@@ -1112,7 +1112,7 @@ void CDescendants::printGAline()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // vRowid vektorba gyûjti a listázott leszármazottak rowid-jeit.
 // Elõtte megnézi, hogy szerepel-e már benne. Ha igen true, ha nem false a visszatérés
-bool CDescendants::rowidExist()
+bool CDescendantsOld::rowidExist()
 {
 	int i;
 	for (i = 0; i < vRowid.size(); ++i)
@@ -1124,7 +1124,7 @@ bool CDescendants::rowidExist()
 	return false;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendants::printvLen()
+void CDescendantsOld::printvLen()
 {
 	if (!m_log) return;
 	DN::LEN len;
@@ -1154,7 +1154,7 @@ void CDescendants::printvLen()
 // Ha van, akkor azt a szakaszt tovább bontjuk a következõ generáció szerint, hasonló módon, csak egy felbontott al-intervallum
 //  "order"  értéke az anya-intervallum "order" értékéhez adódik hozzá
 
-void CDescendants::order_vDesc()
+void CDescendantsOld::order_vDesc()
 {
 	int i;
 	int j;
@@ -1371,7 +1371,7 @@ void CDescendants::order_vDesc()
 
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendants::numOfDesc()
+void CDescendantsOld::numOfDesc()
 {
 	CString rowidF;
 	m_iPrev = 0;

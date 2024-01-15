@@ -1,6 +1,10 @@
 #pragma once
 
-#define VERSION L"10.159"
+#define VERSION L"10.161"
+
+// 10.161 2024.01.15 Interaktív lineáris leszármazotti tábla 
+// 
+// 10.160 2024.01.11 Nõi leszáramzottak gyerekeinek családnevét is kezeli a beolvasásnál
 
 // 10.159 2024.01.10 Lineáris l.táblában a generációs hossz. ;/1 megszüntetése. Kisebb javítások
 

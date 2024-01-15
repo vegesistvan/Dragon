@@ -135,7 +135,7 @@ void CAscendantsFull::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 		nItem = pLVCD->nmcd.dwItemSpec;
 		nCol = pLVCD->iSubItem;
 		toggle = _wtoi(m_ListCtrlF.GetItemText(nItem, F_TOGGLE));
-		if (toggle == 0)
+		if (toggle == false)
 		{
 			rgbColor = WHITE;			// változatlan marad
 			rgbFont = RGB(255, 0, 0);
@@ -251,38 +251,41 @@ void CAscendantsFull::OnKeressPrevious()
 void CAscendantsFull::OnFunctionsDescendands()
 {
 	int nItem = m_ListCtrlF.GetNextItem(-1, LVNI_SELECTED);
-	CString ascendant;
 	CString sex;
 	CString id;
 	CString idC;
-	CString filePathName;
 
-	filePathName = theApp.openTextFile(&flDesc, L"desc", L"w+");  // log fájl
-
-	m_ListCtrlF.SetItemState(nItem, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
 	id = m_ListCtrlF.GetItemText(nItem, F_ID);
 	idC = m_ListCtrlF.GetItemText(nItem, F_IDC);
-	ascendant = m_ListCtrlF.GetItemText(nItem, F_ASCENDANT);
-	fwprintf(flDesc, L"%-8s %s\n", id, ascendant);
 
+	theApp.unselectAll(&m_ListCtrlF);
+	m_ListCtrlF.SetItemState(nItem, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
 	for (int i = nItem-1; i >= 0; --i)
 	{
 		id = m_ListCtrlF.GetItemText(i, F_ID);
 		if (id == idC)
 		{
-			sex = m_ListCtrlF.GetItemText(i, F_SEX);
 			m_ListCtrlF.SetItemState(i, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
-			m_ListCtrlF.SetItemText(nItem, F_COLOR, L"1");
+//			m_ListCtrlF.SetItemText(nItem, F_COLOR, L"1");
 			idC = m_ListCtrlF.GetItemText(i, F_IDC);
-			ascendant = m_ListCtrlF.GetItemText(i, F_ASCENDANT);
-			fwprintf(flDesc, L"%-8s %s\n", id, ascendant);
 
+			sex = m_ListCtrlF.GetItemText(i, F_SEX);
 			if (sex == WOMAN) break;
 		}
 	}
+
+	
+/*
+ 	CString ascendant;
+	CString filePathName;
+	filePathName = theApp.openTextFile(&flDesc, L"desc", L"w+");  // log fájl
+
+	ascendant = m_ListCtrlF.GetItemText(nItem, F_ASCENDANT);
+	fwprintf(flDesc, L"%-8s %s\n", id, ascendant);
+	theApp.showFile(filePathName);
 	fclose(flDesc);
-	LRESULT ret = SendMessage( WM_RELOAD, (WPARAM)FULL, NULL );
-//	theApp.showFile(filePathName);
+*/
+//	LRESULT ret = SendMessage( WM_RELOAD, (WPARAM)FULL, NULL );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CAscendantsFull::OnFunctionsAscendants()
@@ -303,6 +306,8 @@ void CAscendantsFull::OnFunctionsAscendants()
 	ascendant = m_ListCtrlF.GetItemText(nItem, F_ASCENDANT);
 	fwprintf(flDesc, L"%-8s %s\n", id, ascendant.TrimLeft() );
 
+
+//	theApp.unselectAll(&m_ListCtrlF);
 	for (int i = nItem + 1; i < n; ++i)
 	{
 		id = m_ListCtrlF.GetItemText(i, F_ID);
@@ -317,5 +322,5 @@ void CAscendantsFull::OnFunctionsAscendants()
 		}
 	}
 	fclose(flDesc);
-	theApp.showFile(filePathName);
+//	theApp.showFile(filePathName);
 }

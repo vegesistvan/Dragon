@@ -324,7 +324,7 @@ CString CInputGA::insertAny( PEOPLE* p )
 		last_name	= p->last_name.Left( pos );
 		other_names	= p->last_name.Mid( pos+2);
 		other_names.Replace( ')', ' ' );
-		other_names.TrimRight();
+		other_names.Trim();
 	}
 	last_name = convertNameToLower(last_name);  // ha netán (GEDCOM) nagybetûs lenne
 

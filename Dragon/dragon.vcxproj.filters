@@ -72,9 +72,6 @@
     <ClInclude Include="Table_firstnames.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EditText.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SelectOne.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -165,9 +162,6 @@
     <ClInclude Include="Brackets.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CBrackets.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="CDialogRichText.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -237,10 +231,10 @@
     <ClInclude Include="Date.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="descendants.h">
+    <ClInclude Include="old_descendants.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="descendantsParam.h">
+    <ClInclude Include="old_descendantsParam.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="displayInfo.h">
@@ -396,6 +390,18 @@
     <ClInclude Include="unitedEntriesX.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CDescendantsLinearTable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CDescendantsFull.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CDescendantsUnique.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CDescendants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dragon.cpp">
@@ -432,9 +438,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Table_firstnames.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="EditText.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SelectOne.cpp">
@@ -602,16 +605,16 @@
     <ClCompile Include="Date.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="descendants.cpp">
+    <ClCompile Include="old_descendants.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="descendantsParam.cpp">
+    <ClCompile Include="old_descendantsParam.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="descendantsPrint.cpp">
+    <ClCompile Include="old_descendantsPrint..cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="descendantsPrintTxt.cpp">
+    <ClCompile Include="old_descendantsPrintTxt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="displayInfo.cpp">
@@ -791,7 +794,31 @@
     <ClCompile Include="unitedEntriesX.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="descendantsLinearTable.cpp">
+    <ClCompile Include="old_descendantsLinearTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CDescendantsLinearTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CDescendantsFull.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CDescendantsUnique.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CDescendants.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CDescendants_Vector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CDescendants_IndentedHtml.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CDescendants_PrintTxt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CDescendants_LinearHtml.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

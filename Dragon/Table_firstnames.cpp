@@ -5,7 +5,6 @@
 #include "dragon.h"
 #include "Table_firstnames.h"
 #include "afxdialogex.h"
-#include "EditText.h"
 #include "ListBoxEx.h"
 #include "SelectOne.h"
 #include "SelectString.h"

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Dragon.h"
 #include "afxdialogex.h"
-#include "descendants.h"
+#include "CDescendants.h"
 #include "Table_people_columns.h"
 #include "utilities.h"
 #include "build_defs.h"
@@ -121,11 +121,11 @@ void CDescendants::printBeginingTxt(int i)
 		}
 	}
 	/////leszármazott sorának kezedete /////////////////////////////////////////////
-	if (p_numbering == SZLUHA)
+	if (p_numbering == DE::SZLUHA)
 		str.Format(L"%s%d. %c%lc", indent, vDesc.at(i).childorder, gen, diamond);
-	else if (p_numbering == VIL)
+	else if (p_numbering == DE::VIL)
 		str.Format(L"%s%c%d%lc", indent, gen, vDesc.at(i).childorder, diamond);
-	else if (p_numbering == TUP)
+	else if (p_numbering == DE::TUP)
 	{
 		z = vSerial.size() - 1;
 		if (g < z)
@@ -151,7 +151,7 @@ void CDescendants::printDescendantTxt(int i)
 	int j;
 	int last;
 	int	lastMotherIndex;
-	LMX lmx;
+	DE::LMX lmx;
 
 	name = p.first_name;
 	if (p_lastname == 1)

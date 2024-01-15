@@ -10,7 +10,8 @@
 #include "EditMarriage.h"
 #include "ascendants.h"
 #include "SelectFromPeople.h"
-#include "descendants.h"
+#include "old_descendants.h"
+#include "CDescendants.h"
 
 enum
 {
@@ -1068,12 +1069,14 @@ void CRelatives::OnDescendants()
 	int nItem;
 
 	theApp.v_rowid.clear();
-	theApp.v_rowid.push_back(m_rowid);
+	theApp.v_rowid.push_back(m_rowidP);
 
 	theApp.v_tableNumbers.clear();
 	theApp.v_tableNumbers.push_back(L"1");
 
-	CDescendants desc;
-	desc.start();
+//	CDescendantsOld desc;
+//	desc.start();
+	CDescendants dlg;
+	dlg.DoModal();
 }
 

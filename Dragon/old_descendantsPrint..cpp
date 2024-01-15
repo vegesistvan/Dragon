@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Dragon.h"
 #include "afxdialogex.h"
-#include "descendants.h"
+#include "old_descendants.h"
 #include "Table_people_columns.h"
 #include "utilities.h"
 #include "build_defs.h"
@@ -9,7 +9,7 @@
 // ix a kiirandó leszármazott indexe a vDesc vektorban
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendants::printVector( int i )
+void CDescendantsOld::printVector( int i )
 {
 	CString tableheader;
 	CString tableNumber;
@@ -75,7 +75,7 @@ void CDescendants::printVector( int i )
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // A genráció változástól függû behuzás és genrációs kód nyomtatása az m_sytax értékétõl függõen
-void CDescendants::printBegining(int i)
+void CDescendantsOld::printBegining(int i)
 {
 	CString family;
 	CString shift;
@@ -168,7 +168,7 @@ void CDescendants::printBegining(int i)
 	print(str);		
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CDescendants::getTableHeader()
+CString CDescendantsOld::getTableHeader()
 {
 	CString last_name;
 	CString percent;
@@ -200,7 +200,7 @@ CString CDescendants::getTableHeader()
 	return(str);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CDescendants::createDescendant(int i, bool parentIndex )
+CString CDescendantsOld::createDescendant(int i, bool parentIndex )
 {
 	CString name;
 	CString line;
@@ -335,7 +335,7 @@ CString CDescendants::createDescendant(int i, bool parentIndex )
 	return(line);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CDescendants::createSpouses(int i)
+CString CDescendantsOld::createSpouses(int i)
 {
 	CString rowid = vDesc.at(i).rowid;
 	CString rowidS;
@@ -387,7 +387,7 @@ CString CDescendants::createSpouses(int i)
 //	fflush(fl);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CDescendants::createMarriage(CString place, CString date, int i, int numberOfSpouses)
+CString CDescendantsOld::createMarriage(CString place, CString date, int i, int numberOfSpouses)
 {
 	CString marriage;
 
@@ -414,7 +414,7 @@ CString CDescendants::createMarriage(CString place, CString date, int i, int num
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // a házastárs listázados blokkját elkészíti
-CString CDescendants::createSpouse()
+CString CDescendantsOld::createSpouse()
 {
 	CString spouse;
 	CString fullname;
@@ -436,6 +436,7 @@ CString CDescendants::createSpouse()
 	}
 	if (!s.other_names.IsEmpty())
 	{
+		fullname.TrimRight();
 		fullname += L"_(";
 		fullname += s.other_names;
 		fullname += L") ";
@@ -500,7 +501,7 @@ CString CDescendants::createSpouse()
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // a házastárs személyleíró blokkját elkészíti, a neveket bold-dal kiemnelve
-CString CDescendants::createSpRelatives()
+CString CDescendantsOld::createSpRelatives()
 {
 	CString father(L"");
 	CString mother(L"");
@@ -601,7 +602,7 @@ CString CDescendants::createSpRelatives()
 	return(parents);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CDescendants::voltmar(CString index)
+bool CDescendantsOld::voltmar(CString index)
 {
 	for (int i = 0; i < vSpouseIndex.size(); ++i)
 	{
@@ -611,7 +612,7 @@ bool CDescendants::voltmar(CString index)
 	return false;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendants::print(CString str)
+void CDescendantsOld::print(CString str)
 {
 	str.Replace('|', '\'');
 	str = UnicodeToUtf8(str);
@@ -619,7 +620,7 @@ void CDescendants::print(CString str)
 	fflush(fl);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendants::queryPeople(CString rowid, PPEOPLE* p)
+void CDescendantsOld::queryPeople(CString rowid, PPEOPLE* p)
 {
 	m_command.Format(L"SELECT rowid,* FROM people WHERE rowid ='%s'", rowid);
 	if (!queryP(m_command)) return;
@@ -662,7 +663,7 @@ void CDescendants::queryPeople(CString rowid, PPEOPLE* p)
 	if ((p->comment.Find(L"http")) != -1) p->comment.Empty();
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CDescendants::getPlaceDateBlock(CString place, CString date, CString jel)
+CString CDescendantsOld::getPlaceDateBlock(CString place, CString date, CString jel)
 {
 
 	CString block(L"");
@@ -691,7 +692,7 @@ CString CDescendants::getPlaceDateBlock(CString place, CString date, CString jel
 	return block;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CDescendants::getLastFirst(PPEOPLE* p) // házatárs anyjának é stovábbi házastársainak neve képzõdik így
+CString CDescendantsOld::getLastFirst(PPEOPLE* p) // házatárs anyjának é stovábbi házastársainak neve képzõdik így
 {
 
 	CString name = p->last_name;
@@ -715,7 +716,7 @@ CString CDescendants::getLastFirst(PPEOPLE* p) // házatárs anyjának é stovábbi h
 	return name;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CDescendants::getColoredString(CString str, int index)
+CString CDescendantsOld::getColoredString(CString str, int index)
 {
 //	str.Trim();
 	CString colored(str);
@@ -724,7 +725,7 @@ CString CDescendants::getColoredString(CString str, int index)
 	return colored;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CDescendants::openHtml(CString file, CString title, UINT colorBgrnd)
+BOOL CDescendantsOld::openHtml(CString file, CString title, UINT colorBgrnd)
 {
 	CString descendantsPath;
 	CString dragonjpgPathName;
@@ -905,7 +906,7 @@ BOOL CDescendants::openHtml(CString file, CString title, UINT colorBgrnd)
 	return TRUE;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendants::createStyle()
+void CDescendantsOld::createStyle()
 {
 
 	fwprintf(fl, L"<style>\n");
@@ -960,7 +961,7 @@ void CDescendants::createStyle()
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendants::closeHtml()
+void CDescendantsOld::closeHtml()
 {
 //	for (int i = 0; i < m_indent; ++i)			// a kihúzások megszüntetése, vissza az alapvonalra
 //		fwprintf(fl, L"%s", m_tag2);

@@ -27,14 +27,17 @@
 #include "ProgressWnd.h"
 #include "EditPeople.h"
 #include "Relatives.h"
-
 #include "Table_people_columns.h"
 #include "utilities_dragon.h"
 #include "compareEntries.h"
 #include "compareAscendants.h"
+
 #include "ascendants.h"
-#include "descendants.h"
-#include "compareEntries.h"
+
+#include "old_descendants.h"
+#include "CDescendants.h"
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool sortBySource(const UNITE_ENTRIES& v1, const UNITE_ENTRIES& v2)
 {
@@ -150,6 +153,7 @@ ON_COMMAND(ID_DESCENDANTS_NEW, &CTablePeople::OnDescendantsNew)
 ON_COMMAND(ID_EDIT_NOTEPAD, &CTablePeople::OnEditNotepad)
 ON_COMMAND(ID_ROKONOK, &CTablePeople::OnRokonok)
 ON_COMMAND(ID_BIRTH_DEATH, &CTablePeople::OnBirthDeath)
+ON_COMMAND(ID_DESCENDANTS, &CTablePeople::OnDescendants)
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CTablePeople::OnInitDialog()
@@ -1769,5 +1773,45 @@ void CTablePeople::OnRokonok()
 	}
 	dlg.DoModal();
 }
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTablePeople::OnDescendants()
+{
+	int nItem;
 
+	POSITION pos = m_ListCtrl.GetFirstSelectedItemPosition();
+	if (!pos)
+	{
+		theApp.message(L"Kijelölt õsök listája", L"\nNincs kijelölve senki!");
+		return;
+	}
 
+	theApp.v_rowid.clear();
+	theApp.v_tableNumbers.clear();
+	CString rowid;
+	CString tableNumber;
+
+	while (pos)
+	{
+		nItem = m_ListCtrl.GetNextSelectedItem(pos);
+		rowid = m_ListCtrl.GetItemText(nItem, G_ROWID);
+		m_command.Format(L"SELECT rowid FROM people WHERE father_id ='%s' OR mother_id='%s'", rowid, rowid);
+		if (!query(m_command)) return;
+		if (!m_recordset->RecordsCount())
+		{
+			str.Format(L"%s rowid bejegyzésnek nincs leszármoazottja", rowid);
+			AfxMessageBox(str);
+			return;
+		}
+
+		theApp.v_rowid.push_back(rowid);
+		if (theApp.m_inputMode == GAHTML)
+		{
+			tableNumber = m_ListCtrl.GetItemText(nItem, G_TABLENUMBER);
+			theApp.v_tableNumbers.push_back(tableNumber);
+		}
+		else
+			theApp.v_tableNumbers.push_back(L"1");
+	}
+	CDescendants dlg;
+	dlg.DoModal();
+}
