@@ -13,7 +13,7 @@ IMPLEMENT_DYNAMIC(CDescendantsParamOld, CDialogEx)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CDescendantsParamOld::CDescendantsParamOld(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_DESCENDANTS_PARAM, pParent)
-	, m_checkConnect(true)			// táblákat összekösse-e
+	, p_connect(true)			// táblákat összekösse-e
 	, m_checkMother(false)			// nõk leszármazottait listázza-e
 	, m_checkCapital(false)
 	, m_checkBold(FALSE)
@@ -45,7 +45,7 @@ CDescendantsParamOld::~CDescendantsParamOld()
 void CDescendantsParamOld::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Check(pDX, IDC_CHECK_CONNECT, m_checkConnect);
+	DDX_Check(pDX, IDC_CHECK_CONNECT, p_connect);
 	DDX_Check(pDX, IDC_CHECK_WOMAN, m_checkMother);
 
 	DDX_Check(pDX, IDC_CHECK_CAPITAL, m_checkCapital);
@@ -178,7 +178,7 @@ BOOL CDescendantsParamOld::OnInitDialog()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsParamOld::setParameters()
 {
-	m_checkConnect = theApp.GetProfileInt(L"dragon", L"m_checkConnect", 0);
+	p_connect = theApp.GetProfileInt(L"dragon", L"p_connect", 0);
 	m_checkMother = theApp.GetProfileInt(L"dragon", L"m_checkMother", 1);
 	m_checkFolyt = theApp.GetProfileInt(L"dragon", L"m_checkFolyt", 0);
 	m_checkCapital = theApp.GetProfileInt(L"dragon", L"m_checkCapital", 0);
@@ -210,7 +210,7 @@ void CDescendantsParamOld::setParameters()
 void CDescendantsParamOld::OnClickedDefault()
 {
 	m_comboHtmlTxt.SetCurSel(0);
-	m_checkConnect = true;
+	p_connect = true;
 	m_checkMother = true;
 	m_checkFolyt = false;
 	m_checkCapital = false;
@@ -351,7 +351,7 @@ void CDescendantsParamOld::OnClickedCheckConnect()
 {
 	if (m_checkMother)					// ha nõk lszrámazoittait is listázzuk, akkor mindenképpen összekötés kell
 	{
-		m_checkConnect = true;
+		p_connect = true;
 		UpdateData(TOSCREEN);
 	}
 }
@@ -361,7 +361,7 @@ void CDescendantsParamOld::OnClickedCheckWoman()
 	m_checkMother = !m_checkMother;				// ha a nõk cgyerekeit is listázni akarjuk, akkor a táblákat is össze kell kötni!!
 	if (m_checkMother)
 	{
-		m_checkConnect = true;
+		p_connect = true;
 		UpdateData(TOSCREEN);
 	}
 }
@@ -500,7 +500,7 @@ void CDescendantsParamOld::OnBnClickedOk()
 	m_oneFile = m_radioOne;
 
 	int z = m_repeated;
-	theApp.WriteProfileInt(L"dragon", L"m_checkConnect", m_checkConnect);
+	theApp.WriteProfileInt(L"dragon", L"p_connect", p_connect);
 	theApp.WriteProfileInt(L"dragon", L"m_checkMother", m_checkMother);
 	theApp.WriteProfileInt(L"dragon", L"m_repeated", m_repeated);
 	theApp.WriteProfileInt(L"dragon", L"m_repeatedColor", m_repeatedColor);

@@ -962,7 +962,6 @@
 #define ID_MARRIAGE_NAME                35039
 #define ID_BUTTON2                      35040
 #define ID_AVERAGE_LIFESPAN             35040
-#define ID_DESCENDANT_NEW               35040
 #define ID_MEGJELEN35041                35041
 #define ID_BIRTH_DEATH                  35042
 #define ID_EDIT_KERSZTN35043            35043
@@ -982,13 +981,15 @@
 #define ID_GROUP_WIFE                   35057
 #define ID_LESZ35058                    35058
 #define ID_INDENTED_LIST                35059
+#define ID_TABUL35060                   35060
+#define ID_INDENTED_ASCENDANTS          35061
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        577
-#define _APS_NEXT_COMMAND_VALUE         35060
+#define _APS_NEXT_COMMAND_VALUE         35062
 #define _APS_NEXT_CONTROL_VALUE         1854
 #define _APS_NEXT_SYMED_VALUE           387
 #endif

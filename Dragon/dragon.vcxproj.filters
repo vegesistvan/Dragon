@@ -150,7 +150,7 @@
     <ClInclude Include="ascendantsFull.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ascendantsLinearTable.h">
+    <ClInclude Include="ascendantsLinear_Table.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ascendantsPaint.h">
@@ -506,19 +506,19 @@
     <ClCompile Include="checkSameSpouses.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ascendandsLinearHtml.cpp">
+    <ClCompile Include="ascendandsLinear_Html.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ascendants.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ascendantsFixHeader.cpp">
+    <ClCompile Include="ascendants_FixHeader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ascendantsFull.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ascendantsLinearTable.cpp">
+    <ClCompile Include="ascendantsLinear_Table.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ascendantsLinearTable_old.cpp">
@@ -527,7 +527,7 @@
     <ClCompile Include="ascendantsPaint.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ascendantsPiramid.cpp">
+    <ClCompile Include="ascendants_IndentedHtml.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ascendantsUnique.cpp">

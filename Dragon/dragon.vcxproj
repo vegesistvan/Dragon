@@ -209,7 +209,7 @@
     <ClInclude Include="ascendants.h" />
     <ClInclude Include="ascendantsEnum.h" />
     <ClInclude Include="ascendantsFull.h" />
-    <ClInclude Include="ascendantsLinearTable.h" />
+    <ClInclude Include="ascendantsLinear_Table.h" />
     <ClInclude Include="ascendantsPaint.h" />
     <ClInclude Include="ascendantsUnique.h" />
     <ClInclude Include="Brackets.h" />
@@ -338,14 +338,14 @@
   <ItemGroup>
     <ClCompile Include="about.cpp" />
     <ClCompile Include="app_export.cpp" />
-    <ClCompile Include="ascendandsLinearHtml.cpp" />
+    <ClCompile Include="ascendandsLinear_Html.cpp" />
     <ClCompile Include="ascendants.cpp" />
-    <ClCompile Include="ascendantsFixHeader.cpp" />
+    <ClCompile Include="ascendants_FixHeader.cpp" />
     <ClCompile Include="ascendantsFull.cpp" />
-    <ClCompile Include="ascendantsLinearTable.cpp" />
+    <ClCompile Include="ascendantsLinear_Table.cpp" />
     <ClCompile Include="ascendantsLinearTable_old.cpp" />
     <ClCompile Include="ascendantsPaint.cpp" />
-    <ClCompile Include="ascendantsPiramid.cpp" />
+    <ClCompile Include="ascendants_IndentedHtml.cpp" />
     <ClCompile Include="ascendantsUnique.cpp" />
     <ClCompile Include="Brackets.cpp" />
     <ClCompile Include="CDescendants.cpp" />

@@ -201,7 +201,7 @@ protected:
 	BOOL m_checkFolyt;
 	BOOL m_checkCapital;
 	BOOL m_checkBold;
-	BOOL m_checkConnect;
+	BOOL p_connect;
 	BOOL m_checkMother;
 	BOOL m_ceckDeleteRepeated;
 	BOOL m_checkCRLF;
@@ -294,7 +294,7 @@ protected:
 	int  p_repeated;
 	bool p_repeatedColor;
 	bool p_oneFile;
-	bool p_connect;
+//	bool p_connect;
 	bool p_mother;
 	UINT p_colorBgrnd;
 	bool p_print;		// azonnal nyomtassa ki a leszármazottat, a már szükségtelen rekordokat dobja el a vDesc-bõl. Ez hiba kereséshez jó.
@@ -316,6 +316,7 @@ protected:
 	CString m_tag1;		// <ol> vagy <ul>
 	CString m_tag2;		// </ol> vagy </ul>
 	int		m_indent;	// behúzások aktuális száma( <ol>/<il>-ek száma ) 
+	CString m_diamond;
 
 
 	std::vector<UINT>vSerial;			// A Meurgey de Tupigny számozáshoz a sorszámok nyilvántartása
@@ -368,18 +369,18 @@ protected:
 	void CDescendants::queryPeople(CString rowid, DE::PPEOPLE* p);
 	void CDescendants::print(CString str);
 	void CDescendants::printBegining(int i);
-	void CDescendants::printDescendant(int i);
+//	void CDescendants::printDescendant(int i);
 
-	void CDescendants::printSpouses(int i);
-	void CDescendants::printMarriage(CString place, CString date, int i, int numberOfSpouses);
-	void CDescendants::printSpouse();
-	void CDescendants::printSpRelatives();
+//	void CDescendants::printSpouses(int i);
+//	void CDescendants::printMarriage(CString place, CString date, int i, int numberOfSpouses);
+//	void CDescendants::printSpouse();
+//	void CDescendants::printSpRelatives();
 	CString CDescendants::getLastFirst(DE::PPEOPLE* p);
 	bool CDescendants::voltmar(CString index);
 	int CDescendants::getNumberOfChildren(CString rowid, CString sex_id);
 	void CDescendants::listDescendants();
 	void CDescendants::multipleRowid();
-	void CDescendants::multipleRowid0();
+//	void CDescendants::multipleRowid0();
 	void CDescendants::signeD(int i, int j);
 	CString CDescendants::getTableHeader();
 	CString CDescendants::getPlaceDateBlock(CString place, CString date, CString jel);
@@ -406,23 +407,23 @@ protected:
 	BOOL CDescendants::query2(CString command);
 
 
-	bool CDescendants::linearTable(int i, int which);
-	void CDescendants::dataTable(int i);
-	bool CDescendants::printTopContainer(CString title, int which);
-	void CDescendants::printOnly(CString str, int which);
+//	bool CDescendants::linearTable(int i, int which);
+//	void CDescendants::dataTable(int i);
+//	bool CDescendants::printTopContainer(CString title, int which);
+//	void CDescendants::printOnly(CString str, int which);
 	CString CDescendants::createSpouses(int i);
 	CString CDescendants::createMarriage(CString place, CString date, int i, int numberOfSpouses);
 	CString CDescendants::createSpouse();
 	CString CDescendants::createSpRelatives();
 	CString CDescendants::getComplexDescription(int i, bool parentIndex);
-	TCHAR CDescendants::get_gABC(int g);
+//	TCHAR CDescendants::get_gABC(int g);
 
 	void CDescendants::order_vDesc();
 	void CDescendants::printvLen();
 	void CDescendants::print_vDesc();
-	void CDescendants::printDesc(int i, int which);
+//	void CDescendants::printDesc(int i, int which);
 	void CDescendants::numOfDesc();
-	int CDescendants::sort_vDesc();
+//	int CDescendants::sort_vDesc();
 	void CDescendants::printVector(int tbl);
 	void CDescendants::create_id();
 	// descendantsOld változói

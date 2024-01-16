@@ -36,7 +36,7 @@ BOOL CDescendants::create_vDesc()
 	m_listedD = 0;
 
 
-	p_connect = m_checkConnect;
+	p_connect = p_connect;
 	p_mother = m_checkMother;
 	p_numbering = m_radioNumbering;
 	p_lastname = m_radioDNameX;
@@ -152,7 +152,7 @@ BOOL CDescendants::create_vDesc()
 				CDescendantsLinearTable dlg;
 
 //				dlg.m_comboHtmlTxt = 
-				dlg.m_checkConnect = m_checkConnect;
+				dlg.p_connect = p_connect;
 				dlg.m_checkMother = m_checkMother;
 				dlg.m_checkFolyt = m_checkFolyt;
 				dlg.m_checkCapital = m_checkCapital;
@@ -333,7 +333,7 @@ bool CDescendants::tablesDescendants()  // listázandó táblák a theapp.v_tableNum
 			create_id();
 			CDescendantsLinearTable dlg;
 
-			dlg.m_checkConnect = m_checkConnect;
+			dlg.p_connect = p_connect;
 			dlg.m_checkMother = m_checkMother;
 			dlg.m_checkFolyt = m_checkFolyt;
 			dlg.m_checkCapital = m_checkCapital;

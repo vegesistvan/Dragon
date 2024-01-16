@@ -900,7 +900,7 @@ bool CDescendantsOld::parameters()
 	m_comboFontSize = dlg.m_comboFontSize;
 	m_editWidth = dlg.m_editWidth;
 
-	p_connect = dlg.m_checkConnect;
+	p_connect = dlg.p_connect;
 	p_mother = dlg.m_checkMother;
 	p_numbering = dlg.m_radioNumbering;
 	p_lastname = dlg.m_radioDNameX;

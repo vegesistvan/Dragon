@@ -157,9 +157,9 @@ public:
 	int  m_type;
 	BOOL m_listRepeated;
 	CString m_htmlFile;
-
+	CString m_indentedFile;
 	
-	bool m_checkConnect;
+	bool p_connect;
 	bool m_checkMother;
 	bool m_checkFolyt;
 	bool m_checkCapital;

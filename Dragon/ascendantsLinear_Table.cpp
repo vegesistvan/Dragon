@@ -4,7 +4,7 @@
 #include "pch.h"
 #include "Dragon.h"
 #include "afxdialogex.h"
-#include "ascendantsLinearTable.h"
+#include "ascendantsLinear_Table.h"
 #include "ascendants.h"
 #include "ascendantsEnum.h"
 #include <commctrl.h >
@@ -57,6 +57,7 @@ BEGIN_MESSAGE_MAP(CAscendantsLinearTable, CDialogEx)
 
 	ON_MESSAGE(WM_SET_ROW_COLOR, OnSetRowColor)
 	ON_MESSAGE(WM_RELOAD, OnReloadListCtrl )
+	ON_COMMAND(ID_INDENTED_ASCENDANTS, &CAscendantsLinearTable::OnIndentedAscendants)
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CAscendantsLinearTable::OnInitDialog()
@@ -1338,4 +1339,9 @@ LRESULT CAscendantsLinearTable::OnSetRowColor(WPARAM wParam, LPARAM lParam)//wpa
 	cColor->tx	= BLACK;
 
 	return TRUE;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CAscendantsLinearTable::OnIndentedAscendants()
+{
+	ShellExecute(NULL, L"open", m_indentedFile, NULL, NULL, SW_SHOWNORMAL);
 }

@@ -147,6 +147,7 @@ public:
 	CString m_title;
 	std::vector<GKR>* vGKR;
 
+	CString m_indentedFile;
 
 	CString m_name;
 	CListCtrlEx* m_ListCtrl;
@@ -174,4 +175,5 @@ public:
 	afx_msg void OnPiramis();
 	afx_msg LRESULT CAscendantsLinearTable::OnReloadListCtrl(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT CAscendantsLinearTable::OnSetRowColor(WPARAM wParam, LPARAM lParam);//wparam: oszlopszam, lparam: a COLUMNCOLOR struktura cime
+	afx_msg void OnIndentedAscendants();
 };

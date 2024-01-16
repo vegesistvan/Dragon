@@ -30,6 +30,7 @@ void CDescendants::printVector( int tbl)
 	CString tableheader;
 	CString tableNumber;
 	CString people;
+	CString line;
 	tableNumber = theApp.v_tableNumbers.at(tbl);
 	m_command.Format(L"SELECT tableHeader FROM tables WHERE rowid = '%s'", tableNumber);
 	if (!theApp.query(m_command)) return;
@@ -79,8 +80,11 @@ void CDescendants::printVector( int tbl)
 
 		printBegining(i);	// html kódok és generáció elkészítése; 
 		people = getComplexDescription(i, true );
+
 		
-		print(people);
+		line.Format(L"%s%s", m_diamond, people);
+		line.Replace('|', '\'');
+		print(line);
 
 		m_genPrev = vDesc.at(i).g;
 	}
@@ -146,13 +150,12 @@ void CDescendants::printBegining(int i)
 				}
 			}
 			if (g == m_genPrev) // ugyanabban  a generációban névváltozás!!
-				str.Format(L"<br>%s%s\n", shift, (CString)str);	// hogy ugyabban a betolásban legyünk, de új sorban
+				str.Format(L"<br>%s%s", shift, (CString)str);	// hogy ugyabban a betolásban legyünk, de új sorban
 			else
-				str.Format(L"%s%s\n", shift, (CString)str);			// </ol> benne van a shiftben, ha kell
-			shift.Empty();										// az ezt követõ leszármazottat már nem kell tolni
+				str.Format(L"%s%s", shift, (CString)str);			// </ol> benne van a shiftben, ha kell
+			shift.Empty();		// az ezt követõ leszármazottat már nem kell tolni
 			print(str);
 			m_familyName = p.last_name;
-			
 		}
 	}
 	/////leszármazott sorának kezedete /////////////////////////////////////////////
@@ -181,7 +184,8 @@ void CDescendants::printBegining(int i)
 			break;
 		}
 	}
-	print(str);		
+	m_diamond = str;
+//	print(str);		
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CDescendants::getTableHeader()
@@ -304,9 +308,9 @@ CString CDescendants::createDescendant(int i, bool parentIndex )
 
 
 	str = getPlaceDateBlock(p.birth_place, p.birth_date, L"*");
-	line = name;
+	line = name.Trim();
 	if (!str.IsEmpty())
-		line.Format(L"%s %s", name, str);
+		line.Format(L"%s %s", name.Trim(), str);
 
 	str = getPlaceDateBlock(p.death_place, p.death_date, L"+");
 	if (!str.IsEmpty())
@@ -327,6 +331,7 @@ CString CDescendants::createDescendant(int i, bool parentIndex )
 	}
 
 	comment = getColoredString(str, p_commentStyle);
+	comment.Trim();
 	if (str.GetAt(0) == ',')
 		line.Format(L"%s%s", (CString)line, comment);
 	else
@@ -630,9 +635,8 @@ bool CDescendants::voltmar(CString index)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendants::print(CString str)
 {
-	str.Replace('|', '\'');
 	str = UnicodeToUtf8(str);
-	fwprintf(fl, L"%s", str);  // a soreleji %-okat printelési karakterekenk értelmezné, ha közvetlenül nyomtatnánk!!! 
+	fwprintf(fl, L"%s\n", str);  // a soreleji %-okat printelési karakterekenk értelmezné, ha közvetlenül nyomtatnánk!!! 
 	fflush(fl);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -800,21 +804,21 @@ BOOL CDescendants::openHtml(CString file, CString title, UINT colorBgrnd)
 	connect = p_connect ? L"igen": L"nem";
 
 
-	print(L"<!DOCTYPE html>\n");
-	print(L"<html lang=hu>\n");
-	print(L"<head>\n");
-	str.Format(L"<title>%s</title>\n", today);
+	print(L"<!DOCTYPE html>");
+	print(L"<html lang=hu>");
+	print(L"<head>");
+	str.Format(L"<title>%s</title>", today);
 	print(str);
-	print(L"<meta charset=\"UTF-8\">\n");
+	print(L"<meta charset=\"UTF-8\">");
 	createStyle();
-	print(L"</head>\n");
+	print(L"</head>");
 	
 //	CString head;
 //	head = L"<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"UTF-8\">\n</head>\n<body>\n";
 //	print(head);
 
 	CString body;
-	body.Format(L"<body bgcolor=\"%06x\">\n", colorBgrnd);
+	body.Format(L"<body bgcolor=\"%06x\">", colorBgrnd);
 //	body.Format(L"<body>\n" );
 	print(body);
 
@@ -836,12 +840,12 @@ BOOL CDescendants::openHtml(CString file, CString title, UINT colorBgrnd)
 	
 
 	print(L"<br><pre>");
-	str.Format(L"%*s Dragon v. %s\n", l, L"Program:", theApp.m_version );
+	str.Format(L"%*s Dragon v. %s", l, L"Program:", theApp.m_version );
 	print(str);
-	str.Format(L"%*s %s\n", l, L"Dragon.exe készült:", MultiToUnicode(LPCSTR(BUILD)));
+	str.Format(L"%*s %s", l, L"Dragon.exe készült:", MultiToUnicode(LPCSTR(BUILD)));
 	print(str);
 
-	str.Format(L"%*s %s\n", l, L"Alapkönyvtár:", theApp.m_dbFolderPath);
+	str.Format(L"%*s %s", l, L"Alapkönyvtár:", theApp.m_dbFolderPath);
 	print(str);
 
 	str = L"ÜRES";
@@ -852,40 +856,40 @@ BOOL CDescendants::openHtml(CString file, CString title, UINT colorBgrnd)
 	else if (theApp.m_inputMode = GAHTML)
 		str = L"GA.htm fájl";
 
-	str.Format(L"%*s %s\n", l, L"Adatbázis bemenete:", (CString)str);
+	str.Format(L"%*s %s", l, L"Adatbázis bemenete:", (CString)str);
 	print(str);
 
 	if (theApp.m_inputMode == GAHTML || theApp.m_inputMode == GEDCOM )
 	{
-		str.Format(L"%*s %s %s\n", l, L"Bementi fájl készült:", created, inputFile );
+		str.Format(L"%*s %s %s", l, L"Bementi fájl készült:", created, inputFile );
 		print(str);
 	}
-	str.Format(L"%*s %s %s\n", l, L"Adatbázis készült:", dateDB, theApp.m_dbFileName );
+	str.Format(L"%*s %s %s", l, L"Adatbázis készült:", dateDB, theApp.m_dbFileName );
 	print(str);
 	if (!theApp.m_inputVersion.IsEmpty() && theApp.m_inputVersion != theApp.m_version)
 	{
-		str.Format(L"%*s %s\n", l, L"Beolvasás programverziója:", theApp.m_inputVersion);
+		str.Format(L"%*s %s", l, L"Beolvasás programverziója:", theApp.m_inputVersion);
 		print(str);
 	}
 	if (!theApp.m_uniteVersion.IsEmpty() )
 	{
 		if (theApp.m_uniteVersion != theApp.m_version)
 		{
-			str.Format(L"%*s %s\n", l, L"Összevonás programverziója:", theApp.m_uniteVersion);
+			str.Format(L"%*s %s", l, L"Összevonás programverziója:", theApp.m_uniteVersion);
 			print(str);
 		}
 	}
 
-	str.Format(L"%*s %s<br>\n", l, L"Lista készült:", theApp.getPresentDateTime());
+	str.Format(L"%*s %s<br>", l, L"Lista készült:", theApp.getPresentDateTime());
 	print(str);
-	str.Format(L"%*s %s\n", l, L"Generációk max száma:", maxGen);
+	str.Format(L"%*s %s", l, L"Generációk max száma:", maxGen);
 	print(str);
-	str.Format(L"%*s %s\n", l, L"Elágazások összekötése:", connect);
+	str.Format(L"%*s %s", l, L"Elágazások összekötése:", connect);
 	print(str);
-	str.Format(L"%*s %s\n", l, L"Nõk leszármazottai:", nok);
+	str.Format(L"%*s %s", l, L"Nõk leszármazottai:", nok);
 	print(str);
 
-//	str.Format(L"%*s %s\n", l, L"Ismétlõdõk kihagyása:", kihagy);
+//	str.Format(L"%*s %s", l, L"Ismétlõdõk kihagyása:", kihagy);
 //	print(str);
 
 	CString sorrend;
@@ -911,9 +915,9 @@ BOOL CDescendants::openHtml(CString file, CString title, UINT colorBgrnd)
 	if (p_repeatedColor)
 	{
 		if (p_repeated == 0)
-			str.Format(L"%*s %s\n", l, L"Ismétlõdõk színezése:", L"zöld - elsõ elõfordulás, piros - újabb elõfordulás");
+			str.Format(L"%*s %s", l, L"Ismétlõdõk színezése:", L"zöld - elsõ elõfordulás, piros - újabb elõfordulás");
 		else
-			str.Format(L"%*s %s\n", l, L"Ismétlõdõk színezése:", L"zöld");
+			str.Format(L"%*s %s", l, L"Ismétlõdõk színezése:", L"zöld");
 		print(str);
 	}
 	print(L"</pre>\n\n");
@@ -1016,19 +1020,19 @@ void CDescendants::closeHtml()
 	if ( theApp.v_tableNumbers.size() == 1   || !theApp.v_rowid.size() == 1 )
 	{
 
-		print(L"<pre>\n");
-		str.Format(L"%-*s %8s(%c)\n", l, L"Listázott generációk száma:", thousand(bias), gen);
+		print(L"<pre>");
+		str.Format(L"%-*s %8s(%c)", l, L"Listázott generációk száma:", thousand(bias), gen);
 		print(str);
-		str.Format(L"%-*s %8s\n", l, L"Listázott leszármazottak száma:", thousand(m_listedD));
+		str.Format(L"%-*s %8s", l, L"Listázott leszármazottak száma:", thousand(m_listedD));
 		print(str);
 		if (p_repeated)
 		{
-			str.Format(L"%-*s %8s\n", l, L"Ismétlõdõ, nem listázott leszármazottak száma:", thousand(m_cntRepeated));
+			str.Format(L"%-*s %8s", l, L"Ismétlõdõ, nem listázott leszármazottak száma:", thousand(m_cntRepeated));
 			print(str);
 		}
-		str.Format(L"%-*s %8s\n", l, L"Összes listázott emberek száma:", thousand(m_listedP));
+		str.Format(L"%-*s %8s", l, L"Összes listázott emberek száma:", thousand(m_listedP));
 		print(str);
-		str.Format(L"%-*s %s\n", l, L"Futási idõ:", theApp.getTimeElapsed(m_startTime));
+		str.Format(L"%-*s %s", l, L"Futási idõ:", theApp.getTimeElapsed(m_startTime));
 		print(str);
 		print(L"</pre>");
 	}

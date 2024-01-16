@@ -724,7 +724,7 @@ bool CDescendantsLinearTable::printTopContainer(CString title, int which)
 	CString dateDB = theApp.getFileCreationDate(theApp.m_dbPathName);
 
 	CString connect;
-	connect = m_checkConnect ? L"igen" : L"nem";
+	connect = p_connect ? L"igen" : L"nem";
 
 
 	//str.Format(L"<b><center>%s</center>\n<pre></b>\n", title);

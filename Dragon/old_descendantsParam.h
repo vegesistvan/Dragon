@@ -65,7 +65,7 @@ public:
 	BOOL m_checkFolyt;
 	BOOL m_checkCapital;
 	BOOL m_checkBold;
-	BOOL m_checkConnect;
+	BOOL p_connect;
 	BOOL m_checkMother;
 	BOOL m_ceckDeleteRepeated;
 	BOOL m_checkCRLF;

@@ -4,7 +4,7 @@
 #include "pch.h"
 #include "Dragon.h"
 #include "afxdialogex.h"
-#include "ascendantsLinearTable.h"
+#include "ascendantsLinear_Table.h"
 #include "ascendants.h"
 #include "ascendantsEnum.h"
 #include <commctrl.h >

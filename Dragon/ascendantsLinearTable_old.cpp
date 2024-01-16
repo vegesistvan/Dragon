@@ -2,7 +2,7 @@
 #include "Dragon.h"
 #include "afxdialogex.h"
 #include "ascendants.h"
-#include "ascendantsLinearTable.h"
+#include "ascendantsLinear_Table.h"
 #include "ProgressWnd.h"
 
 // which értékek

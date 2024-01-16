@@ -2,7 +2,7 @@
 #include "Dragon.h"
 #include "afxdialogex.h"
 #include "ascendants.h"
-#include "ascendantsLinearTable.h"
+#include "ascendantsLinear_Table.h"
 
 IMPLEMENT_DYNAMIC(CAscendants, CDialogEx)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -817,7 +817,10 @@ void CAscendants::OnClickedLinearSqlitetable()
 {
 	UpdateData(FROMSCREEN);
 
+	OnClickedPyramid();
+
 	CAscendantsLinearTable dlg;
+	dlg.m_indentedFile = m_piramidFile;
 	dlg.m_name = m_rootName;
 	dlg.vGKR = &vGKR;
 

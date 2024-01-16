@@ -10,7 +10,7 @@ IMPLEMENT_DYNAMIC(CDescendants, CDialogEx)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CDescendants::CDescendants(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_DESCENDANTS, pParent)
-	, m_checkConnect(true)			// táblákat összekösse-e
+	, p_connect(true)			// táblákat összekösse-e
 	, m_checkMother(false)			// nõk leszármazottait listázza-e
 	, m_checkCapital(false)
 	, m_checkBold(FALSE)
@@ -42,7 +42,7 @@ CDescendants::~CDescendants()
 void CDescendants::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Check(pDX, IDC_CHECK_CONNECT, m_checkConnect);
+	DDX_Check(pDX, IDC_CHECK_CONNECT, p_connect);
 	DDX_Check(pDX, IDC_CHECK_WOMAN, m_checkMother);
 
 	DDX_Check(pDX, IDC_CHECK_CAPITAL, m_checkCapital);
@@ -64,9 +64,6 @@ void CDescendants::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_STATIC_NUM, colorNum);
 	DDX_Control(pDX, IDC_STATIC_PRINT, colorPrint);
 	DDX_Control(pDX, IDC_STATIC_ATTRIB, colorAttrib);
-//	DDX_Control(pDX, IDC_STATIC_FAMILY_INLINE, colorFamilyInline);
-//	DDX_Control(pDX, IDC_STATIC_FAMILYNAME_NO, colorFamilynameNo);
-//	DDX_Control(pDX, IDC_STATIC_FAMILYNAME_UP, colorFamilynameUp);
 	DDX_Text(pDX, IDC_GENMAX, m_editGenMax);
 
 	DDX_Radio(pDX, IDC_RADIO_ONE, m_radioOne);
@@ -175,7 +172,7 @@ BOOL CDescendants::OnInitDialog()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendants::setParameters()
 {
-	m_checkConnect = theApp.GetProfileInt(L"dragon", L"m_checkConnect", 0);
+	p_connect = theApp.GetProfileInt(L"dragon", L"p_connect", 0);
 	m_checkMother = theApp.GetProfileInt(L"dragon", L"m_checkMother", 1);
 	m_checkFolyt = theApp.GetProfileInt(L"dragon", L"m_checkFolyt", 0);
 	m_checkCapital = theApp.GetProfileInt(L"dragon", L"m_checkCapital", 0);
@@ -207,7 +204,7 @@ void CDescendants::setParameters()
 void CDescendants::OnClickedDefault()
 {
 	m_comboHtmlTxt.SetCurSel(0);
-	m_checkConnect = true;
+	p_connect = true;
 	m_checkMother = true;
 	m_checkFolyt = false;
 	m_checkCapital = false;
@@ -349,7 +346,7 @@ void CDescendants::OnClickedCheckConnect()
 {
 	if (m_checkMother)					// ha nõk lszrámazoittait is listázzuk, akkor mindenképpen összekötés kell
 	{
-		m_checkConnect = true;
+		p_connect = true;
 		UpdateData(TOSCREEN);
 	}
 }
@@ -359,7 +356,7 @@ void CDescendants::OnClickedCheckWoman()
 	m_checkMother = !m_checkMother;				// ha a nõk cgyerekeit is listázni akarjuk, akkor a táblákat is össze kell kötni!!
 	if (m_checkMother)
 	{
-		m_checkConnect = true;
+		p_connect = true;
 		UpdateData(TOSCREEN);
 	}
 }
@@ -498,7 +495,7 @@ void CDescendants::OnBnClickedOk()
 	m_oneFile = m_radioOne;
 
 	int z = m_repeated;
-	theApp.WriteProfileInt(L"dragon", L"m_checkConnect", m_checkConnect);
+	theApp.WriteProfileInt(L"dragon", L"p_connect", p_connect);
 	theApp.WriteProfileInt(L"dragon", L"m_checkMother", m_checkMother);
 	theApp.WriteProfileInt(L"dragon", L"m_repeated", m_repeated);
 	theApp.WriteProfileInt(L"dragon", L"m_repeatedColor", m_repeatedColor);
@@ -593,7 +590,7 @@ CString CDescendants::getComplexDescription(int i, bool parentIndex)
 
 	people.Trim();
 	people += L" ";
-	people += spouses;
+	people += spouses.Trim();
 	people.Trim();
 
 	if (!p.arm.IsEmpty())
