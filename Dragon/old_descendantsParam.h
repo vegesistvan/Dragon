@@ -63,10 +63,10 @@ public:
 	int m_html;
 
 	BOOL m_checkFolyt;
-	BOOL m_checkCapital;
-	BOOL m_checkBold;
+	BOOL p_capital;
+	BOOL p_bold;
 	BOOL p_connect;
-	BOOL m_checkMother;
+	BOOL p_womenDescendants;
 	BOOL m_ceckDeleteRepeated;
 	BOOL m_checkCRLF;
 

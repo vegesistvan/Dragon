@@ -1807,7 +1807,7 @@ void CTablePeople::OnDescendants()
 		if (theApp.m_inputMode == GAHTML)
 		{
 			tableNumber = m_ListCtrl.GetItemText(nItem, G_TABLENUMBER);
-			theApp.v_tableNumbers.push_back(tableNumber);
+//			theApp.v_tableNumbers.push_back(tableNumber);
 		}
 		else
 			theApp.v_tableNumbers.push_back(L"1");

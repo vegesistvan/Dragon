@@ -49,7 +49,7 @@ void CDescendantsOld::printVectorTxt(int i)
 
 		queryPeople(vDesc.at(i).rowid, &p);
 
-		if (!p_mother && vDesc.at(i).parentSex == WOMAN) continue;
+		if (!p_womenDescendants && vDesc.at(i).parentSex == WOMAN) continue;
 
 		printBeginingTxt(i);	// sor elejének elkészítése; 
 		printDescendantTxt(i);
@@ -160,7 +160,7 @@ void CDescendantsOld::printDescendantTxt(int i)
 		if (lastname == L"N") lastname.Empty();
 		if (p_capitalName)
 			lastname = convertNameToUpper(lastname);
-		if (p_checkBold)
+		if (p_bold)
 			lastname.Format(L"<b>%s</b>", lastname);
 		if (lastname == L"N;")
 			name.Format(L"\n%s %s %s", lastname, p.first_name, p.peer);
@@ -305,7 +305,7 @@ void CDescendantsOld::printSpouseTxt()
 
 	if (p_capitalName)
 		lastname = convertNameToUpper(lastname);
-	if (p_checkBold)
+	if (p_bold)
 		lastname.Format(L"<b>%s</b>", lastname);
 	if (lastname != L"N;" && !s.titolo.IsEmpty() && s.peer.IsEmpty())
 	{
@@ -465,7 +465,7 @@ bool CDescendantsOld::openTxt( CString file, CString title )
 
 	int l = -37;
 	CString nok;
-	if (p_mother)
+	if (p_womenDescendants)
 		nok = L"igen";
 	else
 		nok = L"nem";

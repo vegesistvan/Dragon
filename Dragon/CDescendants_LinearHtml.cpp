@@ -30,9 +30,9 @@ void CDescendantsLinearTable::OnHtmlListaPrintable()
 void CDescendantsLinearTable::OnHtmlListaFix()
 {
 	if (m_TabCtrl.GetCurSel() == FULL)
-		createHtmlFile(0, FULL);
+		createHtmlFile(1, FULL);
 	else
-		createHtmlFile(0, UNIQUE);
+		createHtmlFile(1, UNIQUE);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CDescendantsLinearTable::createHtmlFile(int i, int which)
@@ -57,20 +57,28 @@ bool CDescendantsLinearTable::createHtmlFile(int i, int which)
 		if (!query(m_command)) return false;
 		familyName = rs.GetFieldString(0);
 		tableRoman = rs.GetFieldString(2);
-		title.Format(L"%s %s leszármazotti tábla", familyName, tableRoman);
+		if (i)
+			title.Format(L"%s %s lineáris leszármazotti tábla", familyName, tableRoman);
+		else
+			title.Format(L"%s %s nyomtatható lineáris leszármazotti tábla", familyName, tableRoman);
 	}
 	else
-		title.Format(L"%s leszármazotti táblája", m_os);
+	{
+		if( i )
+			title.Format(L"%s lineáris leszármazotti táblája", m_name );
+		else
+			title.Format(L"%s nyomtatható lineáris leszármazotti táblája", m_name);
+	}
 
-	filename = title;
+
 	if (which == UNIQUE || which == FULL )
 	{
-		descendantsTablePathName.Format(L"%s\\%s_%s.html", m_descendantsPath, filename, getTimeTag());
+		descendantsTablePathName.Format(L"%s\\%s_%s.html", m_descendantsPath, title, getTimeTag());
 		if (!openFileSpec(&fhDescTable, descendantsTablePathName, L"w+")) return false;
 	}
 	else if (which == UNIQUE_P || which == FULL_P)
 	{
-		printableTablePathName.Format(L"%s\\%s_printable%s.html", m_descendantsPath, filename, getTimeTag());
+		printableTablePathName.Format(L"%s\\%s_printable%s.html", m_descendantsPath, title, getTimeTag());
 		if (!openFileSpec(&fhPrintable, printableTablePathName, L"w+")) return false;
 	}
 
@@ -351,8 +359,6 @@ bool CDescendantsLinearTable::createHtmlFile(int i, int which)
 		fclose(fhPrintable);
 		ShellExecute(NULL, L"open", printableTablePathName, NULL, NULL, SW_SHOWNORMAL);
 	}
-
-
 	return true;
 }
 
@@ -515,7 +521,7 @@ void CDescendantsLinearTable::printDesc( int i, int which  )
 	vSerial.push_back(1);
 
 	queryPeople(desc.rowid, &p);
-	if (!m_checkMother && desc.parentSex == WOMAN) return;
+	if (!p_womenDescendants && desc.parentSex == WOMAN) return;
 
 	people = getComplexDescription(i, false );
 
@@ -690,7 +696,7 @@ bool CDescendantsLinearTable::printTopContainer(CString title, int which)
 	today = getPresentDateTime();
 	CString yesno;
 	CString nok;
-	if (m_checkMother)
+	if (p_womenDescendants)
 		nok = L"igen";
 	else
 		nok = L"nem";
@@ -945,9 +951,9 @@ CString CDescendantsLinearTable::getLastFirst(DE::PPEOPLE* p) // házatárs anyján
 {
 
 	CString name = p->last_name;
-	if (m_checkCapital)
+	if (p_capital)
 		name = convertNameToUpper(name);
-	if (m_checkBold)
+	if (p_bold)
 		name.Format(L"<b>%s</b>", name);
 	if (!p->other_names.IsEmpty())
 		name.Format(L"%s_(%s)", p->last_name, p->other_names);
@@ -1020,9 +1026,9 @@ CString CDescendantsLinearTable::createDescendant(int i, bool parentIndex)
 	{
 		lastname = p.last_name;
 		if (lastname == L"N") lastname.Empty();
-		if (m_checkCapital)
+		if (p_capital)
 			lastname = convertNameToUpper(lastname);
-		if (m_checkBold)
+		if (p_bold)
 			lastname.Format(L"<b>%s</b>", lastname);
 		if (lastname == L"N;")
 			name.Format(L"\n%s %s %s", lastname, p.first_name, p.peer);
@@ -1218,9 +1224,9 @@ CString CDescendantsLinearTable::createSpouse()
 	CString fullname;
 	CString lastname = s.last_name;
 
-	if (m_checkCapital)
+	if (p_capital)
 		lastname = convertNameToUpper(lastname);
-	if (m_checkBold)
+	if (p_bold)
 		lastname.Format(L"<b>%s</b>", lastname);
 	if (lastname != L"N;" && !s.titolo.IsEmpty() && s.peer.IsEmpty())
 	{

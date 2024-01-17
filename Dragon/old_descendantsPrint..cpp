@@ -59,7 +59,7 @@ void CDescendantsOld::printVector( int i )
 		
 		queryPeople(vDesc.at(i).rowid, &p);
 
-		if (!p_mother && vDesc.at(i).parentSex == WOMAN) continue;
+		if (!p_womenDescendants && vDesc.at(i).parentSex == WOMAN) continue;
 
 		printBegining(i);	// html kódok és generáció elkészítése; 
 		people = getComplexDescription(i, true );
@@ -224,7 +224,7 @@ CString CDescendantsOld::createDescendant(int i, bool parentIndex )
 		if (lastname == L"N") lastname.Empty();
 		if (p_capitalName)
 			lastname = convertNameToUpper(lastname);
-		if (p_checkBold)
+		if (p_bold)
 			lastname.Format(L"<b>%s</b>", lastname);
 		if (lastname == L"N;")
 			name.Format(L"\n%s %s %s", lastname, p.first_name, p.peer);
@@ -422,7 +422,7 @@ CString CDescendantsOld::createSpouse()
 
 	if (p_capitalName)
 		lastname = convertNameToUpper(lastname);
-	if (p_checkBold)
+	if (p_bold)
 		lastname.Format(L"<b>%s</b>", lastname);
 	if (lastname != L"N;" && !s.titolo.IsEmpty() && s.peer.IsEmpty())
 	{
@@ -698,7 +698,7 @@ CString CDescendantsOld::getLastFirst(PPEOPLE* p) // házatárs anyjának é stovább
 	CString name = p->last_name;
 	if (p_capitalName )
 		name = convertNameToUpper(name);
-	if (p_checkBold)
+	if (p_bold)
 		name.Format( L"<b>%s</b>", name);
 	if (!p->other_names.IsEmpty())
 		name.Format(L"%s_(%s)", p->last_name, p->other_names);
@@ -747,7 +747,7 @@ BOOL CDescendantsOld::openHtml(CString file, CString title, UINT colorBgrnd)
 	today = getPresentDateTime();
 	CString yesno;
 	CString nok;
-	if (p_mother)
+	if (p_womenDescendants)
 		nok = L"igen";
 	else
 		nok = L"nem";

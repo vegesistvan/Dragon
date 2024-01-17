@@ -1,7 +1,9 @@
 #pragma once
 
-#define VERSION L"10.162"
+#define VERSION L"10.163"
 
+// 10.163 2024.01.17 Leszármazotti és felmenõi listák a ...list/descendans_x ill. ...list/ascendants_x mappában
+// 
 // 10.162 2024.01.16 Leszármazotti listában a CRLF és szóközök rendbetétele
 
 // 10.161 2024.01.15 Interaktív lineáris leszármazotti tábla 

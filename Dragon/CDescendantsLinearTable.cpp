@@ -104,8 +104,8 @@ BOOL CDescendantsLinearTable::OnInitDialog()
 	cf.crTextColor = LIGHTRED;
 	cf.yHeight = 300;
 
-	m_titleF.Format(L"%s teljes felmenõi listája", m_name);
-	m_titleU.Format(L"%s felmenõi listája ismétlések kihagyásával", m_name);
+	m_titleF.Format(L"%s teljes leszármazotti listája", m_name);
+	m_titleU.Format(L"%s leszármazotti listája ismétlések kihagyásával", m_name);
 
 
 
@@ -388,7 +388,7 @@ void CDescendantsLinearTable::fullTable()
 	{
 		desc = vDesc->at(i);
 
-		if (!m_checkMother && desc.parentSex == WOMAN) return;
+		if (!p_womenDescendants && desc.parentSex == WOMAN) return;
 
 		str.Format(L"%d", desc.clrTextBk);
 		nItem = m_ListCtrl->InsertItem(nItem, str);
@@ -460,7 +460,7 @@ void CDescendantsLinearTable::uniqueTable()
 	{
 		desc = vDesc->at(i);
 
-		if (!m_checkMother && desc.parentSex == WOMAN) return;
+		if (!p_womenDescendants && desc.parentSex == WOMAN) return;
 
 		str.Format(L"%d", desc.clrTextBk);
 		nItem = m_ListCtrl->InsertItem(nItem, str );
@@ -566,7 +566,7 @@ CString CDescendantsLinearTable::createDescendantL(int i, bool parentIndex)
 	{
 		lastname = p.last_name;
 		if (lastname == L"N") lastname.Empty();
-		if (m_checkCapital)
+		if (p_capital)
 			lastname = convertNameToUpper(lastname);
 		
 		if (lastname == L"N;")
@@ -745,7 +745,7 @@ CString CDescendantsLinearTable::createSpouseL()
 	CString fullname;
 	CString lastname = s.last_name;
 
-	if (m_checkCapital)
+	if (p_capital)
 		lastname = convertNameToUpper(lastname);
 	if (lastname != L"N;" && !s.titolo.IsEmpty() && s.peer.IsEmpty())
 	{

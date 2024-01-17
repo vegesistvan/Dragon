@@ -842,13 +842,6 @@ void CAscendantsLinearTable::correctReferences()
 		wndP.PeekAndPump();
 		if (wndP.Cancelled()) break;
 	}
-//	wndP3.DestroyWindow();
-
-	// több házastárs kigyûjtése
-	// Ha egy ember többször házasodott, akkor házastársait a vSP vektorba gyûjti
-	// SP.ix		// az ember indexe a vGKR vektorban
-	// SP.ixSp		// házastársa indexe a VGKR vektorban	
-
 
 
 	SP spouse;
@@ -860,11 +853,7 @@ void CAscendantsLinearTable::correctReferences()
 	int ip2;
 	int ix;
 	_int64 k;
-/*
-	CProgressWnd wndP4(NULL, L"Több házastárs kigyûjtése...");
-	wndP4.SetRange(0, vGKR->size());
-	wndP4.SetStep(1);
-*/
+
 	vSp.clear();
 	for (int i = 1; i < vGKR->size() - 1; ++i)
 	{
@@ -932,13 +921,6 @@ void CAscendantsLinearTable::correctReferences()
 	vSib.clear();
 
 	ip1 = vSp.size();
-//	wndP4.DestroyWindow();
-/*
-	CProgressWnd wndP5(NULL, L"Testvérek kigyûjtése...");
-	wndP5.SetRange(0, vGKR->size());
-	wndP5.SetPos(0);
-	wndP5.SetStep(1);
-*/
 	for (int i = 1; i < vGKR->size() - 1; ++i)
 	{
 		gkri = vGKR->at(i);
@@ -1143,88 +1125,7 @@ void CAscendantsLinearTable::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 		break;
 	}
 }
-/*
-void CAscendantsLinearTable::OnPaint()
-{
-	CPaintDC dc(this);
-
-	dc.SelectObject(GetFont());
-
-	CPen pen, pen_active;
-	COLORREF color_off = RGB(240, 240, 240);
-	COLORREF color_active = RGB(200, 240, 240);
-	CBrush brush_off, brush_active;
-	brush_off.CreateSolidBrush(color_off);
-	brush_active.CreateSolidBrush(color_active);
-	pen.CreatePen(PS_SOLID, 1, RGB(200, 200, 200));
-	pen_active.CreatePen(PS_SOLID, 1, color_active);
-
-	CRect rcitem;
-	GetItemRect(0, &rcitem);
-
-	CRect rc;
-	GetClientRect(&rc);
-	rc.bottom = rcitem.bottom;
-	dc.FillSolidRect(&rc, GetSysColor(COLOR_3DFACE));
-
-	GetClientRect(&rc);
-	rc.top = rcitem.bottom - 1;
-	dc.SelectObject(&pen);
-	dc.SelectObject(&brush_active);
-	dc.Rectangle(&rc);
-
-	for (int i = 0; i < GetItemCount(); i++)
-	{
-		dc.SelectObject(&pen);
-		if (i == GetCurSel())
-		{
-			dc.SelectObject(&brush_active);
-			dc.SetBkColor(color_active);
-		}
-		else
-		{
-			dc.SelectObject(&brush_off);
-			dc.SetBkColor(color_off);
-		}
-
-		GetItemRect(i, &rcitem);
-		rcitem.right++;
-		dc.Rectangle(&rcitem);
-
-		if (i == GetCurSel())
-		{
-			dc.SelectObject(pen_active);
-			dc.MoveTo(rcitem.left + 1, rcitem.bottom - 1);
-			dc.LineTo(rcitem.right, rcitem.bottom - 1);
-		}
-
-		TCITEM item = { 0 };
-		wchar_t buf[32];
-		item.pszText = buf;
-		item.cchTextMax = 32;
-		item.mask = TCIF_TEXT;
-		GetItem(i, &item);
-		dc.DrawText(buf, &rcitem, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-	}
-}
-
-BOOL CAscendantsLinearTable::OnEraseBkgnd(CDC*)
-{
-	return TRUE;
-}
-*/
-
-
-/*
-#define RED     RGB(255,0,0)
-#define YELLOW  RGB(255,255,0)
-#define MAGENTA RGB(255,0,255)
-#define WHITE   RGB(255,255,255)
-#define BLUE    RGB(0,0,255)
-*/
-
-
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CAscendantsLinearTable::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
 {
 	LPDRAWITEMSTRUCT lpdis = lpDrawItemStruct;
@@ -1285,19 +1186,7 @@ void CAscendantsLinearTable::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemS
 	}
 	CDialogEx::OnDrawItem(nIDCtl, lpDrawItemStruct);
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CAscendantsLinearTable::OnPiramis()
-{
-	CAscendantsPaint dlg;
-	dlg.vGKR = vGKR;
-	dlg.m_ascendantsPath = m_ascendantsPath;
-	if (m_TabCtrl.GetCurSel() == FULL)
-		dlg.which = FULL;
-	else
-		dlg.which = UNIQUE;
 
-	dlg.DoModal();
-}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////// D R O P D O W N   F U N C I Ó K  /////////////////////////////////////////////////////////////////
@@ -1340,8 +1229,43 @@ LRESULT CAscendantsLinearTable::OnSetRowColor(WPARAM wParam, LPARAM lParam)//wpa
 
 	return TRUE;
 }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////// M E N U F U N K C I Ó K  ////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CAscendantsLinearTable::OnHtmlListaPrintable()
+{
+	if (m_TabCtrl.GetCurSel() == FULL)
+		createHtmlFile(FULL_P);
+	else
+		createHtmlFile(UNIQUE_P);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CAscendantsLinearTable::OnHtmlListaFix()
+{
+	if (m_TabCtrl.GetCurSel() == FULL)
+		createHtmlFile(FULL);
+	else
+		createHtmlFile(UNIQUE);
+}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CAscendantsLinearTable::OnIndentedAscendants()
 {
 	ShellExecute(NULL, L"open", m_indentedFile, NULL, NULL, SW_SHOWNORMAL);
 }
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CAscendantsLinearTable::OnPiramis()
+{
+	CAscendantsPaint dlg;
+	dlg.vGKR = vGKR;
+	dlg.m_ascendantsPath = m_ascendantsPath;
+	if (m_TabCtrl.GetCurSel() == FULL)
+		dlg.which = FULL;
+	else
+		dlg.which = UNIQUE;
+
+	dlg.DoModal();
+}
+

@@ -15,10 +15,10 @@ void CDescendants::indentedHtml()
 	CString title;
 	CString file;
 	
-	file.Format(L"%s leszármazotti listája", peoS.name);
+	file.Format(L"%s tabulált leszármazotti listája", vDesc.at(0).name);
 	
 	title = file;
-	openHtml(file, title, p_colorBgrnd);
+	if (!openHtml(file, title, p_colorBgrnd)) return;
 	
 	printVector( 0 );
 	closeHtml();
@@ -27,15 +27,15 @@ void CDescendants::indentedHtml()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendants::printVector( int tbl)
 {
-	CString tableheader;
-	CString tableNumber;
+//	CString tableheader;
+//	CString tableNumber;
 	CString people;
 	CString line;
-	tableNumber = theApp.v_tableNumbers.at(tbl);
-	m_command.Format(L"SELECT tableHeader FROM tables WHERE rowid = '%s'", tableNumber);
-	if (!theApp.query(m_command)) return;
-	tableheader = theApp.m_recordset->GetFieldString(0);
-	str.Format(L"<b>%s</b>\n\n", tableheader);
+//	tableNumber = theApp.v_tableNumbers.at(tbl);
+//	m_command.Format(L"SELECT tableHeader FROM tables WHERE rowid = '%s'", tableNumber);
+//	if (!theApp.query(m_command)) return;
+//	tableheader = theApp.m_recordset->GetFieldString(0);
+//	str.Format(L"<b>%s</b>\n\n", tableheader);
 //	print(str);
 
 	int ix;
@@ -76,7 +76,7 @@ void CDescendants::printVector( int tbl)
 		
 		queryPeople(vDesc.at(i).rowid, &p);
 
-		if (!p_mother && vDesc.at(i).parentSex == WOMAN) continue;
+		if (!p_womenDescendants && vDesc.at(i).parentSex == WOMAN) continue;
 
 		printBegining(i);	// html kódok és generáció elkészítése; 
 		people = getComplexDescription(i, true );
@@ -244,7 +244,7 @@ CString CDescendants::createDescendant(int i, bool parentIndex )
 		if (lastname == L"N") lastname.Empty();
 		if (p_capitalName)
 			lastname = convertNameToUpper(lastname);
-		if (p_checkBold)
+		if (p_bold)
 			lastname.Format(L"<b>%s</b>", lastname);
 		if (lastname == L"N;")
 			name.Format(L"\n%s %s %s", lastname, p.first_name, p.peer);
@@ -443,7 +443,7 @@ CString CDescendants::createSpouse()
 
 	if (p_capitalName)
 		lastname = convertNameToUpper(lastname);
-	if (p_checkBold)
+	if (p_bold)
 		lastname.Format(L"<b>%s</b>", lastname);
 	if (lastname != L"N;" && !s.titolo.IsEmpty() && s.peer.IsEmpty())
 	{
@@ -718,7 +718,7 @@ CString CDescendants::getLastFirst(DE::PPEOPLE* p) // házatárs anyjának é stováb
 	CString name = p->last_name;
 	if (p_capitalName )
 		name = convertNameToUpper(name);
-	if (p_checkBold)
+	if (p_bold)
 		name.Format( L"<b>%s</b>", name);
 	if (!p->other_names.IsEmpty())
 		name.Format(L"%s_(%s)", p->last_name, p->other_names);
@@ -767,7 +767,7 @@ BOOL CDescendants::openHtml(CString file, CString title, UINT colorBgrnd)
 	today = getPresentDateTime();
 	CString yesno;
 	CString nok;
-	if (p_mother)
+	if (p_womenDescendants)
 		nok = L"igen";
 	else
 		nok = L"nem";

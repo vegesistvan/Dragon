@@ -11,22 +11,7 @@
 #include <windows.h>
 #include "utilities.h"
 #include "ProgressWnd.h"
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CAscendantsLinearTable::OnHtmlListaPrintable()
-{
-	if (m_TabCtrl.GetCurSel() == FULL)
-		createHtmlFile(FULL_P);
-	else
-		createHtmlFile(UNIQUE_P);
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CAscendantsLinearTable::OnHtmlListaFix()
-{
-	if (m_TabCtrl.GetCurSel() == FULL)
-		createHtmlFile(FULL);
-	else
-		createHtmlFile(UNIQUE);
-}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CAscendantsLinearTable::createHtmlFile(int which)
 {
@@ -43,16 +28,20 @@ bool CAscendantsLinearTable::createHtmlFile(int which)
 
 	if ( m_TabCtrl.GetCurSel() == FULL_TAB )
 	{
-		m_title.Format(L"%s felmenõinek lineáris táblája", m_name);
-		filename = m_title;
-		fullPathName.Format(L"%s\\%s_%s.html", m_ascendantsPath, filename, getTimeTag());
+		if( which == FULL )
+			m_title.Format(L"%s felmenõinek teljes lineáris táblája", m_name);
+		else
+			m_title.Format(L"%s felmenõinek teljes nyomtatható lineáris táblája", m_name);
+		fullPathName.Format(L"%s\\%s_%s.html", m_ascendantsPath, m_title, getTimeTag());
 		if (!openFileSpec(&fh_Full, fullPathName, L"w+")) return false;
 	}
 	else
 	{
-		m_title.Format(L"%s felmenõinek lineáris táblája ismétlõdések kihagyásával", m_name);
-		filename = m_title;
-		uniquePathName.Format(L"%s\\%s_%s.html", m_ascendantsPath, filename, getTimeTag());
+		if( which == FULL)
+			m_title.Format(L"%s felmenõinek nyomtatható lineáris táblája ismétlõdések kihagyásával", m_name);
+		else
+			m_title.Format(L"%s felmenõinek lineáris táblája ismétlõdések kihagyásával", m_name);
+		uniquePathName.Format(L"%s\\%s_%s.html", m_ascendantsPath, m_title, getTimeTag());
 		if (!openFileSpec(&fh_Unique, uniquePathName, L"w+")) return false;
 	}
 

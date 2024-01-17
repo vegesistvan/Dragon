@@ -199,10 +199,9 @@ protected:
 	int m_html;
 
 	BOOL m_checkFolyt;
-	BOOL m_checkCapital;
-	BOOL m_checkBold;
-	BOOL p_connect;
-	BOOL m_checkMother;
+	BOOL p_capital;
+	BOOL p_bold;
+	BOOL p_womenDescendants;
 	BOOL m_ceckDeleteRepeated;
 	BOOL m_checkCRLF;
 	bool m_folyt;
@@ -288,14 +287,12 @@ protected:
 	int  p_commentStyle;
 	int  p_specStyle;
 	bool p_capitalName;
-	bool p_checkBold;
 	bool p_folyt;
 	int	 p_radioCode;
 	int  p_repeated;
 	bool p_repeatedColor;
 	bool p_oneFile;
-//	bool p_connect;
-	bool p_mother;
+	int  p_connect;
 	UINT p_colorBgrnd;
 	bool p_print;		// azonnal nyomtassa ki a leszármazottat, a már szükségtelen rekordokat dobja el a vDesc-bõl. Ez hiba kereséshez jó.
 	bool p_checkCRLF;

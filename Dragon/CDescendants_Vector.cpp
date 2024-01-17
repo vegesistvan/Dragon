@@ -36,8 +36,7 @@ BOOL CDescendants::create_vDesc()
 	m_listedD = 0;
 
 
-	p_connect = p_connect;
-	p_mother = m_checkMother;
+	p_womenDescendants = p_womenDescendants;
 	p_numbering = m_radioNumbering;
 	p_lastname = m_radioDNameX;
 
@@ -45,8 +44,7 @@ BOOL CDescendants::create_vDesc()
 	p_otherNameStyle = m_comboOtherName;
 	p_commentStyle = m_comboComment;
 	p_specStyle = m_comboSpec;
-	p_capitalName = m_checkCapital;
-	p_checkBold = m_checkBold;
+	p_capitalName = p_capital;
 	p_folyt = m_checkFolyt;
 	p_colorBgrnd = m_colorBgrnd;
 	p_repeated = m_repeated;
@@ -82,28 +80,6 @@ BOOL CDescendants::create_vDesc()
 		// Az õs berakása a vDesc vektorba
 		DE::DESC desc;
 		queryR(m_rowid);
-		/*
-				if (peoS.numOfChildren == 0)
-				{
-					str.Format(L"%s-nek nincsenek gyerekei!", peoS.name);
-					//AfxMessageBox(str, MB_ICONEXCLAMATION);
-					continue;
-				}
-		*/
-/*
-		if (!i || !p_oneFile || p_print)
-		{
-			if (theApp.v_rowid.size() > 1 && p_oneFile)
-				file.Format(L"%d ember leszármazotti listája", theApp.v_rowid.size());
-			else
-				file.Format(L"%s leszármazotti listája", peoS.name);
-			title = file;
-			if (p_html)
-				openHtml(file, title, p_colorBgrnd);
-			else
-				openTxt(file, title);
-		}
-*/
 
 		m_tablenumber = peoS.tablenumber;
 
@@ -151,12 +127,13 @@ BOOL CDescendants::create_vDesc()
 
 				CDescendantsLinearTable dlg;
 
+				dlg.m_descendantsPath = m_descendantsPath;
 //				dlg.m_comboHtmlTxt = 
 				dlg.p_connect = p_connect;
-				dlg.m_checkMother = m_checkMother;
+				dlg.p_womenDescendants = p_womenDescendants;
 				dlg.m_checkFolyt = m_checkFolyt;
-				dlg.m_checkCapital = m_checkCapital;
-				dlg.m_checkBold = m_checkBold;
+				dlg.p_capital = p_capital;
+				dlg.p_bold = p_bold;
 				dlg.m_checkCRLF = m_checkCRLF;
 				dlg.m_radioOne = m_radioOne;
 
@@ -182,7 +159,6 @@ BOOL CDescendants::create_vDesc()
 				dlg.vDesc = &vDesc;
 				dlg.m_name = vDesc.at(0).name;
 				dlg.m_htmlFile = m_htmlFile;
-				
 
 				dlg.DoModal();
 			}
@@ -206,9 +182,9 @@ BOOL CDescendants::create_vDesc()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CDescendants::tablesDescendants()  // listázandó táblák a theapp.v_tableNumbers vektorban
 {
-	CString file;
 	CString title;
-
+	CString file;
+	CString descendantsTablePathName;
 	CString familyName;
 	CString tableHeader;
 	CString tableRoman;
@@ -234,11 +210,13 @@ bool CDescendants::tablesDescendants()  // listázandó táblák a theapp.v_tableNum
 		title.Format(L"%s %s tábla", familyName, tableRoman);
 		title.Trim();
 
+		descendantsTablePathName.Format(L"%s\\%s_%s.html", m_descendantsPath, title, getTimeTag());
+
 		if (theApp.v_tableNumbers.size() > 1)
-			file.Format(L"%s és további %d tábla", title, theApp.v_tableNumbers.size() - 1);
+			file.Format(L"%s_és további %d tabulált tábla", descendantsTablePathName, theApp.v_tableNumbers.size() - 1);
 		else
-			file.Format(L"%s_tábla", title);
-		openHtml(file, title, p_colorBgrnd);
+			file.Format(L"%s_tabulált tábla", title);
+		if (!openHtml(file, title, p_colorBgrnd)) return false;
 	}
 
 	CProgressWnd wndProgress(NULL, L"Leszármazotti táblák készítése folyik....");
@@ -263,15 +241,15 @@ bool CDescendants::tablesDescendants()  // listázandó táblák a theapp.v_tableNum
 			title.Format(L"%s tábla leszármazotti listája", (CString)title);
 
 			file.Format(L"%s_tábla", title);
-			openHtml(file, title, p_colorBgrnd);
+			if (!openHtml(file, title, p_colorBgrnd)) return false;
 		}
 		else
 		{
 			if (!i && theApp.v_tableNumbers.size() > 1)
 			{
-				title.Format(L"%d tábla leszármazotti listája", theApp.v_tableNumbers.size());
+				title.Format(L"%d tábla tabulált leszármazotti listája", theApp.v_tableNumbers.size());
 				file = title;
-				openHtml(file, title, p_colorBgrnd);
+				if( !openHtml(file, title, p_colorBgrnd)) return false;
 			}
 		}
 
@@ -334,10 +312,10 @@ bool CDescendants::tablesDescendants()  // listázandó táblák a theapp.v_tableNum
 			CDescendantsLinearTable dlg;
 
 			dlg.p_connect = p_connect;
-			dlg.m_checkMother = m_checkMother;
+			dlg.p_womenDescendants = p_womenDescendants;
 			dlg.m_checkFolyt = m_checkFolyt;
-			dlg.m_checkCapital = m_checkCapital;
-			dlg.m_checkBold = m_checkBold;
+			dlg.p_capital = p_capital;
+			dlg.p_bold = p_bold;
 			dlg.m_checkCRLF = m_checkCRLF;
 			dlg.m_radioOne = m_radioOne;
 
@@ -481,7 +459,7 @@ void CDescendants::descendants()
 
 		desc.hidden = false;
 		desc.cntRep = 0;
-		if (desc.sex == WOMAN && !p_mother)		// ha nõ a leszármazott és annak a gyerekeit nem akarjuk listázni
+		if (desc.sex == WOMAN && !p_womenDescendants)		// ha nõ a leszármazott és annak a gyerekeit nem akarjuk listázni
 			desc.numOfChildren = 0;
 
 		if (p_repeated == 1)						// ismétlõdõ leszármazottak kihagyása
@@ -592,7 +570,7 @@ void CDescendants::descendants()
 
 			//			if (vDesc.at(i).hidden) continue;   // mert csak gyûj
 
-			if (vDesc.at(i).sex == WOMAN && !p_mother)		// ha nõ a leszármazott és annak a gyerekeit nem akarjuk listázni
+			if (vDesc.at(i).sex == WOMAN && !p_womenDescendants)		// ha nõ a leszármazott és annak a gyerekeit nem akarjuk listázni
 			{
 				vDesc.at(i).numOfChildren = 0;
 				vDesc.at(i).procChildren = 0;
@@ -732,7 +710,7 @@ void CDescendants::descendantsOld()
 		}
 
 
-		if (vDesc.at(m_gen).sex == WOMAN && !p_mother)		// ha nõ a leszármazott és annak a gyerekeit nem akarjuk listázni
+		if (vDesc.at(m_gen).sex == WOMAN && !p_womenDescendants)		// ha nõ a leszármazott és annak a gyerekeit nem akarjuk listázni
 		{
 			vDesc.at(m_gen).numOfChildren = 0;
 			vDesc.at(m_gen).procChildren = 0;

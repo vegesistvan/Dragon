@@ -14,9 +14,9 @@ IMPLEMENT_DYNAMIC(CDescendantsParamOld, CDialogEx)
 CDescendantsParamOld::CDescendantsParamOld(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_DESCENDANTS_PARAM, pParent)
 	, p_connect(true)			// táblákat összekösse-e
-	, m_checkMother(false)			// nõk leszármazottait listázza-e
-	, m_checkCapital(false)
-	, m_checkBold(FALSE)
+	, p_womenDescendants(false)			// nõk leszármazottait listázza-e
+	, p_capital(false)
+	, p_bold(FALSE)
 	, m_comboOtherName(1)			// más náv bold
 	, m_comboSpec(0)				// speciális karakterek (*+=) bold
 	, m_comboComment(2)				// comment bold
@@ -46,10 +46,10 @@ void CDescendantsParamOld::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Check(pDX, IDC_CHECK_CONNECT, p_connect);
-	DDX_Check(pDX, IDC_CHECK_WOMAN, m_checkMother);
+	DDX_Check(pDX, IDC_CHECK_WOMAN, p_womenDescendants);
 
-	DDX_Check(pDX, IDC_CHECK_CAPITAL, m_checkCapital);
-	DDX_Check(pDX, IDC_CHECK_BOLD, m_checkBold);
+	DDX_Check(pDX, IDC_CHECK_CAPITAL, p_capital);
+	DDX_Check(pDX, IDC_CHECK_BOLD, p_bold);
 	DDX_Check(pDX, IDC_CHECK_FOLYT, m_checkFolyt);
 
 	DDX_Control(pDX, IDC_COMBO_COMMENT, m_combo_comment);
@@ -179,10 +179,10 @@ BOOL CDescendantsParamOld::OnInitDialog()
 void CDescendantsParamOld::setParameters()
 {
 	p_connect = theApp.GetProfileInt(L"dragon", L"p_connect", 0);
-	m_checkMother = theApp.GetProfileInt(L"dragon", L"m_checkMother", 1);
+	p_womenDescendants = theApp.GetProfileInt(L"dragon", L"p_womenDescendants", 1);
 	m_checkFolyt = theApp.GetProfileInt(L"dragon", L"m_checkFolyt", 0);
-	m_checkCapital = theApp.GetProfileInt(L"dragon", L"m_checkCapital", 0);
-	m_checkBold = theApp.GetProfileInt(L"dragon", L"m_checkBold", 0);
+	p_capital = theApp.GetProfileInt(L"dragon", L"p_capital", 0);
+	p_bold = theApp.GetProfileInt(L"dragon", L"p_bold", 0);
 
 	m_radioOne = theApp.GetProfileInt(L"dragon", L"m_radioOne", true);
 	m_radioDNameX = theApp.GetProfileInt(L"dragon", L"m_radioDNameX", 1);
@@ -211,10 +211,10 @@ void CDescendantsParamOld::OnClickedDefault()
 {
 	m_comboHtmlTxt.SetCurSel(0);
 	p_connect = true;
-	m_checkMother = true;
+	p_womenDescendants = true;
 	m_checkFolyt = false;
-	m_checkCapital = false;
-	m_checkBold = false;
+	p_capital = false;
+	p_bold = false;
 	m_checkCRLF = false;
 	m_radioOne = true;
 	
@@ -278,7 +278,7 @@ void CDescendantsParamOld::updateRadioDName()
 		((CButton*)GetDlgItem(IDC_RADIO_NOFAMILYNAME))->SetCheck(TRUE);
 		((CButton*)GetDlgItem(IDC_RADIO_FAMILYNAME))->SetCheck(FALSE);
 		((CButton*)GetDlgItem(IDC_RADIO_FAMILYNAMEUP))->SetCheck(FALSE);
-		m_checkBold = false;
+		p_bold = false;
 		UpdateData(TOSCREEN);
 		GetDlgItem(IDC_CHECK_BOLD)->EnableWindow(false);
 	}
@@ -297,7 +297,7 @@ void CDescendantsParamOld::updateRadioDName()
 		((CButton*)GetDlgItem(IDC_RADIO_NOFAMILYNAME))->SetCheck(FALSE);
 		((CButton*)GetDlgItem(IDC_RADIO_FAMILYNAME))->SetCheck(FALSE);
 		((CButton*)GetDlgItem(IDC_RADIO_FAMILYNAMEUP))->SetCheck(TRUE);
-		m_checkBold = false;
+		p_bold = false;
 		UpdateData(TOSCREEN);
 		GetDlgItem(IDC_CHECK_BOLD)->EnableWindow(false);
 	}
@@ -349,7 +349,7 @@ void CDescendantsParamOld::updateRepeated()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsParamOld::OnClickedCheckConnect()
 {
-	if (m_checkMother)					// ha nõk lszrámazoittait is listázzuk, akkor mindenképpen összekötés kell
+	if (p_womenDescendants)					// ha nõk lszrámazoittait is listázzuk, akkor mindenképpen összekötés kell
 	{
 		p_connect = true;
 		UpdateData(TOSCREEN);
@@ -358,8 +358,8 @@ void CDescendantsParamOld::OnClickedCheckConnect()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsParamOld::OnClickedCheckWoman()
 {
-	m_checkMother = !m_checkMother;				// ha a nõk cgyerekeit is listázni akarjuk, akkor a táblákat is össze kell kötni!!
-	if (m_checkMother)
+	p_womenDescendants = !p_womenDescendants;				// ha a nõk cgyerekeit is listázni akarjuk, akkor a táblákat is össze kell kötni!!
+	if (p_womenDescendants)
 	{
 		p_connect = true;
 		UpdateData(TOSCREEN);
@@ -373,15 +373,15 @@ void CDescendantsParamOld::OnClickedCheckFolyt()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsParamOld::OnClickedCheckCapital()
 {
-	m_checkCapital = !m_checkCapital;
+	p_capital = !p_capital;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsParamOld::OnClickedCheckBold()
 {
-	m_checkBold = !m_checkBold;
-	if (m_checkBold == true)
+	p_bold = !p_bold;
+	if (p_bold == true)
 	{
-		m_checkCapital = false;
+		p_capital = false;
 		m_comboComment = 0;
 		m_comboDAttrib = 0;
 		m_comboOtherName = 0;
@@ -501,7 +501,7 @@ void CDescendantsParamOld::OnBnClickedOk()
 
 	int z = m_repeated;
 	theApp.WriteProfileInt(L"dragon", L"p_connect", p_connect);
-	theApp.WriteProfileInt(L"dragon", L"m_checkMother", m_checkMother);
+	theApp.WriteProfileInt(L"dragon", L"p_womenDescendants", p_womenDescendants);
 	theApp.WriteProfileInt(L"dragon", L"m_repeated", m_repeated);
 	theApp.WriteProfileInt(L"dragon", L"m_repeatedColor", m_repeatedColor);
 	theApp.WriteProfileInt(L"dragon", L"m_checkFolyt", m_checkFolyt);
@@ -518,8 +518,8 @@ void CDescendantsParamOld::OnBnClickedOk()
 	theApp.WriteProfileInt(L"dragon", L"m_radioNumbering", m_radioNumbering);
 	theApp.WriteProfileInt(L"dragon", L"m_radioOrder", m_radioOrder);
 	theApp.WriteProfileInt(L"dragon", L"m_colorBgrnd", m_colorBgrnd);
-	theApp.WriteProfileInt(L"dragon", L"m_checkCapital", m_checkCapital);
-	theApp.WriteProfileInt(L"dragon", L"m_checkBold", m_checkBold);
+	theApp.WriteProfileInt(L"dragon", L"p_capital", p_capital);
+	theApp.WriteProfileInt(L"dragon", L"p_bold", p_bold);
 	theApp.WriteProfileInt(L"dragon", L"m_checkCRLF", m_checkCRLF);
 	theApp.WriteProfileInt(L"dragon", L"m_radioOne", m_radioOne);
 

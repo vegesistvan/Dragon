@@ -493,7 +493,7 @@ void CDescendantsOld::printDesc( int i, int which  )
 	vSerial.push_back(1);
 
 	queryPeople(desc.rowid, &p);
-	if (!p_mother && desc.parentSex == WOMAN) return;
+	if (!p_womenDescendants && desc.parentSex == WOMAN) return;
 
 	people = getComplexDescription(i, false );
 
@@ -659,7 +659,7 @@ bool CDescendantsOld::printTopContainer(CString title, int which)
 	today = getPresentDateTime();
 	CString yesno;
 	CString nok;
-	if (p_mother)
+	if (p_womenDescendants)
 		nok = L"igen";
 	else
 		nok = L"nem";

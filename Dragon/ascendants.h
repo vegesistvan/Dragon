@@ -224,7 +224,7 @@ protected:
 	CString m_sep;			// generációkat elválasztü vonal
 
 	CString m_piramidFile;
-
+	bool m_show;
 	CString m_linearListFileRep;
 	CString m_linearListFileNoRep;
 	CString m_linearTableFileNoRep;

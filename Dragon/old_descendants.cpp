@@ -136,10 +136,9 @@ BOOL CDescendantsOld::start()
 				file.Format(L"%s leszármazotti listája", peoS.name);
 			title = file;
 			if (p_html)
-				openHtml(file, title, p_colorBgrnd);
-			else
-				openTxt(file, title);
-		}
+				if (!openHtml(file, title, p_colorBgrnd)) return false;
+				else
+					if (!openTxt(file, title)) return false;		}
 
 		m_tablenumber = peoS.tablenumber;
 
@@ -443,7 +442,7 @@ void CDescendantsOld::descendants()
 		
 		desc.hidden = false;
 		desc.cntRep = 0;
-		if (desc.sex == WOMAN && !p_mother)		// ha nõ a leszármazott és annak a gyerekeit nem akarjuk listázni
+		if (desc.sex == WOMAN && !p_womenDescendants)		// ha nõ a leszármazott és annak a gyerekeit nem akarjuk listázni
 			desc.numOfChildren = 0;
 
 		if (p_repeated == 1)						// ismétlõdõ leszármazottak kihagyása
@@ -554,7 +553,7 @@ void CDescendantsOld::descendants()
 
 			//			if (vDesc.at(i).hidden) continue;   // mert csak gyûj
 
-			if (vDesc.at(i).sex == WOMAN && !p_mother)		// ha nõ a leszármazott és annak a gyerekeit nem akarjuk listázni
+			if (vDesc.at(i).sex == WOMAN && !p_womenDescendants)		// ha nõ a leszármazott és annak a gyerekeit nem akarjuk listázni
 			{
 				vDesc.at(i).numOfChildren = 0;
 				vDesc.at(i).procChildren = 0;
@@ -694,7 +693,7 @@ void CDescendantsOld::descendantsOld()
 		}
 
 
-		if (vDesc.at(m_gen).sex == WOMAN && !p_mother)		// ha nõ a leszármazott és annak a gyerekeit nem akarjuk listázni
+		if (vDesc.at(m_gen).sex == WOMAN && !p_womenDescendants)		// ha nõ a leszármazott és annak a gyerekeit nem akarjuk listázni
 		{
 			vDesc.at(m_gen).numOfChildren = 0;
 			vDesc.at(m_gen).procChildren = 0;
@@ -901,7 +900,7 @@ bool CDescendantsOld::parameters()
 	m_editWidth = dlg.m_editWidth;
 
 	p_connect = dlg.p_connect;
-	p_mother = dlg.m_checkMother;
+	p_womenDescendants = dlg.p_womenDescendants;
 	p_numbering = dlg.m_radioNumbering;
 	p_lastname = dlg.m_radioDNameX;
 
@@ -909,8 +908,8 @@ bool CDescendantsOld::parameters()
 	p_otherNameStyle = dlg.m_comboOtherName;
 	p_commentStyle = dlg.m_comboComment;
 	p_specStyle = dlg.m_comboSpec;
-	p_capitalName = dlg.m_checkCapital;
-	p_checkBold = dlg.m_checkBold;
+	p_capitalName = dlg.p_capital;
+	p_bold = dlg.p_bold;
 	p_folyt = dlg.m_checkFolyt;
 	p_colorBgrnd = dlg.m_colorBgrnd;
 	p_repeated = dlg.m_repeated;

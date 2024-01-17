@@ -185,14 +185,14 @@ protected:
 	int  p_commentStyle;
 	int  p_specStyle;
 	bool p_capitalName;
-	bool p_checkBold;
+	bool p_bold;
 	bool p_folyt;
 	int	 p_radioCode;
 	int  p_repeated;
 	bool p_repeatedColor;
 	bool p_oneFile;
 	bool p_connect;
-	bool p_mother;
+	bool p_womenDescendants;
 	UINT p_colorBgrnd;
 	bool p_print;		// azonnal nyomtassa ki a leszármazottat, a már szükségtelen rekordokat dobja el a vDesc-bõl. Ez hiba kereséshez jó.
 	bool p_checkCRLF;

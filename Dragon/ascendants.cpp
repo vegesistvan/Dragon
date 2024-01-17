@@ -78,6 +78,7 @@ BOOL CAscendants::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
+	m_show = true;
 	m_log = false;		// true = vektorok nyomtatása text fájlba
 
 	CString dragonjpgPathName;
@@ -817,6 +818,7 @@ void CAscendants::OnClickedLinearSqlitetable()
 {
 	UpdateData(FROMSCREEN);
 
+	m_show = false;
 	OnClickedPyramid();
 
 	CAscendantsLinearTable dlg;

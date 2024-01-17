@@ -26,7 +26,7 @@ class CDescendantsLinearTable : public CDialogEx
 public:
 	CDescendantsLinearTable(CWnd* pParent = nullptr);   // standard constructor
 	virtual ~CDescendantsLinearTable();
-
+	
 // Dialog Data
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_DESCENDANTS_LINEARTABLE };
@@ -79,7 +79,7 @@ protected:
 	int	m_cnt;
 	CString genPrev;
 	CString m_os;
-	CString m_descendantsPath;
+	
 
 	CSqliteDBRecordSet rs;
 	CSqliteDBRecordSet rs2;
@@ -158,12 +158,13 @@ public:
 	BOOL m_listRepeated;
 	CString m_htmlFile;
 	CString m_indentedFile;
-	
+	CString m_descendantsPath;
+
 	bool p_connect;
-	bool m_checkMother;
+	bool p_womenDescendants;
 	bool m_checkFolyt;
-	bool m_checkCapital;
-	bool m_checkBold;
+	bool p_capital;
+	bool p_bold;
 	bool m_checkCRLF;
 	bool m_radioOne;
 

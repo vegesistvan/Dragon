@@ -187,8 +187,8 @@ void CAscendants::OnClickedPyramid()
 	}
 	else
 	{
-
-		ShellExecute(NULL, L"open", m_piramidFile, NULL, NULL, SW_SHOWNORMAL);
+		if( m_show)
+			ShellExecute(NULL, L"open", m_piramidFile, NULL, NULL, SW_SHOWNORMAL);
 	}
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
