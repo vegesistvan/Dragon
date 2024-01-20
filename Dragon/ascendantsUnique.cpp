@@ -73,7 +73,7 @@ void CAscendantsUnique::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 	int toggle;
 	int nCol;
 	int moreC;
-
+	int family;
 
 	*pResult = 0;
 
@@ -81,7 +81,7 @@ void CAscendantsUnique::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 	nCol = pLVCD->iSubItem;
 	toggle = _wtoi(m_ListCtrlU.GetItemText(nItem, U_TOGGLE));
 	moreC = _wtoi(m_ListCtrlU.GetItemText(nItem, U_MOREC) );
-
+	family = _wtoi(m_ListCtrlU.GetItemText(nItem, U_COLOR));
 	switch (pLVCD->nmcd.dwDrawStage)
 	{
 	case CDDS_PREPAINT:
@@ -111,6 +111,8 @@ void CAscendantsUnique::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 			pLVCD->clrTextBk = RGB( 36, 239, 231 ); 
 		}
 		
+		if( nCol == U_ASCENDANT && family == 4 )
+			pLVCD->clrText = BLUE;
 
 		*pResult = CDRF_DODEFAULT;
 		break;

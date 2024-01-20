@@ -1,6 +1,8 @@
 #pragma once
 
-#define VERSION L"10.163"
+#define VERSION L"10.164"
+
+// 10.164 2024.01.20 Az interaktív lineáris táblában a családnevek kiemelése
 
 // 10.163 2024.01.17 Leszármazotti és felmenõi listák a ...list/descendans_x ill. ...list/ascendants_x mappában
 // 

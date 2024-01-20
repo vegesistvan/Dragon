@@ -58,7 +58,7 @@ void CDescendants::printVector( int tbl)
 	vLMX.clear();		// a generáció utolsó kiírt motherIndexe
 	vSerial.clear();
 	vSerial.push_back(1);
-	str.Format(L"%s leszármazottainak listázása...", m_os);
+	str.Format(L"%s leszármazottainak tabulált listázása...", m_os);
 	CProgressWnd wndP(NULL, str );
 	wndP.GoModal();
 	wndP.SetRange(0, vDesc.size() );
@@ -228,7 +228,6 @@ CString CDescendants::createDescendant(int i, bool parentIndex )
 	CString rang;
 	CString lastname;
 	CString comment;
-//	int parentIndex;
 	int motherIndex;
 	int z;
 	int j;
@@ -285,10 +284,7 @@ CString CDescendants::createDescendant(int i, bool parentIndex )
 		{
 			if (vLMX.at(last).lastMotherIndex != p.parentIndex)   // ha az utoljára kiírt motherIndex más, akkor ezt kiírja
 			{
-//				if (p.parentIndex == 1)
-//					str.Format(L" ;/%d", p.parentIndex);
-//				else
-					str.Format(L"/%d", p.parentIndex);
+				str.Format(L"/%d", p.parentIndex);
 				name += str;
 				vLMX.at(last).lastMotherIndex = p.parentIndex;
 			}
@@ -1017,7 +1013,7 @@ void CDescendants::closeHtml()
 		gen = TCHAR('a') + bias;
 
 
-	if ( theApp.v_tableNumbers.size() == 1   || !theApp.v_rowid.size() == 1 )
+//	if ( theApp.v_tableNumbers.size() == 1   || !theApp.v_rowid.size() == 1 )
 	{
 
 		print(L"<pre>");

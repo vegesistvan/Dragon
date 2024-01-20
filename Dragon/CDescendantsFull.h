@@ -39,6 +39,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	CListCtrlColoredHeader m_ListCtrlF;
+
 	virtual BOOL OnInitDialog();
 	afx_msg void OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
@@ -47,4 +48,5 @@ public:
 	afx_msg void OnKeressPrevious();
 	afx_msg void OnFunctionsDescendands();
 	afx_msg void OnFunctionsAscendants();
+	afx_msg void OnFunctionsNotepad();
 };

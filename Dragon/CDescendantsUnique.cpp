@@ -37,6 +37,8 @@ BEGIN_MESSAGE_MAP(CDescendantsUnique, CDialogEx)
 	ON_COMMAND(ID_KERESS_PREVIOUS, &CDescendantsUnique::OnKeressPrevious)
 	ON_COMMAND(ID_FUNCTIONS_DESCENDANDS, &CDescendantsUnique::OnFunctionsDescendands)
 	ON_COMMAND(ID_FUNCTIONS_ASCENDANTS, &CDescendantsUnique::OnFunctionsAscendants)
+	ON_COMMAND(ID_FUNCTIONS_NOTEPAD, &CDescendantsUnique::OnFunctionsNotepad)
+
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CDescendantsUnique::OnInitDialog()
@@ -50,6 +52,7 @@ BOOL CDescendantsUnique::OnInitDialog()
 
 	m_ListCtrlU.InsertColumn(L_CLRTEXTBK, L"", LVCFMT_RIGHT, 10, -1, COL_HIDDEN);
 	m_ListCtrlU.InsertColumn(L_CLRTEXT, L"", LVCFMT_RIGHT, 10, -1, COL_HIDDEN);
+	m_ListCtrlU.InsertColumn(L_LINENUMBER, L"", LVCFMT_RIGHT, 10, -1, COL_HIDDEN);
 	m_ListCtrlU.InsertColumn(L_NUMOFD, L"desc", LVCFMT_RIGHT, 50, -1, COL_NUM);
 	m_ListCtrlU.InsertColumn(L_ISM, L"ism", LVCFMT_CENTER, 50, -1, COL_TEXT);
 	m_ListCtrlU.InsertColumn(L_ID, L"id", LVCFMT_CENTER, 50, -1, COL_TEXT);
@@ -71,6 +74,7 @@ void CDescendantsUnique::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 
 	int nItem;
 	int nCol;
+	CString gen;
 	*pResult = 0;
 
 
@@ -85,6 +89,7 @@ void CDescendantsUnique::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 	case CDDS_ITEMPREPAINT | CDDS_SUBITEM:
 		nItem = pLVCD->nmcd.dwItemSpec;
 		nCol = pLVCD->iSubItem;
+		gen = m_ListCtrlU.GetItemText(nItem, L_GEN);
 
 		if (_wtoi(m_ListCtrlU.GetItemText(nItem, L_CLRTEXTBK)))
 			pLVCD->clrTextBk = WHITE;
@@ -98,6 +103,8 @@ void CDescendantsUnique::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 			else
 				pLVCD->clrText = RGB(0, 0, 255);
 		}
+		if( nCol == L_DESCENDANT && gen.IsEmpty())
+			pLVCD->clrText = RGB(0, 0, 255);
 		*pResult = CDRF_DODEFAULT;
 		break;
 	}
@@ -124,11 +131,11 @@ LRESULT CDescendantsUnique::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsUnique::OnKeressBeginning()
 {
-	int nItem = m_ListCtrlU.GetNextItem(-1, LVNI_ALL);
+	int nItem = m_ListCtrlU.GetNextItem(-1, LVNI_SELECTED);
 	CString ism = m_ListCtrlU.GetItemText(nItem, L_ISM);
 	if (ism.IsEmpty())
 	{
-		AfxMessageBox(L"Csak egyszer fordul elõ a kijelölt felmenõ!");
+		AfxMessageBox(L"Többször nem fordul elõ a kijelölt leszármazott!");
 	}
 	CString name = m_ListCtrlU.GetItemText(nItem, L_DESCENDANT);
 	int n = m_ListCtrlU.GetItemCount();
@@ -149,7 +156,7 @@ void CDescendantsUnique::OnKeressBeginning()
 void CDescendantsUnique::OnKeressNext()
 {
 	bool gotit = false;
-	int nItem = m_ListCtrlU.GetNextItem(-1, LVNI_ABOVE);
+	int nItem = m_ListCtrlU.GetNextItem(-1, LVNI_SELECTED);
 	CString name = m_ListCtrlU.GetItemText(nItem, L_DESCENDANT);
 	int n = m_ListCtrlU.GetItemCount();
 	for (int i = nItem + 1; i < n; ++i)
@@ -164,13 +171,13 @@ void CDescendantsUnique::OnKeressNext()
 		}
 	}
 	if (!gotit)
-		AfxMessageBox(L"Csak egyszer fordul elõ a kijelölt leszármazott!");
+		AfxMessageBox(L"Többször nem fordul elõ a kijelölt leszármazott!");
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsUnique::OnKeressPrevious()
 {
 	bool gotit = false;
-	int nItem = m_ListCtrlU.GetNextItem(-1, LVNI_BELOW);
+	int nItem = m_ListCtrlU.GetNextItem(-1, LVNI_SELECTED);
 	if (nItem == 0) return;
 	CString name = m_ListCtrlU.GetItemText(nItem, L_DESCENDANT);
 	int n = m_ListCtrlU.GetItemCount();
@@ -187,7 +194,7 @@ void CDescendantsUnique::OnKeressPrevious()
 		}
 	}
 	if (!gotit)
-		AfxMessageBox(L"Csak egyszer fordul elõ a kijelölt leszármazott!");
+		AfxMessageBox(L"Többször nem fordul elõ a kijelölt leszármazott!");
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsUnique::OnFunctionsDescendands()
@@ -202,7 +209,7 @@ void CDescendantsUnique::OnFunctionsDescendands()
 	std::vector<int> vid2;
 	std::vector<int> vid; // leszármazottak
 	idC = _wtoi(m_ListCtrlU.GetItemText(nItem, L_IDC));
-	if (idC == 0)
+	if (!idC)
 	{
 		descendant = m_ListCtrlU.GetItemText(nItem, L_DESCENDANT);
 		str = getTwoWords(descendant);
@@ -210,27 +217,36 @@ void CDescendantsUnique::OnFunctionsDescendands()
 		AfxMessageBox(str, MB_ICONEXCLAMATION);
 		return;
 	}
-
-	id = nItem;
-	vid1.push_back(id);  // ezeknek a leszármazottait fogja keresni
-	vid.push_back(id);	// összes leszármazott	
+	vid1.push_back(nItem);  // ezeknek a leszármazottait fogja keresni
+	vid.push_back(nItem);	// összes leszármazott	
 	theApp.unselectAll(&m_ListCtrlU);
 	m_ListCtrlU.SetItemState(nItem, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
 	while (true)
 	{
 		vid2.clear();		// a következõ generációt gyûjti benne
+		int j;
+		int idF;
+		int cnt;
 		for (int i = 0; i < vid1.size(); ++i)
 		{
-			id = vid1.at(i);	// apa azonosítója
-			idC = _wtoi(m_ListCtrlU.GetItemText(id, L_IDC));  // elsõ gyereke azonosítója
+			nItem = vid1.at(i);	// apa azonosítója
+			idC = _wtoi(m_ListCtrlU.GetItemText(nItem, L_IDC));  // elsõ gyereke azonosítója
 			if (idC)
 			{
-				dbC = _wtoi(m_ListCtrlU.GetItemText(id, L_DBC));
-				for (int j = idC; j < idC + dbC; ++j)  // gyerekeket keressük
+				cnt = 0;
+				dbC = _wtoi(m_ListCtrlU.GetItemText(nItem, L_DBC));
+				for (int j = nItem + 1; j < m_ListCtrlU.GetItemCount(); ++j)
 				{
-					m_ListCtrlU.SetItemState(j, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
-					vid2.push_back(j);  // a következõ generációt gyûjti
-					vid.push_back(j);	// az összes leszármazottat gyûjti
+					if (_wtoi(m_ListCtrlU.GetItemText(j, L_ID)) == idC)
+					{
+						m_ListCtrlU.SetItemState(j, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
+						m_ListCtrlU.EnsureVisible(j, FALSE);
+						vid2.push_back(j);  // a következõ generációt gyûjti
+						vid.push_back(j);	// az összes leszármazottat gyûjti
+						++cnt;
+						++idC;
+						if (cnt == dbC) break;
+					}
 				}
 			}
 		}
@@ -263,11 +279,13 @@ void CDescendantsUnique::OnFunctionsAscendants()
 
 	theApp.unselectAll(&m_ListCtrlU);
 	m_ListCtrlU.SetItemState(nItem, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
-	while (true)
+	for (int i = nItem; i > -1; --i)
 	{
-		m_ListCtrlU.SetItemState(idF, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
-		if (!idF) break;
-		idF = _wtoi(m_ListCtrlU.GetItemText(idF, L_IDF));
+		if (_wtoi(m_ListCtrlU.GetItemText(i, L_ID)) == idF)
+		{
+			m_ListCtrlU.SetItemState(i, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
+			idF = _wtoi(m_ListCtrlU.GetItemText(i, L_IDF));
+		}
 	}
 
 	/*
@@ -279,4 +297,12 @@ void CDescendantsUnique::OnFunctionsAscendants()
 		fclose(flDesc);
 		theApp.showFile(filePathName);
 	*/
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDescendantsUnique::OnFunctionsNotepad()
+{
+	int nItem = m_ListCtrlU.GetNextItem(-1, LVNI_SELECTED);
+	CString lineNumber = m_ListCtrlU.GetItemText(nItem, L_LINENUMBER);
+	if (!lineNumber.IsEmpty())
+		theApp.editNotepad(theApp.m_htmlPathName, lineNumber);
 }

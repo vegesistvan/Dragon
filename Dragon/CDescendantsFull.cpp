@@ -37,6 +37,7 @@ BEGIN_MESSAGE_MAP(CDescendantsFull, CDialogEx)
 	ON_COMMAND(ID_FUNCTIONS_DESCENDANDS, &CDescendantsFull::OnFunctionsDescendands)
 	ON_COMMAND(ID_FUNCTIONS_ASCENDANTS, &CDescendantsFull::OnFunctionsAscendants)
 
+	ON_COMMAND(ID_FUNCTIONS_NOTEPAD, &CDescendantsFull::OnFunctionsNotepad)
 END_MESSAGE_MAP()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CDescendantsFull::OnInitDialog()
@@ -51,6 +52,7 @@ BOOL CDescendantsFull::OnInitDialog()
 
 	m_ListCtrlF.InsertColumn(L_CLRTEXTBK, L"", LVCFMT_RIGHT, 10, -1, COL_HIDDEN);
 	m_ListCtrlF.InsertColumn(L_CLRTEXT, L"", LVCFMT_RIGHT, 10, -1, COL_HIDDEN);
+	m_ListCtrlF.InsertColumn(L_LINENUMBER, L"", LVCFMT_RIGHT, 10, -1, COL_HIDDEN);
 	m_ListCtrlF.InsertColumn(L_NUMOFD, L"desc", LVCFMT_RIGHT, 50, -1, COL_NUM);
 	m_ListCtrlF.InsertColumn(L_ISM, L"ism", LVCFMT_CENTER, 50, -1, COL_TEXT);
 	m_ListCtrlF.InsertColumn(L_ID, L"id", LVCFMT_CENTER, 50, -1, COL_TEXT);
@@ -59,7 +61,7 @@ BOOL CDescendantsFull::OnInitDialog()
 	m_ListCtrlF.InsertColumn(L_MINDEX, L"A", LVCFMT_CENTER, 50, -1, COL_TEXT);
 	m_ListCtrlF.InsertColumn(L_DBC, L"dbC", LVCFMT_RIGHT, 50, -1, COL_TEXT);
 	m_ListCtrlF.InsertColumn(L_GEN, L"gener", LVCFMT_CENTER, 50, -1, COL_TEXT);
-	m_ListCtrlF.InsertColumn(L_DESCENDANT, L"leszármazott", LVCFMT_LEFT, 1600, -1, COL_TEXT);
+	m_ListCtrlF.InsertColumn(L_DESCENDANT, L"leszármazott", LVCFMT_LEFT, 2000, -1, COL_TEXT);
 
 	return TRUE;
 }
@@ -71,6 +73,8 @@ void CDescendantsFull::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 	
 	int nItem;
 	int nCol;
+	CString gen;
+
 	*pResult = 0;
 
 
@@ -85,6 +89,9 @@ void CDescendantsFull::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 	case CDDS_ITEMPREPAINT | CDDS_SUBITEM:
 		nItem = pLVCD->nmcd.dwItemSpec;
 		nCol = pLVCD->iSubItem;
+		gen = m_ListCtrlF.GetItemText(nItem, L_GEN);
+		if (nCol == L_DESCENDANT && gen.IsEmpty())
+			pLVCD->clrText = RGB(0, 0, 255);
 
 		if (_wtoi(m_ListCtrlF.GetItemText(nItem, L_CLRTEXTBK)))
 			pLVCD->clrTextBk = WHITE;
@@ -94,9 +101,9 @@ void CDescendantsFull::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 		if (nCol == L_GEN)
 		{
 			if (_wtoi(m_ListCtrlF.GetItemText(nItem, L_CLRTEXT)))
-				pLVCD->clrText = RGB(255,0,0);
+				pLVCD->clrText = RGB(255, 0, 0);
 			else
-				pLVCD->clrText = RGB(0,0,255);
+				pLVCD->clrText = RGB(0, 0, 255);
 		}
 		*pResult = CDRF_DODEFAULT;
 		break;
@@ -124,11 +131,11 @@ LRESULT CDescendantsFull::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsFull::OnKeressBeginning()
 {
-	int nItem = m_ListCtrlF.GetNextItem(-1, LVNI_ALL);
+	int nItem = m_ListCtrlF.GetNextItem(-1, LVNI_SELECTED);
 	CString ism = m_ListCtrlF.GetItemText(nItem, L_ISM);
 	if (ism.IsEmpty())
 	{
-		AfxMessageBox(L"Csak egyszer fordul elõ a kijelölt leszármazott!");
+		AfxMessageBox(L"Többször nem fordul elõ a kijelölt leszármazott!");
 	}
 	bool getit = false;
 	CString name = m_ListCtrlF.GetItemText(nItem, L_DESCENDANT);
@@ -151,7 +158,7 @@ void CDescendantsFull::OnKeressBeginning()
 void CDescendantsFull::OnKeressNext()
 {
 	bool gotit = false;
-	int nItem = m_ListCtrlF.GetNextItem(-1, LVNI_ABOVE);
+	int nItem = m_ListCtrlF.GetNextItem(-1, LVNI_SELECTED);
 	CString name = m_ListCtrlF.GetItemText(nItem, L_DESCENDANT);
 	int n = m_ListCtrlF.GetItemCount();
 	for (int i = nItem + 1; i < n; ++i)
@@ -166,13 +173,13 @@ void CDescendantsFull::OnKeressNext()
 		}
 	}
 	if( !gotit)
-		AfxMessageBox(L"Csak egyszer fordul elõ a kijelölt leszármazott!");
+		AfxMessageBox(L"Többször nem fordul elõ a kijelölt leszármazott!");
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsFull::OnKeressPrevious()
 {
 	bool gotit = false;
-	int nItem = m_ListCtrlF.GetNextItem(-1, LVNI_BELOW);
+	int nItem = m_ListCtrlF.GetNextItem(-1, LVNI_SELECTED);
 	if (nItem == 0) return;
 	CString name = m_ListCtrlF.GetItemText(nItem, L_DESCENDANT);
 	int n = m_ListCtrlF.GetItemCount();
@@ -189,7 +196,7 @@ void CDescendantsFull::OnKeressPrevious()
 		}
 	}
 	if (!gotit)
-		AfxMessageBox(L"Csak egyszer fordul elõ a kijelölt leszármazott!");
+		AfxMessageBox(L"Többször nem fordul elõ a kijelölt leszármazott!");
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsFull::OnFunctionsDescendands()
@@ -198,13 +205,14 @@ void CDescendantsFull::OnFunctionsDescendands()
 	int dbC;
 	int id;
 	int idC;
+	int j = nItem;
 	CString descendant;
 
 	std::vector<int> vid1;
 	std::vector<int> vid2;
 	std::vector<int> vid; // leszármazottak
-	idC = _wtoi( m_ListCtrlF.GetItemText(nItem, L_IDC) );
-	if (idC == 0 )
+	idC = _wtoi(m_ListCtrlF.GetItemText(nItem, L_IDC));
+	if ( !idC )
 	{
 		descendant = m_ListCtrlF.GetItemText(nItem, L_DESCENDANT);
 		str = getTwoWords(descendant);
@@ -212,33 +220,45 @@ void CDescendantsFull::OnFunctionsDescendands()
 		AfxMessageBox(str, MB_ICONEXCLAMATION);
 		return;
 	}
-
-	id = nItem;
-	vid1.push_back(id);  // ezeknek a leszármazottait fogja keresni
-	vid.push_back(id);	// összes leszármazott	
+	vid1.push_back(nItem);  // ezeknek a leszármazottait fogja keresni
+	vid.push_back(nItem);	// összes leszármazott	
 	theApp.unselectAll(&m_ListCtrlF);
 	m_ListCtrlF.SetItemState(nItem, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
 	while( true)
 	{
 		vid2.clear();		// a következõ generációt gyûjti benne
+
+		int idF;
+		int cnt;
 		for (int i = 0; i < vid1.size(); ++i)
 		{
-			id = vid1.at(i);	// apa azonosítója
-			idC = _wtoi(m_ListCtrlF.GetItemText(id, L_IDC));  // elsõ gyereke azonosítója
+			nItem = vid1.at(i);	// apa azonosítója
+			idC = _wtoi(m_ListCtrlF.GetItemText(nItem, L_IDC));  // elsõ gyereke azonosítója
 			if (idC)
 			{
-				dbC = _wtoi(m_ListCtrlF.GetItemText(id, L_DBC));
-				for (int j = idC; j < idC+dbC; ++j)  // gyerekeket keressük
+				cnt = 0;
+				dbC = _wtoi(m_ListCtrlF.GetItemText(nItem, L_DBC));
+				for ( j = nItem + 1; j < m_ListCtrlF.GetItemCount(); ++j)
 				{
-					m_ListCtrlF.SetItemState(j, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
-					vid2.push_back(j);  // a következõ generációt gyûjti
-					vid.push_back(j);	// az összes leszármazottat gyûjti
+					if (_wtoi(m_ListCtrlF.GetItemText(j, L_ID)) == idC)
+					{
+						m_ListCtrlF.SetItemState(j, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
+//						m_ListCtrlF.EnsureVisible(j, FALSE);
+						vid2.push_back(j);  // a következõ generációt gyûjti
+						vid.push_back(j);	// az összes leszármazottat gyûjti
+						++cnt;
+						++idC;
+						if (cnt == dbC) break;
+					}
+					
 				}
 			}
 		}
 		if (!vid2.size()) break;
 		vid1 = vid2;
 	}
+	m_ListCtrlF.SetItemState(j, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
+	m_ListCtrlF.EnsureVisible(j, FALSE);
 
 /*
 	CString filePathName;
@@ -262,14 +282,16 @@ void CDescendantsFull::OnFunctionsAscendants()
 
 	id = nItem;
 	idF = _wtoi(m_ListCtrlF.GetItemText(nItem, L_IDF) );
-
+	
 	theApp.unselectAll(&m_ListCtrlF);
 	m_ListCtrlF.SetItemState(nItem, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
-	while (true)
+	for( int i = nItem; i > -1; --i )
 	{
-		m_ListCtrlF.SetItemState(idF, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
-		if (!idF) break;
-		idF = _wtoi(m_ListCtrlF.GetItemText(idF, L_IDF));
+		if (_wtoi(m_ListCtrlF.GetItemText(i, L_ID)) == idF)
+		{
+			m_ListCtrlF.SetItemState(i, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
+			idF = _wtoi(m_ListCtrlF.GetItemText(i, L_IDF));
+		}
 	}
 
 /*
@@ -281,4 +303,12 @@ void CDescendantsFull::OnFunctionsAscendants()
 	fclose(flDesc);
 	theApp.showFile(filePathName);
 */
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDescendantsFull::OnFunctionsNotepad()
+{
+	int nItem = m_ListCtrlF.GetNextItem(-1, LVNI_SELECTED);
+	CString lineNumber = m_ListCtrlF.GetItemText(nItem, L_LINENUMBER);
+	if (!lineNumber.IsEmpty())
+		theApp.editNotepad(theApp.m_htmlPathName, lineNumber);
 }

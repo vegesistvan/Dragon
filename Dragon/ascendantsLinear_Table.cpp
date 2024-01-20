@@ -241,7 +241,7 @@ void CAscendantsLinearTable::fullTable()
 	wndP.SetStep(1);
 	wndP.SetRange(0, vGKR->size());
 
-
+	m_familyNamePrev.Empty();
 	m_ListCtrl = &(m_aF.m_ListCtrlF);
 	for (int i = 0; i < vGKR->size(); ++i)
 	{
@@ -282,6 +282,7 @@ void CAscendantsLinearTable::uniqueTable()
 {
 	int nItem = 0;
 	CString name;
+	CString familyName;
 
 	correctReferences();
 	
@@ -296,8 +297,28 @@ void CAscendantsLinearTable::uniqueTable()
 	for (int i = 0; i < vGKR->size(); ++i)
 	{
 		if (vGKR->at(i).cnt > 1) continue;		// kihagyja az ismétléseket
-
-
+		/*
+		familyName = vGKR->at(i).familyName;
+		if ( familyName != m_familyNamePrev)
+		{
+			m_ListCtrl->InsertItem(nItem, L"");
+			m_ListCtrl->SetItemText(nItem, U_MOREC, L"");
+			m_ListCtrl->SetItemText(nItem, U_CNT, L"");
+			m_ListCtrl->SetItemText(nItem, U_ISM, L"");
+			m_ListCtrl->SetItemText(nItem, U_SIBLINGS, L"");
+			m_ListCtrl->SetItemText(nItem, U_SPOUSES, L"");
+			m_ListCtrl->SetItemText(nItem, U_IDM, L"");
+			m_ListCtrl->SetItemText(nItem, U_IDF, L"");
+			m_ListCtrl->SetItemText(nItem, U_IDC, L"");
+			m_ListCtrl->SetItemText(nItem, U_ID, L"");
+			m_ListCtrl->SetItemText(nItem, U_ASCENDANT, vGKR->at(i).familyName);
+			m_ListCtrl->SetItemText(nItem, U_NAME, L"");
+			m_ListCtrl->SetItemText(nItem, U_DESCRIPTION, L"");
+			m_ListCtrl->SetItemText(nItem, U_COLOR, L"4");
+			++nItem;
+			m_familyNamePrev = familyName;
+		}
+		*/
 		getAscendant(i, UNIQUE );
 
 		str.Format(L"%d", vGKR->at(i).toggle);
@@ -354,6 +375,7 @@ void CAscendantsLinearTable::getAscendant(int i, int which )
 {
 	GKR gkr = vGKR->at(i);
 
+
 	CString color;
 	bool lineY = false;
 	int kPrev = 0;
@@ -384,6 +406,7 @@ void CAscendantsLinearTable::getAscendant(int i, int which )
 	col.children.Empty();
 
 	moreC = false;
+
 
 	
 	if (i != 0)

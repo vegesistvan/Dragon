@@ -14,6 +14,10 @@ namespace DE
 		CString rowid;
 		CString rowidF;		// apa rowid-ja
 		CString rowidM;		// anya rowid-ja
+		CString lastname;
+		CString titolo;
+		CString tablenumber;
+		CString linenumber;
 		CString name;
 		CString sex;
 		int numOfSpouses;
@@ -30,8 +34,7 @@ namespace DE
 		int status;			// 0: alaphelyzet, listázandó (fekete)  1: ismétlõdõ elsõ bejegyzés, listázandó 2 (kék): ismétlõdõ második bejegyzés, nem listázandó(piros)
 		
 		bool printed;		// bejegyzés kiírva
-		int	id;			// a lineáris listázásnál a bejegyzés id-je;
-		int id2;			// rendezés utáni id
+		int	id;			// a lineáris listázásnál a bejegyzés id-je; id-re történt rendezés után a vDesc indexe
 		int idC;
 		int idF;
 		CString ixM;
@@ -45,9 +48,11 @@ namespace DE
 	typedef struct
 	{
 		CString tablenumber;
+		CString linenumber;
 		CString	sex;
 		CString posterior;
 		CString firstname;
+		CString titolo;
 		CString name;
 		int numOfSpouses;
 		int numOfChildren;
@@ -242,7 +247,7 @@ protected:
 	CComboBox m_comboHtmlTxt;
 	bool m_printed;
 	CString m_tableNumber;
-
+	CString m_lastname;
 	int m_generationMax;
 
 	void CDescendants::setParameters();

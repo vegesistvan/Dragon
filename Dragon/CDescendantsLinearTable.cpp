@@ -72,8 +72,15 @@ BOOL CDescendantsLinearTable::OnInitDialog()
 
 	std::sort(vDesc->begin(), vDesc->end(), sortById2);
 
+
+	CProgressWnd wndP(NULL, L"Generáció váltások jelölése...");
+	wndP.GoModal();
+	wndP.SetPos(0);
+	wndP.SetStep(1);
+	wndP.SetRange(0, vDesc->size());
 	for (int i = 0; i < vDesc->size(); ++i)
 	{
+		if (vDesc->at(i).id == -1) goto cont;
 		if (vDesc->at(i).g != gPrev)
 			tippingBk = !tippingBk;
 		gPrev = vDesc->at(i).g;
@@ -84,6 +91,10 @@ BOOL CDescendantsLinearTable::OnInitDialog()
 
 		childorderPrev = vDesc->at(i).childorder;
 		vDesc->at(i).clrText = tippingTx;
+
+cont:	wndP.StepIt();
+		wndP.PeekAndPump();
+		if (wndP.Cancelled()) break;
 	}
 /*
 	if (m_log)
@@ -142,6 +153,7 @@ BOOL CDescendantsLinearTable::OnInitDialog()
 	menu->EnableMenuItem(0, MF_BYPOSITION | MF_GRAYED);
 	menu->EnableMenuItem(1, MF_BYPOSITION | MF_GRAYED);
 
+
 	fullTable();
 	uniqueTable();
 
@@ -190,7 +202,7 @@ void CDescendantsLinearTable::OnSelchangeTab(NMHDR* pNMHDR, LRESULT* pResult)
 	switch (nItem)
 	{
 	case FULL_TAB:
-		m_ListCtrl = &(m_aF.m_ListCtrlF);
+//		m_ListCtrl = &(m_aF.m_ListCtrlF);
 		m_aF.ShowWindow(SW_SHOW);
 		m_aU.ShowWindow(SW_HIDE);
 
@@ -211,7 +223,7 @@ void CDescendantsLinearTable::OnSelchangeTab(NMHDR* pNMHDR, LRESULT* pResult)
 
 		break;
 	case UNIQUE_TAB:
-		m_ListCtrl = &(m_aU.m_ListCtrlU);
+//		m_ListCtrl = &(m_aU.m_ListCtrlU);
 
 		m_aU.ShowWindow(SW_SHOW);
 		m_aF.ShowWindow(SW_HIDE);
@@ -369,11 +381,13 @@ void CDescendantsLinearTable::OnIndentedList()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsLinearTable::fullTable()
 {
+	m_TabCtrl.SetCurFocus( 0 );
 	int nItem = 0;
 	CString gen;
 	CString people;
 	CString idC;
 	CString idF;
+	CString familyname;
 	DE::DESC desc;
 
 	CProgressWnd wndP(NULL, L"Lineáris teljes lista készítése...");
@@ -387,14 +401,40 @@ void CDescendantsLinearTable::fullTable()
 	for (int i = 0; i < vDesc->size(); ++i)
 	{
 		desc = vDesc->at(i);
+		if (desc.id == -1) goto cont;
 
-		if (!p_womenDescendants && desc.parentSex == WOMAN) return;
+		if ( p_lastname == 2 && desc.lastname != m_lastnamePrev)
+		{
+			m_lastnamePrev = desc.lastname;
+
+			str.Format(L"%d", desc.clrTextBk);
+			nItem = m_ListCtrl->InsertItem(nItem, str);
+			m_ListCtrl->SetItemText(nItem, L_CLRTEXT, L"");
+			m_ListCtrl->SetItemText(nItem, L_LINENUMBER, L"");
+			m_ListCtrl->SetItemText(nItem, L_NUMOFD, L"");
+			m_ListCtrl->SetItemText(nItem, L_ISM, L"");
+			m_ListCtrl->SetItemText(nItem, L_ID, L"");
+			m_ListCtrl->SetItemText(nItem, L_IDC, L"");
+			m_ListCtrl->SetItemText(nItem, L_IDF, L"");
+			m_ListCtrl->SetItemText(nItem, L_MINDEX, L"");
+			m_ListCtrl->SetItemText(nItem, L_DBC, L"");
+			m_ListCtrl->SetItemText(nItem, L_GEN, L"");
+
+			familyname = getSeededName(i);
+			m_ListCtrl->SetItemText(nItem, L_DESCENDANT, familyname);
+			++nItem;
+		}
+		
+
+		if (!p_womenDescendants && desc.parentSex == WOMAN) goto cont;
 
 		str.Format(L"%d", desc.clrTextBk);
 		nItem = m_ListCtrl->InsertItem(nItem, str);
 
 		str.Format(L"%d", desc.clrText);
 		m_ListCtrl->SetItemText(nItem, L_CLRTEXT, str);
+
+		m_ListCtrl->SetItemText(nItem, L_LINENUMBER, desc.linenumber );
 
 		str.Empty();
 		if (desc.nOfD)
@@ -419,10 +459,7 @@ void CDescendantsLinearTable::fullTable()
 			idF.Format(L"%d", desc.idF);
 		m_ListCtrl->SetItemText(nItem, L_IDF, idF);
 
-		str.Empty();
-		if (vDesc->at(vDesc->at(i).idF).numOfSpouses > 1)
-			str.Format(L"%d", vDesc->at(i).motherIndex);
-		m_ListCtrl->SetItemText(nItem, L_MINDEX, str);
+		m_ListCtrl->SetItemText(nItem, L_MINDEX, desc.ixM);
 
 		str.Empty();
 		if (desc.numOfChildren)
@@ -436,30 +473,59 @@ void CDescendantsLinearTable::fullTable()
 		people = getComplexDescriptionL(i, false);
 		m_ListCtrl->SetItemText(nItem, L_DESCENDANT, people);
 		++nItem;
+
+cont:	wndP.StepIt();
+		wndP.PeekAndPump();
+		if (wndP.Cancelled()) break;
 	}
+	wndP.DestroyWindow();
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsLinearTable::uniqueTable()
 {
+	m_TabCtrl.SetCurFocus(1);
 	int nItem = 0;
 	CString gen;
 	CString people;
 	CString idC;
 	CString idF;
+	CString familyname;
 	DE::DESC desc;
 
-	CProgressWnd wndP(NULL, L"Lineáris teljes lista készítése...");
+	CProgressWnd wndP(NULL, L"Ismétlõdések kihagyásával lineáris lista készítése...");
 	wndP.GoModal();
 	wndP.SetPos(0);
 	wndP.SetStep(1);
 	wndP.SetRange(0, vDesc->size());
 
-
+	m_lastnamePrev.Empty();
 	m_ListCtrl = &(m_aU.m_ListCtrlU);
 	for (int i = 0; i < vDesc->size(); ++i)
 	{
 		desc = vDesc->at(i);
+		if (desc.id == -1) goto cont;
+		if (desc.cntRep > 1 ) goto cont;
+		if (p_lastname == 2 && desc.lastname != m_lastnamePrev)
+		{
+			m_lastnamePrev = desc.lastname;
 
+			str.Format(L"%d", desc.clrTextBk);
+			nItem = m_ListCtrl->InsertItem(nItem, str);
+			m_ListCtrl->SetItemText(nItem, L_CLRTEXT, L"");
+			m_ListCtrl->SetItemText(nItem, L_LINENUMBER, L"");
+			m_ListCtrl->SetItemText(nItem, L_NUMOFD, L"");
+			m_ListCtrl->SetItemText(nItem, L_ISM, L"");
+			m_ListCtrl->SetItemText(nItem, L_ID, L"");
+			m_ListCtrl->SetItemText(nItem, L_IDC, L"");
+			m_ListCtrl->SetItemText(nItem, L_IDF, L"");
+			m_ListCtrl->SetItemText(nItem, L_MINDEX, L"");
+			m_ListCtrl->SetItemText(nItem, L_DBC, L"");
+			m_ListCtrl->SetItemText(nItem, L_GEN, L"");
+
+			familyname = getSeededName(i);
+			m_ListCtrl->SetItemText(nItem, L_DESCENDANT, familyname);
+			++nItem;
+		}
 		if (!p_womenDescendants && desc.parentSex == WOMAN) return;
 
 		str.Format(L"%d", desc.clrTextBk);
@@ -467,6 +533,8 @@ void CDescendantsLinearTable::uniqueTable()
 
 		str.Format(L"%d", desc.clrText);
 		m_ListCtrl->SetItemText(nItem, L_CLRTEXT, str );
+
+		m_ListCtrl->SetItemText(nItem, L_LINENUMBER, desc.linenumber );
 
 		str.Empty();
 		if (desc.nOfD)
@@ -491,10 +559,10 @@ void CDescendantsLinearTable::uniqueTable()
 			idF.Format(L"%d", desc.idF);
 		m_ListCtrl->SetItemText(nItem, L_IDF, idF);
 
-		str.Empty();
-		if( vDesc->at(vDesc->at(i).idF).numOfSpouses > 1 )
-			str.Format(L"%d", vDesc->at(i).motherIndex);
-		m_ListCtrl->SetItemText(nItem, L_MINDEX, str);
+	//	str.Empty();
+	//	if( vDesc->at(i).ixM.IsEmpty() )
+	//		str.Format(L"%s", vDesc->at(i).ixM);
+		m_ListCtrl->SetItemText(nItem, L_MINDEX, desc.ixM );
 
 		str.Empty();
 		if (desc.numOfChildren)
@@ -508,7 +576,11 @@ void CDescendantsLinearTable::uniqueTable()
 		people = getComplexDescriptionL(i, false);
 		m_ListCtrl->SetItemText(nItem, L_DESCENDANT, people);
 		++nItem;
+cont:	wndP.StepIt();
+		wndP.PeekAndPump();
+		if (wndP.Cancelled()) break;
 	}
+	wndP.DestroyWindow();
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CDescendantsLinearTable::getComplexDescriptionL(int i, bool parentIndex)
@@ -535,7 +607,7 @@ CString CDescendantsLinearTable::getComplexDescriptionL(int i, bool parentIndex)
 	{
 		people += p.csalad;
 	}
-	if (!p.folyt.IsEmpty() && m_checkFolyt)
+	if (!p.folyt.IsEmpty() && p_folyt)
 	{
 		folyt.Format(L"%c%c%c folyt %s", '%', '%', '%', p.folyt);
 		people += folyt;
@@ -562,7 +634,7 @@ CString CDescendantsLinearTable::createDescendantL(int i, bool parentIndex)
 	TCHAR ch;
 
 	name = p.first_name;
-	if (m_radioDNameX == 1)
+	if (p_radioDNameX == 1)
 	{
 		lastname = p.last_name;
 		if (lastname == L"N") lastname.Empty();
@@ -622,7 +694,7 @@ CString CDescendantsLinearTable::createDescendantL(int i, bool parentIndex)
 	if (!p.posterior.IsEmpty())
 	{
 		name += p.posterior;
-		if (m_checkCRLF)
+		if (p_checkCRLF)
 			name += L"\n";
 	}
 
@@ -784,7 +856,7 @@ CString CDescendantsLinearTable::createSpouseL()
 	{
 		fullname += L" ";
 		fullname += s.posterior;
-		if (m_checkCRLF)
+		if (p_checkCRLF)
 			fullname += L"\n";
 	}
 	fullname.Trim();
@@ -799,7 +871,8 @@ CString CDescendantsLinearTable::createSpouseL()
 	if (!str.IsEmpty())
 		spouse.Format(L"%s %s", (CString)spouse, str);
 
-	str = getColoredString(s.comment, m_comboComment);
+	//str = getColoredString(s.comment, p_comboComment);
+	str = s.comment;
 	if (!str.IsEmpty())
 	{
 		if (s.comment.GetAt(0) == ',')
@@ -834,7 +907,7 @@ CString CDescendantsLinearTable::createSpRelativesL()
 	if (!s.mother_id.IsEmpty() && s.mother_id != L"0")
 	{
 		queryPeople(s.mother_id, &sm);
-		mother = getLastFirst(&sm);
+		mother = getLastFirst(&sm, false);
 		mother.Trim();
 	}
 
@@ -881,7 +954,7 @@ CString CDescendantsLinearTable::createSpRelativesL()
 			queryPeople(spouse_id, &ss);
 			if (ss.rowid != p.rowid)		// a GA sorban szereplõ házastársat kihagyja
 			{
-				spouseSpouse = getLastFirst(&ss);
+				spouseSpouse = getLastFirst(&ss, false);
 
 				if (parents.GetLength())
 					parents += L", ";
@@ -902,3 +975,19 @@ CString CDescendantsLinearTable::createSpRelativesL()
 	}
 	return(parents);
 }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CString CDescendantsLinearTable::getSeededName(int i)
+{
+	CString familyname;
+	DE::DESC desc = vDesc->at(i);
+	familyname = desc.lastname.MakeUpper();
+	if (theApp.m_inputMode == GAHTML)
+	{
+		m_command.Format(L"SELECT tableHeader FROM tables WHERE rowid='%s'", desc.tablenumber);
+		if (!query(m_command)) return L"";
+
+		familyname.Format(L"%s, %s %s", (CString)familyname, desc.titolo, rs.GetFieldString(0));
+	}
+	return familyname;
+}
+

@@ -8,6 +8,7 @@ enum
 {
 	L_CLRTEXTBK = 0,		// hidden
 	L_CLRTEXT,
+	L_LINENUMBER,
 	L_NUMOFD,
 	L_ISM,
 	L_ID,
@@ -75,6 +76,7 @@ protected:
 	//////////////
 
 	CString m_familyName;
+	CString m_lastnamePrev;
 	CString m_lastname;
 	int	m_cnt;
 	CString genPrev;
@@ -106,18 +108,17 @@ protected:
 
 	bool gflag;
 	void CDescendantsLinearTable::keress(int start);
-	void CDescendantsLinearTable::dataTable(int which);
+	void CDescendantsLinearTable::dataTable();
 	int CDescendantsLinearTable::sort_vDesc();
 	BOOL CDescendantsLinearTable::query(CString command);
 	BOOL CDescendantsLinearTable::queryP(CString command);
 	BOOL CDescendantsLinearTable::queryM(CString command);
-	bool CDescendantsLinearTable::printTopContainer(CString title, int which);
+	bool CDescendantsLinearTable::printTopContainer(CString title );
+	void CDescendantsLinearTable::printDesc(int i);
 	TCHAR CDescendantsLinearTable::get_gABC(int g);
-	void CDescendantsLinearTable::printOnly(CString str, int which);
 	CString CDescendantsLinearTable::getComplexDescription(int i, bool parentIndex);
-	void CDescendantsLinearTable::printDesc(int i, int which);
 	CString CDescendantsLinearTable::getColoredString(CString str, int index);
-	CString CDescendantsLinearTable::getLastFirst(DE::PPEOPLE* p);
+	CString CDescendantsLinearTable::getLastFirst(DE::PPEOPLE* p, bool style );
 	CString CDescendantsLinearTable::getPlaceDateBlock(CString place, CString date, CString jel);
 	void CDescendantsLinearTable::queryPeople(CString rowid, DE::PPEOPLE* p);
 	CString CDescendantsLinearTable::getTableHeader();
@@ -138,54 +139,31 @@ protected:
 	CString CDescendantsLinearTable::createSpRelativesL();
 
 
-	DECLARE_MESSAGE_MAP()
-public:
-
+	bool CDescendantsLinearTable::createHtmlFile(int i, int which);
+	void CDescendantsLinearTable::fullTable();
+	void CDescendantsLinearTable::uniqueTable();
 	BOOL CDescendantsLinearTable::attachDialogs();
+
+	CString getSeededName(int i);
+	DECLARE_MESSAGE_MAP()
+
+	virtual BOOL OnInitDialog();
+	afx_msg void OnSelchangeTab(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	afx_msg void OnClickedStaticNext();
+	afx_msg void OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct);
+	afx_msg void OnHtmlListaFix();
+	afx_msg void OnHtmlListaPrintable();
+	afx_msg LRESULT CDescendantsLinearTable::OnReloadListCtrl(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT CDescendantsLinearTable::OnSetRowColor(WPARAM wParam, LPARAM lParam);//wparam: oszlopszam, lparam: a COLUMNCOLOR struktura cime
+	afx_msg void OnIndentedList();
+
+
 
 	CRichEditCtrl m_RichEditCtrl;
 	CListCtrlEx* m_ListCtrl;
-	CString m_title;
-	CString m_name;
 
-	CString s_editK;
-	CString s_editG;
-	BOOL m_bold;
-	BOOL m_firstBold;
-	BOOL m_peerPrint;
-	BOOL m_checkColor;
-	int  m_type;
-	BOOL m_listRepeated;
-	CString m_htmlFile;
-	CString m_indentedFile;
-	CString m_descendantsPath;
-
-	bool p_connect;
-	bool p_womenDescendants;
-	bool m_checkFolyt;
-	bool p_capital;
-	bool p_bold;
-	bool m_checkCRLF;
-	bool m_radioOne;
-
-	CString m_editWidth;
-	CString m_editGenMax;
-
-	int m_radioDNameX;
-
-	int m_comboDAttrib;
-	int m_comboFontSize;
-	int m_comboComment;
-	int m_comboSpec;
-	int m_comboOtherName;
-
-	int m_colorBgrnd;
-
-	int m_repeated;
-	int m_repeatedColor;
-	int m_radioOrder;
-	bool m_folyt;
-	bool m_html;
 
 	COLORREF m_clrTextBk;
 	COLORREF m_clrText;
@@ -196,31 +174,50 @@ public:
 	DE::PPEOPLE sm;
 	DE::PPEOPLE ss;
 
+	CString m_title;
+public:
 	std::vector<DE::DESC>* vDesc;
+	
+	CString m_name;
+	CString m_descendantsPath;
+	CString m_htmlFile;
+	CString m_indentedFile;
+
+	bool p_connect;
+	bool p_womenDescendants;
+	bool p_folyt;
+	bool p_capital;
+	bool p_bold;
+	bool p_checkCRLF;
+	bool p_radioOne;
+	int p_lastname;
 
 
-	afx_msg void OnPaint();
-	afx_msg void OnSelchangeTab(NMHDR* pNMHDR, LRESULT* pResult);
-	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
-	afx_msg void OnSize(UINT nType, int cx, int cy);
-	virtual BOOL PreTranslateMessage(MSG* pMsg);
-	afx_msg void OnClickedStaticNext();
-	afx_msg void OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct);
-	afx_msg void OnHtmLista();
-	afx_msg void OnHtmlListaFix();
-	afx_msg void OnHtmlListaPrintable();
-	bool CDescendantsLinearTable::createHtmlFileP(int which);
-	bool CDescendantsLinearTable::createHtmlFileF(int which);
-	bool CDescendantsLinearTable::createHtmlFile(int i, int which);
-	afx_msg void OnPiramis();
-	afx_msg LRESULT CDescendantsLinearTable::OnReloadListCtrl(WPARAM wParam, LPARAM lParam);
-	afx_msg LRESULT CDescendantsLinearTable::OnSetRowColor(WPARAM wParam, LPARAM lParam);//wparam: oszlopszam, lparam: a COLUMNCOLOR struktura cime
-	virtual BOOL OnInitDialog();
-	afx_msg void OnHtmllistaFix();
-	afx_msg void OnHtmllistaPrintable();
-	afx_msg void OnIndentedList();
-	void CDescendantsLinearTable::fullTable();
-	void CDescendantsLinearTable::uniqueTable();
+	CString p_editWidth;
+	CString p_editGenMax;
+	CString p_editK;
+	CString p_editG;
+	
+	BOOL p_firstBold;
+	BOOL p_peerPrint;
+	BOOL p_checkColor;
+	int  p_type;
+	BOOL p_listRepeated;
+	
 
+	int p_repeatedColor;
+	int p_radioOrder;
+	int p_radioDNameX;
+
+	int p_comboDAttrib;
+	int p_comboFontSize;
+	int p_comboComment;
+	int p_comboSpec;
+	int p_comboOtherName;
+	
+	int p_colorBgrnd;
+	int p_repeated;
+	
+	bool p_html;
 };
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

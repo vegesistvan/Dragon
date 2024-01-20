@@ -11,6 +11,7 @@ typedef struct
 	int		original;	// eredeti sorrend indexe
 	CString rowidC;		// gyere rowid-ja
 	CString rowid;		// apa rowid-ja
+	CString familyName;
 	CString name;
 	CString birth;
 	CString death;
@@ -109,6 +110,7 @@ protected:
 	CString m_father_id;
 	CString m_mother_id;
 	CString m_name;
+	CString m_familyName;
 	CString m_birth;
 	CString m_death;
 	int		m_sex_id;

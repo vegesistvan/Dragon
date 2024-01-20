@@ -15,6 +15,7 @@ enum
 	U_NAME,				// hidden
 	U_DESCRIPTION,		// hidden
 	U_COLOR,
+	U_NUMOFCOLUMNS
 };
 
 enum
@@ -30,6 +31,7 @@ enum
 	F_NAME,				// hidden
 	F_DESCRIPTION,		// hidden
 	F_COLOR,
+	F_NUMOFCOLUMNS
 };
 enum
 {

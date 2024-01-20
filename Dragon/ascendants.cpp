@@ -158,6 +158,7 @@ void CAscendants::create_vGKR()
 	gkr.gABC = TCHAR('A');
 	gkr.rowidC = L"";
 	gkr.rowid = m_rowid;		// saját rowidja
+	gkr.familyName = m_familyName;
 	gkr.name = m_name;
 	gkr.cnt = 0;
 	gkr.ixC = -1;				// gyerekének indexe
@@ -205,6 +206,7 @@ void CAscendants::create_vGKR()
 				gkr.ixF = 0;
 				gkr.ixSp = 0;
 				gkr.gcnt = gcnt;
+				gkr.familyName = m_familyName;
 				gkr.name = m_name;
 				gkr.sex_id = m_sex_id;
 				gkr.cntMax = 1;
@@ -499,6 +501,7 @@ bool CAscendants::getPeople(CString rowid)
 {
 	m_command.Format(L"SELECT last_name, first_name, sex_id, birth_date, death_date FROM people WHERE rowid='%s'", rowid);
 	if (!queryP(m_command)) return false;
+	m_familyName = m_recP->GetFieldString(0);
 	m_name.Format(L"%s %s", m_recP->GetFieldString(0), m_recP->GetFieldString(1));
 	m_birth = m_recP->GetFieldString(3);
 	m_death = m_recP->GetFieldString(4);

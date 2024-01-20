@@ -983,13 +983,14 @@
 #define ID_INDENTED_LIST                35059
 #define ID_TABUL35060                   35060
 #define ID_INDENTED_ASCENDANTS          35061
+#define ID_FUNCTIONS_NOTEPAD            35062
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        577
-#define _APS_NEXT_COMMAND_VALUE         35062
+#define _APS_NEXT_COMMAND_VALUE         35063
 #define _APS_NEXT_CONTROL_VALUE         1854
 #define _APS_NEXT_SYMED_VALUE           387
 #endif

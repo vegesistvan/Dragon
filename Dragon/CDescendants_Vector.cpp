@@ -85,7 +85,11 @@ BOOL CDescendants::create_vDesc()
 
 		desc.g = 0;
 		desc.rowid = m_rowid;
+		desc.tablenumber = m_tablenumber;
+		desc.linenumber = peoS.linenumber;
+		desc.titolo = peoS.titolo;
 		desc.rowidF.Empty();
+		desc.lastname = m_lastname;
 		desc.name = peoS.name;
 		desc.sex = peoS.sex;
 		desc.numOfSpouses = peoS.numOfSpouses;
@@ -128,33 +132,32 @@ BOOL CDescendants::create_vDesc()
 				CDescendantsLinearTable dlg;
 
 				dlg.m_descendantsPath = m_descendantsPath;
-//				dlg.m_comboHtmlTxt = 
+
 				dlg.p_connect = p_connect;
 				dlg.p_womenDescendants = p_womenDescendants;
-				dlg.m_checkFolyt = m_checkFolyt;
+				dlg.p_folyt = m_checkFolyt;
 				dlg.p_capital = p_capital;
 				dlg.p_bold = p_bold;
-				dlg.m_checkCRLF = m_checkCRLF;
-				dlg.m_radioOne = m_radioOne;
+				dlg.p_lastname = p_lastname;
+				dlg.p_checkCRLF = m_checkCRLF;
+				dlg.p_radioOne = m_radioOne;
 
-				dlg.m_editWidth = m_editWidth;
-				dlg.m_editGenMax = m_editGenMax;
+				dlg.p_editWidth = m_editWidth;
+				dlg.p_editGenMax = m_editGenMax;
 
-				dlg.m_repeatedColor = m_repeatedColor;
-				dlg.m_radioDNameX = m_radioDNameX;
-				dlg.m_radioOrder = m_radioOrder;
+				dlg.p_repeatedColor = m_repeatedColor;
+				dlg.p_radioDNameX = m_radioDNameX;
+				dlg.p_radioOrder = m_radioOrder;
 
-				dlg.m_comboDAttrib = m_comboDAttrib;
-				dlg.m_comboFontSize = m_comboFontSize;
-				dlg.m_comboComment = m_comboComment;
-				dlg.m_comboSpec = m_comboSpec;
-				dlg.m_comboOtherName = m_comboOtherName;
-				dlg.m_colorBgrnd = m_colorBgrnd;
-				dlg.m_repeated = m_repeated;
-				dlg.m_repeatedColor = m_repeatedColor;
-				dlg.m_radioOrder = m_radioOrder;
-				dlg.m_html = m_html;
-				dlg.m_folyt = m_folyt;
+				dlg.p_comboDAttrib = m_comboDAttrib;
+				dlg.p_comboFontSize = m_comboFontSize;
+				dlg.p_comboComment = m_comboComment;
+				dlg.p_comboSpec = m_comboSpec;
+				dlg.p_comboOtherName = m_comboOtherName;
+				dlg.p_colorBgrnd = m_colorBgrnd;
+				dlg.p_repeated = m_repeated;
+				dlg.p_html = m_html;
+				dlg.p_folyt = m_folyt;
 				
 				dlg.vDesc = &vDesc;
 				dlg.m_name = vDesc.at(0).name;
@@ -279,6 +282,9 @@ bool CDescendants::tablesDescendants()  // listázandó táblák a theapp.v_tableNum
 			desc.hidden = true;
 		}
 		desc.g = 0;
+		desc.tablenumber = peoS.tablenumber;
+		desc.linenumber = peoS.linenumber;
+		desc.titolo = peoS.titolo;
 		desc.rowidF = father_id;
 		desc.sex = peoS.sex;
 		desc.numOfChildren = peoS.numOfChildren;
@@ -287,6 +293,7 @@ bool CDescendants::tablesDescendants()  // listázandó táblák a theapp.v_tableNum
 		desc.numOfSpouses = 0;
 		desc.parentIndex = 0;
 		desc.motherIndex = 1;
+		desc.lastname = m_lastname;
 		desc.name = peoS.name;
 		desc.cntRep = 0;
 		desc.order = 0;
@@ -313,30 +320,30 @@ bool CDescendants::tablesDescendants()  // listázandó táblák a theapp.v_tableNum
 
 			dlg.p_connect = p_connect;
 			dlg.p_womenDescendants = p_womenDescendants;
-			dlg.m_checkFolyt = m_checkFolyt;
+			dlg.p_folyt = m_checkFolyt;
 			dlg.p_capital = p_capital;
 			dlg.p_bold = p_bold;
-			dlg.m_checkCRLF = m_checkCRLF;
-			dlg.m_radioOne = m_radioOne;
+			dlg.p_checkCRLF = m_checkCRLF;
+			dlg.p_radioOne = m_radioOne;
 
-			dlg.m_editWidth = m_editWidth;
-			dlg.m_editGenMax = m_editGenMax;
+			dlg.p_editWidth = m_editWidth;
+			dlg.p_editGenMax = m_editGenMax;
 
-			dlg.m_repeatedColor = m_repeatedColor;
-			dlg.m_radioDNameX = m_radioDNameX;
-			dlg.m_radioOrder = m_radioOrder;
+			dlg.p_repeatedColor = m_repeatedColor;
+			dlg.p_radioDNameX = m_radioDNameX;
+			dlg.p_radioOrder = m_radioOrder;
 
-			dlg.m_comboDAttrib = m_comboDAttrib;
-			dlg.m_comboFontSize = m_comboFontSize;
-			dlg.m_comboComment = m_comboComment;
-			dlg.m_comboSpec = m_comboSpec;
-			dlg.m_comboOtherName = m_comboOtherName;
-			dlg.m_colorBgrnd = m_colorBgrnd;
-			dlg.m_repeated = m_repeated;
-			dlg.m_repeatedColor = m_repeatedColor;
-			dlg.m_radioOrder = m_radioOrder;
-			dlg.m_html = m_html;
-			dlg.m_folyt = m_folyt;
+			dlg.p_comboDAttrib = m_comboDAttrib;
+			dlg.p_comboFontSize = m_comboFontSize;
+			dlg.p_comboComment = m_comboComment;
+			dlg.p_comboSpec = m_comboSpec;
+			dlg.p_comboOtherName = m_comboOtherName;
+			dlg.p_colorBgrnd = m_colorBgrnd;
+			dlg.p_repeated = m_repeated;
+			dlg.p_repeatedColor = m_repeatedColor;
+			dlg.p_radioOrder = m_radioOrder;
+			dlg.p_html = m_html;
+			dlg.p_folyt = m_folyt;
 
 			dlg.vDesc = &vDesc;
 			dlg.m_name = vDesc.at(0).name;
@@ -437,8 +444,12 @@ void CDescendants::descendants()
 
 		if (rowid == L"308824")
 			z = 1;
+		desc.tablenumber = peoS.tablenumber;
+		desc.linenumber = peoS.linenumber;
+		desc.titolo = peoS.titolo;
 		desc.rowidF = vDesc.at(i).rowid;
 		desc.rowid = rowid;
+		desc.lastname = m_lastname;
 		desc.name = peoS.name;
 		desc.sex = peoS.sex;
 		desc.numOfSpouses = peoS.numOfSpouses;
@@ -774,7 +785,7 @@ bool CDescendants::queryR(CString rowid)
 {
 	int z;
 
-	m_command.Format(L"SELECT generation, sex_id, posterior, last_name, first_name, tableNumber, folyt, parentIndex, numOfChildren  FROM people WHERE rowid ='%s'", rowid);
+	m_command.Format(L"SELECT generation, sex_id, posterior, last_name, first_name, tableNumber, folyt, parentIndex, numOfChildren, titolo, linenumber  FROM people WHERE rowid ='%s'", rowid);
 	if (!queryP(m_command)) return false;
 
 	CString folyt;
@@ -783,17 +794,19 @@ bool CDescendants::queryR(CString rowid)
 	//		++m_folyt_db;
 
 	peoS.tablenumber = rsP.GetFieldString(5);
+	peoS.linenumber = rsP.GetFieldString(10);
+	peoS.titolo = rsP.GetFieldString(9);
 	peoS.sex = rsP.GetFieldString(1);
 	if (peoS.sex == BISEX)
 		peoS.sex = MAN;
 	peoS.posterior = rsP.GetFieldString(2);
 
-	CString lastname = rsP.GetFieldString(3);
-	if (!lastname.IsEmpty() && !iswupper(lastname.GetAt(0)))
-		lastname.Empty();
-	lastname.Replace('|', ' ');
-	lastname.Replace('/', ' ');
-	lastname.Replace('?', ' ');
+	m_lastname = rsP.GetFieldString(3);
+	if (!m_lastname.IsEmpty() && !iswupper(m_lastname.GetAt(0)))
+		m_lastname.Empty();
+	m_lastname.Replace('|', ' ');
+	m_lastname.Replace('/', ' ');
+	m_lastname.Replace('?', ' ');
 
 	CString firstname = rsP.GetFieldString(4);
 	peoS.tablenumber = rsP.GetFieldString(5);
@@ -808,7 +821,7 @@ bool CDescendants::queryR(CString rowid)
 	peoS.firstname = firstname;
 	if (firstname == L"Emília")
 		z = 1;
-	peoS.name.Format(L"%s %s", lastname, firstname);
+	peoS.name.Format(L"%s %s", m_lastname, firstname);
 	peoS.name.Trim();
 	peoS.numOfChildren = getNumberOfChildren(rowid, peoS.sex);
 
@@ -914,6 +927,12 @@ void CDescendants::multipleRowid()
 	int g;
 	int cnt;
 	// az ismétlõdõket megjelöli:  az elsõ elõfordulást 1-el, a következõket -1-el
+	str.Format(L"Ismétlõdõ leszármazottak jekölése...");
+	CProgressWnd wndP(NULL, str);
+	wndP.GoModal();
+	wndP.SetRange(0, vDesc.size());
+	wndP.SetPos(0);
+
 	for (int i = 0; i < vDesc.size(); ++i)
 	{
 		if (vDesc.at(i).status == 0)
@@ -933,10 +952,18 @@ void CDescendants::multipleRowid()
 				}
 			}
 		}
+		wndP.StepIt();
+		wndP.PeekAndPump();
+		if (wndP.Cancelled()) break;
 	}
 
 	if (p_repeated == 2)   // apa leszármazottait tartja meg
 	{
+		str.Format(L"Ismétlõdõ leszármazottak jelölése...");
+		CProgressWnd wndP(NULL, str);
+		wndP.GoModal();
+		wndP.SetRange(0, vDesc.size());
+		wndP.SetPos(0);
 		for (int i = 0; i < vDesc.size();)
 		{
 			if (vDesc.at(i).status == 0)  // ha nem ismétlõdõ, akkor elfogadja listázandónak
@@ -963,6 +990,9 @@ void CDescendants::multipleRowid()
 				//				else							// h anõ, akkor elfogadja kihagyandónak
 				//					for (i; i < vDesc.size() && vDesc.at(i).status == 2; ++i);
 			}
+			wndP.StepIt();
+			wndP.PeekAndPump();
+			if (wndP.Cancelled()) break;
 
 		}
 	}
@@ -1369,6 +1399,11 @@ void CDescendants::numOfDesc()
 	for (int i = 0; i < vDesc.size(); ++i)
 		vDesc.at(i).nOfD = 0;
 
+	str.Format(L"Leszármazottak számának számolása...");
+	CProgressWnd wndP(NULL, str);
+	wndP.GoModal();
+	wndP.SetRange(0, vDesc.size());
+	wndP.SetPos(0);
 	// leszármazottak számának (nOfD) számolása minden bejegyzéshez
 	vDesc.at(0).nOfD = vDesc.size() - 1;
 	for (int i = 0; i < vDesc.size(); ++i)
@@ -1399,8 +1434,11 @@ void CDescendants::numOfDesc()
 			}
 			vDesc.at(vSib.at(j)).nOfD = bottom - vSib.at(j) - 1;
 		}
-
+		wndP.StepIt();
+		wndP.PeekAndPump();
+		if (wndP.Cancelled()) break;
 	}
+	wndP.DestroyWindow();
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendants::create_id()
@@ -1412,7 +1450,7 @@ void CDescendants::create_id()
 		vDesc.at(i).printed = false;
 		vDesc.at(i).idC = 0;
 		vDesc.at(i).idF = 0;
-		vDesc.at(i).id = -1;
+		vDesc.at(i).id = -1; 
 		vDesc.at(i).ixM.Empty();
 	}
 	std::vector<DE::DESC> vD1;
@@ -1422,13 +1460,19 @@ void CDescendants::create_id()
 	DE::DESC desc;
 	int numOfSpouses;
 
+	str.Format(L"Leszármazottak rendezése a lineáris listához...");
+	CProgressWnd wndP(NULL, str);
+	wndP.GoModal();
+	wndP.SetRange(0, vDesc.size());
+	wndP.SetPos(0);
+
+
 	for (int i = 0; i < vDesc.size(); ++i)
 	{
 		desc = vDesc.at(i);
 		if (desc.hidden || (p_repeated != 0 && desc.status == 2))
 		{
 			vDesc.at(i).printed = true;
-			vDesc.at(i).id = -1;
 		}
 	}
 
@@ -1442,7 +1486,7 @@ void CDescendants::create_id()
 
 	CString rowidF;
 	CString ixM;
-
+	
 	// vD1-k már ki vannak írva, a gyerekeiken kell végigmenni, akiket vD2-be gyûjtünk
 	while (true)
 	{
@@ -1459,9 +1503,10 @@ void CDescendants::create_id()
 					if (vDesc.at(k).printed) continue;
 					if (vDesc.at(k).rowidF == rowidF)
 					{
-						if (desc.numOfSpouses > 1 )
+						if (desc.numOfSpouses > 1)
 							vDesc.at(k).ixM.Format(L"%d", vDesc.at(k).motherIndex);
-
+						else
+							vDesc.at(k).ixM.Empty();
 
 
 						vDesc.at(k).printed = true;
@@ -1472,29 +1517,61 @@ void CDescendants::create_id()
 				}
 			}
 		}
+		wndP.StepIt();
+		wndP.PeekAndPump();
+		if (wndP.Cancelled()) break;
+
 		vD1 = vD2;
 		if (!vD1.size()) break;
 	}
 
+	int j;
 	int gPrev = -1;
 	for (int i = 0; i < vDesc.size(); ++i)
 	{
-		for (int j = 0; j < vDesc.size(); ++j)
+		for ( j = 0; j < vDesc.size(); ++j)
 		{
-			if (vDesc.at(j).rowid == vDesc.at(i).rowidF)
+			if (vDesc.at(j).rowid == vDesc.at(i).rowidF && vDesc.at(j).cntRep == vDesc.at(i).cntRep )
 			{
 				vDesc.at(i).idF = vDesc.at(j).id;
 				break;
 			}
 		}
-
-		for (int j = 0; j < vDesc.size(); ++j)
+		if (j == vDesc.size())
 		{
-			if (vDesc.at(j).rowidF == vDesc.at(i).rowid)
+			for (j = 0; j < vDesc.size(); ++j)
+			{
+				if (vDesc.at(j).rowid == vDesc.at(i).rowidF  )
+				{
+					vDesc.at(i).idF = vDesc.at(j).id;
+					break;
+				}
+			}
+		}
+
+		for ( j = 0; j < vDesc.size(); ++j)
+		{
+			if (vDesc.at(j).rowidF == vDesc.at(i).rowid && vDesc.at(j).cntRep == vDesc.at(i).cntRep)
 			{
 				vDesc.at(i).idC = vDesc.at(j).id;
 				break;
 			}
 		}
+		if (j == vDesc.size())
+		{
+			for (j = 0; j < vDesc.size(); ++j)
+			{
+				if (vDesc.at(j).rowidF == vDesc.at(i).rowid )
+				{
+					vDesc.at(i).idC = vDesc.at(j).id;
+					break;
+				}
+			}
+		}
+		wndP.StepIt();
+		wndP.PeekAndPump();
+		if (wndP.Cancelled()) break;
+
 	}
+	wndP.DestroyWindow();
 }

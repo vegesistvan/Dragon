@@ -71,300 +71,282 @@ bool CDescendantsLinearTable::createHtmlFile(int i, int which)
 	}
 
 
-	if (which == UNIQUE || which == FULL )
-	{
-		descendantsTablePathName.Format(L"%s\\%s_%s.html", m_descendantsPath, title, getTimeTag());
-		if (!openFileSpec(&fhDescTable, descendantsTablePathName, L"w+")) return false;
-	}
-	else if (which == UNIQUE_P || which == FULL_P)
-	{
-		printableTablePathName.Format(L"%s\\%s_printable%s.html", m_descendantsPath, title, getTimeTag());
-		if (!openFileSpec(&fhPrintable, printableTablePathName, L"w+")) return false;
-	}
+	descendantsTablePathName.Format(L"%s\\%s_%s.html", m_descendantsPath, title, getTimeTag());
+	if (!openFileSpec(&fhDescTable, descendantsTablePathName, L"w+")) return false;
 
-	printOnly(L"<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">", which);
-	printOnly(L"<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\"><head>", which);
+	print(L"<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">");
+	print(L"<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\"><head>" );
 	str.Format(L"<title>%s</title>", title);
-	printOnly(str, which);
-	printOnly(L"<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\" />", which);
-	printOnly(L"<meta http-equiv=\"language\" content=\"en-us\"/>", which);
-	printOnly(L"<script type=\"text/javascript\">", which);
-	printOnly(L"<meta name=\"viewport\" content =\"width=device-width, initial-scale=1\">", which);
-	//	printOnly(L"<!--", which);
-	printOnly(L"/\* http://www.alistapart.com/articles/zebratables/ */", which);
-	printOnly(L"function removeClassName (elem, className) {", which);
-	printOnly(L"	elem.className = elem.className.replace(className, \"\").trim();", which);
-	printOnly(L"}\n", which);
+	print(str);
+	print(L"<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\" />");
+	print(L"<meta http-equiv=\"language\" content=\"en-us\"/>");
+	print(L"<script type=\"text/javascript\">");
+	print(L"<meta name=\"viewport\" content =\"width=device-width, initial-scale=1\">");
 
-	printOnly(L"function addCSSClass (elem, className) {", which);
-	printOnly(L"	removeClassName (elem, className);", which);
-	printOnly(L"	elem.className = (elem.className + \" \" + className).trim();", which);
-	printOnly(L"}\n", which);
+	print(L"/\* http://www.alistapart.com/articles/zebratables/ */");
+	print(L"function removeClassName (elem, className) {");
+	print(L"	elem.className = elem.className.replace(className, \"\").trim();");
+	print(L"}\n");
 
-	printOnly(L"String.prototype.trim = function() {", which);
-	printOnly(L"	return this.replace( /^\\s+|\\s+$/, \"\" );", which);
-	printOnly(L"}\n", which);
+	print(L"function addCSSClass (elem, className) {");
+	print(L"	removeClassName (elem, className);");
+	print(L"	elem.className = (elem.className + \" \" + className).trim();");
+	print(L"}\n");
 
-	printOnly(L"function stripedTable() {", which);
-	printOnly(L"	if (document.getElementById && document.getElementsByTagName) {", which);
-	printOnly(L"		var allTables = document.getElementsByTagName('table');", which);
-	printOnly(L"		if (!allTables) { return; }\n", which);
+	print(L"String.prototype.trim = function() {");
+	print(L"	return this.replace( /^\\s+|\\s+$/, \"\" );");
+	print(L"}\n");
 
-	printOnly(L"		for (var i = 0; i < allTables.length; i++) {", which);
-	printOnly(L"			if (allTables[i].className.match(/[\\w\\s ]*scrollTable[\\w\\s ]*/)) {", which);
-	printOnly(L"				var trs = allTables[i].getElementsByTagName(\"tr\");", which);
+	print(L"function stripedTable() {");
+	print(L"	if (document.getElementById && document.getElementsByTagName) {");
+	print(L"		var allTables = document.getElementsByTagName('table');");
+	print(L"		if (!allTables) { return; }\n");
 
-	printOnly(L"				for (var j = 0; j < trs.length; j++) {", which);
-	printOnly(L"					removeClassName(trs[j], 'alternateRow');", which);
-	printOnly(L"					addCSSClass(trs[j], 'normalRow');", which);
-	printOnly(L"				}", which);
-	printOnly(L"				for (var k = 0; k < trs.length; k += 2) {", which);
-	printOnly(L"					removeClassName(trs[k], 'normalRow');", which);
-	printOnly(L"					addCSSClass(trs[k], 'alternateRow');", which);
-	printOnly(L"				}", which);
-	printOnly(L"			}", which);
-	printOnly(L"		}", which);
-	printOnly(L"	}", which);
-	printOnly(L"}\n", which);
+	print(L"		for (var i = 0; i < allTables.length; i++) {");
+	print(L"			if (allTables[i].className.match(/[\\w\\s ]*scrollTable[\\w\\s ]*/)) {");
+	print(L"				var trs = allTables[i].getElementsByTagName(\"tr\");");
 
-	printOnly(L"window.onload = function() { stripedTable(); }", which);
-	printOnly(L"-->", which);
-	printOnly(L"</script>", which);
+	print(L"				for (var j = 0; j < trs.length; j++) {");
+	print(L"					removeClassName(trs[j], 'alternateRow');");
+	print(L"					addCSSClass(trs[j], 'normalRow');");
+	print(L"				}");
+	print(L"				for (var k = 0; k < trs.length; k += 2) {");
+	print(L"					removeClassName(trs[k], 'normalRow');");
+	print(L"					addCSSClass(trs[k], 'alternateRow');");
+	print(L"				}");
+	print(L"			}");
+	print(L"		}");
+	print(L"	}");
+	print(L"}\n");
 
-	printOnly(L"<style type=\"text/css\">", which);
-	//	printOnly(L"<!--", which);
-	printOnly(L"/* Terence Ordona, portal[AT]imaputz[DOT]com         */", which);
-	printOnly(L"/* http://creativecommons.org/licenses/by-sa/2.0/    */\n", which);
+	print(L"window.onload = function() { stripedTable(); }");
+	print(L"-->");
+	print(L"</script>");
 
-	printOnly(L"/* begin some basic styling here                     */", which);
+	print(L"<style type=\"text/css\">");
+	//	print(L"<!--");
+	print(L"/* Terence Ordona, portal[AT]imaputz[DOT]com         */");
+	print(L"/* http://creativecommons.org/licenses/by-sa/2.0/    */\n");
 
-	printOnly(L"fB{ font color= \"blue\"; }", which);
-	printOnly(L"body {", which);
-	printOnly(L"	background: #FFF;", which);
-	printOnly(L"	color: #000;", which);
-	printOnly(L"	font: normal normal 12px Verdana, Geneva, Arial, Helvetica, sans-serif;", which);
-	printOnly(L"	margin: 10px;", which);
-	printOnly(L"	padding: 0", which);
-	printOnly(L"}\n", which);
+	print(L"/* begin some basic styling here                     */");
 
-	printOnly(L"table, th, a {", which);
-	printOnly(L"	color: #000;", which);
-	printOnly(L"	font: normal bold 12px Verdana, Geneva, Arial, Helvetica, sans-serif", which);
-	printOnly(L"}\n", which);
+	print(L"fB{ font color= \"blue\"; }");
+	print(L"body {");
+	print(L"	background: #FFF;");
+	print(L"	color: #000;");
+	print(L"	font: normal normal 12px Verdana, Geneva, Arial, Helvetica, sans-serif;");
+	print(L"	margin: 10px;");
+	print(L"	padding: 0");
+	print(L"}\n");
 
-
-	printOnly(L"table, td, a {", which);
-	printOnly(L"	color: #000;", which);
-	printOnly(L"	font: normal normal 12px Verdana, Geneva, Arial, Helvetica, sans-serif", which);
-	printOnly(L"}\n", which);
-
-	printOnly(L"h1 {", which);
-	printOnly(L"	font: normal normal 18px Verdana, Geneva, Arial, Helvetica, sans-serif;", which);
-	printOnly(L"	margin: 0 0 5px 0", which);
-	printOnly(L"}\n", which);
-
-	printOnly(L"h2 {", which);
-	printOnly(L"	font: normal normal 16px Verdana, Geneva, Arial, Helvetica, sans-serif;", which);
-	printOnly(L"	margin: 0 0 5px 0", which);
-	printOnly(L"}\n", which);
-
-	printOnly(L"h3 {", which);
-	printOnly(L"	font: normal normal 13px Verdana, Geneva, Arial, Helvetica, sans-serif;", which);
-	printOnly(L"	color: #008000;", which);
-	printOnly(L"	margin: 0 0 15px 0", which);
-	printOnly(L"}", which);
-	printOnly(L"/* end basic styling                                 */\n", which);
-
-	printOnly(L"/* define height and width of scrollable area. Add 16px to width for scrollbar*/", which);
-	printOnly(L"div.tableContainer {", which);
-	printOnly(L"	clear: both;", which);
-	printOnly(L"	border: 1px solid #963;", which);
-	printOnly(L"	overflow: auto;", which);
-	printOnly(L"	width: device-width", which);
-	printOnly(L"}\n", which);
+	print(L"table, th, a {");
+	print(L"	color: #000;");
+	print(L"	font: normal old 12px Verdana, Geneva, Arial, Helvetica, sans-serif");
+	print(L"}\n");
 
 
-	printOnly(L"/* Reset overflow value to hidden for all non-IE browsers. */", which);
-	printOnly(L"html>body div.tableContainer {", which);
-	printOnly(L"	overflow: hidden;", which);
-	printOnly(L"}\n", which);
+	print(L"table, td, a {");
+	print(L"	color: #000;");
+	print(L"	font: normal normal 12px Verdana, Geneva, Arial, Helvetica, sans-serif");
+	print(L"}\n");
 
-	printOnly(L"/* set table header to a fixed position. WinIE 6.x only                                       */", which);
-	printOnly(L"/* In WinIE 6.x, any element with a position property set to relative and is a child of       */", which);
-	printOnly(L"/* an element that has an overflow property set, the relative value translates into fixed.    */", which);
-	printOnly(L"/* Ex: parent element DIV with a class of tableContainer has an overflow property set to auto */", which);
-	printOnly(L"thead.fixedHeader tr {", which);
-	printOnly(L"	position: relative", which);
-	printOnly(L"}\n", which);
+	print(L"h1 {");
+	print(L"	font: normal normal 18px Verdana, Geneva, Arial, Helvetica, sans-serif;");
+	print(L"	margin: 0 0 5px 0");
+	print(L"}\n");
 
-	printOnly(L"/* set THEAD element to have block level attributes. All other non-IE browsers            */", which);
-	printOnly(L"/* this enables overflow to work on TBODY element. All other non-IE, non-Mozilla browsers */", which);
-	printOnly(L"html>body thead.fixedHeader tr {", which);
-	printOnly(L"	display: block", which);
-	printOnly(L"}\n", which);
+	print(L"h2 {");
+	print(L"	font: normal normal 16px Verdana, Geneva, Arial, Helvetica, sans-serif;");
+	print(L"	margin: 0 0 5px 0");
+	print(L"}\n");
 
-	printOnly(L"/* make the TH elements pretty */", which);
-	printOnly(L"thead.fixedHeader th {", which);
-	printOnly(L"	color: black;", which);
-	printOnly(L"	background: AntiqueWhite;", which);
-	printOnly(L"	border-left: 1px solid #EB8;", which);
-	printOnly(L"	border-right: 1px solid #B74;", which);
-	printOnly(L"	border-top: 1px solid #EB8;", which);
-	printOnly(L"	border-bottom: 1px solid #EB8;", which);
-	printOnly(L"	font-weight: bold;", which);
-	printOnly(L"	padding: 4px 3px;", which);
-	printOnly(L"	text-align: center", which);
-	printOnly(L"}\n", which);
+	print(L"h3 {");
+	print(L"	font: normal normal 13px Verdana, Geneva, Arial, Helvetica, sans-serif;");
+	print(L"	color: #008000;");
+	print(L"	margin: 0 0 15px 0");
+	print(L"}");
+	print(L"/* end basic styling                                 */\n");
 
-	printOnly(L"/* make the A elements pretty. makes for nice clickable headers                */", which);
-	printOnly(L"thead.fixedHeader a, thead.fixedHeader a:link, thead.fixedHeader a:visited {", which);
-	printOnly(L"	display: block;", which);
-	printOnly(L"	text-decoration: none;", which);
-	printOnly(L"	width: 100%", which);
-	printOnly(L"}\n", which);
+	print(L"/* define height and width of scrollable area. Add 16px to width for scrollbar*/");
+	print(L"div.tableContainer {");
+	print(L"	clear: both;");
+	print(L"	border: 1px solid #963;");
+	print(L"	overflow: auto;");
+	print(L"	width: device-width");
+	print(L"}\n");
 
-	printOnly(L"/* make the A elements pretty. makes for nice clickable headers                */", which);
-	printOnly(L"/* WARNING: swapping the background on hover may cause problems in WinIE 6.x   */", which);
-	printOnly(L"thead.fixedHeader a:hover{", which);
-	printOnly(L"	display: block;", which);
-	printOnly(L"	text-decoration: underline;", which);
-	printOnly(L"	width: 100%", which);
-	printOnly(L"}\n", which);
 
-	printOnly(L"/* define the table content to be scrollable                                              */", which);
-	printOnly(L"/* set TBODY element to have block level attributes. All other non-IE browsers            */", which);
-	printOnly(L"/* this enables overflow to work on TBODY element. All other non-IE, non-Mozilla browsers */", which);
-	printOnly(L"/* induced side effect is that child TDs no longer accept width: auto                     */", which);
-	printOnly(L"html>body tbody.scrollContent {", which);
-	printOnly(L"	display: block;", which);
+	print(L"/* Reset overflow value to hidden for all non-IE browsers. */");
+	print(L"html>body div.tableContainer {");
+	print(L"	overflow: hidden;");
+	print(L"}\n");
+
+	print(L"/* set table header to a fixed position. WinIE 6.x only                                       */");
+	print(L"/* In WinIE 6.x, any element with a position property set to relative and is a child of       */");
+	print(L"/* an element that has an overflow property set, the relative value translates into fixed.    */");
+	print(L"/* Ex: parent element DIV with a class of tableContainer has an overflow property set to auto */");
+	print(L"thead.fixedHeader tr {");
+	print(L"	position: relative");
+	print(L"}\n");
+
+	print(L"/* set THEAD element to have block level attributes. All other non-IE browsers            */");
+	print(L"/* this enables overflow to work on TBODY element. All other non-IE, non-Mozilla browsers */");
+	print(L"html>body thead.fixedHeader tr {");
+	print(L"	display: block");
+	print(L"}\n");
+
+	print(L"/* make the TH elements pretty */");
+	print(L"thead.fixedHeader th {");
+	print(L"	color: black;");
+	print(L"	background: AntiqueWhite;");
+	print(L"	border-left: 1px solid #EB8;");
+	print(L"	border-right: 1px solid #B74;");
+	print(L"	border-top: 1px solid #EB8;");
+	print(L"	border-bottom: 1px solid #EB8;");
+	print(L"	font-weight: bold;");
+	print(L"	padding: 4px 3px;");
+	print(L"	text-align: center");
+	print(L"}\n");
+
+	print(L"/* make the A elements pretty. makes for nice clickable headers                */");
+	print(L"thead.fixedHeader a, thead.fixedHeader a:link, thead.fixedHeader a:visited {");
+	print(L"	display: block;");
+	print(L"	text-decoration: none;");
+	print(L"	width: 100%");
+	print(L"}\n");
+
+	print(L"/* make the A elements pretty. makes for nice clickable headers                */");
+	print(L"/* WARNING: swapping the background on hover may cause problems in WinIE 6.x   */");
+	print(L"thead.fixedHeader a:hover{");
+	print(L"	display: block;");
+	print(L"	text-decoration: underline;");
+	print(L"	width: 100%");
+	print(L"}\n");
+
+	print(L"/* define the table content to be scrollable                                              */");
+	print(L"/* set TBODY element to have block level attributes. All other non-IE browsers            */");
+	print(L"/* this enables overflow to work on TBODY element. All other non-IE, non-Mozilla browsers */");
+	print(L"/* induced side effect is that child TDs no longer accept width: auto                     */");
+	print(L"html>body tbody.scrollContent {");
+	print(L"	display: block;");
 
 	if (which == UNIQUE || which == FULL)  // vagyis fix fejléc, nem nyomtatható
 	{
 		str.Format(L"    height: %dpx;", height);
-		printOnly(str, which);
+		print(str);
 	}
 
-	printOnly(L"	overflow: auto;", which);
-	printOnly(L"	width: 100%", which);
-	printOnly(L"}\n", which);
+	print(L"	overflow: auto;");
+	print(L"	width: 100%");
+	print(L"}\n");
 
 
-	printOnly(L"/* make TD elements pretty. Provide alternating classes for striping the table */", which);
-	printOnly(L"/* http://www.alistapart.com/articles/zebratables/                             */", which);
+	print(L"/* make TD elements pretty. Provide alternating classes for striping the table */");
+	print(L"/* http://www.alistapart.com/articles/zebratables/                             */");
 
-	printOnly(L"tbody.scrollContent td, tbody.scrollContent tr.normalRow td {", which);
-	printOnly(L"	border-bottom: none;", which);
-	printOnly(L"	border-left: none;", which);
-	printOnly(L"	border-right: 1px solid #CCC;", which);
-	printOnly(L"	border-top: 1px solid #DDD;", which);
-	printOnly(L"	padding: 2px 3px 3px 4px", which);
-	printOnly(L"}\n", which);
+	print(L"tbody.scrollContent td, tbody.scrollContent tr.normalRow td {");
+	print(L"	border-bottom: none;");
+	print(L"	border-left: none;");
+	print(L"	border-right: 1px solid #CCC;");
+	print(L"	border-top: 1px solid #DDD;");
+	print(L"	padding: 2px 3px 3px 4px");
+	print(L"}\n");
 
-	printOnly(L"tbody.scrollContent tr.alternateRow td {", which);
-	printOnly(L"	border-bottom: none;", which);
-	printOnly(L"	border-left: none;", which);
-	printOnly(L"	border-right: 1px solid #CCC;", which);
-	printOnly(L"	border-top: 1px solid #DDD;", which);
-	printOnly(L"	padding: 2px 3px 3px 4px", which);
-	printOnly(L"}\n", which);
-
-
-	printOnly(L"/* define width of TD elements: 1st, 2nd, and 3rd respectively.          */", which);
-	printOnly(L"/* All other non-IE browsers.                                            */", which);
-	printOnly(L"/* http://www.w3.org/TR/REC-CSS2/selector.html#adjacent-selectors        */", which);
-
-	printOnly(L"html>body tbody.scrollContent td {", which);
-	printOnly(L"	width: 45px", which);
-	printOnly(L"}\n", which);
+	print(L"tbody.scrollContent tr.alternateRow td {");
+	print(L"	border-bottom: none;");
+	print(L"	border-left: none;");
+	print(L"	border-right: 1px solid #CCC;");
+	print(L"	border-top: 1px solid #DDD;");
+	print(L"	padding: 2px 3px 3px 4px");
+	print(L"}\n");
 
 
-	printOnly(L"html>body tbody.scrollContent td + td {", which);
-	printOnly(L"	width: 20px", which);
-	printOnly(L"}\n", which);
+	print(L"/* define width of TD elements: 1st, 2nd, and 3rd respectively.          */");
+	print(L"/* All other non-IE browsers.                                            */");
+	print(L"/* http://www.w3.org/TR/REC-CSS2/selector.html#adjacent-selectors        */");
 
-	printOnly(L"html>body tbody.scrollContent td + td + td {", which);
-	printOnly(L"	width: 35px", which);
-	printOnly(L"}\n", which);
+	print(L"html>body tbody.scrollContent td {");
+	print(L"	width: 45px");
+	print(L"}\n");
 
-	printOnly(L"html>body tbody.scrollContent td + td + td + td {", which);
-	printOnly(L"	width: 55px", which);
-	printOnly(L"}", which);
 
-	printOnly(L"html>body tbody.scrollContent td + td + td + td + td{", which);
-	printOnly(L"	width: 55px", which);
-	printOnly(L"}", which);
+	print(L"html>body tbody.scrollContent td + td {");
+	print(L"	width: 20px");
+	print(L"}\n");
 
-	printOnly(L"html>body tbody.scrollContent td + td + td + td + td + td{", which);
-	printOnly(L"	width: 20px", which);
-	printOnly(L"}", which);
+	print(L"html>body tbody.scrollContent td + td + td {");
+	print(L"	width: 35px");
+	print(L"}\n");
 
-	printOnly(L"html>body tbody.scrollContent td + td + td + td + td + td + td{", which);
-	printOnly(L"	width: 55px", which);
-	printOnly(L"}", which);
+	print(L"html>body tbody.scrollContent td + td + td + td {");
+	print(L"	width: 55px");
+	print(L"}");
 
-	printOnly(L"html>body tbody.scrollContent td + td + td + td + td + td + td + td{", which);
-	printOnly(L"	width: 55px", which);
-	printOnly(L"}", which);
+	print(L"html>body tbody.scrollContent td + td + td + td + td{");
+	print(L"	width: 55px");
+	print(L"}");
 
-	printOnly(L"html>body tbody.scrollContent td + td + td + td + td + td + td + td + td{", which);
+	print(L"html>body tbody.scrollContent td + td + td + td + td + td{");
+	print(L"	width: 20px");
+	print(L"}");
+
+	print(L"html>body tbody.scrollContent td + td + td + td + td + td + td{");
+	print(L"	width: 55px");
+	print(L"}");
+
+	print(L"html>body tbody.scrollContent td + td + td + td + td + td + td + td{");
+	print(L"	width: 55px");
+	print(L"}");
+
+	print(L"html>body tbody.scrollContent td + td + td + td + td + td + td + td + td{");
 	str.Format(L"width: %dpx", width - (45 + 4 * 55 + 35 + + 2*20 + 120));
-	printOnly(str, which);
-	printOnly(L"}", which);
+	print(str);
+	print(L"}");
 
 
-	printOnly(L"</style>", which);
-	printOnly(L"</head><body>\n", which);
+	print(L"</style>");
+	print(L"</head><body>\n");
 
-	printTopContainer(title, which);
-	printOnly(L"<br><br>", which);
+	printTopContainer(title);
+	print(L"<br><br>");
 
-	printOnly(L"<div id=\"tableContainer\" class=\"tableContainer\">", which);
-	printOnly(L"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" class=\"scrollTable\">", which);
-	printOnly(L"<thead class=\"fixedHeader\">", which);
-	printOnly(L"<tr>", which);
+	print(L"<div id=\"tableContainer\" class=\"tableContainer\">");
+	print(L"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" class=\"scrollTable\">");
+	print(L"<thead class=\"fixedHeader\">");
+	print(L"<tr>");
 
-	printOnly(L"<th style=\"width: 45px\">desc</th>", which);
-	printOnly(L"<th style=\"width: 20px\">I</th>", which);
-	printOnly(L"<th style=\"width: 35px\">id</th>", which);
-	printOnly(L"<th style=\"width: 55px\">gyerek<br>id</th>", which);
-	printOnly(L"<th style=\"width: 55px\">szülõ<br>id</th>", which);
-	printOnly(L"<th style=\"width: 20px\">A</th>", which);
-	printOnly(L"<th style=\"width: 55px\">gyerek<br>db</th>", which);
-	printOnly(L"<th style=\"width: 55px\">generáció<br>-sorszám</th>", which);
+	print(L"<th style=\"width: 45px\">desc</th>");
+	print(L"<th style=\"width: 20px\">I</th>");
+	print(L"<th style=\"width: 35px\">id</th>");
+	print(L"<th style=\"width: 55px\">gyerek<br>id</th>");
+	print(L"<th style=\"width: 55px\">szülõ<br>id</th>");
+	print(L"<th style=\"width: 20px\">A</th>");
+	print(L"<th style=\"width: 55px\">gyerek<br>db</th>");
+	print(L"<th style=\"width: 55px\">generáció<br>-sorszám</th>");
 	str.Format(L"<th style=\"width: %dpx\">leszármazott</th>", width - (4 * 55 + 35 + 2*20 ));
-	printOnly(str, which);
+	print(str);
 
-	printOnly(L"</tr>", which);
-	printOnly(L"</thead>", which);
-	printOnly(L"<tbody class=\"scrollContent\">", which);
+	print(L"</tr>");
+	print(L"</thead>");
+	print(L"<tbody class=\"scrollContent\">");
 
-	dataTable(which);
+	dataTable();
 
-	printOnly(L"</tbody>", which);
-	printOnly(L"</table>", which);
-	printOnly(L"</div>\n", which);
+	print(L"</tbody>");
+	print(L"</table>");
+	print(L"</div>\n");
 
-	printOnly(L"<div><br/ ></div>\n", which);
-	printOnly(L"</body></html>\n", which);
+	print(L"<div><br/ ></div>\n");
+	print(L"</body></html>\n");
 
 
 
-	if (which == UNIQUE || which == FULL)
-	{
-		fclose(fhDescTable);
-		ShellExecute(NULL, L"open", descendantsTablePathName, NULL, NULL, SW_SHOWNORMAL);
-	}
-	else if (which == UNIQUE_P || which == FULL_P )
-	{
-		fclose(fhPrintable);
-		ShellExecute(NULL, L"open", printableTablePathName, NULL, NULL, SW_SHOWNORMAL);
-	}
+	fclose(fhDescTable);
+	ShellExecute(NULL, L"open", descendantsTablePathName, NULL, NULL, SW_SHOWNORMAL);
 	return true;
 }
-
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsLinearTable::dataTable(int which)
+void CDescendantsLinearTable::dataTable()
 {
 	DE::DESC desc;
 	CString rowidF;
@@ -469,7 +451,7 @@ void CDescendantsLinearTable::dataTable(int which)
 		desc = vDesc->at(i);
 		if (desc.id < 0) continue;
 
-		printDesc(i, which);
+		printDesc(i);
 	}
 
 /*
@@ -495,7 +477,7 @@ void CDescendantsLinearTable::dataTable(int which)
 	wndP.DestroyWindow();
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsLinearTable::printDesc( int i, int which  )
+void CDescendantsLinearTable::printDesc( int i  )
 {
 	DE::DESC desc = vDesc->at(i);
 
@@ -549,72 +531,57 @@ void CDescendantsLinearTable::printDesc( int i, int which  )
 	rep.Empty();
 	if (desc.cntRep)
 		rep.Format(L"%d", desc.cntRep);
-/*
-	ixM.Empty();
-	for (int j = 0; j < vDesc->size(); ++j)
+
+	if (p_lastname == 2 && m_familyName != desc.lastname )  // kiemelt családnév
 	{
-		if (vDesc->at(j).rowid == desc.rowidF)
-		{
-			numOfSpouses = vDesc->at(j).numOfSpouses;
-			break;
-		}
-	}
-	if( numOfSpouses > 1 )
-	{
-		if (desc.motherIndex)
-			ixM.Format(L"%d", desc.motherIndex);
-	}
-*/
-	if (m_lastname == 2 && m_familyName != m_radioDNameX)  // kiemelt családnév
-	{
-		str = getTableHeader();
+		str = getSeededName(i);
 		family = getColoredString(str, DE::KEK);
 
 		str.Format(L"<td>%s</td>", L"");
-		printOnly(L"<tr>", which);
-		printOnly(str, which);
-		printOnly(str, which);
-		printOnly(str, which);
-		printOnly(str, which);
-		printOnly(str, which);
-		printOnly(str, which);
-		printOnly(str, which);
-		printOnly(str, which);
+		print(L"<tr>");
+		print(str);
+		print(str);
+		print(str);
+		print(str);
+		print(str);
+		print(str);
+		print(str);
+		print(str);
 		name.Format(L"<td>%s</td>", family);
-		printOnly(name, which);
-		printOnly(L"</tr>", which);
+		print(name);
+		print(L"</tr>");
 	}
-	m_familyName = p.last_name;
+	m_familyName = desc.lastname;
 
-//	printOnly(L"<tr>", which);
+
 	if ( gen != genPrev)
 		gflag = !gflag;
 
 	if (gflag)
-		printOnly(L"<tr style=\"background-color: #fff;\">", which);
+		print(L"<tr style=\"background-color: #fff;\">");
 	else
-		printOnly(L"<tr style=\"background-color: #eee;\">", which);
+		print(L"<tr style=\"background-color: #eee;\">");
 
 	str.Format(L"<td><center>%d</center></td>", desc.nOfD);
-	printOnly(str, which);
+	print(str);
 	str.Format(L"<td><center>%s</center></td>", rep);
-	printOnly(str, which);
+	print(str);
 	str.Format(L"<td><center>%d</center></td>", desc.id);
-	printOnly(str, which);
+	print(str);
 	str.Format(L"<td><center>%s</center></td>", idC);
-	printOnly(str, which);
+	print(str);
 	str.Format(L"<td><center>%s</center></td>", idF);
-	printOnly(str, which);
+	print(str);
 	str.Format(L"<td><center>%s</center></td>", desc.ixM );
-	printOnly(str, which);
+	print(str);
 	str.Format(L"<td><center>%s</center></td>", numOfChildren);
-	printOnly(str, which);
+	print(str);
 	str.Format(L"<td><center>%s</center></td>", idD);
-	printOnly(str, which);
+	print(str);
 
 	str.Format(L"<td>%s</td>", people);
-	printOnly(str, which);
-	printOnly(L"</tr>", which);
+	print(str);
+	print(L"</tr>");
 
 //	++m_cnt;
 	vDesc->at(i).printed = true;
@@ -644,41 +611,12 @@ CString CDescendantsLinearTable::getComplexDescription(int i, bool parentIndex )
 		csalad.Format(L" <font color='blue'>[%s]</font>", p.csalad);
 		people += csalad;
 	}
-	if (!p.folyt.IsEmpty() && m_checkFolyt )
+	if (!p.folyt.IsEmpty() && p_folyt )
 	{
 		folyt.Format(L"<font color='blue'> %c%c%c folyt %s</font>", '%', '%', '%', p.folyt);
 		people += folyt;
 	}
 	return people;
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsLinearTable::printOnly(CString str, int which)
-{
-	str.Replace('|', '\'');
-	str = UnicodeToUtf8(str);
-	switch (which)
-	{
-//	case 0:
-//		fwprintf(fl, L"%s", str);  // a soreleji %-okat printelési karakterekenk értelmezné, ha közvetlenül nyomtatnánk!!! 
-		//		fflush(fl);
-//		break;
-	case UNIQUE:
-		fwprintf(fhDescTable, L"%s\n", str);
-		//		fflush(fhDescTable);
-		break;
-	case FULL:
-		fwprintf(fhDescTable, L"%s\n", str);
-		//		fflush(fhDescTable);
-		break;
-	case UNIQUE_P:
-		fwprintf(fhPrintable, L"%s\n", str);
-		//		fflush(fhDescTable);
-		break;
-	case FULL_P:
-		fwprintf(fhPrintable, L"%s\n", str);
-		//		fflush(fhDescTable);
-		break;
-	}
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TCHAR CDescendantsLinearTable::get_gABC(int g)
@@ -689,7 +627,7 @@ TCHAR CDescendantsLinearTable::get_gABC(int g)
 	return gABC;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CDescendantsLinearTable::printTopContainer(CString title, int which)
+bool CDescendantsLinearTable::printTopContainer(CString title)
 {
 	int l = -37;
 	CString today;
@@ -702,7 +640,7 @@ bool CDescendantsLinearTable::printTopContainer(CString title, int which)
 		nok = L"nem";
 
 	CString kihagy;
-	switch (m_repeated)
+	switch (p_repeated)
 	{
 	case 0:
 		kihagy = L"Nem hagyja aki az ismétlõdõ leszármazottakat.";
@@ -715,10 +653,10 @@ bool CDescendantsLinearTable::printTopContainer(CString title, int which)
 	}
 
 	CString maxGen;
-	if (m_editGenMax.IsEmpty())
+	if (p_editGenMax.IsEmpty())
 		maxGen = L"minden generáció";
 	else
-		maxGen = m_editGenMax;
+		maxGen = p_editGenMax;
 
 	CString inputFile;
 	CString created;
@@ -735,17 +673,16 @@ bool CDescendantsLinearTable::printTopContainer(CString title, int which)
 
 	//str.Format(L"<b><center>%s</center>\n<pre></b>\n", title);
 	str.Format(L"<b><center>%s</center></b><br>\n\n", title);
-	printOnly(str, which);
-	//	printOnly(L"<center><img src = \"dragon.jpg\" alt = \"Dragon\" width = \"100\" height = \"70\"></center>", which );
-
-	printOnly(L"<pre>", which);
+	print(str);
+	
+	print(L"<pre>");
 	str.Format(L"%*s Dragon v. %s", l, L"Program:", theApp.m_version);
-	printOnly(str, which);
+	print(str);
 	str.Format(L"%*s %s", l, L"Dragon.exe készült:", MultiToUnicode(LPCSTR(BUILD)));
-	printOnly(str, which);
+	print(str);
 
 	str.Format(L"%*s %s", l, L"Alapkönyvtár:", theApp.m_dbFolderPath);
-	printOnly(str, which);
+	print(str);
 
 	str = L"ÜRES";
 	if (theApp.m_inputMode == MANUAL)
@@ -756,41 +693,41 @@ bool CDescendantsLinearTable::printTopContainer(CString title, int which)
 		str = L"GA.htm fájl";
 
 	str.Format(L"%*s %s", l, L"Adatbázis bemenete:", (CString)str);
-	printOnly(str, which);
+	print(str);
 
 	if (theApp.m_inputMode == GAHTML || theApp.m_inputMode == GEDCOM)
 	{
 		str.Format(L"%*s %s %s", l, L"Bementi fájl készült:", created, inputFile);
-		printOnly(str, which);
+		print(str);
 	}
 	str.Format(L"%*s %s %s", l, L"Adatbázis készült:", dateDB, theApp.m_dbFileName);
-	printOnly(str, which);
+	print(str);
 	//	if (!theApp.m_inputVersion.IsEmpty() && theApp.m_inputVersion != theApp.m_version)
 	{
 		str.Format(L"%*s %s", l, L"Beolvasás programverziója:", theApp.m_inputVersion);
-		printOnly(str, which);
+		print(str);
 	}
 
 	//	if (theApp.m_uniteVersion != theApp.m_version)
 	{
 		str.Format(L"%*s %s", l, L"Összevonás programverziója:", theApp.m_uniteVersion);
-		printOnly(str, which);
+		print(str);
 	}
 
 	str.Format(L"%*s %s<br>", l, L"Lista készült:", theApp.getPresentDateTime());
-	printOnly(str, which);
+	print(str);
 	str.Format(L"%*s %s", l, L"Generációk max száma:", maxGen);
-	printOnly(str, which);
+	print(str);
 	str.Format(L"%*s %s", l, L"Elágazások összekötése:", connect);
-	printOnly(str, which);
+	print(str);
 	str.Format(L"%*s %s", l, L"Nõk leszármazottai:", nok);
-	printOnly(str, which);
+	print(str);
 
 	//	str.Format(L"%*s %s", l, L"Ismétlõdõk kihagyása:", kihagy);
-	//	printOnly(str, which );
+	//	print(str);
 
 	CString sorrend;
-	switch (m_radioOrder)
+	switch (p_radioOrder)
 	{
 	case DE::ORDER_INPUT:
 		sorrend = L"bementi sorrend";
@@ -806,17 +743,17 @@ bool CDescendantsLinearTable::printTopContainer(CString title, int which)
 		break;
 	}
 	str.Format(L"%*s %s", l, L"Sorrend:", sorrend);
-	printOnly(str, which);
+	print(str);
 	str.Format(L"<br>%*s desc - a bejegyzés leszármazottainak száma", l, L"Oszlopok:");
-	printOnly(str, which);
+	print(str);
 	str.Format(L"%*s I - ismétlõdõ leszármazottak sorszáma", l, L" ");
-	printOnly(str, which);
+	print(str);
 	str.Format(L"%*s id - a bejegyzés azonosítója", l, L" ");
-	printOnly(str, which);
+	print(str);
 	str.Format(L"%*s A - anya index", l, L" ");
-	printOnly(str, which);
+	print(str);
 
-	printOnly(L"</pre>", which);
+	print(L"</pre>");
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int CDescendantsLinearTable::sort_vDesc()
@@ -932,7 +869,7 @@ CString CDescendantsLinearTable::getPlaceDateBlock(CString place, CString date, 
 	if (!place.IsEmpty() || !date.IsEmpty())
 	{
 		block = jel;
-		block = getColoredString(jel, m_comboSpec);
+//		block = getColoredString(jel, p_comboSpec);
 		if (!place.IsEmpty())
 		{
 			block += place;
@@ -947,7 +884,7 @@ CString CDescendantsLinearTable::getPlaceDateBlock(CString place, CString date, 
 	return block;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CDescendantsLinearTable::getLastFirst(DE::PPEOPLE* p) // házatárs anyjának é stovábbi házastársainak neve képzõdik így
+CString CDescendantsLinearTable::getLastFirst(DE::PPEOPLE* p, bool style ) // házatárs anyjának é stovábbi házastársainak neve képzõdik így
 {
 
 	CString name = p->last_name;
@@ -962,8 +899,11 @@ CString CDescendantsLinearTable::getLastFirst(DE::PPEOPLE* p) // házatárs anyján
 	{
 		name += L" ";
 		name += p->first_name;
-		if (m_html)
-			name = getColoredString(name, m_comboOtherName);
+		if (p_html)
+		{
+			if( style )
+				name = getColoredString(name, p_comboOtherName);
+		}
 	}
 	if (!p->peer.IsEmpty())
 		name.Format(L"%s %s", p->peer, (CString)name);
@@ -975,20 +915,20 @@ CString CDescendantsLinearTable::getLastFirst(DE::PPEOPLE* p) // házatárs anyján
 CString CDescendantsLinearTable::getTableHeader()
 {
 	CString last_name;
-	CString percent;
-	CString family;
-	CString roman;
-	CString arm;
+//	CString percent;
+//	CString family;
+//	CString roman;
+//	CString arm;
 	CString tableHeader;
 
 
 	m_command.Format(L"SELECT percent, familyName, tableRoman, arm, tableHeader FROM tables WHERE rowid='%s'", p.tableNumber);
 	if (!query(m_command)) return str;
 
-	percent = rs.GetFieldString(0);
-	family = rs.GetFieldString(1);
-	roman = rs.GetFieldString(2);
-	arm = rs.GetFieldString(3);
+//	percent = rs.GetFieldString(0);
+//	family = rs.GetFieldString(1);
+//	roman = rs.GetFieldString(2);
+// 	arm = rs.GetFieldString(3);
 	tableHeader = rs.GetFieldString(4);
 	last_name = p.last_name;
 	last_name.MakeUpper();
@@ -997,10 +937,7 @@ CString CDescendantsLinearTable::getTableHeader()
 	if (!p.titolo.IsEmpty())
 		str.Format(L"%s, %s", (CString)str, p.titolo);
 	if (theApp.m_inputMode == GAHTML)
-	{
-		//str.Format(L"%s (%s %s %s)", (CString)str, percent, family, roman );
 		str.Format(L"%s (%s)", (CString)str, tableHeader);
-	}
 	return(str);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1022,7 +959,7 @@ CString CDescendantsLinearTable::createDescendant(int i, bool parentIndex)
 	TCHAR ch;
 
 	name = p.first_name;
-	if (m_radioDNameX == 1)
+	if (p_radioDNameX == 1)
 	{
 		lastname = p.last_name;
 		if (lastname == L"N") lastname.Empty();
@@ -1038,7 +975,7 @@ CString CDescendantsLinearTable::createDescendant(int i, bool parentIndex)
 		if (!p.other_names.IsEmpty())
 			name.Format(L"\n%s_(%s)", (CString)name, p.other_names);
 	}
-	name = getColoredString(name, m_comboDAttrib );
+	name = getColoredString(name, p_comboDAttrib );
 
 
 
@@ -1086,7 +1023,7 @@ CString CDescendantsLinearTable::createDescendant(int i, bool parentIndex)
 	if (!p.posterior.IsEmpty())
 	{
 		name += p.posterior;
-		if (m_checkCRLF)
+		if (p_checkCRLF)
 			name += L"\n";
 	}
 
@@ -1114,7 +1051,7 @@ CString CDescendantsLinearTable::createDescendant(int i, bool parentIndex)
 			str = p.occupation;
 	}
 
-	comment = getColoredString(str, m_comboComment);
+	comment = getColoredString(str, p_comboComment);
 	if (str.GetAt(0) == ',')
 		line.Format(L"%s%s", (CString)line, comment);
 	else
@@ -1122,7 +1059,7 @@ CString CDescendantsLinearTable::createDescendant(int i, bool parentIndex)
 
 
 	// ha színezni akarjuk, akkor a törlendõ piros, a megtartandó kék
-	if (m_repeatedColor)
+	if (p_repeatedColor)
 	{
 		switch (vDesc->at(i).status)
 		{
@@ -1169,12 +1106,9 @@ CString CDescendantsLinearTable::createSpouses(int i)
 		{
 			queryPeople(spouse_id, &s);   // házastárs adatainak beolvasása
 			marriage = createMarriage(place, date, i, numberOfSpouses);
-			//			print(marriage);
 			spouse = createSpouse();				// kiírás elõtt ellenõrzi, hogy szerepel-e ilyen névem már kiírt házastárs. Ha igen, akkor színezi
-			//			print(spouse);
 			vFullname.push_back(s.fullname);	// vFullname-en gyûjti a már kilistázott házastársak nevét
 			spRelatives = createSpRelatives();
-			//			print(spRelatives);
 			if (!marriage.IsEmpty())
 				spouses += marriage;
 			if (!spouse.IsEmpty())
@@ -1186,9 +1120,6 @@ CString CDescendantsLinearTable::createSpouses(int i)
 	}
 	spouses.Trim();
 	return spouses;
-
-	//	fwprintf(fl, L"\n");
-	//	fflush(fl);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CDescendantsLinearTable::createMarriage(CString place, CString date, int i, int numberOfSpouses)
@@ -1200,7 +1131,7 @@ CString CDescendantsLinearTable::createMarriage(CString place, CString date, int
 	else
 		str = L" =";
 
-	marriage = getColoredString(str, m_comboSpec);
+	marriage = getColoredString(str, p_comboSpec);
 
 	if (!place.IsEmpty())
 	{
@@ -1250,7 +1181,7 @@ CString CDescendantsLinearTable::createSpouse()
 		fullname += s.first_name;
 	}
 	fullname.Trim();
-	fullname = getColoredString(fullname, m_comboOtherName );
+	fullname = getColoredString(fullname, p_comboOtherName );
 
 	// Ellenõrti, hogy ilyen néven már listázott-e házastársat. Ha igen, akkoe színezi
 	for (int i = 0; i < vFullname.size(); ++i)
@@ -1275,7 +1206,7 @@ CString CDescendantsLinearTable::createSpouse()
 	{
 		fullname += L" ";
 		fullname += s.posterior;
-		if (m_checkCRLF)
+		if (p_checkCRLF)
 			fullname += L"\n";
 	}
 	fullname.Trim();
@@ -1290,7 +1221,7 @@ CString CDescendantsLinearTable::createSpouse()
 	if (!str.IsEmpty())
 		spouse.Format(L"%s %s", (CString)spouse, str);
 
-	str = getColoredString(s.comment, m_comboComment );
+	str = getColoredString(s.comment, p_comboComment );
 	if (!str.IsEmpty())
 	{
 		if (s.comment.GetAt(0) == ',')
@@ -1322,7 +1253,7 @@ CString CDescendantsLinearTable::createSpRelatives()
 		sf.first_name.Replace('-', ' ');
 		str = getFirstWord(sf.first_name);
 
-		father = getColoredString(str, m_comboOtherName );
+		father = getColoredString(str, p_comboOtherName );
 		//		if (!sf.peer.IsEmpty())
 		//			father.Format(L"%s %s", sf.peer, (CString)father);
 
@@ -1331,7 +1262,7 @@ CString CDescendantsLinearTable::createSpRelatives()
 	if (!s.mother_id.IsEmpty() && s.mother_id != L"0")
 	{
 		queryPeople(s.mother_id, &sm);
-		mother = getLastFirst(&sm);
+		mother = getLastFirst(&sm, true );
 		mother.Trim();
 	}
 
@@ -1378,7 +1309,7 @@ CString CDescendantsLinearTable::createSpRelatives()
 			queryPeople(spouse_id, &ss);
 			if (ss.rowid != p.rowid)		// a GA sorban szereplõ házastársat kihagyja
 			{
-				spouseSpouse = getLastFirst(&ss);
+				spouseSpouse = getLastFirst(&ss, true);
 
 				//spouseSpouse.Format(L"%s %s", ss.peer, (CString)spouseSpouse);
 				// spouseSpouse.Trim();
@@ -1420,7 +1351,7 @@ void CDescendantsLinearTable::print(CString str)
 {
 	str.Replace('|', '\'');
 	str = UnicodeToUtf8(str);
-	fwprintf(fl, L"%s", str);  // a soreleji %-okat printelési karakterekenk értelmezné, ha közvetlenül nyomtatnánk!!! 
+	fwprintf(fhDescTable, L"%s\n", str);  
 	fflush(fl);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

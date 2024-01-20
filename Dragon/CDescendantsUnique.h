@@ -33,4 +33,5 @@ public:
 	afx_msg void OnKeressPrevious();
 	afx_msg void OnFunctionsDescendands();
 	afx_msg void OnFunctionsAscendants();
+	afx_msg void OnFunctionsNotepad();
 };

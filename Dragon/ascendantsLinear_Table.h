@@ -89,6 +89,7 @@ protected:
 
 	CString m_titleF;
 	CString m_titleU;
+	CString m_familyNamePrev;
 
 	int m_gPrev;
 	bool m_gFlag;
