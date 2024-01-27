@@ -170,7 +170,7 @@ void CAscendantsLinearTable::OnSelchangeTab(NMHDR* pNMHDR, LRESULT* pResult)
 	switch (nItem)
 	{
 	case FULL_TAB:
-		m_ListCtrl = &(m_aF.m_ListCtrlF);
+//		m_ListCtrl = &(m_aF.m_ListCtrlF);
 		m_aF.ShowWindow(SW_SHOW);
 		m_aU.ShowWindow(SW_HIDE);
 
@@ -191,7 +191,7 @@ void CAscendantsLinearTable::OnSelchangeTab(NMHDR* pNMHDR, LRESULT* pResult)
 
 		break;
 	case UNIQUE_TAB:
-		m_ListCtrl = &(m_aU.m_ListCtrlU);
+//		m_ListCtrl = &(m_aU.m_ListCtrlU);
 
 		m_aU.ShowWindow(SW_SHOW);
 		m_aF.ShowWindow(SW_HIDE);
@@ -251,6 +251,9 @@ void CAscendantsLinearTable::fullTable()
 
 		str.Format(L"%d", vGKR->at(i).toggle);		// hidden: generációk háttér színezésére
 		m_ListCtrl->InsertItem(nItem, str);
+
+
+		m_ListCtrl->SetItemText(nItem, F_LINENUMBER, vGKR->at(i).linenumber);	// hidden
 
 		str.Format(L"%d", vGKR->at(i).sex_id);
 		m_ListCtrl->SetItemText(nItem, F_SEX, str);	// hidden
@@ -323,10 +326,11 @@ void CAscendantsLinearTable::uniqueTable()
 
 		str.Format(L"%d", vGKR->at(i).toggle);
 		m_ListCtrl->InsertItem(nItem, str);
-
+		
 		str.Format(L"%d", vGKR->at(i).moreC);
 		m_ListCtrl->SetItemText(nItem, U_MOREC, str);
 
+		m_ListCtrl->SetItemText(nItem, U_LINENUMBER, vGKR->at(i).linenumber);
 
 		str.Format(L"%d", nItem);
 		m_ListCtrl->SetItemText(nItem, U_CNT, str);
@@ -355,11 +359,14 @@ cont:	wndP.StepIt();
 		if (wndP.Cancelled()) break;
 
 	}
+/*
 	m_ListCtrl->SetColumnWidth(U_SIBLINGS, -1);
 	m_ListCtrl->SetColumnWidth(U_SPOUSES, -1);
+	m_ListCtrl->SetColumnWidth(U_IDM, -1);
 	m_ListCtrl->SetColumnWidth(U_IDC, -1);
+	m_ListCtrl->SetColumnWidth(U_IDF, -1);
 	m_ListCtrl->SetColumnWidth(U_ID, -1);
-
+*/
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1261,17 +1268,29 @@ LRESULT CAscendantsLinearTable::OnSetRowColor(WPARAM wParam, LPARAM lParam)//wpa
 void CAscendantsLinearTable::OnHtmlListaPrintable()
 {
 	if (m_TabCtrl.GetCurSel() == FULL)
+	{
+		m_ListCtrl = &(m_aF.m_ListCtrlF);
 		createHtmlFile(FULL_P);
+	}
 	else
+	{
+		m_ListCtrl = &(m_aU.m_ListCtrlU);
 		createHtmlFile(UNIQUE_P);
+	}
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CAscendantsLinearTable::OnHtmlListaFix()
 {
 	if (m_TabCtrl.GetCurSel() == FULL)
+	{
+		m_ListCtrl = &(m_aF.m_ListCtrlF);
 		createHtmlFile(FULL);
+	}
 	else
+	{
+		m_ListCtrl = &(m_aU.m_ListCtrlU);
 		createHtmlFile(UNIQUE);
+	}
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CAscendantsLinearTable::OnIndentedAscendants()

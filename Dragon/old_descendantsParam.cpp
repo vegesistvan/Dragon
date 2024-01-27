@@ -17,24 +17,23 @@ CDescendantsParamOld::CDescendantsParamOld(CWnd* pParent /*=nullptr*/)
 	, p_womenDescendants(false)			// nõk leszármazottait listázza-e
 	, p_capital(false)
 	, p_bold(FALSE)
-	, m_comboOtherName(1)			// más náv bold
-	, m_comboSpec(0)				// speciális karakterek (*+=) bold
-	, m_comboComment(2)				// comment bold
-	, m_comboKiemeltAttrib(3)		// leszármazott kiemelt családneve
-	, m_comboFontSize(3)
+	, p_otherNameAttrib(1)			// más náv bold
+	, p_comboSpect(0)				// speciális karakterek (*+=) bold
+	, p_commentAttrib(2)				// comment bold
+	, p_fontSize(3)
 
-	, m_radioNumbering(TUPP)		// milyen számozási rendszer legyen (0,1,2) SZLUHA/VIL/TUP
+	, p_numberingSystem(DE::TUPP)		// milyen számozási rendszer legyen (0,1,2) SZLUHA/VIL/TUP
 
 	, m_tableNumber(L"")			// tablenumber, ha a táblázat leszármazotti listáját kérjük
-	, m_editWidth(L"képernyõ")
+	, p_rowWidth(L"képernyõ")
 	, m_printed(FALSE)
-	, m_checkFolyt(FALSE)
-	, m_editGenMax(_T(""))
-	, m_radioOne(true)
-	, m_repeated(0)
-	, m_repeatedColor(FALSE)
-	, m_checkCRLF(FALSE)
-	, m_radioOrder(0)
+	, p_folyt(FALSE)
+	, p_generationMax(_T(""))
+	, p_oneOutputFile(true)
+	, p_repeated(0)
+	, p_repeatedColor(FALSE)
+	, p_checkCRLF(FALSE)
+	, p_childrenOrder(0)
 {
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -50,38 +49,36 @@ void CDescendantsParamOld::DoDataExchange(CDataExchange* pDX)
 
 	DDX_Check(pDX, IDC_CHECK_CAPITAL, p_capital);
 	DDX_Check(pDX, IDC_CHECK_BOLD, p_bold);
-	DDX_Check(pDX, IDC_CHECK_FOLYT, m_checkFolyt);
+	DDX_Check(pDX, IDC_CHECK_FOLYT, p_folyt);
 
-	DDX_Control(pDX, IDC_COMBO_COMMENT, m_combo_comment);
-	DDX_Control(pDX, IDC_COMBO_SPEC, m_combo_spec);
-	DDX_Control(pDX, IDC_COMBO_FONTSIZE, m_combo_FontSize);
+	DDX_Control(pDX, IDC_COMBO_COMMENT, m__commentAttribCombo);
+	DDX_Control(pDX, IDC_COMBO_SPEC, m_specAttribCombo);
+	DDX_Control(pDX, IDC_COMBO_FONTSIZE, m_fontSizeCombo);
 
 	DDX_Control(pDX, IDC_STATIC_BACKGROUND, colorBgrnd);
 	DDX_Control(pDX, IDC_BUTTON_BGNCOLOR, colorBgn);
 
-	DDX_Control(pDX, IDC_COMBO_NAME, m_combo_OtherName);
-	DDX_Control(pDX, IDC_COMBO_DESCATTRIB, m_combo_DAttrib);
-	DDX_Control(pDX, IDC_RADIO_NOFAMILYNAME, m_RadioFamily);
-	DDX_Text(pDX, IDC_EDIT_WIDTH, m_editWidth);
+	DDX_Control(pDX, IDC_COMBO_NAME, m_otherNameAttribCombo);
+	DDX_Control(pDX, IDC_COMBO_DESCATTRIB, m_descendantAttribCombo);
+	//  DDX_Control(pDX, IDC_RADIO_NOFAMILYNAME, m_RadioFamily);
+	DDX_Text(pDX, IDC_EDIT_WIDTH, p_rowWidth);
 	DDX_Control(pDX, IDC_STATIC_NAME, colorName);
 	DDX_Control(pDX, IDC_STATIC_NUM, colorNum);
 	DDX_Control(pDX, IDC_STATIC_PRINT, colorPrint);
 	DDX_Control(pDX, IDC_STATIC_ATTRIB, colorAttrib);
-//	DDX_Control(pDX, IDC_STATIC_FAMILY_INLINE, colorFamilyInline);
-//	DDX_Control(pDX, IDC_STATIC_FAMILYNAME_NO, colorFamilynameNo);
-//	DDX_Control(pDX, IDC_STATIC_FAMILYNAME_UP, colorFamilynameUp);
-	DDX_Text(pDX, IDC_GENMAX, m_editGenMax);
+	DDX_Text(pDX, IDC_GENMAX, p_generationMax);
 
-	DDX_Radio(pDX, IDC_RADIO_ONE, m_radioOne);
+	DDX_Radio(pDX, IDC_RADIO_ONE, p_oneOutputFile);
 	DDX_Control(pDX, IDC_STATIC_OUTPUT, colorOutput);
 	DDX_Control(pDX, IDC_STATIC_PRINT, colorPrint);
 	DDX_Control(pDX, IDC_STATIC_CONTENT, colorContent);
-	DDX_Check(pDX, IDC_REPEATED_COLOR, m_repeatedColor);
+	DDX_Check(pDX, IDC_REPEATED_COLOR, p_repeatedColor);
 	DDX_Control(pDX, IDC_STATIC_REPEATED, colorRepeated);
 	DDX_Control(pDX, IDC_COMBO_HTMTXT, m_comboHtmlTxt);
-	DDX_Check(pDX, IDC_CHECK_CRLF, m_checkCRLF);
-	DDX_Radio(pDX, IDC_ORDER_INPUT, m_radioOrder);
+	DDX_Check(pDX, IDC_CHECK_CRLF, p_checkCRLF);
+	DDX_Radio(pDX, IDC_ORDER_INPUT, p_childrenOrder);
 	DDX_Control(pDX, IDC_ORDER_TXT, colorOrder);
+	DDX_Control(pDX, IDC_RADIO_NOFAMILYNAME, m_descendantNameRadio);
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CDescendantsParamOld, CDialogEx)
@@ -121,16 +118,16 @@ BOOL CDescendantsParamOld::OnInitDialog()
 
 	for (int i = 0; i < sizeof(attrib) / sizeof(ATTRIB); ++i)
 	{
-		m_combo_DAttrib.InsertString(i, attrib[i].text);
-		m_combo_OtherName.InsertString(i, attrib[i].text);
-		m_combo_spec.InsertString(i, attrib[i].text);
-		m_combo_comment.InsertString(i, attrib[i].text);
+		m_descendantAttribCombo.InsertString(i, attrib[i].text);
+		m_otherNameAttribCombo.InsertString(i, attrib[i].text);
+		m_specAttribCombo.InsertString(i, attrib[i].text);
+		m__commentAttribCombo.InsertString(i, attrib[i].text);
 		//		m_combo_KiemeltAttrib.InsertString(i, attrib[i].text);
 	}
 	for (INT i = 0; i < 6; ++i)
 	{
 		str.Format(L"%d", 10 + i * 2);
-		m_combo_FontSize.InsertString(i, str);
+		m_fontSizeCombo.InsertString(i, str);
 	}
 
 	m_comboHtmlTxt.AddString(L"htm");
@@ -166,7 +163,7 @@ BOOL CDescendantsParamOld::OnInitDialog()
 	
 	if (theApp.v_rowid.size() < 2 && theApp.v_tableNumbers.size() < 2)
 	{
-		m_radioOne = true;
+		p_oneOutputFile = true;
 		UpdateData(TOSCREEN);
 		GetDlgItem(IDC_RADIO_ONE)->EnableWindow(false);
 		GetDlgItem(IDC_RADIO_ONE1)->EnableWindow(false);
@@ -180,31 +177,31 @@ void CDescendantsParamOld::setParameters()
 {
 	p_connect = theApp.GetProfileInt(L"dragon", L"p_connect", 0);
 	p_womenDescendants = theApp.GetProfileInt(L"dragon", L"p_womenDescendants", 1);
-	m_checkFolyt = theApp.GetProfileInt(L"dragon", L"m_checkFolyt", 0);
+	p_folyt = theApp.GetProfileInt(L"dragon", L"p_folyt", 0);
 	p_capital = theApp.GetProfileInt(L"dragon", L"p_capital", 0);
 	p_bold = theApp.GetProfileInt(L"dragon", L"p_bold", 0);
 
-	m_radioOne = theApp.GetProfileInt(L"dragon", L"m_radioOne", true);
-	m_radioDNameX = theApp.GetProfileInt(L"dragon", L"m_radioDNameX", 1);
-	m_radioNumbering = theApp.GetProfileInt(L"dragon", L"m_radioNumbering", 2);
+	p_oneOutputFile = theApp.GetProfileInt(L"dragon", L"p_oneOutputFile", true);
+	p_descendantName = theApp.GetProfileInt(L"dragon", L"p_descendantName", 1);
+	p_numberingSystem = theApp.GetProfileInt(L"dragon", L"p_numberingSystem", 2);
 
-	m_editWidth = theApp.GetProfileString(L"dragon", L"m_editWidth", L"0");
-	m_editGenMax = theApp.GetProfileString(L"dragon", L"m_editGenMax", L"");
+	p_rowWidth = theApp.GetProfileString(L"dragon", L"p_rowWidth", L"0");
+	p_generationMax = theApp.GetProfileString(L"dragon", L"p_generationMax", L"");
 
 
-	m_repeated = theApp.GetProfileInt(L"dragon", L"m_repeated", 0);
-	m_repeatedColor = theApp.GetProfileInt(L"dragon", L"m_repeatedColor", 0);
+	p_repeated = theApp.GetProfileInt(L"dragon", L"p_repeated", 0);
+	p_repeatedColor = theApp.GetProfileInt(L"dragon", L"p_repeatedColor", 0);
 
-	m_comboDAttrib = theApp.GetProfileInt(L"dragon", L"m_comboDAttrib", 1);
-	m_comboFontSize = theApp.GetProfileInt(L"dragon", L"m_comboFontSize", 3);
-	m_comboComment = theApp.GetProfileInt(L"dragon", L"m_comboComment", 2);
-	m_comboSpec = theApp.GetProfileInt(L"dragon", L"m_comboSpec", 0);
-	m_comboOtherName = theApp.GetProfileInt(L"dragon", L"m_comboOtherName", 1);
+	p_descendantAttrib = theApp.GetProfileInt(L"dragon", L"p_descendantAttrib", 1);
+	p_fontSize = theApp.GetProfileInt(L"dragon", L"p_fontSize", 3);
+	p_commentAttrib = theApp.GetProfileInt(L"dragon", L"p_commentAttrib", 2);
+	p_comboSpect = theApp.GetProfileInt(L"dragon", L"p_comboSpect", 0);
+	p_otherNameAttrib = theApp.GetProfileInt(L"dragon", L"p_otherNameAttrib", 1);
 
-	m_colorBgrnd = theApp.GetProfileInt(L"dragon", L"m_colorBgrnd", WHITE);
-	m_checkCRLF = theApp.GetProfileInt(L"dragon", L"m_checkCRLF", WHITE);
+	p_colorBgrnd = theApp.GetProfileInt(L"dragon", L"p_colorBgrnd", WHITE);
+	p_checkCRLF = theApp.GetProfileInt(L"dragon", L"p_checkCRLF", WHITE);
 
-	m_radioOrder = theApp.GetProfileInt(L"dragon", L"m_radioOrder", WHITE);
+	p_childrenOrder = theApp.GetProfileInt(L"dragon", L"p_childrenOrder", WHITE);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsParamOld::OnClickedDefault()
@@ -212,32 +209,32 @@ void CDescendantsParamOld::OnClickedDefault()
 	m_comboHtmlTxt.SetCurSel(0);
 	p_connect = true;
 	p_womenDescendants = true;
-	m_checkFolyt = false;
+	p_folyt = false;
 	p_capital = false;
 	p_bold = false;
-	m_checkCRLF = false;
-	m_radioOne = true;
+	p_checkCRLF = false;
+	p_oneOutputFile = true;
 	
-	m_editWidth = L"0";
-	m_editGenMax.Empty();
+	p_rowWidth = L"0";
+	p_generationMax.Empty();
 
-	m_repeatedColor = false;
-	m_radioDNameX = 2;
-	m_radioNumbering = SZLUHA;
-	m_radioOrder = 0;
+	p_repeatedColor = false;
+	p_descendantName = RAISED;
+	p_numberingSystem = SZLUHA;
+	p_childrenOrder = 0;
 
-	m_comboDAttrib = 1;
-	m_comboFontSize = 3;
-	m_comboComment = 2;
-	m_comboSpec = 0;
-	m_comboOtherName = 1;
+	p_descendantAttrib = 1;
+	p_fontSize = 3;
+	p_commentAttrib = 2;
+	p_comboSpect = 0;
+	p_otherNameAttrib = 1;
 
-	m_colorBgrnd = WHITE;
+	p_colorBgrnd = WHITE;
 
-	m_repeated =  0;
-	m_repeatedColor = 0;
+	p_repeated =  0;
+	p_repeatedColor = 0;
 
-	m_radioOrder = 0;
+	p_childrenOrder = 0;
 
 	updateParameters();
 
@@ -253,14 +250,14 @@ void CDescendantsParamOld::OnClickedDefault()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsParamOld::updateParameters()
 {
-	m_combo_OtherName.SetCurSel(m_comboOtherName);
-	m_combo_spec.SetCurSel(m_comboSpec);
-	m_combo_comment.SetCurSel(m_comboComment);
-	m_combo_DAttrib.SetCurSel(m_comboDAttrib);
-	m_combo_FontSize.SetCurSel(m_comboFontSize);
+	m_otherNameAttribCombo.SetCurSel(p_otherNameAttrib);
+	m_specAttribCombo.SetCurSel(p_comboSpect);
+	m__commentAttribCombo.SetCurSel(p_commentAttrib);
+	m_descendantAttribCombo.SetCurSel(p_descendantAttrib);
+	m_fontSizeCombo.SetCurSel(p_fontSize);
 
 
-	colorBgn.SetColor(BLACK, m_colorBgrnd);
+	colorBgn.SetColor(BLACK, p_colorBgrnd);
 
 	updateRadioDName();
 	updateRadioNumbering();
@@ -272,9 +269,8 @@ void CDescendantsParamOld::updateParameters()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsParamOld::updateRadioDName()
 {
-	if (m_radioDNameX == 0)									// leszármazott családnevét nem írjuk ki
+	if (p_descendantName == NOINLINE)									// leszármazott családnevét nem írjuk ki
 	{
-		m_comboKiemeltAttrib = 0;
 		((CButton*)GetDlgItem(IDC_RADIO_NOFAMILYNAME))->SetCheck(TRUE);
 		((CButton*)GetDlgItem(IDC_RADIO_FAMILYNAME))->SetCheck(FALSE);
 		((CButton*)GetDlgItem(IDC_RADIO_FAMILYNAMEUP))->SetCheck(FALSE);
@@ -282,18 +278,16 @@ void CDescendantsParamOld::updateRadioDName()
 		UpdateData(TOSCREEN);
 		GetDlgItem(IDC_CHECK_BOLD)->EnableWindow(false);
 	}
-	else if (m_radioDNameX == 1)								// családnév a leszármazotti sorban
+	else if (p_descendantName == INLINE)								// családnév a leszármazotti sorban
 	{
-		m_comboKiemeltAttrib = 0;
 		((CButton*)GetDlgItem(IDC_RADIO_NOFAMILYNAME))->SetCheck(FALSE);
 		((CButton*)GetDlgItem(IDC_RADIO_FAMILYNAME))->SetCheck(TRUE);
 		((CButton*)GetDlgItem(IDC_RADIO_FAMILYNAMEUP))->SetCheck(FALSE);
 		GetDlgItem(IDC_CHECK_BOLD)->EnableWindow(true);
 	}
-	else if (m_radioDNameX == 2)								// leszármazott családneve kiemelve
+	else if (p_descendantName == RAISED)								// leszármazott családneve kiemelve
 	{
-		m_RadioFamily.SetCheck(2);
-		m_comboKiemeltAttrib = 3;
+		m_descendantNameRadio.SetCheck(2);
 		((CButton*)GetDlgItem(IDC_RADIO_NOFAMILYNAME))->SetCheck(FALSE);
 		((CButton*)GetDlgItem(IDC_RADIO_FAMILYNAME))->SetCheck(FALSE);
 		((CButton*)GetDlgItem(IDC_RADIO_FAMILYNAMEUP))->SetCheck(TRUE);
@@ -305,13 +299,13 @@ void CDescendantsParamOld::updateRadioDName()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsParamOld::updateRadioNumbering()
 {
-	if (m_radioNumbering == SZLUHA)
+	if (p_numberingSystem == SZLUHA)
 	{
 		((CButton*)GetDlgItem(IDC_SZLUHA))->SetCheck(TRUE);
 		((CButton*)GetDlgItem(IDC_VILLERS))->SetCheck(FALSE);
 		((CButton*)GetDlgItem(IDC_TUPIGNY))->SetCheck(FALSE);
 	}
-	else if (m_radioNumbering == VIL)
+	else if (p_numberingSystem == VIL)
 	{
 		((CButton*)GetDlgItem(IDC_SZLUHA))->SetCheck(FALSE);
 		((CButton*)GetDlgItem(IDC_VILLERS))->SetCheck(TRUE);
@@ -328,7 +322,7 @@ void CDescendantsParamOld::updateRadioNumbering()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsParamOld::updateRepeated()
 {
-	switch (m_repeated)
+	switch (p_repeated)
 	{
 	case 0:
 		((CButton*)GetDlgItem(IDC_REPEATED_ALL))->SetCheck(TRUE);
@@ -368,7 +362,7 @@ void CDescendantsParamOld::OnClickedCheckWoman()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsParamOld::OnClickedCheckFolyt()
 {
-	m_checkFolyt = !m_checkFolyt;
+	p_folyt = !p_folyt;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsParamOld::OnClickedCheckCapital()
@@ -382,14 +376,14 @@ void CDescendantsParamOld::OnClickedCheckBold()
 	if (p_bold == true)
 	{
 		p_capital = false;
-		m_comboComment = 0;
-		m_comboDAttrib = 0;
-		m_comboOtherName = 0;
-		m_comboSpec = 0;
-		m_combo_OtherName.SetCurSel(m_comboOtherName);
-		m_combo_spec.SetCurSel(m_comboSpec);
-		m_combo_comment.SetCurSel(m_comboComment);
-		m_combo_DAttrib.SetCurSel(m_comboDAttrib);
+		p_commentAttrib = 0;
+		p_descendantAttrib = 0;
+		p_otherNameAttrib = 0;
+		p_comboSpect = 0;
+		m_otherNameAttribCombo.SetCurSel(p_otherNameAttrib);
+		m_specAttribCombo.SetCurSel(p_comboSpect);
+		m__commentAttribCombo.SetCurSel(p_commentAttrib);
+		m_descendantAttribCombo.SetCurSel(p_descendantAttrib);
 
 		GetDlgItem(IDC_CHECK_CAPITAL)->EnableWindow(false);
 		GetDlgItem(IDC_COMBO_DESCATTRIB)->EnableWindow(false);
@@ -410,51 +404,51 @@ void CDescendantsParamOld::OnClickedCheckBold()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsParamOld::OnClickedSzluha()
 {
-	m_radioNumbering = SZLUHA;
+	p_numberingSystem = SZLUHA;
 	updateRadioNumbering();
 }
 void CDescendantsParamOld::OnVillers()
 {
-	m_radioNumbering = VIL;
+	p_numberingSystem = VIL;
 	updateRadioNumbering();
 }
 void CDescendantsParamOld::OnTupigny()
 {
-	m_radioNumbering = TUP;
+	p_numberingSystem = TUP;
 	updateRadioNumbering();
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsParamOld::OnClickedRadioNofamilyname()
 {
-	m_radioDNameX = 0;
+	p_descendantName = NOINLINE;
 	updateRadioDName();
 }
 void CDescendantsParamOld::OnRadioFamilyname()
 {
-	m_radioDNameX = 1;
+	p_descendantName = INLINE;
 	updateRadioDName();
 }
 void CDescendantsParamOld::OnRadioFamilynameup()
 {
-	m_radioDNameX = 2;
+	p_descendantName = RAISED;
 	updateRadioDName();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsParamOld::OnClickedRepeatedAll()
 {
-	m_repeated = 0;
+	p_repeated = 0;
 	updateRepeated();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsParamOld::OnRepeatedFirst()
 {
-	m_repeated = 1;
+	p_repeated = 1;
 	updateRepeated();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsParamOld::OnRepeatedFather()
 {
-	m_repeated = 2;
+	p_repeated = 2;
 	updateRepeated();
 }
 
@@ -469,7 +463,7 @@ void CDescendantsParamOld::OnClickedStaticBackground()
 	COLORREF bgn = dlgColors.GetColor();
 	colorBgn.SetColor(BLACK, bgn);
 
-	m_colorBgrnd = GetRValue(bgn) << 16 | GetGValue(bgn) << 8 | GetBValue(bgn);
+	p_colorBgrnd = GetRValue(bgn) << 16 | GetGValue(bgn) << 8 | GetBValue(bgn);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsParamOld::OnBnClickedOk()
@@ -478,18 +472,19 @@ void CDescendantsParamOld::OnBnClickedOk()
 
 
 	m_html = m_comboHtmlTxt.GetCurSel();
-	m_comboDAttrib = m_combo_DAttrib.GetCurSel();
-	m_comboOtherName = m_combo_OtherName.GetCurSel();
-	m_comboSpec = m_combo_spec.GetCurSel();
-	m_comboComment = m_combo_comment.GetCurSel();
-	m_comboFontSize = m_combo_FontSize.GetCurSel();
+	p_descendantAttrib = m_descendantAttribCombo.GetCurSel();
+	p_otherNameAttrib = m_otherNameAttribCombo.GetCurSel();
+	p_comboSpect = m_specAttribCombo.GetCurSel();
+	p_commentAttrib = m__commentAttribCombo.GetCurSel();
+	p_fontSize = m_fontSizeCombo.GetCurSel();
 
+	p_descendantName = m_descendantNameRadio.GetCheck();
 
-	if (m_editGenMax.IsEmpty())
+	if (p_generationMax.IsEmpty())
 		m_generationMax = INT_MAX;
 	else
 	{
-		m_generationMax = _wtoi(m_editGenMax);
+		m_generationMax = _wtoi(p_generationMax);
 		if (m_generationMax < 3)
 		{
 			AfxMessageBox(L"A maximális listázandó generációk száma 2-nél nagyobbnak kell lenni!", MB_ICONEXCLAMATION);
@@ -497,31 +492,31 @@ void CDescendantsParamOld::OnBnClickedOk()
 		}
 	}
 
-	m_oneFile = m_radioOne;
+	p_oneOutputFile = p_oneOutputFile;
 
-	int z = m_repeated;
+	int z = p_repeated;
 	theApp.WriteProfileInt(L"dragon", L"p_connect", p_connect);
 	theApp.WriteProfileInt(L"dragon", L"p_womenDescendants", p_womenDescendants);
-	theApp.WriteProfileInt(L"dragon", L"m_repeated", m_repeated);
-	theApp.WriteProfileInt(L"dragon", L"m_repeatedColor", m_repeatedColor);
-	theApp.WriteProfileInt(L"dragon", L"m_checkFolyt", m_checkFolyt);
+	theApp.WriteProfileInt(L"dragon", L"p_repeated", p_repeated);
+	theApp.WriteProfileInt(L"dragon", L"p_repeatedColor", p_repeatedColor);
+	theApp.WriteProfileInt(L"dragon", L"p_folyt", p_folyt);
 
-	theApp.WriteProfileString(L"dragon", L"m_editWidth", m_editWidth);
-	theApp.WriteProfileString(L"dragon", L"m_editGenMax", m_editGenMax);
+	theApp.WriteProfileString(L"dragon", L"p_rowWidth", p_rowWidth);
+	theApp.WriteProfileString(L"dragon", L"p_generationMax", p_generationMax);
 
-	theApp.WriteProfileInt(L"dragon", L"m_radioDNameX", m_radioDNameX);
-	theApp.WriteProfileInt(L"dragon", L"m_comboDAttrib", m_comboDAttrib);
-	theApp.WriteProfileInt(L"dragon", L"m_comboOtherName", m_comboOtherName);
-	theApp.WriteProfileInt(L"dragon", L"m_comboComment", m_comboComment);
-	theApp.WriteProfileInt(L"dragon", L"m_comboFontSize", m_comboFontSize);
-	theApp.WriteProfileInt(L"dragon", L"m_comboSpec", m_comboSpec);
-	theApp.WriteProfileInt(L"dragon", L"m_radioNumbering", m_radioNumbering);
-	theApp.WriteProfileInt(L"dragon", L"m_radioOrder", m_radioOrder);
-	theApp.WriteProfileInt(L"dragon", L"m_colorBgrnd", m_colorBgrnd);
+	theApp.WriteProfileInt(L"dragon", L"p_descendantName", p_descendantName);
+	theApp.WriteProfileInt(L"dragon", L"p_descendantAttrib", p_descendantAttrib);
+	theApp.WriteProfileInt(L"dragon", L"p_otherNameAttrib", p_otherNameAttrib);
+	theApp.WriteProfileInt(L"dragon", L"p_commentAttrib", p_commentAttrib);
+	theApp.WriteProfileInt(L"dragon", L"p_fontSize", p_fontSize);
+	theApp.WriteProfileInt(L"dragon", L"p_comboSpect", p_comboSpect);
+	theApp.WriteProfileInt(L"dragon", L"p_numberingSystem", p_numberingSystem);
+	theApp.WriteProfileInt(L"dragon", L"p_childrenOrder", p_childrenOrder);
+	theApp.WriteProfileInt(L"dragon", L"p_colorBgrnd", p_colorBgrnd);
 	theApp.WriteProfileInt(L"dragon", L"p_capital", p_capital);
 	theApp.WriteProfileInt(L"dragon", L"p_bold", p_bold);
-	theApp.WriteProfileInt(L"dragon", L"m_checkCRLF", m_checkCRLF);
-	theApp.WriteProfileInt(L"dragon", L"m_radioOne", m_radioOne);
+	theApp.WriteProfileInt(L"dragon", L"p_checkCRLF", p_checkCRLF);
+	theApp.WriteProfileInt(L"dragon", L"p_oneOutputFile", p_oneOutputFile);
 
 	CDialogEx::OnOK();
 }
@@ -567,20 +562,20 @@ void CDescendantsParamOld::colorFrame(CPaintDC* dc, int IDC, COLORREF color)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsParamOld::OnClickedOrderInput()
 {
-	m_radioOrder = ORDER_INPUT;
+	p_childrenOrder = ORDER_INPUT;
 }
 void CDescendantsParamOld::OnOrderBirth()
 {
-	m_radioOrder = ORDER_BIRTH;
+	p_childrenOrder = ORDER_BIRTH;
 }
 void CDescendantsParamOld::OnOrderLength()
 {
-	m_radioOrder = ORDER_INCREASING;
+	p_childrenOrder = ORDER_INCREASING;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsParamOld::OnOrderDecreasing()
 {
-	m_radioOrder = ORDER_DECREASING;
+	p_childrenOrder = ORDER_DECREASING;
 }
 
 

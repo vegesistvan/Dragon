@@ -51,10 +51,14 @@ BEGIN_MESSAGE_MAP(CDescendantsLinearTable, CDialogEx)
 
 	ON_COMMAND(ID_HTMLLISTA_FIX, &CDescendantsLinearTable::OnHtmlListaFix)
 	ON_COMMAND(ID_HTMLLISTA_PRINTABLE, &CDescendantsLinearTable::OnHtmlListaPrintable)
+	ON_COMMAND(ID_HTMLLIST_FIX_NOREP, &CDescendantsLinearTable::OnHtmllistFixNorep)
+	ON_COMMAND(ID_HTMLLIST_PR_NOREP, &CDescendantsLinearTable::OnHtmllistPrNorep)
 
 	ON_MESSAGE(WM_SET_ROW_COLOR, OnSetRowColor)
 	ON_MESSAGE(WM_RELOAD_D, OnReloadListCtrl)
 	ON_COMMAND(ID_INDENTED_LIST, &CDescendantsLinearTable::OnIndentedList)
+
+	
 END_MESSAGE_MAP()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CDescendantsLinearTable::OnInitDialog()
@@ -128,14 +132,14 @@ cont:	wndP.StepIt();
 	TCITEM tcItem;
 	tcItem = { 0 };
 	tcItem.mask = TCIF_TEXT | TCIF_PARAM | TCIF_STATE;
-	tcItem.pszText = L"Teljes lista";
+	tcItem.pszText = L"Ismétlések nélkül";
 	tcItem.lParam = 0;
 	tcItem.dwStateMask = TCIS_HIGHLIGHTED;
 	tcItem.dwState = TCIS_HIGHLIGHTED;
 
 	m_TabCtrl.InsertItem(i, &tcItem);
 	++i;
-	m_TabCtrl.InsertItem(i, L"Ismétlések nélkül");
+	m_TabCtrl.InsertItem(i, L"Ismétlésekkel");
 
 	attachDialogs();
 
@@ -157,7 +161,7 @@ cont:	wndP.StepIt();
 	fullTable();
 	uniqueTable();
 
-	m_TabCtrl.SetCurSel(FULL);
+	m_TabCtrl.SetCurSel(REPEATED);
 	m_ListCtrl = &(m_aF.m_ListCtrlF);
 	m_aF.ShowWindow(SW_SHOW);
 	menu->EnableMenuItem(0, MF_BYPOSITION | MF_ENABLED);
@@ -201,46 +205,19 @@ void CDescendantsLinearTable::OnSelchangeTab(NMHDR* pNMHDR, LRESULT* pResult)
 	int nItem = m_TabCtrl.GetCurSel();
 	switch (nItem)
 	{
-	case FULL_TAB:
-//		m_ListCtrl = &(m_aF.m_ListCtrlF);
+	case REPEATED:
 		m_aF.ShowWindow(SW_SHOW);
 		m_aU.ShowWindow(SW_HIDE);
 
 		m_title = m_titleF;
-		/*
-				m_TabCtrl.GetItem(0, &curItem);
-				curItem.mask = TCIF_STATE;
-				curItem.dwState = TCIS_BUTTONPRESSED;
-				curItem.dwStateMask = TCIS_BUTTONPRESSED;
-				m_TabCtrl.SetItem(0, &curItem);
-
-				m_TabCtrl.GetItem(0, &curItem);
-				curItem.mask = TCIF_STATE;
-				curItem.dwState = TCIS_BUTTONPRESSED;
-				curItem.dwStateMask = TCIS_BUTTONPRESSED;
-				m_TabCtrl.SetItem(0, &curItem);
-		*/
-
 		break;
-	case UNIQUE_TAB:
-//		m_ListCtrl = &(m_aU.m_ListCtrlU);
-
+	case NOTREPEATED:
 		m_aU.ShowWindow(SW_SHOW);
 		m_aF.ShowWindow(SW_HIDE);
 
 		m_title = m_titleU;
 		break;
 	}
-
-	/*
-		m_TabCtrl.GetItem(nItem, &curItem);
-		curItem.mask = TCIF_STATE;
-		curItem.dwState = TCIS_BUTTONPRESSED;
-		curItem.dwStateMask = TCIS_BUTTONPRESSED;
-		m_TabCtrl.SetItem(nItem, &curItem);
-	*/
-
-
 
 	m_RichEditCtrl.SetSel(0, -1);
 	m_RichEditCtrl.Clear();
@@ -287,7 +264,7 @@ void CDescendantsLinearTable::keress(int start)
 	CString	search;
 	m_SearchCtrl.GetWindowTextW(search);
 
-	theApp.keress(search, m_ListCtrl, L_DESCENDANT, start, false);
+	theApp.keress(search, m_ListCtrl, L_DESCENDANT, start, false );
 	
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -319,13 +296,13 @@ void CDescendantsLinearTable::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItem
 		// which tab?
 		switch (lpdis->itemID)
 		{
-		case 0:
+		case REPEATED:
 			//			cbr = &m_brRed;
 			txtColor = RGB(255, 0, 0, );
 			pC = L" Teljes táblázat";
 			break;
 
-		case 1:
+		case NOTREPEATED:
 			//			cbr = &m_brYellow;
 			txtColor = RGB(0, 0, 255);
 			pC = L" Ismétlések nélkül";
@@ -354,7 +331,7 @@ void CDescendantsLinearTable::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItem
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 LRESULT CDescendantsLinearTable::OnReloadListCtrl(WPARAM wParam, LPARAM lParam)//wparam: F vagy Q tábla, lparam: az CLIstCtrl*
 {
-	if (wParam == FULL)
+	if (wParam == REPEATED)
 		fullTable();
 	else
 		uniqueTable();
@@ -381,7 +358,7 @@ void CDescendantsLinearTable::OnIndentedList()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsLinearTable::fullTable()
 {
-	m_TabCtrl.SetCurFocus( 0 );
+	m_TabCtrl.SetCurSel(REPEATED);
 	int nItem = 0;
 	CString gen;
 	CString people;
@@ -401,9 +378,10 @@ void CDescendantsLinearTable::fullTable()
 	for (int i = 0; i < vDesc->size(); ++i)
 	{
 		desc = vDesc->at(i);
-		if (desc.id == -1) goto cont;
+		if (desc.id == -1) 
+			goto cont;
 
-		if ( p_lastname == 2 && desc.lastname != m_lastnamePrev)
+		if ( p_descendantName == DE::RAISED && desc.lastname != m_lastnamePrev)
 		{
 			m_lastnamePrev = desc.lastname;
 
@@ -483,7 +461,7 @@ cont:	wndP.StepIt();
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsLinearTable::uniqueTable()
 {
-	m_TabCtrl.SetCurFocus(1);
+	m_TabCtrl.SetCurSel(NOTREPEATED);
 	int nItem = 0;
 	CString gen;
 	CString people;
@@ -505,7 +483,7 @@ void CDescendantsLinearTable::uniqueTable()
 		desc = vDesc->at(i);
 		if (desc.id == -1) goto cont;
 		if (desc.cntRep > 1 ) goto cont;
-		if (p_lastname == 2 && desc.lastname != m_lastnamePrev)
+		if (p_descendantName == DE::RAISED && desc.lastname != m_lastnamePrev)
 		{
 			m_lastnamePrev = desc.lastname;
 
@@ -514,7 +492,7 @@ void CDescendantsLinearTable::uniqueTable()
 			m_ListCtrl->SetItemText(nItem, L_CLRTEXT, L"");
 			m_ListCtrl->SetItemText(nItem, L_LINENUMBER, L"");
 			m_ListCtrl->SetItemText(nItem, L_NUMOFD, L"");
-			m_ListCtrl->SetItemText(nItem, L_ISM, L"");
+	//		m_ListCtrl->SetItemText(nItem, L_ISM, L"");
 			m_ListCtrl->SetItemText(nItem, L_ID, L"");
 			m_ListCtrl->SetItemText(nItem, L_IDC, L"");
 			m_ListCtrl->SetItemText(nItem, L_IDF, L"");
@@ -540,6 +518,7 @@ void CDescendantsLinearTable::uniqueTable()
 		if (desc.nOfD)
 			str.Format(L"%d", desc.nOfD);
 		m_ListCtrl->SetItemText(nItem, L_NUMOFD, str);
+
 
 		str.Empty();
 		if (desc.cntRep)
@@ -596,7 +575,7 @@ CString CDescendantsLinearTable::getComplexDescriptionL(int i, bool parentIndex)
 
 	people.Trim();
 	people += L" ";
-	people += spouses;
+	people += spouses.Trim();
 	people.Trim();
 
 	if (!p.arm.IsEmpty())
@@ -607,11 +586,13 @@ CString CDescendantsLinearTable::getComplexDescriptionL(int i, bool parentIndex)
 	{
 		people += p.csalad;
 	}
+/*
 	if (!p.folyt.IsEmpty() && p_folyt)
 	{
 		folyt.Format(L"%c%c%c folyt %s", '%', '%', '%', p.folyt);
 		people += folyt;
 	}
+*/
 	return people;
 }
 
@@ -634,7 +615,7 @@ CString CDescendantsLinearTable::createDescendantL(int i, bool parentIndex)
 	TCHAR ch;
 
 	name = p.first_name;
-	if (p_radioDNameX == 1)
+	if (p_descendantName == DE::INLINE)
 	{
 		lastname = p.last_name;
 		if (lastname == L"N") lastname.Empty();
@@ -694,13 +675,11 @@ CString CDescendantsLinearTable::createDescendantL(int i, bool parentIndex)
 	if (!p.posterior.IsEmpty())
 	{
 		name += p.posterior;
-		if (p_checkCRLF)
-			name += L"\n";
 	}
 
 
 	str = getPlaceDateBlock(p.birth_place, p.birth_date, L"*");
-	line = name;
+	line = name.Trim();
 	if (!str.IsEmpty())
 		line.Format(L"%s %s", name, str);
 
@@ -776,7 +755,7 @@ CString CDescendantsLinearTable::createSpousesL(int i)
 				spouses += spouse;
 			if (!spRelatives.IsEmpty())
 				spouses += spRelatives;
-			spouses += L" ";
+//			spouses += L" ";
 		}
 	}
 	spouses.Trim();
@@ -856,8 +835,8 @@ CString CDescendantsLinearTable::createSpouseL()
 	{
 		fullname += L" ";
 		fullname += s.posterior;
-		if (p_checkCRLF)
-			fullname += L"\n";
+//		if (p_checkCRLF)
+//			fullname += L"\n";
 	}
 	fullname.Trim();
 	spouse = fullname;
@@ -871,7 +850,7 @@ CString CDescendantsLinearTable::createSpouseL()
 	if (!str.IsEmpty())
 		spouse.Format(L"%s %s", (CString)spouse, str);
 
-	//str = getColoredString(s.comment, p_comboComment);
+	//str = getColoredString(s.comment, p_commentAttrib);
 	str = s.comment;
 	if (!str.IsEmpty())
 	{
@@ -990,4 +969,5 @@ CString CDescendantsLinearTable::getSeededName(int i)
 	}
 	return familyname;
 }
+
 

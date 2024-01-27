@@ -21,21 +21,27 @@ bool sortById1(const DE::DESC& d1, const DE::DESC& d2 )
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsLinearTable::OnHtmlListaPrintable()
 {
-	if (m_TabCtrl.GetCurSel() == FULL)
-		createHtmlFile(0, FULL_P);
-	else
-		createHtmlFile(0, UNIQUE_P);
+	createHtmlFile( PRINTABLE, REPEATED);
+	
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsLinearTable::OnHtmlListaFix()
 {
-	if (m_TabCtrl.GetCurSel() == FULL)
-		createHtmlFile(1, FULL);
-	else
-		createHtmlFile(1, UNIQUE);
+	createHtmlFile( NOTPRINTABLE, REPEATED);
 }
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDescendantsLinearTable::OnHtmllistFixNorep()
+{
+	createHtmlFile( NOTPRINTABLE, NOTREPEATED);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDescendantsLinearTable::OnHtmllistPrNorep()
+{
+	createHtmlFile( PRINTABLE, NOTREPEATED);
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CDescendantsLinearTable::createHtmlFile(int i, int which)
+bool CDescendantsLinearTable::createHtmlFile(bool printable, bool repeated)
 {
 	CString filename;
 	CString title;
@@ -53,49 +59,56 @@ bool CDescendantsLinearTable::createHtmlFile(int i, int which)
 
 	if (theApp.v_tableNumbers.size())
 	{
-		m_command.Format(L"SELECT familyName, tableHeader, tableRoman FROM tables WHERE rowid ='%s'", theApp.v_tableNumbers.at(i));
+
+		// ennek utána kell nézni, milyen tablenumber-re kérdezzen le
+		m_command.Format(L"SELECT familyName, tableHeader, tableRoman FROM tables WHERE rowid ='%s'", theApp.v_tableNumbers.at(0));
 		if (!query(m_command)) return false;
 		familyName = rs.GetFieldString(0);
 		tableRoman = rs.GetFieldString(2);
-		if (i)
-			title.Format(L"%s %s lineáris leszármazotti tábla", familyName, tableRoman);
+		if (printable)
+		{
+			if (repeated)
+				title.Format(L"%s %s nyomtatható lineáris leszármazotti tábla ismétlésekkel", familyName, tableRoman);
+			else
+				title.Format(L"%s %s nyomtatható lineáris leszármazotti tábla ismétlések nélkül", familyName, tableRoman);
+		}
 		else
-			title.Format(L"%s %s nyomtatható lineáris leszármazotti tábla", familyName, tableRoman);
+		{
+			if (repeated)
+				title.Format(L"%s %s lineáris leszármazotti tábla ismétlésekkel", familyName, tableRoman);
+			else
+				title.Format(L"%s %s lineáris leszármazotti tábla ismétlések nélkül", familyName, tableRoman);
+		}
 	}
 	else
 	{
-		if( i )
-			title.Format(L"%s lineáris leszármazotti táblája", m_name );
+		if (printable)
+		{
+			if (repeated)
+				title.Format(L"%s nyomtatható lineáris leszármazotti tábla ismétlésekkel", m_name);
+			else
+				title.Format(L"%s nyomtatható lineáris leszármazotti tábla ismétlések nélkül", m_name);
+		}
 		else
-			title.Format(L"%s nyomtatható lineáris leszármazotti táblája", m_name);
+		{
+			if (repeated)
+				title.Format(L"%s lineáris leszármazotti táblája ismétlésekkel", m_name);
+			else
+				title.Format(L"%s lineáris leszármazotti táblája ismétlések nélkül", m_name);
+		}
 	}
-
-
 	descendantsTablePathName.Format(L"%s\\%s_%s.html", m_descendantsPath, title, getTimeTag());
 	if (!openFileSpec(&fhDescTable, descendantsTablePathName, L"w+")) return false;
 
-	print(L"<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">");
-	print(L"<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\"><head>" );
+	print(L"<!DOCTYPE html>");
+	print(L"<html xml:lang=\"en\"><head>");
 	str.Format(L"<title>%s</title>", title);
 	print(str);
-	print(L"<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\" />");
+	print(L"<meta charset=UTF-8>");
 	print(L"<meta http-equiv=\"language\" content=\"en-us\"/>");
+
 	print(L"<script type=\"text/javascript\">");
 	print(L"<meta name=\"viewport\" content =\"width=device-width, initial-scale=1\">");
-
-	print(L"/\* http://www.alistapart.com/articles/zebratables/ */");
-	print(L"function removeClassName (elem, className) {");
-	print(L"	elem.className = elem.className.replace(className, \"\").trim();");
-	print(L"}\n");
-
-	print(L"function addCSSClass (elem, className) {");
-	print(L"	removeClassName (elem, className);");
-	print(L"	elem.className = (elem.className + \" \" + className).trim();");
-	print(L"}\n");
-
-	print(L"String.prototype.trim = function() {");
-	print(L"	return this.replace( /^\\s+|\\s+$/, \"\" );");
-	print(L"}\n");
 
 	print(L"function stripedTable() {");
 	print(L"	if (document.getElementById && document.getElementsByTagName) {");
@@ -103,7 +116,7 @@ bool CDescendantsLinearTable::createHtmlFile(int i, int which)
 	print(L"		if (!allTables) { return; }\n");
 
 	print(L"		for (var i = 0; i < allTables.length; i++) {");
-	print(L"			if (allTables[i].className.match(/[\\w\\s ]*scrollTable[\\w\\s ]*/)) {");
+	print(L"			if (allTables[i].className.match(/[\\w\\s ]*scrollTable[\\w\\s ])) {");
 	print(L"				var trs = allTables[i].getElementsByTagName(\"tr\");");
 
 	print(L"				for (var j = 0; j < trs.length; j++) {");
@@ -120,52 +133,9 @@ bool CDescendantsLinearTable::createHtmlFile(int i, int which)
 	print(L"}\n");
 
 	print(L"window.onload = function() { stripedTable(); }");
-	print(L"-->");
 	print(L"</script>");
 
 	print(L"<style type=\"text/css\">");
-	//	print(L"<!--");
-	print(L"/* Terence Ordona, portal[AT]imaputz[DOT]com         */");
-	print(L"/* http://creativecommons.org/licenses/by-sa/2.0/    */\n");
-
-	print(L"/* begin some basic styling here                     */");
-
-	print(L"fB{ font color= \"blue\"; }");
-	print(L"body {");
-	print(L"	background: #FFF;");
-	print(L"	color: #000;");
-	print(L"	font: normal normal 12px Verdana, Geneva, Arial, Helvetica, sans-serif;");
-	print(L"	margin: 10px;");
-	print(L"	padding: 0");
-	print(L"}\n");
-
-	print(L"table, th, a {");
-	print(L"	color: #000;");
-	print(L"	font: normal old 12px Verdana, Geneva, Arial, Helvetica, sans-serif");
-	print(L"}\n");
-
-
-	print(L"table, td, a {");
-	print(L"	color: #000;");
-	print(L"	font: normal normal 12px Verdana, Geneva, Arial, Helvetica, sans-serif");
-	print(L"}\n");
-
-	print(L"h1 {");
-	print(L"	font: normal normal 18px Verdana, Geneva, Arial, Helvetica, sans-serif;");
-	print(L"	margin: 0 0 5px 0");
-	print(L"}\n");
-
-	print(L"h2 {");
-	print(L"	font: normal normal 16px Verdana, Geneva, Arial, Helvetica, sans-serif;");
-	print(L"	margin: 0 0 5px 0");
-	print(L"}\n");
-
-	print(L"h3 {");
-	print(L"	font: normal normal 13px Verdana, Geneva, Arial, Helvetica, sans-serif;");
-	print(L"	color: #008000;");
-	print(L"	margin: 0 0 15px 0");
-	print(L"}");
-	print(L"/* end basic styling                                 */\n");
 
 	print(L"/* define height and width of scrollable area. Add 16px to width for scrollbar*/");
 	print(L"div.tableContainer {");
@@ -185,17 +155,20 @@ bool CDescendantsLinearTable::createHtmlFile(int i, int which)
 	print(L"/* In WinIE 6.x, any element with a position property set to relative and is a child of       */");
 	print(L"/* an element that has an overflow property set, the relative value translates into fixed.    */");
 	print(L"/* Ex: parent element DIV with a class of tableContainer has an overflow property set to auto */");
+
 	print(L"thead.fixedHeader tr {");
 	print(L"	position: relative");
 	print(L"}\n");
 
 	print(L"/* set THEAD element to have block level attributes. All other non-IE browsers            */");
 	print(L"/* this enables overflow to work on TBODY element. All other non-IE, non-Mozilla browsers */");
+
 	print(L"html>body thead.fixedHeader tr {");
 	print(L"	display: block");
 	print(L"}\n");
 
 	print(L"/* make the TH elements pretty */");
+	/* A táblafejléce barna lesz */
 	print(L"thead.fixedHeader th {");
 	print(L"	color: black;");
 	print(L"	background: AntiqueWhite;");
@@ -207,7 +180,7 @@ bool CDescendantsLinearTable::createHtmlFile(int i, int which)
 	print(L"	padding: 4px 3px;");
 	print(L"	text-align: center");
 	print(L"}\n");
-
+	/* a tábla kerete barna lesz */
 	print(L"/* make the A elements pretty. makes for nice clickable headers                */");
 	print(L"thead.fixedHeader a, thead.fixedHeader a:link, thead.fixedHeader a:visited {");
 	print(L"	display: block;");
@@ -215,8 +188,7 @@ bool CDescendantsLinearTable::createHtmlFile(int i, int which)
 	print(L"	width: 100%");
 	print(L"}\n");
 
-	print(L"/* make the A elements pretty. makes for nice clickable headers                */");
-	print(L"/* WARNING: swapping the background on hover may cause problems in WinIE 6.x   */");
+
 	print(L"thead.fixedHeader a:hover{");
 	print(L"	display: block;");
 	print(L"	text-decoration: underline;");
@@ -227,10 +199,11 @@ bool CDescendantsLinearTable::createHtmlFile(int i, int which)
 	print(L"/* set TBODY element to have block level attributes. All other non-IE browsers            */");
 	print(L"/* this enables overflow to work on TBODY element. All other non-IE, non-Mozilla browsers */");
 	print(L"/* induced side effect is that child TDs no longer accept width: auto                     */");
+
 	print(L"html>body tbody.scrollContent {");
 	print(L"	display: block;");
 
-	if (which == UNIQUE || which == FULL)  // vagyis fix fejléc, nem nyomtatható
+	if (!printable)  // vagyis fix fejléc, nem nyomtatható
 	{
 		str.Format(L"    height: %dpx;", height);
 		print(str);
@@ -244,6 +217,7 @@ bool CDescendantsLinearTable::createHtmlFile(int i, int which)
 	print(L"/* make TD elements pretty. Provide alternating classes for striping the table */");
 	print(L"/* http://www.alistapart.com/articles/zebratables/                             */");
 
+	/* A tálázat belsõ vonalai */
 	print(L"tbody.scrollContent td, tbody.scrollContent tr.normalRow td {");
 	print(L"	border-bottom: none;");
 	print(L"	border-left: none;");
@@ -260,51 +234,87 @@ bool CDescendantsLinearTable::createHtmlFile(int i, int which)
 	print(L"	padding: 2px 3px 3px 4px");
 	print(L"}\n");
 
-
 	print(L"/* define width of TD elements: 1st, 2nd, and 3rd respectively.          */");
 	print(L"/* All other non-IE browsers.                                            */");
 	print(L"/* http://www.w3.org/TR/REC-CSS2/selector.html#adjacent-selectors        */");
 
-	print(L"html>body tbody.scrollContent td {");
-	print(L"	width: 45px");
-	print(L"}\n");
+	if (repeated)
+	{
+		print(L"html>body tbody.scrollContent td {");
+		print(L"	width: 45px");
+		print(L"}\n");
 
+		print(L"html>body tbody.scrollContent td + td {");
+		print(L"	width: 20px");
+		print(L"}\n");
 
-	print(L"html>body tbody.scrollContent td + td {");
-	print(L"	width: 20px");
-	print(L"}\n");
+		print(L"html>body tbody.scrollContent td + td + td {");
+		print(L"	width: 35px");
+		print(L"}\n");
 
-	print(L"html>body tbody.scrollContent td + td + td {");
-	print(L"	width: 35px");
-	print(L"}\n");
+		print(L"html>body tbody.scrollContent td + td + td + td {");
+		print(L"	width: 55px");
+		print(L"}");
 
-	print(L"html>body tbody.scrollContent td + td + td + td {");
-	print(L"	width: 55px");
-	print(L"}");
+		print(L"html>body tbody.scrollContent td + td + td + td + td{");
+		print(L"	width: 55px");
+		print(L"}");
 
-	print(L"html>body tbody.scrollContent td + td + td + td + td{");
-	print(L"	width: 55px");
-	print(L"}");
+		print(L"html>body tbody.scrollContent td + td + td + td + td + td{");
+		print(L"	width: 20px");
+		print(L"}");
 
-	print(L"html>body tbody.scrollContent td + td + td + td + td + td{");
-	print(L"	width: 20px");
-	print(L"}");
+		print(L"html>body tbody.scrollContent td + td + td + td + td + td + td{");
+		print(L"	width: 55px");
+		print(L"}");
 
-	print(L"html>body tbody.scrollContent td + td + td + td + td + td + td{");
-	print(L"	width: 55px");
-	print(L"}");
+		print(L"html>body tbody.scrollContent td + td + td + td + td + td + td + td{");
+		print(L"	width: 55px");
+		print(L"}");
 
-	print(L"html>body tbody.scrollContent td + td + td + td + td + td + td + td{");
-	print(L"	width: 55px");
-	print(L"}");
+		print(L"html>body tbody.scrollContent td + td + td + td + td + td + td + td + td{");
+		str.Format(L"width: %dpx", width - (45 + 4 * 55 + 35 + +2 * 20 + 120));
+		print(str);
+		print(L"}");
+	}
+	else
+	{
+		print(L"html>body tbody.scrollContent td {");
+		print(L"	width: 45px");
+		print(L"}\n");
 
-	print(L"html>body tbody.scrollContent td + td + td + td + td + td + td + td + td{");
-	str.Format(L"width: %dpx", width - (45 + 4 * 55 + 35 + + 2*20 + 120));
-	print(str);
-	print(L"}");
+		print(L"html>body tbody.scrollContent td + td {");
+		print(L"	width: 35px");
+		print(L"}\n");
 
+		print(L"html>body tbody.scrollContent td + td + td {");
+		print(L"	width: 55px");
+		print(L"}");
+
+		print(L"html>body tbody.scrollContent td + td + td + td{");
+		print(L"	width: 55px");
+		print(L"}");
+
+		print(L"html>body tbody.scrollContent td + td + td + td + td{");
+		print(L"	width: 20px");
+		print(L"}");
+
+		print(L"html>body tbody.scrollContent td + td + td + td + td + td{");
+		print(L"	width: 55px");
+		print(L"}");
+
+		print(L"html>body tbody.scrollContent td + td + td + td + td + td + td{");
+		print(L"	width: 55px");
+		print(L"}");
+
+		print(L"html>body tbody.scrollContent td + td + td + td + td + td + td + td{");
+		str.Format(L"width: %dpx", width - (45 + 4 * 55 + 35 + + 20 + 120));
+		print(str);
+		print(L"}");
+	}
 
 	print(L"</style>");
+
 	print(L"</head><body>\n");
 
 	printTopContainer(title);
@@ -316,7 +326,8 @@ bool CDescendantsLinearTable::createHtmlFile(int i, int which)
 	print(L"<tr>");
 
 	print(L"<th style=\"width: 45px\">desc</th>");
-	print(L"<th style=\"width: 20px\">I</th>");
+	if( repeated )
+		print(L"<th style=\"width: 20px\">I</th>");
 	print(L"<th style=\"width: 35px\">id</th>");
 	print(L"<th style=\"width: 55px\">gyerek<br>id</th>");
 	print(L"<th style=\"width: 55px\">szülõ<br>id</th>");
@@ -330,7 +341,7 @@ bool CDescendantsLinearTable::createHtmlFile(int i, int which)
 	print(L"</thead>");
 	print(L"<tbody class=\"scrollContent\">");
 
-	dataTable();
+	dataTable(repeated);
 
 	print(L"</tbody>");
 	print(L"</table>");
@@ -346,7 +357,7 @@ bool CDescendantsLinearTable::createHtmlFile(int i, int which)
 	return true;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsLinearTable::dataTable()
+void CDescendantsLinearTable::dataTable( bool repeated)
 {
 	DE::DESC desc;
 	CString rowidF;
@@ -451,7 +462,7 @@ void CDescendantsLinearTable::dataTable()
 		desc = vDesc->at(i);
 		if (desc.id < 0) continue;
 
-		printDesc(i);
+		printDesc(i, repeated);
 	}
 
 /*
@@ -477,7 +488,7 @@ void CDescendantsLinearTable::dataTable()
 	wndP.DestroyWindow();
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsLinearTable::printDesc( int i  )
+void CDescendantsLinearTable::printDesc( int i, bool repeated  )
 {
 	DE::DESC desc = vDesc->at(i);
 
@@ -532,7 +543,7 @@ void CDescendantsLinearTable::printDesc( int i  )
 	if (desc.cntRep)
 		rep.Format(L"%d", desc.cntRep);
 
-	if (p_lastname == 2 && m_familyName != desc.lastname )  // kiemelt családnév
+	if (p_descendantName == DE::RAISED && m_familyName != desc.lastname )  // kiemelt családnév
 	{
 		str = getSeededName(i);
 		family = getColoredString(str, DE::KEK);
@@ -540,7 +551,8 @@ void CDescendantsLinearTable::printDesc( int i  )
 		str.Format(L"<td>%s</td>", L"");
 		print(L"<tr>");
 		print(str);
-		print(str);
+		if( repeated )
+			print(str);
 		print(str);
 		print(str);
 		print(str);
@@ -564,8 +576,11 @@ void CDescendantsLinearTable::printDesc( int i  )
 
 	str.Format(L"<td><center>%d</center></td>", desc.nOfD);
 	print(str);
-	str.Format(L"<td><center>%s</center></td>", rep);
-	print(str);
+	if (repeated)
+	{
+		str.Format(L"<td><center>%s</center></td>", rep);
+		print(str);
+	}
 	str.Format(L"<td><center>%d</center></td>", desc.id);
 	print(str);
 	str.Format(L"<td><center>%s</center></td>", idC);
@@ -611,11 +626,13 @@ CString CDescendantsLinearTable::getComplexDescription(int i, bool parentIndex )
 		csalad.Format(L" <font color='blue'>[%s]</font>", p.csalad);
 		people += csalad;
 	}
+/*
 	if (!p.folyt.IsEmpty() && p_folyt )
 	{
 		folyt.Format(L"<font color='blue'> %c%c%c folyt %s</font>", '%', '%', '%', p.folyt);
 		people += folyt;
 	}
+*/
 	return people;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -640,6 +657,7 @@ bool CDescendantsLinearTable::printTopContainer(CString title)
 		nok = L"nem";
 
 	CString kihagy;
+/*
 	switch (p_repeated)
 	{
 	case 0:
@@ -651,12 +669,12 @@ bool CDescendantsLinearTable::printTopContainer(CString title)
 	case 2:
 		kihagy = L"Ha az apja leszármazott, akkor kiírja, ha az anyja, akkor nem";
 	}
-
+*/
 	CString maxGen;
-	if (p_editGenMax.IsEmpty())
-		maxGen = L"minden generáció";
-	else
-		maxGen = p_editGenMax;
+//	if (p_generationMax.IsEmpty())
+//		maxGen = L"minden generáció";
+//	else
+//		maxGen = p_generationMax;
 
 	CString inputFile;
 	CString created;
@@ -727,7 +745,7 @@ bool CDescendantsLinearTable::printTopContainer(CString title)
 	//	print(str);
 
 	CString sorrend;
-	switch (p_radioOrder)
+	switch (p_childrenOrder)
 	{
 	case DE::ORDER_INPUT:
 		sorrend = L"bementi sorrend";
@@ -869,7 +887,7 @@ CString CDescendantsLinearTable::getPlaceDateBlock(CString place, CString date, 
 	if (!place.IsEmpty() || !date.IsEmpty())
 	{
 		block = jel;
-//		block = getColoredString(jel, p_comboSpec);
+		block = getColoredString(jel, p_specAttrib);
 		if (!place.IsEmpty())
 		{
 			block += place;
@@ -899,11 +917,8 @@ CString CDescendantsLinearTable::getLastFirst(DE::PPEOPLE* p, bool style ) // há
 	{
 		name += L" ";
 		name += p->first_name;
-		if (p_html)
-		{
-			if( style )
-				name = getColoredString(name, p_comboOtherName);
-		}
+		if( style )
+			name = getColoredString(name, p_otherNameAttrib);
 	}
 	if (!p->peer.IsEmpty())
 		name.Format(L"%s %s", p->peer, (CString)name);
@@ -915,20 +930,12 @@ CString CDescendantsLinearTable::getLastFirst(DE::PPEOPLE* p, bool style ) // há
 CString CDescendantsLinearTable::getTableHeader()
 {
 	CString last_name;
-//	CString percent;
-//	CString family;
-//	CString roman;
-//	CString arm;
 	CString tableHeader;
 
 
 	m_command.Format(L"SELECT percent, familyName, tableRoman, arm, tableHeader FROM tables WHERE rowid='%s'", p.tableNumber);
 	if (!query(m_command)) return str;
 
-//	percent = rs.GetFieldString(0);
-//	family = rs.GetFieldString(1);
-//	roman = rs.GetFieldString(2);
-// 	arm = rs.GetFieldString(3);
 	tableHeader = rs.GetFieldString(4);
 	last_name = p.last_name;
 	last_name.MakeUpper();
@@ -959,7 +966,7 @@ CString CDescendantsLinearTable::createDescendant(int i, bool parentIndex)
 	TCHAR ch;
 
 	name = p.first_name;
-	if (p_radioDNameX == 1)
+	if (p_descendantName == DE::INLINE)
 	{
 		lastname = p.last_name;
 		if (lastname == L"N") lastname.Empty();
@@ -975,7 +982,7 @@ CString CDescendantsLinearTable::createDescendant(int i, bool parentIndex)
 		if (!p.other_names.IsEmpty())
 			name.Format(L"\n%s_(%s)", (CString)name, p.other_names);
 	}
-	name = getColoredString(name, p_comboDAttrib );
+	name = getColoredString(name, p_descendantAttrib );
 
 
 
@@ -1023,8 +1030,8 @@ CString CDescendantsLinearTable::createDescendant(int i, bool parentIndex)
 	if (!p.posterior.IsEmpty())
 	{
 		name += p.posterior;
-		if (p_checkCRLF)
-			name += L"\n";
+//		if (p_checkCRLF)
+//			name += L"\n";
 	}
 
 
@@ -1051,7 +1058,7 @@ CString CDescendantsLinearTable::createDescendant(int i, bool parentIndex)
 			str = p.occupation;
 	}
 
-	comment = getColoredString(str, p_comboComment);
+	comment = getColoredString(str, p_commentAttrib);
 	if (str.GetAt(0) == ',')
 		line.Format(L"%s%s", (CString)line, comment);
 	else
@@ -1071,6 +1078,7 @@ CString CDescendantsLinearTable::createDescendant(int i, bool parentIndex)
 			break;
 		}
 	}
+
 	++m_listedP;
 	++m_listedD;
 	return(line);
@@ -1130,8 +1138,8 @@ CString CDescendantsLinearTable::createMarriage(CString place, CString date, int
 		str.Format(L" %d=", i + 1);
 	else
 		str = L" =";
-
-	marriage = getColoredString(str, p_comboSpec);
+	marriage = str;
+	marriage = getColoredString(str, p_specAttrib);
 
 	if (!place.IsEmpty())
 	{
@@ -1181,7 +1189,7 @@ CString CDescendantsLinearTable::createSpouse()
 		fullname += s.first_name;
 	}
 	fullname.Trim();
-	fullname = getColoredString(fullname, p_comboOtherName );
+	fullname = getColoredString(fullname, p_otherNameAttrib );
 
 	// Ellenõrti, hogy ilyen néven már listázott-e házastársat. Ha igen, akkoe színezi
 	for (int i = 0; i < vFullname.size(); ++i)
@@ -1206,8 +1214,8 @@ CString CDescendantsLinearTable::createSpouse()
 	{
 		fullname += L" ";
 		fullname += s.posterior;
-		if (p_checkCRLF)
-			fullname += L"\n";
+//		if (p_checkCRLF)
+//			fullname += L"\n";
 	}
 	fullname.Trim();
 	spouse = fullname;
@@ -1221,7 +1229,8 @@ CString CDescendantsLinearTable::createSpouse()
 	if (!str.IsEmpty())
 		spouse.Format(L"%s %s", (CString)spouse, str);
 
-	str = getColoredString(s.comment, p_comboComment );
+/*
+	str = getColoredString(s.comment, p_commentAttrib );
 	if (!str.IsEmpty())
 	{
 		if (s.comment.GetAt(0) == ',')
@@ -1229,7 +1238,7 @@ CString CDescendantsLinearTable::createSpouse()
 		else
 			spouse.Format(L"%s %s", (CString)spouse, str);
 	}
-
+*/
 	++m_listedP;
 	return spouse;
 }
@@ -1253,7 +1262,8 @@ CString CDescendantsLinearTable::createSpRelatives()
 		sf.first_name.Replace('-', ' ');
 		str = getFirstWord(sf.first_name);
 
-		father = getColoredString(str, p_comboOtherName );
+
+		father = getColoredString(str, p_otherNameAttrib );
 		//		if (!sf.peer.IsEmpty())
 		//			father.Format(L"%s %s", sf.peer, (CString)father);
 

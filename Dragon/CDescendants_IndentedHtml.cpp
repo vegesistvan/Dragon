@@ -40,14 +40,14 @@ void CDescendants::printVector( int tbl)
 
 	int ix;
 
-	if (p_numbering == DE::SZLUHA) // orderd list
+	if (p_numberingSystem == DE::SZLUHA) // orderd list
 	{
-		m_tag1 = L"<ol>";
+		m_tag1 = L"<ol>\n";
 		m_tag2 = L"</ol>\n";
 	}
 	else				// unordered list
 	{
-		m_tag1 = L"<ul>";
+		m_tag1 = L"<ul>\n";
 		m_tag2 = L"</ul>\n";
 	}
 
@@ -128,7 +128,7 @@ void CDescendants::printBegining(int i)
 		gen = TCHAR('a') + bias;
 
 	// Kiemelt családnév //////////////////////////////////////
-	if (p_lastname == 2) 
+	if (p_descendantName == DE::RAISED ) 
 	{
 		if (m_familyName != p.last_name)
 		{
@@ -159,11 +159,11 @@ void CDescendants::printBegining(int i)
 		}
 	}
 	/////leszármazott sorának kezedete /////////////////////////////////////////////
-	if (p_numbering == DE::SZLUHA)
+	if (p_numberingSystem == DE::SZLUHA)
 		str.Format(L"%s<li>%c&diams;", shift, gen);
-	else if (p_numbering == DE::VIL)
+	else if (p_numberingSystem == DE::VIL)
 		str.Format(L"%s<li>%c%d&diams;", shift, gen, vDesc.at(i).childorder);
-	else if (p_numbering == DE::TUP)
+	else if (p_numberingSystem == DE::TUP)
 	{
 		z = vSerial.size() - 1;
 		if (g < z)
@@ -237,7 +237,7 @@ CString CDescendants::createDescendant(int i, bool parentIndex )
 	TCHAR ch;
 
 	name = p.first_name;
-	if (p_lastname == 1)
+	if (p_descendantName == DE::INLINE)
 	{
 		lastname = p.last_name;
 		if (lastname == L"N") lastname.Empty();
@@ -253,7 +253,7 @@ CString CDescendants::createDescendant(int i, bool parentIndex )
 		if (!p.other_names.IsEmpty())
 			name.Format(L"\n%s_(%s)", (CString)name, p.other_names);
 	}
-	name = getColoredString(name, p_descStyle);
+	name = getColoredString(name, p_descendantAttrib);
 	
 
 
@@ -326,7 +326,7 @@ CString CDescendants::createDescendant(int i, bool parentIndex )
 			str = p.occupation;
 	}
 
-	comment = getColoredString(str, p_commentStyle);
+	comment = getColoredString(str, p_commentAttrib);
 	comment.Trim();
 	if (str.GetAt(0) == ',')
 		line.Format(L"%s%s", (CString)line, comment);
@@ -413,7 +413,7 @@ CString CDescendants::createMarriage(CString place, CString date, int i, int num
 	else
 		str = L" =";
 
-	marriage = getColoredString(str, p_specStyle);
+	marriage = getColoredString(str, p_specAttrib);
 
 	if (!place.IsEmpty())
 	{
@@ -463,7 +463,7 @@ CString CDescendants::createSpouse()
 		fullname += s.first_name;
 	}
 	fullname.Trim();
-	fullname = getColoredString(fullname, p_otherNameStyle);
+	fullname = getColoredString(fullname, p_otherNameAttrib);
 
 	// Ellenõrti, hogy ilyen néven már listázott-e házastársat. Ha igen, akkoe színezi
 	for (int i = 0; i < vFullname.size(); ++i)
@@ -503,7 +503,7 @@ CString CDescendants::createSpouse()
 	if (!str.IsEmpty())
 		spouse.Format(L"%s %s", (CString)spouse, str);
 
-	str = getColoredString(s.comment, p_commentStyle);
+	str = getColoredString(s.comment, p_commentAttrib);
 	if (!str.IsEmpty())
 	{
 		if (s.comment.GetAt(0) == ',')
@@ -535,7 +535,7 @@ CString CDescendants::createSpRelatives()
 		sf.first_name.Replace('-', ' ');
 		str = getFirstWord(sf.first_name);
 
-		father = getColoredString(str, p_otherNameStyle);
+		father = getColoredString(str, p_otherNameAttrib);
 		//		if (!sf.peer.IsEmpty())
 		//			father.Format(L"%s %s", sf.peer, (CString)father);
 
@@ -693,7 +693,7 @@ CString CDescendants::getPlaceDateBlock(CString place, CString date, CString jel
 	if (!place.IsEmpty() || !date.IsEmpty())
 	{
 		block = jel;
-		block = getColoredString(jel, p_specStyle );
+		block = getColoredString(jel, p_specAttrib );
 		if (!place.IsEmpty())
 		{
 			block += place;
@@ -723,8 +723,7 @@ CString CDescendants::getLastFirst(DE::PPEOPLE* p) // házatárs anyjának é stováb
 	{
 		name += L" ";
 		name += p->first_name;
-		if( p_html )
-			name = getColoredString(name, p_otherNameStyle);
+			name = getColoredString(name, p_otherNameAttrib);
 	}
 	if (!p->peer.IsEmpty())
 		name.Format(L"%s %s", p->peer, (CString)name);
@@ -782,10 +781,10 @@ BOOL CDescendants::openHtml(CString file, CString title, UINT colorBgrnd)
 	}
 
 	CString maxGen;
-	if (m_editGenMax.IsEmpty())
+	if (p_generationMax.IsEmpty())
 		maxGen = L"minden generáció";
 	else
-		maxGen = m_editGenMax;
+		maxGen = p_generationMax;
 
 	CString inputFile;
 	CString created;
@@ -835,7 +834,7 @@ BOOL CDescendants::openHtml(CString file, CString title, UINT colorBgrnd)
 
 	
 
-	print(L"<br><pre>");
+	print(L"<br>\n<pre>\n");
 	str.Format(L"%*s Dragon v. %s", l, L"Program:", theApp.m_version );
 	print(str);
 	str.Format(L"%*s %s", l, L"Dragon.exe készült:", MultiToUnicode(LPCSTR(BUILD)));
@@ -889,7 +888,7 @@ BOOL CDescendants::openHtml(CString file, CString title, UINT colorBgrnd)
 //	print(str);
 
 	CString sorrend;
-	switch (p_radioOrder)
+	switch (p_childrenOrder)
 	{
 	case DE::ORDER_INPUT:
 		sorrend = L"bementi sorrend";
@@ -926,8 +925,8 @@ void CDescendants::createStyle()
 {
 
 	fwprintf(fl, L"<style>\n");
-	if (m_editWidth != L"képernyõ" && m_editWidth != L"0")
-		fwprintf(fl, L"html{width:%scm;}\n", m_editWidth);
+	if (p_rowWidth != L"képernyõ" && p_rowWidth != L"0")
+		fwprintf(fl, L"html{width:%scm;}\n", p_rowWidth);
 
 
 	CString font;
@@ -937,7 +936,7 @@ void CDescendants::createStyle()
 	font = L"<body class=\"w3-container\">";
 	//	fwprintf( fl, L"%s\n", font );
 	CString fontSize;
-	fontSize.Format(L"body {font-size: %dpx;}", 10 + 2 * m_comboFontSize);
+	fontSize.Format(L"body {font-size: %dpx;}", 10 + 2 * p_fontSize);
 	fwprintf(fl, L"%s\n", fontSize);
 
 	//	fwprintf( fl, L"body {font-size: 10px;}" );

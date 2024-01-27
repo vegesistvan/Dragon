@@ -2,15 +2,8 @@
 #include "afxdialogex.h"
 #include "colorstatic.h"
 #include "colorbutton.h"
+#include "CDescendants.h"
 
-
-enum
-{
-	SZLUHAP = 0,
-	VILP,
-	TUPP,
-
-};
 
 class CDescendantsParamOld : public CDialogEx
 {
@@ -53,30 +46,32 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnInitDialog();
-	int m_radioDNameX;
-	int m_comboDAttrib;
-	int	m_comboOtherName;
-	int	m_comboSpec;
-	int	m_comboComment;
-	int	m_comboKiemeltAttrib;
-	int m_comboFontSize;
+	
+	CColorButton	colorBgn;
+	
+	int p_descendantName;
+	int p_descendantAttrib;
+	int	p_otherNameAttrib;
+	int	p_comboSpect;
+	int	p_commentAttrib;
+	int p_fontSize;
 	int m_html;
 
-	BOOL m_checkFolyt;
+	BOOL p_folyt;
 	BOOL p_capital;
 	BOOL p_bold;
 	BOOL p_connect;
 	BOOL p_womenDescendants;
 	BOOL m_ceckDeleteRepeated;
-	BOOL m_checkCRLF;
+	BOOL p_checkCRLF;
 
-	CComboBox m_combo_spec;
-	CComboBox m_combo_comment;
-	CComboBox m_combo_FontSize;
-	CComboBox m_combo_OtherName;
-	CComboBox m_combo_DAttrib;
+	CComboBox m_specAttribCombo;
+	CComboBox m__commentAttribCombo;
+	CComboBox m_fontSizeCombo;
+	CComboBox m_otherNameAttribCombo;
+	CComboBox m_descendantAttribCombo;
 
-	CButton m_RadioFamily;
+//	CButton m_RadioFamily;
 	CColorStatic colorFamilyInline;
 	CColorStatic colorFamilynameNo;
 	CColorStatic colorFamilynameUp;
@@ -89,18 +84,18 @@ public:
 	CColorStatic colorPrint;
 	CColorStatic colorOrder;
 
-	int		m_radioOrder;
-	int		m_radioNumbering;
-	int		m_repeated;
-	BOOL	m_oneFile;
+	int		p_childrenOrder;
+	int		p_numberingSystem;
+	int		p_repeated;
+	BOOL	p_oneOutputFile;
 
-	UINT	m_colorBgrnd;
+	UINT	p_colorBgrnd;
 	CColorStatic	colorBgrnd;
-	CColorButton	colorBgn;
-	CString m_editWidth;
-	CString m_editGenMax;
+	
+	CString p_rowWidth;
+	CString p_generationMax;
 
-	BOOL m_radioOne;
+	
 	
 	bool m_printed;
 	CString m_tableNumber;
@@ -112,7 +107,7 @@ public:
 	afx_msg void OnClickedRepeatedAll();
 	afx_msg void OnRepeatedFather();
 	afx_msg void OnRepeatedFirst();
-	BOOL m_repeatedColor;
+	BOOL p_repeatedColor;
 	CColorStatic colorRepeated;
 	afx_msg void OnPaint();
 	CComboBox m_comboHtmlTxt;
@@ -123,4 +118,5 @@ public:
 	afx_msg void OnOrderLength();
 	afx_msg void OnOrderDecreasing();
 	afx_msg void OnOrderBirth();
+	CButton m_descendantNameRadio;
 };

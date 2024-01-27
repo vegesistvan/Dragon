@@ -109,7 +109,7 @@ void CDescendants::printBeginingTxt(int i)
 		gen = TCHAR('a') + bias;
 
 	// Kiemelt családnév //////////////////////////////////////
-	if (p_lastname == 2)
+	if (p_descendantName == DE::RAISED)
 	{
 		if (m_familyName != p.last_name)
 		{
@@ -121,11 +121,11 @@ void CDescendants::printBeginingTxt(int i)
 		}
 	}
 	/////leszármazott sorának kezedete /////////////////////////////////////////////
-	if (p_numbering == DE::SZLUHA)
+	if (p_numberingSystem == DE::SZLUHA)
 		str.Format(L"%s%d. %c%lc", indent, vDesc.at(i).childorder, gen, diamond);
-	else if (p_numbering == DE::VIL)
+	else if (p_numberingSystem == DE::VIL)
 		str.Format(L"%s%c%d%lc", indent, gen, vDesc.at(i).childorder, diamond);
-	else if (p_numbering == DE::TUP)
+	else if (p_numberingSystem == DE::TUP)
 	{
 		z = vSerial.size() - 1;
 		if (g < z)
@@ -154,7 +154,7 @@ void CDescendants::printDescendantTxt(int i)
 	DE::LMX lmx;
 
 	name = p.first_name;
-	if (p_lastname == 1)
+	if (p_descendantName == DE::INLINE) 
 	{
 		lastname = p.last_name;
 		if (lastname == L"N") lastname.Empty();
@@ -484,10 +484,10 @@ bool CDescendants::openTxt( CString file, CString title )
 	}
 
 	CString maxGen;
-	if (m_editGenMax.IsEmpty())
+	if (p_generationMax.IsEmpty())
 		maxGen = L"minden generáció";
 	else
-		maxGen = m_editGenMax;
+		maxGen = p_generationMax;
 
 	CString inputFile;
 	CString created;

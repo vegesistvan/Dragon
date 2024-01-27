@@ -23,6 +23,8 @@ protected:
 	CString str;
 
 	FILE* flDesc;
+	std::vector<int> vid;
+
 	DECLARE_MESSAGE_MAP()
 public:
 //	CListCtrlEx m_ListCtrlF;
@@ -37,4 +39,9 @@ public:
 	afx_msg void OnKeressPrevious();
 	afx_msg void OnFunctionsDescendands();
 	afx_msg void OnFunctionsAscendants();
+	afx_msg void OnDescendantsMarked();
+	afx_msg void OnDescendantsListed();
+	afx_msg void OnAscendantsMarked();
+	afx_msg void OnAscendantsListed();
+	afx_msg void OnFunctionsNotepad();
 };

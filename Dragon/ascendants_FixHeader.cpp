@@ -4,10 +4,6 @@
 #include "ascendants.h"
 
 
-//void CAscendants::OnClickedFixheader()
-//{
-//	fixTableHeader();
-//}
 
 
 // A neten talált példa. Nem1 hívható, be kell indítani, ha látni akarod.

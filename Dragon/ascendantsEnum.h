@@ -3,6 +3,7 @@ enum
 {
 	U_TOGGLE = 0,		// hidden
 	U_MOREC,			// hidden
+	U_LINENUMBER,
 	U_CNT,
 	U_ISM,
 	U_SIBLINGS,
@@ -21,6 +22,7 @@ enum
 enum
 {
 	F_TOGGLE = 0,		// hidden
+	F_LINENUMBER,
 	F_SEX,
 	F_CNT,
 	F_ISM,
@@ -33,12 +35,19 @@ enum
 	F_COLOR,
 	F_NUMOFCOLUMNS
 };
+
 enum
 {
 	FULL = 0,
 	UNIQUE,
 	FULL_P,
 	UNIQUE_P
+};
+
+
+enum
+{
+
 };
 enum
 {

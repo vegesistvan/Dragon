@@ -1184,6 +1184,7 @@ void CDragApp::keress( CString search, CListCtrlEx* p_ListCtrl, int column, int 
 		}
 	}
 	wndProgress.DestroyWindow();
+	itemCnt = p_ListCtrl->GetItemCount();
 	if( 0 <= nItem && nItem < itemCnt -1 )			// megtalálta a keresett embert,. aki az nItem-1 sorban van
 	{
 		showItem( nItem, p_ListCtrl );
@@ -1205,20 +1206,20 @@ void CDragApp::keress( CString search, CListCtrlEx* p_ListCtrl, int column, int 
 // A p_ListCtrl-al megadott list control nItem-edik  sorát képbe hozza és kijelölöi
 void CDragApp::showItem( int nItem, CListCtrlEx* p_ListCtrl )
 {
-	int	itemCount	= p_ListCtrl->GetItemCount();	// összesen ennyi sor van
-	int topIndex	= p_ListCtrl->GetTopIndex();	// jelenleg ez van az ablak tetjén
-	int countPP		= p_ListCtrl->GetCountPerPage();// oldalanként ennyi sor van
-	int nVisible	= nItem;						// default láttatás
+	int	itemCount = p_ListCtrl->GetItemCount();	// összesen ennyi sor van
+	int topIndex = p_ListCtrl->GetTopIndex();	// jelenleg ez van az ablak tetjén
+	int countPP = p_ListCtrl->GetCountPerPage();// oldalanként ennyi sor van
+	int nVisible = nItem;						// default láttatás
 
-	if( nItem > topIndex )							// felhúzza a tábla tetejére, vagy ha már nincs annyi, akkor  a megtalált sort
+	if (nItem > topIndex)							// felhúzza a tábla tetejére, vagy ha már nincs annyi, akkor  a megtalált sort
 	{
-		if( (nItem + countPP) < itemCount ) 
+		if ((nItem + countPP) < itemCount)
 			nVisible = nItem + countPP - 1;
 		else
 			nVisible = itemCount - 1;
-	}																	
-	p_ListCtrl->EnsureVisible( nVisible, FALSE );
-	p_ListCtrl->SetItemState( nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED );
+	}
+	p_ListCtrl->EnsureVisible(nVisible, FALSE);
+	p_ListCtrl->SetItemState(nItem, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CDragApp::selectPeople( CString rowid, CString* linenumber )

@@ -124,6 +124,12 @@ namespace DE
 		ORDER_DECREASING
 	};
 
+	enum
+	{
+		NOINLINE = 0,
+		INLINE,
+		RAISED
+	};
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// leszármazotti listánál p, s, sf, sm, ss strukturák
 	typedef struct
@@ -191,37 +197,63 @@ public:
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
+	// paraméterek osztályai
+	CButton	m_descendantNameRadio;
+	CColorButton m_backgroundColor;
+	CComboBox m_specAttribCombo;
+	CComboBox m__commentAttribCombo;
+	CComboBox m_otherNameAttribCombo;
+	CComboBox m_descendantAttribCombo;
+	CComboBox m_fontSizeCombo;
+
+	
+	// Lineáris és tabulált listához is
+	
+	int		p_descendantName;
+	int		p_connect;
+	int		p_childrenOrder;
+	BOOL	p_womenDescendants;
+	CString	p_generationMax;
+	
+	// Csak a html listákhoz
+
+	int	p_descendantAttrib;
+	bool p_capital;
+	bool p_bold;
+	int	p_otherNameAttrib;
+	int	p_specAttrib;
+	int	p_commentAttrib;
+	int p_familyNameAttrib;
+
+	int	p_numberingSystem;		// leszármazottak számozása
+	int	p_repeated;
+	
+	UINT p_colorBgrnd;
+	
+	int p_fontSize;
+	bool p_capitalName;
+	BOOL p_folyt;
+	BOOL p_checkCRLF;
+	BOOL p_oneOutputFile;
+	BOOL p_repeatedColor;
+	CString p_rowWidth;
+
+
+////////////////////////////////////////////////////////////////////////////////////////
+	bool p_print;		// azonnal nyomtassa ki a leszármazottat, a már szükségtelen rekordokat dobja el a vDesc-bõl. Ez hiba kereséshez jó.
+	
 	CString str;
+	int m_generationMax;
 
-	int m_radioDNameX;
-	int m_comboDAttrib;
-	int	m_comboOtherName;
-	int	m_comboSpec;
-	int	m_comboComment;
-	int	m_comboKiemeltAttrib;
-	int m_comboFontSize;
-	int m_comboHtmlText;
-	int m_html;
-
-	BOOL m_checkFolyt;
-	BOOL p_capital;
-	BOOL p_bold;
-	BOOL p_womenDescendants;
+	
 	BOOL m_ceckDeleteRepeated;
-	BOOL m_checkCRLF;
-	bool m_folyt;
+	
+	
+	
 
-	CComboBox m_combo_spec;
-	CComboBox m_combo_comment;
-	CComboBox m_combo_FontSize;
-	CComboBox m_combo_OtherName;
-	CComboBox m_combo_DAttrib;
-
-	CButton m_RadioFamily;
 	CColorStatic colorFamilyInline;
 	CColorStatic colorFamilynameNo;
 	CColorStatic colorFamilynameUp;
-
 	CColorStatic colorName;
 	CColorStatic colorNum;
 	CColorStatic colorAttrib;
@@ -229,48 +261,13 @@ protected:
 	CColorStatic colorOutput;
 	CColorStatic colorPrint;
 	CColorStatic colorOrder;
-
-	int		m_radioOrder;
-	int		m_radioNumbering;
-	int		m_repeated;
-	BOOL	m_oneFile;
-
-	UINT	m_colorBgrnd;
-	CColorStatic	colorBgrnd;
-	CColorButton	colorBgn;
-	CString m_editWidth;
-	CString m_editGenMax;
-
-	BOOL m_radioOne;
-	BOOL m_repeatedColor;
 	CColorStatic colorRepeated;
-	CComboBox m_comboHtmlTxt;
+	CColorStatic colorBgrnd;
+
+
 	bool m_printed;
 	CString m_tableNumber;
 	CString m_lastname;
-	int m_generationMax;
-
-	void CDescendants::setParameters();
-	void CDescendants::OnClickedDefault();
-	void CDescendants::updateParameters();
-	void CDescendants::updateRadioDName();
-	void CDescendants::updateRepeated();
-	void CDescendants::updateRadioNumbering();
-	void CDescendants::OnClickedCheckConnect();
-	void CDescendants::OnClickedCheckWoman();
-	void CDescendants::OnClickedCheckFolyt();
-	void CDescendants::OnClickedCheckCapital();
-	void CDescendants::OnClickedSzluha();
-	void CDescendants::OnVillers();
-	void CDescendants::OnTupigny();
-	void CDescendants::OnClickedRadioNofamilyname();
-	void CDescendants::OnRadioFamilyname();
-	void CDescendants::OnRadioFamilynameup();
-	void CDescendants::OnClickedStaticBackground();
-	void CDescendants::OnBnClickedOk();
-	void CDescendants::colorFrame(CPaintDC* dc, int IDC, COLORREF color);
-
-	BOOL CDescendants::create_vDesc();
 
 	CString m_command;
 	CString m_htmlFile;
@@ -278,40 +275,14 @@ protected:
 	_int64 m_startTime;
 
 	CString m_txtFile;
-	// beállítható paraméterek //////////////////////
-
-
-
 	CString m_tablenumber;
 
 	bool m_log;
-	bool p_html;			// true: html lista készül, false: text fájl készül
-	int  p_numbering;
-	int  p_descStyle;
-	int  p_otherNameStyle;
-	int  p_commentStyle;
-	int  p_specStyle;
-	bool p_capitalName;
-	bool p_folyt;
-	int	 p_radioCode;
-	int  p_repeated;
-	bool p_repeatedColor;
-	bool p_oneFile;
-	int  p_connect;
-	UINT p_colorBgrnd;
-	bool p_print;		// azonnal nyomtassa ki a leszármazottat, a már szükségtelen rekordokat dobja el a vDesc-bõl. Ez hiba kereséshez jó.
-	bool p_checkCRLF;
-	int	 p_radioOrder;
 	///////////////////////////////////////////////
-	//	int m_folyt_db;
 	int m_cntRepeated;  // az ismétlõdõ leszármazottak száma
 
 	CString m_descendantsPath;
-
-
 	CString m_familyName;
-
-	int		p_lastname;
 	int		m_listedD;
 	int		m_listedP;
 
@@ -362,6 +333,37 @@ protected:
 	DE::PPEOPLE sm;
 	DE::PPEOPLE ss;
 
+	// descendantsOld változói
+	int m_genPeer;
+	CString m_lastnamePrev;
+	CString m_sexidPrev;
+
+	CColorStatic groupAllText;
+	CColorStatic groupDontworkText;
+	CColorStatic groupIndentedText;
+
+
+
+	void CDescendants::setParameters();
+	void CDescendants::OnClickedDefault();
+	void CDescendants::updateParameters();
+	void CDescendants::updateRadioDName();
+	void CDescendants::updateRepeated();
+	void CDescendants::updateRadioNumbering();
+	void CDescendants::OnClickedCheckConnect();
+	void CDescendants::OnClickedCheckWoman();
+	void CDescendants::OnClickedCheckFolyt();
+//	void CDescendants::OnClickedCheckCapital();
+	void CDescendants::OnClickedSzluha();
+	void CDescendants::OnVillers();
+	void CDescendants::OnTupigny();
+	void CDescendants::OnClickedRadioNofamilyname();
+	void CDescendants::OnRadioFamilyname();
+	void CDescendants::OnRadioFamilynameup();
+	void CDescendants::OnClickedStaticBackground();
+	void CDescendants::OnBnClickedOk();
+	void CDescendants::colorFrame(CPaintDC* dc, int IDC, COLORREF color);
+	BOOL CDescendants::create_vDesc();
 	void CDescendants::descendants();
 	void CDescendants::descendantsOld();
 	CString CDescendants::getNextChildRowid(UINT i);
@@ -371,18 +373,12 @@ protected:
 	void CDescendants::queryPeople(CString rowid, DE::PPEOPLE* p);
 	void CDescendants::print(CString str);
 	void CDescendants::printBegining(int i);
-//	void CDescendants::printDescendant(int i);
 
-//	void CDescendants::printSpouses(int i);
-//	void CDescendants::printMarriage(CString place, CString date, int i, int numberOfSpouses);
-//	void CDescendants::printSpouse();
-//	void CDescendants::printSpRelatives();
 	CString CDescendants::getLastFirst(DE::PPEOPLE* p);
 	bool CDescendants::voltmar(CString index);
 	int CDescendants::getNumberOfChildren(CString rowid, CString sex_id);
 	void CDescendants::listDescendants();
 	void CDescendants::multipleRowid();
-//	void CDescendants::multipleRowid0();
 	void CDescendants::signeD(int i, int j);
 	CString CDescendants::getTableHeader();
 	CString CDescendants::getPlaceDateBlock(CString place, CString date, CString jel);
@@ -408,36 +404,20 @@ protected:
 	BOOL CDescendants::query(CString command);
 	BOOL CDescendants::query2(CString command);
 
-
-//	bool CDescendants::linearTable(int i, int which);
-//	void CDescendants::dataTable(int i);
-//	bool CDescendants::printTopContainer(CString title, int which);
-//	void CDescendants::printOnly(CString str, int which);
 	CString CDescendants::createSpouses(int i);
 	CString CDescendants::createMarriage(CString place, CString date, int i, int numberOfSpouses);
 	CString CDescendants::createSpouse();
 	CString CDescendants::createSpRelatives();
 	CString CDescendants::getComplexDescription(int i, bool parentIndex);
-//	TCHAR CDescendants::get_gABC(int g);
 
 	void CDescendants::order_vDesc();
 	void CDescendants::printvLen();
 	void CDescendants::print_vDesc();
-//	void CDescendants::printDesc(int i, int which);
 	void CDescendants::numOfDesc();
-//	int CDescendants::sort_vDesc();
 	void CDescendants::printVector(int tbl);
 	void CDescendants::create_id();
-	// descendantsOld változói
-	int m_genPeer;
-	CString m_lastnamePrev;
-	CString m_sexidPrev;
-
-
 	void CDescendants::printGAline();
 	bool CDescendants::rowidExist();
-
-
 
 	DECLARE_MESSAGE_MAP()
 public:
@@ -452,9 +432,13 @@ public:
 	afx_msg void OnRepeatedFather();
 	afx_msg void OnRepeatedFirst();
 	afx_msg void OnPaint();
-	afx_msg void OnClickedCheckBold();
+//	afx_msg void OnClickedCheckBold();
 	afx_msg void OnClickedOrderInput();
 	afx_msg void OnOrderLength();
 	afx_msg void OnOrderDecreasing();
 	afx_msg void OnOrderBirth();
+
+
+
+	CComboBox m_comboFamilyName;
 };

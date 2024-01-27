@@ -173,6 +173,7 @@ void CAscendants::create_vGKR()
 	gkr.death = m_death;
 	gkr.x = 0;
 	gkr.y = 0;
+	gkr.linenumber = m_linenumber;
 	vGKR.push_back(gkr);
 	g = 1;
 
@@ -216,6 +217,7 @@ void CAscendants::create_vGKR()
 				gkr.y = 0;
 				gkr.birth = m_birth;
 				gkr.death = m_death;
+				gkr.linenumber = m_linenumber;
 				vGKR.push_back(gkr);
 				husband = true;
 			}
@@ -241,6 +243,7 @@ void CAscendants::create_vGKR()
 				gkr.gABC = get_gABC(g);
 				gkr.x = 0;
 				gkr.y = 0;
+				gkr.linenumber = m_linenumber;
 				if (husband)
 				{
 					gkr.numOfSp = 1;
@@ -499,13 +502,14 @@ bool CAscendants::getParentsId(int i)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CAscendants::getPeople(CString rowid)
 {
-	m_command.Format(L"SELECT last_name, first_name, sex_id, birth_date, death_date FROM people WHERE rowid='%s'", rowid);
+	m_command.Format(L"SELECT last_name, first_name, sex_id, birth_date, death_date, linenumber FROM people WHERE rowid='%s'", rowid);
 	if (!queryP(m_command)) return false;
 	m_familyName = m_recP->GetFieldString(0);
 	m_name.Format(L"%s %s", m_recP->GetFieldString(0), m_recP->GetFieldString(1));
 	m_birth = m_recP->GetFieldString(3);
 	m_death = m_recP->GetFieldString(4);
 	m_sex_id = _wtoi(m_recP->GetFieldString(2));
+	m_linenumber = m_recP->GetFieldString(5);
 }
 /////////////////////////////////////////// //////////////////////////////////////////////////////////////////////////////////////
 BOOL CAscendants::queryP(CString command)

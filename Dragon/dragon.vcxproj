@@ -383,7 +383,7 @@
     <ClCompile Include="compareEntries.cpp" />
     <ClCompile Include="ConnectCsaladTorzs.cpp" />
     <ClCompile Include="Date.cpp" />
-    <ClCompile Include="CDescendants_LinearHtml.cpp" />
+    <ClCompile Include="CDescendantsLinearHtml.cpp" />
     <ClCompile Include="CDescendantsLinearTable.cpp" />
     <ClCompile Include="old_descendants.cpp" />
     <ClCompile Include="old_descendantsLinearTable.cpp" />

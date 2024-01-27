@@ -472,8 +472,6 @@ void CAscendantsLinearTable::printData()
 
 	if (m_TabCtrl.GetCurSel() == FULL )
 	{
-
-
 		for (int i = 0; i < m_ListCtrl->GetItemCount(); ++i)
 		{
 			gkr = vGKR->at(i);

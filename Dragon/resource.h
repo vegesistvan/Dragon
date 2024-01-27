@@ -577,6 +577,14 @@
 #define IDC_LIST5                       1851
 #define IDC_LIST6                       1852
 #define IDC_LIST_X                      1853
+#define IDC_GROUP_INDENTED              1854
+#define IDC_GROUP_ALL                   1855
+#define IDC_GROUP_ALL_TEXT              1856
+#define IDC_GROUP_INDENTED_TEXT         1857
+#define IDC_GROUP_DONTWORK              1858
+#define IDC_GROUP_DONTWORK_TEXT         1859
+#define IDC_COMBO_FAMILINAME            1860
+#define IDC_COMBO_FAMILYNAME            1860
 #define IDC_LISTCOLUMNS                 11044
 #define ID_EDIT_INSERT                  32771
 #define ID_EDIT_UPDATE                  32772
@@ -984,14 +992,28 @@
 #define ID_TABUL35060                   35060
 #define ID_INDENTED_ASCENDANTS          35061
 #define ID_FUNCTIONS_NOTEPAD            35062
+#define ID_LESZ35063                    35063
+#define ID_DESCENDANTS_MARKED           35064
+#define ID_LESZ35065                    35065
+#define ID_DESCENDANTS_LISTED           35066
+#define ID_FUNCTIONS_FELMEN35067        35067
+#define ID_FELMEN35068                  35068
+#define ID_FELMEN35069                  35069
+#define ID_ASCENBANTS_MARKED            35070
+#define ID_ASCENDANTS_MARKED            35071
+#define ID_ASCENDANTS_LISTED            35072
+#define ID_LINE35073                    35073
+#define ID_LINE35074                    35074
+#define ID_HTMLLIST_FIX_NOREP           35075
+#define ID_HTMLLIST_PR_NOREP            35076
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        577
-#define _APS_NEXT_COMMAND_VALUE         35063
-#define _APS_NEXT_CONTROL_VALUE         1854
+#define _APS_NEXT_COMMAND_VALUE         35077
+#define _APS_NEXT_CONTROL_VALUE         1861
 #define _APS_NEXT_SYMED_VALUE           387
 #endif
 #endif

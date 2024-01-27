@@ -1,6 +1,8 @@
 #pragma once
 
-#define VERSION L"10.164"
+#define VERSION L"10.165"
+
+// 10.165 2024.01.27 <li>,<ol>,<\ol> után CRFL, leszármazotti lista pareméterablakának átrendezése
 
 // 10.164 2024.01.20 Az interaktív lineáris táblában a családnevek kiemelése
 

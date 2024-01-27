@@ -818,7 +818,7 @@
     <ClCompile Include="CDescendants_PrintTxt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CDescendants_LinearHtml.cpp">
+    <ClCompile Include="CDescendantsLinearHtml.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

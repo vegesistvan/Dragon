@@ -19,6 +19,18 @@ enum
 	L_GEN,
 	L_DESCENDANT,
 };
+
+enum
+{
+	NOTPRINTABLE = 0,
+	PRINTABLE
+};
+enum
+{
+	NOTREPEATED = 0,
+	REPEATED
+};
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class CDescendantsLinearTable : public CDialogEx
 {
@@ -35,7 +47,6 @@ public:
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-
 
 	CString m_command;
 	CString str;
@@ -108,13 +119,13 @@ protected:
 
 	bool gflag;
 	void CDescendantsLinearTable::keress(int start);
-	void CDescendantsLinearTable::dataTable();
+	void CDescendantsLinearTable::dataTable( bool repaeted);
 	int CDescendantsLinearTable::sort_vDesc();
 	BOOL CDescendantsLinearTable::query(CString command);
 	BOOL CDescendantsLinearTable::queryP(CString command);
 	BOOL CDescendantsLinearTable::queryM(CString command);
 	bool CDescendantsLinearTable::printTopContainer(CString title );
-	void CDescendantsLinearTable::printDesc(int i);
+	void CDescendantsLinearTable::printDesc(int i, bool repaeted );
 	TCHAR CDescendantsLinearTable::get_gABC(int g);
 	CString CDescendantsLinearTable::getComplexDescription(int i, bool parentIndex);
 	CString CDescendantsLinearTable::getColoredString(CString str, int index);
@@ -139,7 +150,7 @@ protected:
 	CString CDescendantsLinearTable::createSpRelativesL();
 
 
-	bool CDescendantsLinearTable::createHtmlFile(int i, int which);
+	bool CDescendantsLinearTable::createHtmlFile(bool printable, bool repeated );
 	void CDescendantsLinearTable::fullTable();
 	void CDescendantsLinearTable::uniqueTable();
 	BOOL CDescendantsLinearTable::attachDialogs();
@@ -155,6 +166,8 @@ protected:
 	afx_msg void OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct);
 	afx_msg void OnHtmlListaFix();
 	afx_msg void OnHtmlListaPrintable();
+	afx_msg void OnHtmllistFixNorep();
+	afx_msg void OnHtmllistPrNorep();
 	afx_msg LRESULT CDescendantsLinearTable::OnReloadListCtrl(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT CDescendantsLinearTable::OnSetRowColor(WPARAM wParam, LPARAM lParam);//wparam: oszlopszam, lparam: a COLUMNCOLOR struktura cime
 	afx_msg void OnIndentedList();
@@ -178,46 +191,40 @@ protected:
 public:
 	std::vector<DE::DESC>* vDesc;
 	
-	CString m_name;
-	CString m_descendantsPath;
-	CString m_htmlFile;
-	CString m_indentedFile;
-
+// linearTable-hoz
+	int p_childrenOrder;
+	int p_descendantName;
 	bool p_connect;
 	bool p_womenDescendants;
-	bool p_folyt;
+
+// html-hez
 	bool p_capital;
-	bool p_bold;
-	bool p_checkCRLF;
-	bool p_radioOne;
-	int p_lastname;
+	
+	CString	p_generationMax;
+
+	int	p_descendantAttrib;
+	int	p_otherNameAttrib;
+	int	p_specAttrib;
+	int	p_commentAttrib;
+
+	int p_fontSize;
+	int	p_numberingSystem;		// leszármazottak számozása
+	int	p_repeated;
+	
+	
+	UINT p_colorBgrnd;
+
+	bool p_capitalName;
+	BOOL p_folyt;
+	BOOL p_bold;
+	BOOL p_checkCRLF;
+	BOOL p_oneOutputFile;
+	BOOL p_repeatedColor;
 
 
-	CString p_editWidth;
-	CString p_editGenMax;
-	CString p_editK;
-	CString p_editG;
-	
-	BOOL p_firstBold;
-	BOOL p_peerPrint;
-	BOOL p_checkColor;
-	int  p_type;
-	BOOL p_listRepeated;
-	
+	CString m_name;
+	CString m_htmlFile;
+	CString m_descendantsPath;
 
-	int p_repeatedColor;
-	int p_radioOrder;
-	int p_radioDNameX;
-
-	int p_comboDAttrib;
-	int p_comboFontSize;
-	int p_comboComment;
-	int p_comboSpec;
-	int p_comboOtherName;
-	
-	int p_colorBgrnd;
-	int p_repeated;
-	
-	bool p_html;
 };
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

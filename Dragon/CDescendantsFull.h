@@ -34,7 +34,7 @@ protected:
 	CString str;
 	FILE* flDesc;
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-
+	std::vector<int> vid; // leszármazottak
 
 	DECLARE_MESSAGE_MAP()
 public:
@@ -46,7 +46,9 @@ public:
 	afx_msg void OnKeressBeginning();
 	afx_msg void OnKeressNext();
 	afx_msg void OnKeressPrevious();
-	afx_msg void OnFunctionsDescendands();
-	afx_msg void OnFunctionsAscendants();
 	afx_msg void OnFunctionsNotepad();
+	afx_msg void OnDescendantsMarked();
+	afx_msg void OnDescendantsListed();
+	afx_msg void OnAscendantsListed();
+	afx_msg void OnAscendantsMarked();
 };

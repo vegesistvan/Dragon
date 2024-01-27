@@ -536,7 +536,7 @@ void CDescendantsOld::printDesc( int i, int which  )
 			ixM.Format(L"%d", desc.motherIndex);
 	}
 
-	if (p_lastname == 2 && m_familyName != p.last_name)  // kiemelt családnév
+	if (p_descendantName == RAISED && m_familyName != p.last_name)  // kiemelt családnév
 	{
 		str = getTableHeader();
 		family = getColoredString(str, KEK);
@@ -678,10 +678,10 @@ bool CDescendantsOld::printTopContainer(CString title, int which)
 	}
 
 	CString maxGen;
-	if (m_editGenMax.IsEmpty())
+	if (p_generationMax.IsEmpty())
 		maxGen = L"minden generáció";
 	else
-		maxGen = m_editGenMax;
+		maxGen = p_generationMax;
 
 	CString inputFile;
 	CString created;
@@ -753,7 +753,7 @@ bool CDescendantsOld::printTopContainer(CString title, int which)
 	//	printOnly(str, which );
 
 	CString sorrend;
-	switch (p_radioOrder)
+	switch (p_childrenOrder)
 	{
 	case ORDER_INPUT:
 		sorrend = L"bementi sorrend";

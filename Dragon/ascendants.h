@@ -29,6 +29,7 @@ typedef struct
 	int		moreC;
 	int		x;			// piramis koordináták 
 	int		y;			//
+	CString linenumber;
 }GKR;
 
 typedef struct
@@ -114,6 +115,7 @@ protected:
 	CString m_birth;
 	CString m_death;
 	int		m_sex_id;
+	CString m_linenumber;
 
 // elõírható paraméterek
 	CString s_editK;

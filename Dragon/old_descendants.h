@@ -15,6 +15,14 @@ enum
 	ORDER_INCREASING,
 	ORDER_DECREASING
 };
+enum
+{
+	NOINLINE = 0,
+	INLINE,
+	RAISED
+};
+
+
 namespace DN
 {
 	typedef struct
@@ -171,34 +179,34 @@ protected:
 	CString m_txtFile;
 // beállítható paraméterek //////////////////////
 	
-	int m_comboFontSize;
+	int p_fontSize;
 	
-	CString m_editWidth;
+	CString p_rowWidth;
 	CString m_tablenumber;
-	CString m_editGenMax;
+	CString p_generationMax;
 	
 	bool m_log;
-	bool p_html;			// true: html lista készül, false: text fájl készül
-	int  p_numbering;
-	int  p_descStyle;
-	int  p_otherNameStyle;
-	int  p_commentStyle;
-	int  p_specStyle;
+
+	int	p_descendantName;
+	int p_numberingSystem;
+	int p_descendantAttrib;
+	int p_otherNameAttrib;
+	int p_commentAttrib;
+	int p_specAttrib;
 	bool p_capitalName;
 	bool p_bold;
 	bool p_folyt;
-	int	 p_radioCode;
 	int  p_repeated;
 	bool p_repeatedColor;
-	bool p_oneFile;
+	bool p_oneOutputFile;
 	bool p_connect;
 	bool p_womenDescendants;
 	UINT p_colorBgrnd;
 	bool p_print;		// azonnal nyomtassa ki a leszármazottat, a már szükségtelen rekordokat dobja el a vDesc-bõl. Ez hiba kereséshez jó.
 	bool p_checkCRLF;
-	int	 p_radioOrder;
+	int	 p_childrenOrder;
 ///////////////////////////////////////////////
-//	int m_folyt_db;
+
 	int m_cntRepeated;  // az ismétlõdõ leszármazottak száma
 
 	CString m_descendantsPath;
@@ -207,7 +215,7 @@ protected:
 	CString m_familyName;
 	CString m_tableNumber;
 
-	int		p_lastname;
+	
 	int		m_listedD;
 	int		m_listedP;
 

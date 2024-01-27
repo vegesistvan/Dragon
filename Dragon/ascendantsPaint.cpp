@@ -192,6 +192,7 @@ void CAscendantsPaint::OnPaint()
 	VERIFY(fontAx.CreatePointFontIndirect(&logfont, &hDC));
 
 	SelectObject( memDC, &fontAx);
+	SetBkColor(memDC, m_colorGray);
 	if( vGKR->at(0).sex_id == 1)
 		SetTextColor(memDC, RED);
 	else
@@ -205,6 +206,7 @@ void CAscendantsPaint::OnPaint()
 	yAxis( &memDC );
 	ascendantsXY();
 	_int64 k;
+
 
 //	SelectObject(memDC, penWhite);
 //	SetTextColor(memDC, WHITE);
@@ -461,8 +463,8 @@ void CAscendantsPaint::OnMouseMove(UINT nFlags, CPoint point)
 {
 	CString str;
 	m_mousePos.Format( L"%4d,%-4d", point.x, point.y );
-	GetDlgItem(IDC_COORDINATES)->SetWindowTextW(m_mousePos);
-	GetDlgItem(IDC_STATUS)->SetWindowTextW( L"");
+//	GetDlgItem(IDC_COORDINATES)->SetWindowTextW(m_mousePos);
+//	GetDlgItem(IDC_STATUS)->SetWindowTextW( L"");
 	CDialogEx::OnMouseMove(nFlags, point);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -496,7 +498,7 @@ void CAscendantsPaint::OnLButtonDblClk(UINT nFlags, CPoint point)
 				ascendants.Format(L"%c-%d %s *%s", gkr.gABC, gkr.k, gkr.name, gkr.birth );
 				*/
 			AfxMessageBox(ascendants, MB_ICONINFORMATION);
-			GetDlgItem(IDC_STATUS)->SetWindowTextW(ascendants);
+//			GetDlgItem(IDC_STATUS)->SetWindowTextW(ascendants);
 		}
 	}
 }
@@ -562,7 +564,9 @@ void CAscendantsPaint::OnSave()
 	PRINT = true;
 	Invalidate(false);
 	str.Format(L"Képernyõ a\n%s\nfájlba kiírva.", m_filePathName);
-	AfxMessageBox(str, MB_ICONINFORMATION);
+//	AfxMessageBox(str, MB_ICONINFORMATION);
+	ShellExecute(NULL, L"open", m_filePathName, NULL, NULL, SW_SHOWNORMAL);
+
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CAscendantsPaint::OnMButtonDown(UINT nFlags, CPoint point)

@@ -22,6 +22,12 @@ protected:
 
 
 	CString str;
+	FILE* flDesc;
+
+	std::vector<int> vid;
+
+
+
 
 	void CAscendantsUnique::OnKeressBeginning();
 	void CAscendantsUnique::OnKeressNext();
@@ -34,4 +40,9 @@ public:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
+	afx_msg void OnDescendantsMarked();
+	afx_msg void OnDescendantsListed();
+	afx_msg void OnAscendantsMarked();
+	afx_msg void OnAscendantsListed();
+	afx_msg void OnFunctionsNotepad();
 };
