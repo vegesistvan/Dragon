@@ -83,21 +83,88 @@ void CGEDCOMInput::getFirst(CString value, INDI* indi)
 // Ez specifikusan egy ged fájlra készült. nem valószínû, hogy a standard NAME-ben íg lennének az elõnevek és a comment
 void CGEDCOMInput::getName(CString value, INDI* indi)
 {
-	return;
 	CString lastname;
-	CString first_name(L"");
-	CString titolo(L"");
-	CString title(L"");
-	CString comment(L"");
+	CString firstname;
+	CString titolo;
+	CString title;
+	CString comment;
 	CStringArray A;
-	CString rest(L"");
+	CString rest;
+	CString word;
 	int n;
+	int m;
 	CString ret;
+	CString sex;
+	TCHAR lastCharacter;
+	TCHAR firstCharacter;
 
-	if ((n = value.Find(L"nemes és nemzetes")) != -1)
-		n = 2;
 	n = splitCString(value, ' ', false, &A);
+	m = n;
+	// title meghatározása
+	for (int i = 0; i < n; ++i)
+	{
+		word = A[i];
+		for (int j = 0; j < sizeof(t); ++j)
+		{
+			if (word == t[j].title)
+			{
+				title = word;
+				A[i].Empty();
+				--m;
+				break;
+			}
+		}
+	}
+	
+	// keresztnév meghatározása
+	for (int i = 0; i < n; ++i)
+	{
+		if (!A[i].IsEmpty() && m > 1)
+		{
+			word = A[i];
+			if ((sex = theApp.isFirstName(word)) != L"")
+			{
+				firstname += word;
+				firstname += L" ";
+				A[i].Empty();
+				--m;
+			}
+		}
+	}
+	firstname.TrimRight();
 
+	for (int i = 0; i < n; ++i)
+	{
+		if (!A[i].IsEmpty() )
+		{
+			word = A[i];
+			firstCharacter = word.GetAt(0);
+			lastCharacter = word.GetAt(word.GetLength() - 1);
+			if (m > 1 && iswupper( firstCharacter) && lastCharacter == 'i')
+			{
+				titolo = word;
+				A[i].Empty();
+			}
+		}
+	}
+
+	for (int i = 0; i < n; ++i)
+	{
+		if (!A[i].IsEmpty())
+		{
+			word = A[i];
+			lastname += word;
+			lastname += L" ";
+		}
+	}
+	lastname.TrimRight();
+
+	indi->title = title;
+	indi->titolo = titolo;
+	indi->first_name = firstname;
+	indi->last_name = lastname;
+
+/*
 	lastname = A[0];
 	TCHAR k = towupper(lastname[0]);
 	lastname = k + lastname.Mid(1);
@@ -147,6 +214,7 @@ void CGEDCOMInput::getName(CString value, INDI* indi)
 		indi->title = title;
 		indi->titolo = titolo;
 	}
+*/
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // firstname /lastname/

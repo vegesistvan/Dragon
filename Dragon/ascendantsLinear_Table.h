@@ -129,6 +129,7 @@ protected:
 	void CAscendantsLinearTable::printF(CString str);
 	void CAscendantsLinearTable::printU(CString str);
 	void CAscendantsLinearTable::printData();
+	CString CAscendantsLinearTable::konvTitolo(CString titolo);
 
 
 	CBrush m_brRed;
@@ -161,6 +162,7 @@ public:
 	BOOL m_checkColor;
 	int  m_type;
 	BOOL m_listRepeated;
+	bool p_titololower;
 
 	afx_msg void OnPaint();
 	afx_msg void OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult);

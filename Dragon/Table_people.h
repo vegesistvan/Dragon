@@ -53,6 +53,8 @@ protected:
 
 	CHARFORMAT cf = { 0 };
 
+	CRichEditCtrl captionCtrl;
+
 	BOOL m_getFirstPeople;
 
 	std::vector<TCHAR*> v_individuals;
@@ -69,8 +71,7 @@ protected:
 	CSqliteDBRecordSet*	 m_recordset3;
 	CSqliteDBRecordSet*	 m_recordset4;
 	
-	void CTablePeople::directAscendants(bool apai);
-//	void CTablePeople::listHtmlLine( int lineNumber );
+
 	void CTablePeople::enableMenu( BOOL flag );
 	void CTablePeople::createListColumns();
 	void CTablePeople::fillTable( UINT nItem );
@@ -85,8 +86,6 @@ protected:
 	void CTablePeople::updateField( int nItem, int i, CString str );
 	bool CTablePeople::contractSameItems();
 
-	bool CTablePeople::processName();
-	bool CTablePeople::getPeople(CString rowid);
 
 	void keress( int start );
 
@@ -190,7 +189,6 @@ public:
 	afx_msg void OnEditDelete();
 	afx_msg void OnEditUpdate();
 	afx_msg void OnEditInsert();
-//	afx_msg void On3Generations();
 	afx_msg void OnHtmlChildren();
 	afx_msg void OnInfo();
 	afx_msg void OnClickedNext();
@@ -204,8 +202,7 @@ public:
 	afx_msg void OnCompare2People();
 	afx_msg void OnKekule();
 	afx_msg void OnCompareAsc();
-	afx_msg void OnDescendantsNew();
-	CRichEditCtrl captionCtrl;
+	
 	afx_msg void OnEditNotepad();
 	afx_msg void OnRokonok();
 	afx_msg void OnBirthDeath();

@@ -1,9 +1,21 @@
 #pragma once
 #include <afxdialogex.h>
-#include "GEDCOM_typdef.h"
+#include "inputGEDCOM_typdef.h"
 #include "utilities_dragon.h"
 #include "ColorStatic.h"
 
+typedef struct
+{
+	CString title;
+}TITLE;
+
+const TITLE t[] =
+{
+	{ L"vitéz" },
+	{ L"dr." },
+	{ L"ifj."},
+	{ L"id."},
+};
 
 CString date2date(CString date);
 bool sortByCnt(const FAM &v1, const FAM &v2);
@@ -48,26 +60,16 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	DECLARE_MESSAGE_MAP()
 
-
 	CSqliteDBRecordSet* m_recordset;
 	CColorStatic colorComment;
 	CColorStatic colorGED;
 	CStdioFile gedFile;
 	BOOL m_sameDBName;
-//	BOOL REFRESH;
-
-	/*
-	CString m_gedFileTitle;
-	CString m_gedFileName;
-	CString m_gedPathName;
-	CString m_gedFolderPath;
-	*/
-	
 
 	bool m_nomore;
 	CString str;
 	CString m_command;
-//	BOOL	setDB();
+
 	BOOL	query(CString command);
 
 	int m_count;	// az adatbázisban lévõ emberek száma a beolvasás elõtt

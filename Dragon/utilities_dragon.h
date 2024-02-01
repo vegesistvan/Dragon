@@ -2,7 +2,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
-#include "GEDCOM_typdef.h"
+#include "inputGEDCOM_typdef.h"
 #include "uniteStructures.h"
 
 #include <afxcoll.h>

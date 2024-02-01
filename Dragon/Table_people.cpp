@@ -149,7 +149,7 @@ ON_COMMAND(ID_FILTER_FAMILY_ANCESTORS, &CTablePeople::OnFilterFamilyAncestors)
 ON_COMMAND(ID_GROUPBY_POSTERIOR, &CTablePeople::OnGroupbyPosterior)
 ON_COMMAND(ID_UNITE, &CTablePeople::OnUnite)
 ON_COMMAND(ID_KEKULE, &CTablePeople::OnKekule)
-ON_COMMAND(ID_DESCENDANTS_NEW, &CTablePeople::OnDescendantsNew)
+ON_COMMAND(ID_DESCENDANTS_NEW, &CTablePeople::OnDescendants)
 ON_COMMAND(ID_EDIT_NOTEPAD, &CTablePeople::OnEditNotepad)
 ON_COMMAND(ID_ROKONOK, &CTablePeople::OnRokonok)
 ON_COMMAND(ID_BIRTH_DEATH, &CTablePeople::OnBirthDeath)
@@ -1804,13 +1804,13 @@ void CTablePeople::OnDescendants()
 		}
 
 		theApp.v_rowid.push_back(rowid);
-		if (theApp.m_inputMode == GAHTML)
+//		if (theApp.m_inputMode == GAHTML)
 		{
 			tableNumber = m_ListCtrl.GetItemText(nItem, G_TABLENUMBER);
 //			theApp.v_tableNumbers.push_back(tableNumber);
 		}
-		else
-			theApp.v_tableNumbers.push_back(L"1");
+//		else
+//			theApp.v_tableNumbers.push_back(L"1");
 	}
 	CDescendants dlg;
 	dlg.DoModal();

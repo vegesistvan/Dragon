@@ -86,60 +86,49 @@ BOOL CDescendants::create_vDesc()
 		desc.fatherIndex = -1;  // nincs apja
 		vDesc.clear();
 		vDesc.push_back(desc);
-
 		m_os = desc.name;
-		if (p_print )
-		{
-			descendantsOld();
-			if (theApp.v_rowid.size() > 1)
-			{
-				for (int i = 0; i < m_indent; ++i)
-					fwprintf(fl, L"%s", m_tag2);
-				fwprintf(fl, L"<br><br><br>");
-			}
-		}
-		else
-		{
-			descendants();
-			numOfDesc();
-			multipleRowid();
 
-			indentedHtml();
-			create_id();
+		descendants();
+		numOfDesc();
+		multipleRowid();
 
-			CDescendantsLinearTable dlg;
-			dlg.p_descendantName = p_descendantName;
-			dlg.p_connect = p_connect;
-			dlg.p_womenDescendants = p_womenDescendants;
-			dlg.p_generationMax = p_generationMax;
-			dlg.p_childrenOrder = p_childrenOrder;
-			dlg.p_descendantAttrib = p_descendantAttrib;
-			dlg.p_otherNameAttrib = p_otherNameAttrib;
-			dlg.p_specAttrib = p_specAttrib;
-			dlg.p_commentAttrib = p_commentAttrib;
-			dlg.p_numberingSystem = p_numberingSystem;		// leszármazottak számozása
-			dlg.p_repeated = p_repeated;
-			dlg.p_descendantAttrib = p_descendantAttrib;
-			dlg.p_otherNameAttrib = p_otherNameAttrib;
-			dlg.p_commentAttrib = p_commentAttrib;
-			dlg.p_specAttrib = p_specAttrib;
-			dlg.p_colorBgrnd = p_colorBgrnd;
-			dlg.p_fontSize = p_fontSize;
-			dlg.p_capitalName = p_capitalName;
-			dlg.p_folyt = p_folyt;
-			dlg.p_capital = p_capital;
-			dlg.p_bold = p_bold;
-			dlg.p_checkCRLF = p_checkCRLF;
-			dlg.p_oneOutputFile = p_oneOutputFile;
-			dlg.p_repeatedColor= p_repeatedColor;
+		indentedHtml();
+		create_id();
 
-			dlg.m_descendantsPath = m_descendantsPath;
-			dlg.vDesc = &vDesc;
-			dlg.m_name = vDesc.at(0).name;
-			dlg.m_htmlFile = m_htmlFile;
+	
+		CDescendantsLinearTable dlg;
+		dlg.p_descendantName = p_descendantName;
+		dlg.p_connect = p_connect;
+		dlg.p_womenDescendants = p_womenDescendants;
+		dlg.p_generationMax = p_generationMax;
+		dlg.p_childrenOrder = p_childrenOrder;
+		dlg.p_titololower = p_titololower;
+		dlg.p_descendantAttrib = p_descendantAttrib;
+		dlg.p_otherNameAttrib = p_otherNameAttrib;
+		dlg.p_specAttrib = p_specAttrib;
+		dlg.p_commentAttrib = p_commentAttrib;
+		dlg.p_numberingSystem = p_numberingSystem;		// leszármazottak számozása
+		dlg.p_repeated = p_repeated;
+		dlg.p_descendantAttrib = p_descendantAttrib;
+		dlg.p_otherNameAttrib = p_otherNameAttrib;
+		dlg.p_commentAttrib = p_commentAttrib;
+		dlg.p_specAttrib = p_specAttrib;
+		dlg.p_colorBgrnd = p_colorBgrnd;
+		dlg.p_fontSize = p_fontSize;
+		dlg.p_capitalName = p_capitalName;
+		dlg.p_folyt = p_folyt;
+		dlg.p_capital = p_capital;
+		dlg.p_bold = p_bold;
+		dlg.p_checkCRLF = p_checkCRLF;
+		dlg.p_oneOutputFile = p_oneOutputFile;
+		dlg.p_repeatedColor = p_repeatedColor;
 
-			dlg.DoModal();
-		}
+		dlg.m_descendantsPath = m_descendantsPath;
+		dlg.vDesc = &vDesc;
+		dlg.m_name = vDesc.at(0).name;
+		dlg.m_htmlFile = m_htmlFile;
+
+		dlg.DoModal();
 	}
 	return TRUE;
 }
@@ -283,6 +272,7 @@ bool CDescendants::tablesDescendants()  // listázandó táblák a theapp.v_tableNum
 		dlg.p_womenDescendants = p_womenDescendants;
 		dlg.p_generationMax = p_generationMax;
 		dlg.p_childrenOrder = p_childrenOrder;
+		dlg.p_titololower = p_titololower;
 		dlg.p_descendantAttrib = p_descendantAttrib;
 		dlg.p_otherNameAttrib = p_otherNameAttrib;
 		dlg.p_specAttrib = p_specAttrib;
@@ -745,6 +735,8 @@ bool CDescendants::queryR(CString rowid)
 	peoS.tablenumber = rsP.GetFieldString(5);
 	peoS.linenumber = rsP.GetFieldString(10);
 	peoS.titolo = rsP.GetFieldString(9);
+	if (p_titololower)
+		towlower(peoS.titolo[0]);
 	peoS.sex = rsP.GetFieldString(1);
 	if (peoS.sex == BISEX)
 		peoS.sex = MAN;

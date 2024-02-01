@@ -132,19 +132,131 @@ void CInputGEDCOM::marr()
 };
 void CInputGEDCOM::name()
 {
-	int pos;
-	if ((pos = lxtv.value.Find('/')) != -1)
+	CString value = lxtv.value;
+	CString lastname;
+	CString firstname;
+	CString titolo;
+	CString title;
+	CString comment;
+	CStringArray A;
+	CString rest;
+	CString word;
+	int n;
+	int m;
+	CString ret;
+	CString sex;
+	TCHAR lastCharacter;
+	TCHAR firstCharacter;
+
+	value.Remove('/');
+	value.Remove('\\');
+	value.Trim();
+
+	n = splitCString(value, ' ', false, &A);
+	m = n;
+
+	int k;
+
+	// title meghatározása
+	for (int i = 0; i < n; ++i)
 	{
-		I.first_name = lxtv.value.Left(pos-1);
-		I.last_name = lxtv.value.Mid(pos);
-		I.last_name.Trim();
-		I.last_name.Remove('/');
-		I.first_name.Remove('/');
+		word = A[i];
+		k = sizeof(t) / sizeof(TITLE);
+		for (int j = 0; j < sizeof(t)/sizeof(TITLE); ++j)
+		{
+			if (word == t[j].title)
+			{
+				title = word;
+				A[i].Empty();
+				--m;
+				break;
+			}
+		}
 	}
+
+	
+	// keresztnév meghatározása
+	// elteker az elsõ betûig
+	int i;
+	for( i = 0; i < n; ++i)
+	{
+		if (!A[i].IsEmpty())
+			break;
+	}
+	++i;	// az elsõ nem empty szót átugorja, mert az a vezetéknév
+	for( i; i <n; ++i )
+	{
+		if (!A[i].IsEmpty() && m > 1)
+
+		{
+			word = A[i];
+			if ((sex = theApp.isFirstName(word)) != L"")
+			{
+				firstname += word;
+				firstname += L" ";
+				A[i].Empty();
+				--m;
+			}
+		}
+	}
+	firstname.TrimRight();
+
+	for (int i = 0; i < n; ++i)
+	{
+		if (!A[i].IsEmpty())
+		{
+			word = A[i];
+			firstCharacter = word.GetAt(0);
+			lastCharacter = word.GetAt(word.GetLength() - 1);
+			if (m > 1 && iswupper(firstCharacter) && lastCharacter == 'i')
+			{
+				titolo = word;
+				A[i].Empty();
+				--m;
+			}
+		}
+	}
+
+	for (int i = 0; i < n; ++i)
+	{
+		word = A[i];
+		if (!word.IsEmpty() && iswupper( word[0] ) )
+		{
+			lastname += word;
+			lastname += L" ";
+			A[i].Empty();
+
+		}
+	}
+	lastname.TrimRight();
+
+	for (int i = 0; i < n; ++i)
+	{
+		word = A[i];
+		if (!word.IsEmpty() )
+		{
+			comment += word;
+			comment += L" ";
+			A[i].Empty();
+		}
+	}
+	comment.TrimRight();
+
+
+	I.title = title;
+	I.titolo = titolo;
+	I.first_name = firstname;
+	I.last_name = lastname;
+	I.comment = comment;
+
 }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CInputGEDCOM::note()
 {
-	I.comment.Format(L"%s %s", (CString)I.comment, lxtv.value );
+	if (I.comment.IsEmpty())
+		I.comment = lxtv.value;
+	else
+		I.comment.Format(L"%s %s", (CString)I.comment, lxtv.value );
 };
 void CInputGEDCOM::nsfx()
 {

@@ -45,48 +45,7 @@ CDescendantsOld::~CDescendantsOld()
 BEGIN_MESSAGE_MAP(CDescendantsOld, CWnd)
 END_MESSAGE_MAP()
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CTablePeople::OnDescendantsNew()
-{
-	int nItem;
 
-	POSITION pos = m_ListCtrl.GetFirstSelectedItemPosition();
-	if (!pos)
-	{
-		theApp.message(L"Kijelölt õsök listája", L"\nNincs kijelölve senki!");
-		return;
-	}
-
-	theApp.v_rowid.clear();
-	theApp.v_tableNumbers.clear();
-	CString rowid;
-	CString tableNumber;
-
-	while (pos)
-	{
-		nItem = m_ListCtrl.GetNextSelectedItem(pos);
-		rowid = m_ListCtrl.GetItemText(nItem, G_ROWID);
-		m_command.Format(L"SELECT rowid FROM people WHERE father_id ='%s' OR mother_id='%s'", rowid, rowid);
-		if (!query(m_command)) return;
-		if (!m_recordset->RecordsCount())
-		{
-			str.Format(L"%s rowid bejegyzésnek nincs leszármoazottja", rowid);
-			AfxMessageBox(str);
-			return;
-		}
-
-		theApp.v_rowid.push_back(rowid);
-		if (theApp.m_inputMode == GAHTML)
-		{
-			tableNumber = m_ListCtrl.GetItemText(nItem, G_TABLENUMBER);
-			theApp.v_tableNumbers.push_back(tableNumber);
-		}
-		else
-			theApp.v_tableNumbers.push_back( L"1" );
-	}
-	CDescendantsOld desc;
-	desc.start();
-}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CDescendantsOld::start()

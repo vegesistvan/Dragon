@@ -172,7 +172,8 @@ bool CGEDCOMInput::recordINDI( GEDLINE* gl )
 			goto cont;
 
 		if (lxtv.tag == L"NAME")					// minden név benne lehet, zagyvaság
-			splitNAME(lxtv.value, &indi);
+			//splitNAME(lxtv.value, &indi);
+			getName(lxtv.value, &indi);
 		else if (lxtv.tag == L"SURN")				// családnév
 			splitSURN(lxtv.value, &indi);
 		else if (lxtv.tag == L"GIVN")				// keresztnév

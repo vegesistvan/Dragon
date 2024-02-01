@@ -583,8 +583,9 @@
 #define IDC_GROUP_INDENTED_TEXT         1857
 #define IDC_GROUP_DONTWORK              1858
 #define IDC_GROUP_DONTWORK_TEXT         1859
-#define IDC_COMBO_FAMILINAME            1860
 #define IDC_COMBO_FAMILYNAME            1860
+#define IDC_TITOLOLOWER                 1862
+#define IDC_CHECK1                      1863
 #define IDC_LISTCOLUMNS                 11044
 #define ID_EDIT_INSERT                  32771
 #define ID_EDIT_UPDATE                  32772
@@ -1013,7 +1014,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        577
 #define _APS_NEXT_COMMAND_VALUE         35077
-#define _APS_NEXT_CONTROL_VALUE         1861
+#define _APS_NEXT_CONTROL_VALUE         1864
 #define _APS_NEXT_SYMED_VALUE           387
 #endif
 #endif

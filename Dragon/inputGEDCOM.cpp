@@ -5,7 +5,7 @@
 #include "Dragon.h"
 #include "afxdialogex.h"
 #include "inputGEDCOM.h"
-#include "GEDCOM_TAGS.h"
+#include "inputGEDCOM_TAGS.h"
 #include "utilities.h"
 #include <algorithm>
 #include "ProgressWnd.h"
@@ -87,7 +87,7 @@ void CInputGEDCOM::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_COMMENT, colorComment);
 	DDX_Control(pDX, IDC_STATIC_GED, colorGED);
-	DDX_Text(pDX, IDC_GED, theApp.m_gedPathName);
+	DDX_Text(pDX, IDC_GED, theApp.m_gedFileName);
 	DDX_Control(pDX, IDC_DATABASE, m_databaseCtrl);
 	DDX_Control(pDX, IDC_MAPPA, m_mappaCtrl);
 	DDX_Control(pDX, IDC_GED, m_gedCtrl);
@@ -124,6 +124,8 @@ BOOL CInputGEDCOM::OnInitDialog()
 	}
 	if( theApp.m_gedFileName.IsEmpty() )
 		GetDlgItem(IDOK)->EnableWindow(false);
+
+	theApp.m_gedPathName.Format(L"%s\\%s", theApp.m_dbFolderPath, theApp.m_gedFileName);
 	return FALSE;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -171,11 +173,14 @@ void CInputGEDCOM::OnBnClickedOk()
 		setCreationTime(theApp.m_dbPathName);
 	}
 
+	m_gedCtrl.GetWindowTextW(theApp.m_gedFileName);
+
 	insertINDI();
 	insertFAM();
 	updateParents();
 
 	theApp.insertIntoFiles( theApp.m_gedFileName, GEDCOM_FILE);
+	theApp.insertVersion(GEDCOM);
 	theApp.getDBtype();
 	CDialogEx::OnOK();
 }

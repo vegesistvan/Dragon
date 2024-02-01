@@ -563,8 +563,6 @@ void CTableTables::OnDescendantsTable()  // Kijelölt táblák listája
 		rowid = m_ListCtrl.GetItemText(nItem, 1);
 		theApp.v_tableNumbers.push_back(rowid);
 	}
-//	CDescendantsOld desc;
-//	desc.tablesDescendants();
 	CDescendants dlg;
 	dlg.DoModal();
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GEDCOM_TAGS.h"
+#include "inputGEDCOM_TAGS.h"
 
 
 class CGedcomFile : public CWnd

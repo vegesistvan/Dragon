@@ -1,8 +1,22 @@
 #pragma once
 #include "afxdialogex.h"
-#include "GEDCOM_typdef.h"
+#include "inputGEDCOM_typdef.h"
 #include "utilities_dragon.h"
 #include "ColorStatic.h"
+
+typedef struct
+{
+	CString title;
+}TITLE;
+
+const TITLE t[] =
+{
+	{ L"vitéz" },
+	{ L"dr." },
+	{ L"ifj."},
+	{ L"id."},
+};
+
 
 class CInputGEDCOM : public CDialogEx
 {

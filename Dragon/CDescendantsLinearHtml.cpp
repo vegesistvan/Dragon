@@ -865,12 +865,29 @@ void CDescendantsLinearTable::queryPeople(CString rowid, DE::PPEOPLE* p)
 	p->tableRoman = rsP.GetFieldString(DBP_TABLEROMAN);
 	p->title = rsP.GetFieldString(DBP_TITLE);
 	p->titolo = rsP.GetFieldString(DBP_TITOLO);
+	if (p_titololower && !p->titolo.IsEmpty() )
+		p->titolo = konvTitolo(p->titolo);
 	p->whichHusband = rsP.GetFieldString(DBP_WHICHHUSBAND);
 	p->whichWife = rsP.GetFieldString(DBP_WHICHWIFE);
 
 	p->fullname.Format(L"%s %s", p->last_name, p->first_name);
 
 	if ((p->comment.Find(L"http")) != -1) p->comment.Empty();
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CString CDescendantsLinearTable::konvTitolo(CString titolo)
+{
+	TCHAR kar;
+
+	for (int i = 0; i < titolo.GetLength(); ++i)
+	{
+		if (iswupper(titolo[i]))
+		{
+			kar = towlower(titolo[i]);
+			titolo.SetAt(i, kar);
+		}
+	}
+	return titolo;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CDescendantsLinearTable::getPlaceDateBlock(CString place, CString date, CString jel)
@@ -979,6 +996,7 @@ CString CDescendantsLinearTable::createDescendant(int i, bool parentIndex)
 		else
 			name.Format(L"\n%s %s %s %s", p.titolo, lastname, p.first_name, p.peer);
 		name.Trim();
+	
 		if (!p.other_names.IsEmpty())
 			name.Format(L"\n%s_(%s)", (CString)name, p.other_names);
 	}

@@ -42,12 +42,12 @@ void CDescendants::printVector( int tbl)
 
 	if (p_numberingSystem == DE::SZLUHA) // orderd list
 	{
-		m_tag1 = L"<ol>\n";
+		m_tag1 = L"<ol>";
 		m_tag2 = L"</ol>\n";
 	}
 	else				// unordered list
 	{
-		m_tag1 = L"<ul>\n";
+		m_tag1 = L"<ul>";
 		m_tag2 = L"</ul>\n";
 	}
 
@@ -284,9 +284,12 @@ CString CDescendants::createDescendant(int i, bool parentIndex )
 		{
 			if (vLMX.at(last).lastMotherIndex != p.parentIndex)   // ha az utoljára kiírt motherIndex más, akkor ezt kiírja
 			{
-				str.Format(L"/%d", p.parentIndex);
-				name += str;
-				vLMX.at(last).lastMotherIndex = p.parentIndex;
+				if (p.parentIndex)
+				{
+					str.Format(L"/%d", p.parentIndex);
+					name += str;
+					vLMX.at(last).lastMotherIndex = p.parentIndex;
+				}
 			}
 		}
 
@@ -671,12 +674,29 @@ void CDescendants::queryPeople(CString rowid, DE::PPEOPLE* p)
 	p->tableRoman = rsP.GetFieldString(DBP_TABLEROMAN);
 	p->title = rsP.GetFieldString(DBP_TITLE);
 	p->titolo = rsP.GetFieldString(DBP_TITOLO);
+ 	if (p_titololower && !p->titolo.IsEmpty() )
+		p->titolo = konvTitolo(p->titolo);
 	p->whichHusband = rsP.GetFieldString(DBP_WHICHHUSBAND);
 	p->whichWife = rsP.GetFieldString(DBP_WHICHWIFE);
 
 	p->fullname.Format(L"%s %s", p->last_name, p->first_name);
 
 	if ((p->comment.Find(L"http")) != -1) p->comment.Empty();
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CString CDescendants::konvTitolo(CString titolo)
+{
+	TCHAR kar;
+
+	for (int i = 0; i < titolo.GetLength(); ++i)
+	{
+		if (iswupper(titolo[i]))
+		{
+			kar = towlower(titolo[i]);
+			titolo.SetAt(i, kar);
+		}
+	}
+	return titolo;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CDescendants::getPlaceDateBlock(CString place, CString date, CString jel)

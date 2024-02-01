@@ -154,6 +154,7 @@ protected:
 	void CDescendantsLinearTable::fullTable();
 	void CDescendantsLinearTable::uniqueTable();
 	BOOL CDescendantsLinearTable::attachDialogs();
+	CString CDescendantsLinearTable::konvTitolo(CString titolo);
 
 	CString getSeededName(int i);
 	DECLARE_MESSAGE_MAP()
@@ -196,6 +197,7 @@ public:
 	int p_descendantName;
 	bool p_connect;
 	bool p_womenDescendants;
+	bool p_titololower;
 
 // html-hez
 	bool p_capital;

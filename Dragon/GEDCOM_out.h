@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ListCtrlEx.h"
-#include "GEDCOM_typdef.h"
+#include "inputGEDCOM_typdef.h"
 // CGedcomOut dialog
 typedef struct
 {

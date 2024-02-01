@@ -252,8 +252,6 @@
     <ClInclude Include="database.h" />
     <ClInclude Include="Date.h" />
     <ClInclude Include="CDescendantsLinearTable.h" />
-    <ClInclude Include="old_descendants.h" />
-    <ClInclude Include="old_descendantsParam.h" />
     <ClInclude Include="CDescendantsUnique.h" />
     <ClInclude Include="displayInfo.h" />
     <ClInclude Include="dragonDoc.h" />
@@ -270,10 +268,9 @@
     <ClInclude Include="Filter.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="GEDCOM_file.h" />
-    <ClInclude Include="GEDCOM_input.h" />
     <ClInclude Include="GEDCOM_out.h" />
-    <ClInclude Include="GEDCOM_TAGS.h" />
-    <ClInclude Include="GEDCOM_typdef.h" />
+    <ClInclude Include="inputGEDCOM_TAGS.h" />
+    <ClInclude Include="inputGEDCOM_typdef.h" />
     <ClInclude Include="GetLastFirst.h" />
     <ClInclude Include="GetMarriage.h" />
     <ClInclude Include="GetPeople.h" />
@@ -385,13 +382,8 @@
     <ClCompile Include="Date.cpp" />
     <ClCompile Include="CDescendantsLinearHtml.cpp" />
     <ClCompile Include="CDescendantsLinearTable.cpp" />
-    <ClCompile Include="old_descendants.cpp" />
-    <ClCompile Include="old_descendantsLinearTable.cpp" />
-    <ClCompile Include="old_descendantsParam.cpp" />
     <ClCompile Include="CDescendants_IndentedHtml.cpp" />
-    <ClCompile Include="old_descendantsPrint..cpp" />
     <ClCompile Include="CDescendants_PrintTxt.cpp" />
-    <ClCompile Include="old_descendantsPrintTxt.cpp" />
     <ClCompile Include="CDescendantsUnique.cpp" />
     <ClCompile Include="CDescendants_Vector.cpp" />
     <ClCompile Include="displayInfo.cpp" />
@@ -410,10 +402,6 @@
     <ClCompile Include="FatherMother.cpp" />
     <ClCompile Include="Filter.cpp" />
     <ClCompile Include="GEDCOM_file.cpp" />
-    <ClCompile Include="GEDCOM_input.cpp" />
-    <ClCompile Include="GEDCOM_input_fillVectors.cpp" />
-    <ClCompile Include="GEDCOM_input_listVectors.cpp" />
-    <ClCompile Include="GEDCOM_input_processName.cpp" />
     <ClCompile Include="GEDCOM_out.cpp" />
     <ClCompile Include="GetLastFirst.cpp" />
     <ClCompile Include="GetMarriage.cpp" />
@@ -432,7 +420,7 @@
     <ClCompile Include="inputGA_spouseString.cpp" />
     <ClCompile Include="inputGA_tableHeader.cpp" />
     <ClCompile Include="inputGEDCOM.cpp" />
-    <ClCompile Include="inputGEDCOM_tags.cpp" />
+    <ClCompile Include="inputGEDCOM_processTAGS.cpp" />
     <ClCompile Include="Languages.cpp" />
     <ClCompile Include="ListCtrlColoredHeader.cpp" />
     <ClCompile Include="MainFrm.cpp" />

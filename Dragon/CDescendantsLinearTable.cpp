@@ -492,7 +492,6 @@ void CDescendantsLinearTable::uniqueTable()
 			m_ListCtrl->SetItemText(nItem, L_CLRTEXT, L"");
 			m_ListCtrl->SetItemText(nItem, L_LINENUMBER, L"");
 			m_ListCtrl->SetItemText(nItem, L_NUMOFD, L"");
-	//		m_ListCtrl->SetItemText(nItem, L_ISM, L"");
 			m_ListCtrl->SetItemText(nItem, L_ID, L"");
 			m_ListCtrl->SetItemText(nItem, L_IDC, L"");
 			m_ListCtrl->SetItemText(nItem, L_IDF, L"");

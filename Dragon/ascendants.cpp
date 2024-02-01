@@ -22,6 +22,7 @@ CAscendants::CAscendants(CWnd* pParent /*=nullptr*/)
 	, s_editK(_T("1"))
 	, s_editG(_T("4"))
 	, m_checkColor(true)
+	, p_titololower(FALSE)
 {
 	m_recP = new CSqliteDBRecordSet;
 	m_recM = new CSqliteDBRecordSet;
@@ -58,6 +59,7 @@ void CAscendants::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_G, s_editG);
 	DDX_Check(pDX, IDC_CHECK_COLOR, m_checkColor);
 	DDX_Control(pDX, IDC_LINEAR_TITLE, colorLinearTitle);
+	DDX_Check(pDX, IDC_TITOLOLOWER, p_titololower);
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CAscendants, CDialogEx)
@@ -72,6 +74,8 @@ BEGIN_MESSAGE_MAP(CAscendants, CDialogEx)
 	ON_EN_KILLFOCUS(IDC_EDIT_K, &CAscendants::OnKillfocusEditK)
 	ON_BN_CLICKED(IDC_LINEAR, &CAscendants::OnClickedLinear)
 	ON_BN_CLICKED(IDC_LINEAR_SQLITETABLE, &CAscendants::OnClickedLinearSqlitetable)
+	ON_BN_CLICKED(IDC_GROUP_OTHER, &CAscendants::OnBnClickedGroupOther)
+	ON_BN_CLICKED(IDC_TITOLOLOWER, &CAscendants::OnClickedTitololower)
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CAscendants::OnInitDialog()
@@ -473,6 +477,7 @@ void CAscendants::saveParameters()
 	theApp.WriteProfileInt(L"dragon", L"m_NN", m_NN);
 	theApp.WriteProfileInt(L"dragon", L"m_peerPrint", m_peerPrint);
 	theApp.WriteProfileInt(L"dragon", L"m_checkColor", m_checkColor);
+	theApp.WriteProfileInt(L"dragon", L"p_titololower", p_titololower);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CAscendants::getParameters()
@@ -483,6 +488,7 @@ void CAscendants::getParameters()
 	m_NN = theApp.GetProfileInt(L"dragon", L"m_NN", 1);
 	m_peerPrint = theApp.GetProfileInt(L"dragon", L"m_peerPrint", 1);
 	m_checkColor = theApp.GetProfileInt(L"dragon", L"m_checkColor", 1);
+	p_titololower = theApp.GetProfileInt(L"dragon", L"p_titololower", p_titololower);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -829,6 +835,7 @@ void CAscendants::OnClickedLinearSqlitetable()
 	OnClickedPyramid();
 
 	CAscendantsLinearTable dlg;
+	dlg.p_titololower = p_titololower;
 	dlg.m_indentedFile = m_piramidFile;
 	dlg.m_name = m_rootName;
 	dlg.vGKR = &vGKR;
@@ -845,3 +852,15 @@ void CAscendants::OnClickedLinearSqlitetable()
 	dlg.DoModal();
 
 }
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CAscendants::OnClickedTitololower()
+{
+	p_titololower = !p_titololower;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CAscendants::OnBnClickedGroupOther()
+{
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+

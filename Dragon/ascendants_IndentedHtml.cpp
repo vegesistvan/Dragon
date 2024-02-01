@@ -376,6 +376,9 @@ CString CAscendants::getPeopleString(int i)
 	generation = m_recP->GetFieldString(DBP_GENERATION);
 	title = m_recP->GetFieldString(DBP_TITLE);
 	titolo = m_recP->GetFieldString(DBP_TITOLO);
+	if (p_titololower)
+		titolo = konvTitolo(titolo);
+
 	last_name = m_recP->GetFieldString(DBP_LAST_NAME);
 	first_name = m_recP->GetFieldString(DBP_FIRST_NAME);
 	posterior = m_recP->GetFieldString(DBP_POSTERIOR);
@@ -467,6 +470,22 @@ CString CAscendants::getPeopleString(int i)
 		str += L" család]";
 	}
 	return str;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CString CAscendants::konvTitolo(CString titolo)
+{
+	TCHAR kar;
+
+	for (int i = 0; i < titolo.GetLength(); ++i)
+	{
+		if (iswupper(titolo[i]))
+		{
+			kar = towlower(titolo[i]);
+			titolo.SetAt(i, kar);
+		}
+	}
+	return titolo;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CAscendants::getMarriage(CString rowid, CString rowidS)

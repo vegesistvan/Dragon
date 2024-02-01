@@ -1,7 +1,15 @@
 #pragma once
 
-#define VERSION L"10.165"
+#define VERSION L"10.169"
 
+// 10.169 2024.02.01 Felmenõknél és leszármazottaknál kis kezdõbetûs elõnév opció. 
+
+// 10.168 2024.01.30 3 féle CRLF
+ 
+// 10.167 2024.01.29 GEDCOM beolvasásban a NAME feldolgozás igazítása a Komoróczy.ged-hez
+// 
+// 10.166 2024.01.28 GEDCOM adatbázis esetén a leszármazottak hívásának javítása az új programra.
+// 
 // 10.165 2024.01.27 <li>,<ol>,<\ol> után CRFL, leszármazotti lista pareméterablakának átrendezése
 
 // 10.164 2024.01.20 Az interaktív lineáris táblában a családnevek kiemelése

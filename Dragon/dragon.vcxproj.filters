@@ -231,28 +231,19 @@
     <ClInclude Include="Date.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="old_descendants.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="old_descendantsParam.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="displayInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GEDCOM_file.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GEDCOM_input.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GEDCOM_out.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GEDCOM_TAGS.h">
+    <ClInclude Include="inputGEDCOM_TAGS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GEDCOM_typdef.h">
+    <ClInclude Include="inputGEDCOM_typdef.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GetLastFirst.h">
@@ -605,34 +596,10 @@
     <ClCompile Include="Date.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="old_descendants.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="old_descendantsParam.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="old_descendantsPrint..cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="old_descendantsPrintTxt.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="displayInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GEDCOM_file.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GEDCOM_input.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GEDCOM_input_fillVectors.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GEDCOM_input_listVectors.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GEDCOM_input_processName.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GEDCOM_out.cpp">
@@ -686,7 +653,7 @@
     <ClCompile Include="inputGEDCOM.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="inputGEDCOM_tags.cpp">
+    <ClCompile Include="inputGEDCOM_processTAGS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ListCtrlColoredHeader.cpp">
@@ -792,9 +759,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="unitedEntriesX.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="old_descendantsLinearTable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CDescendantsLinearTable.cpp">

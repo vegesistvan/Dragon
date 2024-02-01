@@ -213,6 +213,7 @@ protected:
 	int		p_connect;
 	int		p_childrenOrder;
 	BOOL	p_womenDescendants;
+	BOOL	p_titololower;
 	CString	p_generationMax;
 	
 	// Csak a html listákhoz
@@ -240,7 +241,7 @@ protected:
 
 
 ////////////////////////////////////////////////////////////////////////////////////////
-	bool p_print;		// azonnal nyomtassa ki a leszármazottat, a már szükségtelen rekordokat dobja el a vDesc-bõl. Ez hiba kereséshez jó.
+//	bool p_print;		// azonnal nyomtassa ki a leszármazottat, a már szükségtelen rekordokat dobja el a vDesc-bõl. Ez hiba kereséshez jó.
 	
 	CString str;
 	int m_generationMax;
@@ -333,6 +334,7 @@ protected:
 	DE::PPEOPLE sm;
 	DE::PPEOPLE ss;
 
+	CComboBox m_comboFamilyName;
 	// descendantsOld változói
 	int m_genPeer;
 	CString m_lastnamePrev;
@@ -418,6 +420,7 @@ protected:
 	void CDescendants::create_id();
 	void CDescendants::printGAline();
 	bool CDescendants::rowidExist();
+	CString CDescendants::konvTitolo(CString titolo);
 
 	DECLARE_MESSAGE_MAP()
 public:
@@ -432,13 +435,10 @@ public:
 	afx_msg void OnRepeatedFather();
 	afx_msg void OnRepeatedFirst();
 	afx_msg void OnPaint();
-//	afx_msg void OnClickedCheckBold();
 	afx_msg void OnClickedOrderInput();
 	afx_msg void OnOrderLength();
 	afx_msg void OnOrderDecreasing();
 	afx_msg void OnOrderBirth();
 
-
-
-	CComboBox m_comboFamilyName;
+	afx_msg void OnClickedTitololower();
 };

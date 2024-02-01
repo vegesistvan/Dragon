@@ -1074,8 +1074,6 @@ void CRelatives::OnDescendants()
 	theApp.v_tableNumbers.clear();
 	theApp.v_tableNumbers.push_back(L"1");
 
-//	CDescendantsOld desc;
-//	desc.start();
 	CDescendants dlg;
 	dlg.DoModal();
 }

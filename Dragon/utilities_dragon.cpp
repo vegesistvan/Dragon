@@ -248,7 +248,6 @@ bool extract(CString cLine, GEDLINE* lxtv)
 		else
 			word3 = left3.Left(pos4);				// lehet 3-nál több szó is: 3. szó
 	}
-
 	
 	// a szavak ellenõrzése és lxtv értékadása
 	if (!isNumeric(word1))

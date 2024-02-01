@@ -137,6 +137,10 @@ BOOL CGEDCOMInput::OnInitDialog()
 		GetDlgItem(IDOK)->EnableWindow(false);
 
 	m_nomore = false;		// Ha a https egyszer sikertelen, akkor többet nem próbálkozik vele.
+
+	theApp.m_gedPathName.Format(L"%s\\%s", theApp.m_dbFolderPath, theApp.m_gedFileName);
+
+
 	return TRUE;
 }
 

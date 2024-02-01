@@ -30,6 +30,7 @@ CDescendants::CDescendants(CWnd* pParent /*=nullptr*/)
 	, p_repeatedColor(FALSE)
 	, p_checkCRLF(FALSE)
 	, p_childrenOrder(1)
+	, p_titololower(FALSE)
 {
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -74,7 +75,7 @@ void CDescendants::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_RADIO_NOFAMILYNAME, m_descendantNameRadio);
 	DDX_Radio(pDX, IDC_ORDER_INPUT, p_childrenOrder);
 	DDX_Control(pDX, IDC_BUTTON_BGNCOLOR, m_backgroundColor);
-	
+	DDX_Check(pDX, IDC_TITOLOLOWER, p_titololower);
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CDescendants, CDialogEx)
@@ -104,6 +105,7 @@ BEGIN_MESSAGE_MAP(CDescendants, CDialogEx)
 	ON_COMMAND(IDC_ORDER_LENGTH, &CDescendants::OnOrderLength)
 	ON_COMMAND(IDC_ORDER_DECREASING, &CDescendants::OnOrderDecreasing)
 	ON_COMMAND(IDC_ORDER_BIRTH, &CDescendants::OnOrderBirth)
+	ON_BN_CLICKED(IDC_TITOLOLOWER, &CDescendants::OnClickedTitololower)
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CDescendants::OnInitDialog()
@@ -160,7 +162,8 @@ BOOL CDescendants::OnInitDialog()
 		GetDlgItem(IDC_CHECK_CONNECT)->EnableWindow(false);
 	}
 	
-	if (theApp.v_rowid.size() < 2 && theApp.v_tableNumbers.size() < 2)
+//	if (theApp.v_rowid.size() < 2 && theApp.v_tableNumbers.size() < 2)
+	if ( theApp.v_tableNumbers.size() < 2)
 	{
 		p_oneOutputFile = true;
 		UpdateData(TOSCREEN);
@@ -178,6 +181,7 @@ void CDescendants::setParameters()
 	p_connect			= theApp.GetProfileInt(L"dragon", L"p_connect", p_connect);
 	p_womenDescendants	= theApp.GetProfileInt(L"dragon", L"p_womenDescendants", p_womenDescendants);
 	p_childrenOrder		= theApp.GetProfileInt(L"dragon", L"p_childrenOrder", p_childrenOrder);
+	p_titololower		= theApp.GetProfileInt(L"dragon", L"p_titololower", p_titololower);
 	p_repeated			= theApp.GetProfileInt(L"dragon", L"p_repeated", p_repeated);
 	p_repeatedColor		= theApp.GetProfileInt(L"dragon", L"p_repeatedColor", p_repeatedColor);
 	p_folyt				= theApp.GetProfileInt(L"dragon", L"p_folyt", p_folyt);
@@ -202,6 +206,7 @@ void CDescendants::OnClickedDefault()
 {
 	p_connect = true;
 	p_womenDescendants = true;
+	p_titololower = false;
 	p_folyt = false;
 	p_capital = false;
 	p_checkCRLF = false;
@@ -252,6 +257,7 @@ void CDescendants::updateParameters()
 
 
 	m_backgroundColor.SetColor(BLACK, p_colorBgrnd);
+
 
 	updateRadioDName();
 	updateRadioNumbering();
@@ -590,6 +596,7 @@ void CDescendants::OnBnClickedOk()
 	theApp.WriteProfileInt(L"dragon", L"p_connect", p_connect);
 	theApp.WriteProfileInt(L"dragon", L"p_womenDescendants", p_womenDescendants);
 	theApp.WriteProfileInt(L"dragon", L"p_childrenOrder", p_childrenOrder);
+	theApp.WriteProfileInt(L"dragon", L"p_titololower", p_titololower);
 	theApp.WriteProfileInt(L"dragon", L"p_repeated", p_repeated);
 	theApp.WriteProfileInt(L"dragon", L"p_repeatedColor", p_repeatedColor);
 	theApp.WriteProfileInt(L"dragon", L"p_folyt", p_folyt);
@@ -612,4 +619,10 @@ void CDescendants::OnBnClickedOk()
 	create_vDesc();
 
 	CDialog::OnCancel();
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDescendants::OnClickedTitololower()
+{
+	p_titololower = !p_titololower;
+	UpdateData(TOSCREEN);
 }

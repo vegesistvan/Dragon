@@ -302,6 +302,7 @@ protected:
 	TCHAR CAscendants::get_gABC(int g);
 	bool CAscendants::sticky();
 	bool CAscendants::tableHeaderFix(int which);
+	CString CAscendants::konvTitolo(CString titolo);
 	
 	DECLARE_MESSAGE_MAP()
 public:
@@ -317,4 +318,7 @@ public:
 	afx_msg void OnClickedCheckFirstBold();
 	afx_msg void OnClickedLinear();
 	afx_msg void OnClickedLinearSqlitetable();
+	afx_msg void OnBnClickedGroupOther();
+	BOOL p_titololower;
+	afx_msg void OnClickedTitololower();
 };
