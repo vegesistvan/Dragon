@@ -70,7 +70,6 @@ void CDescendants::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_CRLF, p_checkCRLF);
 	DDX_Control(pDX, IDC_ORDER_TXT, colorOrder);
 	DDX_Control(pDX, IDC_GROUP_ALL_TEXT, groupAllText);
-	DDX_Control(pDX, IDC_GROUP_DONTWORK_TEXT, groupDontworkText);
 	DDX_Control(pDX, IDC_GROUP_INDENTED_TEXT, groupIndentedText);
 	DDX_Control(pDX, IDC_RADIO_NOFAMILYNAME, m_descendantNameRadio);
 	DDX_Radio(pDX, IDC_ORDER_INPUT, p_childrenOrder);
@@ -102,8 +101,6 @@ BEGIN_MESSAGE_MAP(CDescendants, CDialogEx)
 
 	ON_WM_PAINT()
 	ON_BN_CLICKED(IDC_ORDER_INPUT, &CDescendants::OnClickedOrderInput)
-	ON_COMMAND(IDC_ORDER_LENGTH, &CDescendants::OnOrderLength)
-	ON_COMMAND(IDC_ORDER_DECREASING, &CDescendants::OnOrderDecreasing)
 	ON_COMMAND(IDC_ORDER_BIRTH, &CDescendants::OnOrderBirth)
 	ON_BN_CLICKED(IDC_TITOLOLOWER, &CDescendants::OnClickedTitololower)
 END_MESSAGE_MAP()
@@ -529,12 +526,12 @@ void CDescendants::OnOrderBirth()
 }
 void CDescendants::OnOrderLength()
 {
-	p_childrenOrder = DE::ORDER_INCREASING;
+
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendants::OnOrderDecreasing()
 {
-	p_childrenOrder = DE::ORDER_DECREASING;
+
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CDescendants::getComplexDescription(int i, bool parentIndex)

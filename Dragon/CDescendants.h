@@ -4,6 +4,8 @@
 #include "colorbutton.h"
 
 #define WM_RELOAD			WM_USER + 0x1FF9
+
+
 namespace DE
 {
 	typedef struct
@@ -300,6 +302,9 @@ protected:
 	std::vector<DE::LMX>vLMX;				// a generáció utolsó kiírt motherIndexe a leszármazotti listában
 	std::vector<DE::LEN>* vLenOu;
 	std::vector<int> vSib;
+	std::vector<DE::DESC> vDesc2;
+	std::vector<DE::DESC> vDL;
+	
 
 	DE::PEO peoS;
 
@@ -421,6 +426,7 @@ protected:
 	void CDescendants::printGAline();
 	bool CDescendants::rowidExist();
 	CString CDescendants::konvTitolo(CString titolo);
+	void CDescendants::OnDescendantLength();
 
 	DECLARE_MESSAGE_MAP()
 public:

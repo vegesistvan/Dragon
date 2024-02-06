@@ -379,73 +379,7 @@ void CDescendantsLinearTable::dataTable( bool repeated)
 	m_listedP = 0;
 	m_listedD = 0;
 	m_indent = 0;
-/*
-	vLMX.clear();		// a generáció utolsó kiírt motherIndexe
-	vSerial.clear();
-	vSerial.push_back(1);
-	str.Format(L"%s leszármazottainak listázása...", m_os);
-	CProgressWnd wndP(NULL, str);
-	wndP.GoModal();
-	wndP.SetRange(0, vDesc->size());
-	wndP.SetPos(0);
 
-	// Az id kitöltése, hogy a tényleges listában meh tudja adni a gyerek id-jét
-	for (int i = 0; i < vDesc->size(); ++i)
-	{
-		vDesc->at(i).printed = false;
-		vDesc->at(i).id = -1;
-	}
-	std::vector<DE::DESC> vD1;
-	std::vector<DE::DESC> vD2;
-	int cnt;
-	int g = 1;
-
-	for (int i = 0; i < vDesc->size(); ++i)
-	{
-		desc = vDesc->at(i);
-		if (desc.hidden || (p_repeated != 0 && desc.status == 2))
-		{
-			vDesc->at(i).printed = true;
-			vDesc->at(i).id = -1;
-		}
-	}
-
-
-	cnt = 0;
-	vD1.clear();
-	vDesc->at(0).id = cnt;
-	++cnt;
-	vDesc->at(0).printed = true;
-	vD1.push_back(vDesc->at(0));
-
-	// vD1-k már ki vannak írva, a gyerekeiken kell végigmenni, akiket vD2-be gyûjtünk
-	while( true )
-	{
-		vD2.clear();
-		for (int i = 0; i < vD1.size(); ++i)
-		{
-			desc = vD1.at(i);
-			rowidF = vD1.at(i).rowid;		
-			for (int j = 0; j < desc.numOfChildren; ++j)
-			{
-				// gyerekeiket keressük
-				for (int k = i+1; k < vDesc->size(); ++k)
-				{
-					if (vDesc->at(k).printed) continue;
-					if (vDesc->at(k).rowidF == rowidF)
-					{
-						vDesc->at(k).printed = true;
-						vDesc->at(k).id = cnt;		// saját id;
-						++cnt;
-						vD2.push_back(vDesc->at(k));
-					}
-				}
-			}
-		}
-		vD1 = vD2;
-		if (!vD1.size()) break;
-	}
-*/
 	str.Format(L"%s leszármazottainak listázása...", m_os);
 	CProgressWnd wndP(NULL, str);
 	wndP.GoModal();
@@ -464,27 +398,6 @@ void CDescendantsLinearTable::dataTable( bool repeated)
 
 		printDesc(i, repeated);
 	}
-
-/*
-	int gPrev = -1;
-	int ordPrev = 0;
-	int ix1 = 0;		// rendezendõ bejegyzések elsõ elemének indexe
-	int ix2;			// rendezendõ bejegyzések utolsó elemének indexe
-	for (int i = 0; i > vDesc->size(); ++i)
-	{
-		if (vDesc->at(i).g != gPrev || vDesc->at(i).childorder != ordPrev + 1)
-		{
-			ix2 = i;
-			if (ix2 > ix1)
-			{
-				std::sort(vDesc->begin() + ix1, vDesc->begin() + ix2, sortBynOfD1);
-			}
-			ix1 = i + 1;
-			gPrev = vDesc->at(i).g;
-			ordPrev = vDesc->at(i).childorder;
-		}
-	}
-*/
 	wndP.DestroyWindow();
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -640,7 +553,12 @@ TCHAR CDescendantsLinearTable::get_gABC(int g)
 {
 	TCHAR gABC;
 	int ix = g / 26;		  // ix = 0, ha g kisebb mint 26, = 1 Ha nagyobb
-	gABC = TCHAR('A') + ix * 6 + g;   // 6 : a 'Z' és 'a' közötti karakterek száma,
+	int G = g % 26;
+
+	if( isEven(ix) )
+		gABC = TCHAR('A') + G;   // 6 : a 'Z' és 'a' közötti karakterek száma,
+	else
+		gABC = TCHAR('a') + G;   // 6 : a 'Z' és 'a' közötti karakterek száma,
 	return gABC;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -752,12 +670,6 @@ bool CDescendantsLinearTable::printTopContainer(CString title)
 		break;
 	case DE::ORDER_BIRTH:
 		sorrend = L"születési idõ";
-		break;
-	case DE::ORDER_INCREASING:
-		sorrend = L"növekvõ hosszúságú leszármazotti szálak";
-		break;
-	case DE::ORDER_DECREASING:
-		sorrend = L"csökkenõ hosszúságú leszármazotti szálak";
 		break;
 	}
 	str.Format(L"%*s %s", l, L"Sorrend:", sorrend);

@@ -374,6 +374,7 @@ TCHAR CAscendantsLinearTable::get_gABC(int g)
 {
 	TCHAR gABC;
 	int ix = g / 26;		  // ix = 0, ha g kisebb mint 26, = 1 Ha nagyobb
+	int G = g % 26;
 	gABC = TCHAR('A') + ix * 6 + g;   // 6 : a 'Z' és 'a' közötti karakterek száma,
 	return gABC;
 }

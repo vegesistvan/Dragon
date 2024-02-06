@@ -8,6 +8,16 @@
 #include "Table_tables.h"
 #include "Table_people.h"
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bool sortById3(const DE::DESC& d1, const DE::DESC& d2)
+{
+	return(d1.id < d2.id);
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bool sortByNumOfD(const DE::DESC& d1, const DE::DESC& d2)
+{
+	return(d1.nOfD > d2.nOfD);
+}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool sortByOrder(const DE::DESC& v1, const DE::DESC& v2)
 {
@@ -82,6 +92,7 @@ BOOL CDescendants::create_vDesc()
 		desc.hidden = false;
 		desc.cntRep = 0;
 		desc.order = 0;
+		desc.numOfRep = 0;
 		desc.original = 0;
 		desc.fatherIndex = -1;  // nincs apja
 		vDesc.clear();
@@ -122,6 +133,8 @@ BOOL CDescendants::create_vDesc()
 		dlg.p_checkCRLF = p_checkCRLF;
 		dlg.p_oneOutputFile = p_oneOutputFile;
 		dlg.p_repeatedColor = p_repeatedColor;
+		dlg.p_rowWidth = p_rowWidth;
+		dlg.p_colorBgrnd = p_colorBgrnd;
 
 		dlg.m_descendantsPath = m_descendantsPath;
 		dlg.vDesc = &vDesc;
@@ -247,6 +260,7 @@ bool CDescendants::tablesDescendants()  // listázandó táblák a theapp.v_tableNum
 		desc.name = peoS.name;
 		desc.cntRep = 0;
 		desc.order = 0;
+		desc.numOfRep = 0;
 		desc.fatherIndex = -1;  // ez nem biztos!!!!!!!!
 
 		vDesc.clear();
@@ -396,6 +410,7 @@ void CDescendants::descendants()
 		desc.motherIndex = peoS.motherIndex;
 		desc.procChildren = 0;
 		desc.order = 0;
+		desc.numOfRep = 0;
 		desc.original = vDesc.size();
 
 		desc.parentIndex = i;
@@ -436,10 +451,6 @@ void CDescendants::descendants()
 		}
 	}
 	wndP.DestroyWindow();
-
-	if (p_childrenOrder == DE::ORDER_INCREASING || p_childrenOrder == DE::ORDER_DECREASING) //  leszármazotti szál növekvõ vagy csökkenõ sorrendjét kérjük
-		order_vDesc();
-
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendants::print_vDesc()
@@ -454,160 +465,6 @@ void CDescendants::print_vDesc()
 	fclose(text);
 	theApp.showFile(fileSpec);
 }
-
-/*
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendants::descendants()
-{
-	CString rowid;
-	int i;
-	int j;
-	int numOfChildren;
-	int procChildren;
-	int z = 0;
-	int cnt = 0;
-	int maxGen = _wtoi(p_generationMax) - 2;
-	m_actGen = 0;
-	m_gMax = 0;
-	m_givup = 0;
-	m_canceled = false;
-	m_cntRepeated = 0;
-	DN::DESC desc;
-
-	m_listedP = 0;
-	m_listedD = 0;
-	m_maxDesc = 2000000;
-	if (maxGen == -2) maxGen = 0;
-	//	CString fileSpec;
-	//	fileSpec = theApp.openTextFile(&fl, L"vDesc", L"w+");
-
-
-	str.Format(L"%s leszármazottainak összegyûjtése folyik...", m_os);
-	CProgressWnd wndP(NULL, str);
-	wndP.GoModal();
-	wndP.SetRange(0, 10000);
-	wndP.SetPos(0);
-
-//	m_folyt_db = 0;
-	while (true)
-	{
-		if (cnt == 10000)	cnt = 0;
-		wndP.SetPos(cnt);
-		wndP.PeekAndPump();
-		if (wndP.Cancelled())
-		{
-			m_canceled = true;
-			break;
-		}
-		++cnt;
-
-		if (maxGen && m_actGen > maxGen)
-		{
-			m_actGen = -100;		// jelzi, hogy a listára írja ki, hogy a generációk magas száma miatt szakdt meg a listázás
-			break;
-		}
-
-
-		// A vektor utolsó bejegyzésétõl vagy a visszatekert szülõtöl indul
-		//numOfChildren = vDesc.at(i).numOfChildren;
-		//procChildren = vDesc.at(i).procChildren;
-		//visszamegy az utolsó emberre, akinek még van ki fel nem dolgozott gyereke
-		for (i = vDesc.size() - 1; i >= 0; --i)
-		{
-
-			if (vDesc.at(i).rowid == L"26103")
-				z = 1;
-
-			//			if (vDesc.at(i).hidden) continue;   // mert csak gyûj
-
-			if (vDesc.at(i).sex == WOMAN && !p_womenDescendants)		// ha nõ a leszármazott és annak a gyerekeit nem akarjuk listázni
-			{
-				vDesc.at(i).numOfChildren = 0;
-				vDesc.at(i).procChildren = 0;
-			}
-
-			numOfChildren = vDesc.at(i).numOfChildren;
-			procChildren = vDesc.at(i).procChildren;
-			if (numOfChildren && numOfChildren != procChildren)
-				break;
-
-		}
-		if (i < 0)
-			break;	// vége van a programnak, nincs több fel nem dolgozott gyerek!! Kilép a ciklusból
-		// a kinyomtatott ember következõ, míg ki nem nyomtatott gyerekét keresi
-		// szülõ index: i;
-		str = m_tablenumber;
-		rowid = getNextChildRowid(i);
-		if (rowid.IsEmpty()) continue;  // nincs gyereke
-		m_actGen = vDesc.at(i).g;
-		if (m_actGen >= m_gMax)
-			m_gMax = m_actGen;
-		queryR(rowid);		// lekérdezi a gyereket és beállítja m_sex_id-t és m_numOfSpouses-t
-
-		m_tablenumber = peoS.tablenumber;
-
-		if (rowid == L"308824")
-			z = 1;
-
-		desc.rowid = rowid;
-		desc.name = peoS.name;
-		desc.sex = peoS.sex;
-		desc.numOfSpouses = peoS.numOfSpouses;
-		desc.numOfChildren = peoS.numOfChildren;
-		desc.motherIndex = peoS.motherIndex;
-		desc.procChildren = 0;
-		desc.order = 0;
-		desc.original = vDesc.size();
-
-		desc.parentIndex = i;
-		desc.parentSex = vDesc.at(i).sex;
-		desc.g = vDesc.at(i).g + 1;		// apja generációjánál 1-el nagyobb
-		desc.fatherIndex = i;
-		desc.status = 0;
-
-		vDesc.at(i).procChildren += 1;		// a most feldolgozott testvéreinek száma nõ egyet
-		desc.childorder = vDesc.at(i).procChildren;
-
-		desc.hidden = false;
-		desc.cntRep = 0;
-
-		if (p_repeated == 1)						// ismétlõdõ leszármazottak kihagyása
-		{
-			for (j = 0; j < vDesc.size(); ++j)
-			{
-				if (vDesc.at(j).rowid == rowid)		// szerepel-e a már meglaláltak között a rowid?
-					break;
-			}
-			if (j == vDesc.size())					// csak akkor teszi el, ha nem találta ismétlõdõnek
-				vDesc.push_back(desc);				//
-			else
-				++m_cntRepeated;
-		}
-		else
-			vDesc.push_back(desc);
-
-		if (vDesc.size() == m_maxDesc)
-		{
-			str.Format(L"%d leszármazottnál feladom!", m_maxDesc);
-			AfxMessageBox(str, MB_ICONEXCLAMATION);
-			m_givup = vDesc.size();
-			break;
-		}
-
-		i = vDesc.size() - 1;
-		//		fwprintf(fl, L"%20s %8s %2d %1d\n", vDesc.at(i).name, vDesc.at(i).rowid, vDesc.at(i).numOfChildren, vDesc.at(i).sex);
-		//		fflush(fl);
-		if (rowid == L"349494")
-			z = 1;
-	}
-	wndP.DestroyWindow();
-//	i = m_folyt_db;
-	if (p_childrenOrder == ORDER_INCREASING || p_childrenOrder == ORDER_DECREASING ) //  leszármazotti szál növekvõ vagy csökkenõ sorrendjét kérjük
-		order_vDesc();
-	//	fclose(fl);
-	//	theApp.showFile(fileSpec);
-}
-*/
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendants::descendantsOld()
@@ -1293,17 +1150,7 @@ void CDescendants::order_vDesc()
 	//		break;
 		}
 	*/
-
-
-	// A vLen vektort kívánság szerint rendezi
-	if (p_childrenOrder == DE::ORDER_INCREASING)
-	{
-		std::sort(vLenOu->begin(), vLenOu->end(), sortByOrderAsc);
-	}
-	else
-	{
-		std::sort(vLenOu->begin(), vLenOu->end(), sortByOrderDesc);
-	}
+	
 	printvLen();
 
 	// A vDesc vektorba átvezeti a sorrendet, majd ennek megfelelõen rendezi azt
@@ -1354,11 +1201,13 @@ void CDescendants::numOfDesc()
 		vSib.clear();
 		for (j = i + 1; j < vDesc.size(); ++j)
 		{
+
 			if (vDesc.at(j).g <= g)
 			{
 				bottom = j;
 				break;
 			}
+
 			// gyerekek indexe
 			if (vDesc.at(j).rowidF == rowidF)
 			{
@@ -1385,7 +1234,7 @@ void CDescendants::numOfDesc()
 void CDescendants::create_id()
 {
 
-	// Az id kitöltése, hogy a tényleges listában meh tudja adni a gyerek id-jét
+	// Az id kitöltése, hogy a tényleges listában meg tudja adni a gyerek id-jét
 	for (int i = 0; i < vDesc.size(); ++i)
 	{
 		vDesc.at(i).printed = false;
@@ -1394,6 +1243,7 @@ void CDescendants::create_id()
 		vDesc.at(i).id = -1; 
 		vDesc.at(i).ixM.Empty();
 	}
+	
 	std::vector<DE::DESC> vD1;
 	std::vector<DE::DESC> vD2;
 	int cnt;
@@ -1407,19 +1257,6 @@ void CDescendants::create_id()
 	wndP.SetRange(0, vDesc.size());
 	wndP.SetPos(0);
 
-/*
-	for (int i = 0; i < vDesc.size(); ++i)
-	{
-		desc = vDesc.at(i);
-//		if (desc.hidden || (p_repeated != 0 && desc.status == 2))
-
-//		if( desc.hidden )
-//		{
-//			vDesc.at(i).printed = true;
-//		}
-		
-	}
-*/
 
 	cnt = 0;
 	vD1.clear();
@@ -1442,7 +1279,7 @@ void CDescendants::create_id()
 			for (int j = 0; j < desc.numOfChildren; ++j)
 			{
 				// gyerekeiket keressük
-				for (int k = i + 1; k < vDesc.size(); ++k)
+				for (int k = 0; k < vDesc.size(); ++k)
 				{
 					if (!vDesc.at(k).printed) 
 					{
@@ -1473,11 +1310,13 @@ void CDescendants::create_id()
 
 	int j;
 	int gPrev = -1;
+	// apák azonosítója
 	for (int i = 0; i < vDesc.size(); ++i)
 	{
 		for ( j = 0; j < vDesc.size(); ++j)
 		{
-			if (vDesc.at(j).rowid == vDesc.at(i).rowidF && vDesc.at(j).cntRep == vDesc.at(i).cntRep )
+	//		if (vDesc.at(j).rowid == vDesc.at(i).rowidF && vDesc.at(j).cntRep == vDesc.at(i).cntRep )
+			if (vDesc.at(j).rowid == vDesc.at(i).rowidF && vDesc.at(j).g + 1 == vDesc.at(i).g)
 			{
 				vDesc.at(i).idF = vDesc.at(j).id;
 				break;
@@ -1487,17 +1326,18 @@ void CDescendants::create_id()
 		{
 			for (j = 0; j < vDesc.size(); ++j)
 			{
-				if (vDesc.at(j).rowid == vDesc.at(i).rowidF  )
+				if (vDesc.at(j).rowid == vDesc.at(i).rowidF && vDesc.at(j).g + 1 == vDesc.at(i).g)
 				{
 					vDesc.at(i).idF = vDesc.at(j).id;
 					break;
 				}
 			}
 		}
-
+		// gyerekek azonosítója
 		for ( j = 0; j < vDesc.size(); ++j)
 		{
-			if (vDesc.at(j).rowidF == vDesc.at(i).rowid && vDesc.at(j).cntRep == vDesc.at(i).cntRep)
+		//	if (vDesc.at(j).rowidF == vDesc.at(i).rowid && vDesc.at(j).cntRep == vDesc.at(i).cntRep)
+			if (vDesc.at(j).rowidF == vDesc.at(i).rowid && vDesc.at(j).g == vDesc.at(i).g + 1)
 			{
 				vDesc.at(i).idC = vDesc.at(j).id;
 				break;
@@ -1507,7 +1347,7 @@ void CDescendants::create_id()
 		{
 			for (j = 0; j < vDesc.size(); ++j)
 			{
-				if (vDesc.at(j).rowidF == vDesc.at(i).rowid )
+				if (vDesc.at(j).rowidF == vDesc.at(i).rowid && vDesc.at(j).g == vDesc.at(i).g + 1)
 				{
 					vDesc.at(i).idC = vDesc.at(j).id;
 					break;
@@ -1517,7 +1357,46 @@ void CDescendants::create_id()
 		wndP.StepIt();
 		wndP.PeekAndPump();
 		if (wndP.Cancelled()) break;
-
+		
 	}
+	std::sort(vDesc.begin(), vDesc.end(), sortById3);
+
+	OnDescendantLength();
 	wndP.DestroyWindow();
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDescendants::OnDescendantLength()
+{
+	int idC;
+	int dbC;
+	int id;
+	int j;
+	int k;
+	int cnt;
+	DE::DESC desc;
+	std::vector<DE::DESC> vCH;
+	
+	for (int i = 0; i < vDesc.size(); ++i)
+	{
+		desc = vDesc.at(i);
+
+		idC = desc.idC;
+		dbC = desc.numOfChildren;
+		
+		if (dbC > 1)
+		{
+			j = idC;
+			k = idC + dbC;
+			std::sort(vDesc.begin()+idC, vDesc.begin()+k, sortByNumOfD);
+			cnt = 1;
+			for (j = idC; j < k; ++j)
+			{
+				vDesc.at(j).id = j;
+				vDesc.at(j).childorder = cnt;
+				vDesc.at(j).idF = i;
+				++cnt;
+
+			}
+		}
+	}
 }

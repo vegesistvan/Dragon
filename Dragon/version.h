@@ -1,6 +1,10 @@
 #pragma once
 
-#define VERSION L"10.169"
+#define VERSION L"10.171"
+
+// 10.170 2024.02.06 Leszármazotti szálak sorrendje csökenõ hosszúság
+//  
+// 10.170 2024.02.01 GEDCOM beolvasásnál a kis kezdõbetûs elõnevek kezelése. (Komoróczy NAME esetén);
 
 // 10.169 2024.02.01 Felmenõknél és leszármazottaknál kis kezdõbetûs elõnév opció. 
 

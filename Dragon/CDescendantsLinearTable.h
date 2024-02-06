@@ -31,6 +31,13 @@ enum
 	REPEATED
 };
 
+typedef struct
+{
+	int ix;
+	int  numOfD;
+	int g;
+}CH;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class CDescendantsLinearTable : public CDialogEx
 {
@@ -114,10 +121,28 @@ protected:
 	std::vector<CString>vFullname;		// már listázott házastársak neve
 	std::vector<CString>vSpouseIndex;
 	std::vector<int> vSib;
+	std::vector<DE::DESC> vDL;
+	std::vector<CH> vCH;
+	std::vector<DE::DESC> vD;
 
 	DE::PEO peoS;
 
 	bool gflag;
+
+	int m_actGen;
+	int m_gMax;
+	int m_givup;
+	bool m_canceled;
+	int m_cntRepeated;
+	
+	int m_maxDesc;
+
+	_int64 m_startTime;
+	CString m_rowid;
+	CString m_tablenumber;
+	CString m_filePathName;
+	
+
 	void CDescendantsLinearTable::keress(int start);
 	void CDescendantsLinearTable::dataTable( bool repaeted);
 	int CDescendantsLinearTable::sort_vDesc();
@@ -155,6 +180,13 @@ protected:
 	void CDescendantsLinearTable::uniqueTable();
 	BOOL CDescendantsLinearTable::attachDialogs();
 	CString CDescendantsLinearTable::konvTitolo(CString titolo);
+	bool CDescendantsLinearTable::openHtml();
+	bool CDescendantsLinearTable::closeHtml();
+	void CDescendantsLinearTable::createStyle();
+
+	BOOL CDescendantsLinearTable::create_vD();
+	void CDescendantsLinearTable::descendants();
+
 
 	CString getSeededName(int i);
 	DECLARE_MESSAGE_MAP()
@@ -173,6 +205,15 @@ protected:
 	afx_msg LRESULT CDescendantsLinearTable::OnSetRowColor(WPARAM wParam, LPARAM lParam);//wparam: oszlopszam, lparam: a COLUMNCOLOR struktura cime
 	afx_msg void OnIndentedList();
 
+	void CDescendantsLinearTable::printVector(int tbl);
+	void CDescendantsLinearTable::printBegining(int i);
+	void CDescendantsLinearTable::print1(CString str);
+
+
+	CString m_tag1;
+	CString m_tag2;
+	CString m_diamond;
+	int m_genPrev;
 
 
 	CRichEditCtrl m_RichEditCtrl;
@@ -192,6 +233,7 @@ protected:
 public:
 	std::vector<DE::DESC>* vDesc;
 	
+
 // linearTable-hoz
 	int p_childrenOrder;
 	int p_descendantName;
@@ -222,11 +264,13 @@ public:
 	BOOL p_checkCRLF;
 	BOOL p_oneOutputFile;
 	BOOL p_repeatedColor;
-
+	CString p_rowWidth;
 
 	CString m_name;
 	CString m_htmlFile;
 	CString m_descendantsPath;
+	CString m_htmlPathName;
 
+	afx_msg void OnDescendantLength();
 };
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

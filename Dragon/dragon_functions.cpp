@@ -58,7 +58,7 @@ void CDragApp::OnListsAll()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDragApp::OnUpdateListsRowid(CCmdUI* pCmdUI)
 {
-	if (m_inputMode != GAHTML) pCmdUI->Enable(FALSE);
+
 }
 void CDragApp::OnListsRowid()
 {

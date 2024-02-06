@@ -147,6 +147,7 @@ void CInputGEDCOM::name()
 	CString sex;
 	TCHAR lastCharacter;
 	TCHAR firstCharacter;
+	TCHAR kar;
 
 	value.Remove('/');
 	value.Remove('\\');
@@ -229,6 +230,12 @@ void CInputGEDCOM::name()
 		}
 	}
 	lastname.TrimRight();
+	if (lastname.IsEmpty())
+	{
+		lastname = titolo;
+		titolo.Empty();
+	}
+
 
 	for (int i = 0; i < n; ++i)
 	{
@@ -241,6 +248,19 @@ void CInputGEDCOM::name()
 		}
 	}
 	comment.TrimRight();
+
+	if (titolo.IsEmpty() && !comment.IsEmpty())
+	{
+		firstCharacter = comment.GetAt(0);
+		lastCharacter = comment.GetAt(comment.GetLength() - 1);
+		if (IsCharLowerW(firstCharacter) && lastCharacter == 'i')
+		{
+			titolo = comment;
+			kar = towupper(titolo[0]);
+			titolo.SetAt(0, kar);
+			comment.Empty();
+		}
+	}
 
 
 	I.title = title;

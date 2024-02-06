@@ -840,7 +840,7 @@ BOOL CDescendants::openHtml(CString file, CString title, UINT colorBgrnd)
 
 
 	//str.Format(L"<b><center>%s</center>\n<pre></b>\n", title);
-	str.Format(L"<b><center>%s</center></b><br>\n\n", title);
+	str.Format(L"<b><center>%s</center></b><br>", title);
 	print(str);
 	print(L"<center><img src = \"dragon.jpg\" alt = \"Dragon\" width = \"100\" height = \"70\"></center>");
 
@@ -916,12 +916,6 @@ BOOL CDescendants::openHtml(CString file, CString title, UINT colorBgrnd)
 	case DE::ORDER_BIRTH:
 		sorrend = L"születési idõ";
 		break;
-	case DE::ORDER_INCREASING:
-		sorrend = L"növekvõ hosszúságú leszármazotti szálak";
-		break;
-	case DE::ORDER_DECREASING:
-		sorrend = L"csökkenõ hosszúságú leszármazotti szálak";
-		break;
 	}
 
 	str.Format(L"%*s %s", l, L"Sorrend:", sorrend);
@@ -966,32 +960,28 @@ void CDescendants::createStyle()
 	//	font = L"<font-family: Avenir Next, Calibri, Verdana, sans-serif>\n";
 	//	fwprintf( fl, font );
 
-//	if (p_numbering != SZLUHA)
-	{
-		fwprintf(fl, L"ul {\n");
-		fwprintf(fl, L"display: block;\n");
-		fwprintf(fl, L"max-width: 200%;\n");
-		//	fwprintf( fl, L"list-style-type: square;\n" );
-		fwprintf(fl, L"list-style-type: none;\n");
-		fwprintf(fl, L"margin-top: 0 em;\n");
-		fwprintf(fl, L"margin-bottom: 0 em;\n");
-		fwprintf(fl, L"margin-left: 0;\n");
-		fwprintf(fl, L"margin-right: 0;\n");
-		fwprintf(fl, L"padding-left: 40px;\n");
-		fwprintf(fl, L"}\n");
-	}
-//	else
-	{
-		fwprintf(fl, L"ol {\n");
-		fwprintf(fl, L"display: block;\n");
-		fwprintf(fl, L"list-style-type: decimal;\n");
-		fwprintf(fl, L"margin-top: 0 em;\n");
-		fwprintf(fl, L"margin-bottom: 0 em;\n");
-		fwprintf(fl, L"margin-left: 0;\n");
-		fwprintf(fl, L"margin-right: 0;\n");
-		fwprintf(fl, L"padding-left: 40px;\n");
-		fwprintf(fl, L"}\n");
-	}
+	fwprintf(fl, L"ul {\n");
+	fwprintf(fl, L"display: block;\n");
+	fwprintf(fl, L"max-width: 200%;\n");
+	//	fwprintf( fl, L"list-style-type: square;\n" );
+	fwprintf(fl, L"list-style-type: none;\n");
+	fwprintf(fl, L"margin-top: 0 em;\n");
+	fwprintf(fl, L"margin-bottom: 0 em;\n");
+	fwprintf(fl, L"margin-left: 0;\n");
+	fwprintf(fl, L"margin-right: 0;\n");
+	fwprintf(fl, L"padding-left: 40px;\n");
+	fwprintf(fl, L"}\n");
+
+	fwprintf(fl, L"ol {\n");
+	fwprintf(fl, L"display: block;\n");
+	fwprintf(fl, L"list-style-type: decimal;\n");
+	fwprintf(fl, L"margin-top: 0 em;\n");
+	fwprintf(fl, L"margin-bottom: 0 em;\n");
+	fwprintf(fl, L"margin-left: 0;\n");
+	fwprintf(fl, L"margin-right: 0;\n");
+	fwprintf(fl, L"padding-left: 40px;\n");
+	fwprintf(fl, L"}\n");
+
 	fwprintf(fl, L"</style>\n");
 }
 

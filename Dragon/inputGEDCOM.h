@@ -15,6 +15,7 @@ const TITLE t[] =
 	{ L"dr." },
 	{ L"ifj."},
 	{ L"id."},
+	{ L"Dr."},
 };
 
 
