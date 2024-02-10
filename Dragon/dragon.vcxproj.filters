@@ -785,6 +785,9 @@
     <ClCompile Include="CDescendantsLinearHtml.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CDEscendantsLinearStrand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="dragon.rc">

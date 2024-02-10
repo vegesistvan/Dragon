@@ -2,6 +2,8 @@
 
 #define VERSION L"10.171"
 
+// 10.171 2024.02.10 Hosszra rendezett leszármazotti szálak javítása.
+// 
 // 10.170 2024.02.06 Leszármazotti szálak sorrendje csökenõ hosszúság
 //  
 // 10.170 2024.02.01 GEDCOM beolvasásnál a kis kezdõbetûs elõnevek kezelése. (Komoróczy NAME esetén);

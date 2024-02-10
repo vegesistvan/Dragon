@@ -386,7 +386,7 @@ protected:
 	int CDescendants::getNumberOfChildren(CString rowid, CString sex_id);
 	void CDescendants::listDescendants();
 	void CDescendants::multipleRowid();
-	void CDescendants::signeD(int i, int j);
+//	void CDescendants::signeD(int i, int j);
 	CString CDescendants::getTableHeader();
 	CString CDescendants::getPlaceDateBlock(CString place, CString date, CString jel);
 	CString CDescendants::getColoredString(CString str, int index);
@@ -417,7 +417,7 @@ protected:
 	CString CDescendants::createSpRelatives();
 	CString CDescendants::getComplexDescription(int i, bool parentIndex);
 
-	void CDescendants::order_vDesc();
+//	void CDescendants::order_vDesc();
 	void CDescendants::printvLen();
 	void CDescendants::print_vDesc();
 	void CDescendants::numOfDesc();
@@ -426,8 +426,8 @@ protected:
 	void CDescendants::printGAline();
 	bool CDescendants::rowidExist();
 	CString CDescendants::konvTitolo(CString titolo);
-	void CDescendants::OnDescendantLength();
-
+	void CDescendants::order_numOfD();
+	
 	DECLARE_MESSAGE_MAP()
 public:
 

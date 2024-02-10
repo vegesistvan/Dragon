@@ -174,6 +174,13 @@ protected:
 	CString CDescendantsLinearTable::createSpouseL();
 	CString CDescendantsLinearTable::createSpRelativesL();
 
+	CString CDescendantsLinearTable::getComplexDescriptionL1(int i, bool parentIndex);
+	CString CDescendantsLinearTable::createDescendantL1(int i, bool parentIndex);
+	CString CDescendantsLinearTable::createSpousesL1(int i);
+	CString CDescendantsLinearTable::createMarriageL1(CString place, CString date, int i, int numberOfSpouses);
+	CString CDescendantsLinearTable::createSpouseL1();
+	CString CDescendantsLinearTable::createSpRelativesL1();
+
 
 	bool CDescendantsLinearTable::createHtmlFile(bool printable, bool repeated );
 	void CDescendantsLinearTable::fullTable();
@@ -184,6 +191,7 @@ protected:
 	bool CDescendantsLinearTable::closeHtml();
 	void CDescendantsLinearTable::createStyle();
 
+	void CDescendantsLinearTable::order_numOfD();
 	BOOL CDescendantsLinearTable::create_vD();
 	void CDescendantsLinearTable::descendants();
 
@@ -207,8 +215,7 @@ protected:
 
 	void CDescendantsLinearTable::printVector(int tbl);
 	void CDescendantsLinearTable::printBegining(int i);
-	void CDescendantsLinearTable::print1(CString str);
-
+	void CDescendantsLinearTable::multipleRowid();
 
 	CString m_tag1;
 	CString m_tag2;

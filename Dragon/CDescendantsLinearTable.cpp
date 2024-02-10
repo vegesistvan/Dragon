@@ -13,21 +13,26 @@
 #include "build_defs.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 bool sortByNumOfD(const CH& d1, const CH& d2)
 {
 	return(d1.numOfD > d2.numOfD);
 }
+*/
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 bool sortById2(const DE::DESC& d1, const DE::DESC& d2)
 {
 	return(d1.id < d2.id);
 }
+*/
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 bool sortByStatus(const DE::DESC& d1, const DE::DESC& d2)
 {
 	return(d1.status < d2.status );
 }
-
+*/
 IMPLEMENT_DYNAMIC(CDescendantsLinearTable, CDialogEx)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CDescendantsLinearTable::CDescendantsLinearTable(CWnd* pParent /*=nullptr*/)
@@ -214,13 +219,13 @@ void CDescendantsLinearTable::OnSelchangeTab(NMHDR* pNMHDR, LRESULT* pResult)
 	case REPEATED:
 		m_aF.ShowWindow(SW_SHOW);
 		m_aU.ShowWindow(SW_HIDE);
-
+		m_ListCtrl = &(m_aF.m_ListCtrlF);
 		m_title = m_titleF;
 		break;
 	case NOTREPEATED:
 		m_aU.ShowWindow(SW_SHOW);
 		m_aF.ShowWindow(SW_HIDE);
-
+		m_ListCtrl = &(m_aU.m_ListCtrlU);
 		m_title = m_titleU;
 		break;
 	}
@@ -454,7 +459,7 @@ void CDescendantsLinearTable::fullTable()
 		str.Format(L"%3s-%-4d", gen, desc.childorder);
 		m_ListCtrl->SetItemText(nItem, L_GEN, str);
 
-		people = getComplexDescriptionL(i, false);
+		people = getComplexDescriptionL(i, true);
 		m_ListCtrl->SetItemText(nItem, L_DESCENDANT, people);
 		++nItem;
 
@@ -543,9 +548,6 @@ void CDescendantsLinearTable::uniqueTable()
 			idF.Format(L"%d", desc.idF);
 		m_ListCtrl->SetItemText(nItem, L_IDF, idF);
 
-	//	str.Empty();
-	//	if( vDesc->at(i).ixM.IsEmpty() )
-	//		str.Format(L"%s", vDesc->at(i).ixM);
 		m_ListCtrl->SetItemText(nItem, L_MINDEX, desc.ixM );
 
 		str.Empty();
@@ -557,7 +559,7 @@ void CDescendantsLinearTable::uniqueTable()
 		str.Format(L"%3s-%-4d", gen, desc.childorder);
 		m_ListCtrl->SetItemText(nItem, L_GEN, str);
 
-		people = getComplexDescriptionL(i, false);
+		people = getComplexDescriptionL(i, true);
 		m_ListCtrl->SetItemText(nItem, L_DESCENDANT, people);
 		++nItem;
 cont:	wndP.StepIt();
@@ -603,7 +605,6 @@ CString CDescendantsLinearTable::createDescendantL(int i, bool parentIndex)
 	CString rang;
 	CString lastname;
 	CString comment;
-	//	int parentIndex;
 	int motherIndex;
 	int z;
 	int j;
@@ -656,12 +657,12 @@ CString CDescendantsLinearTable::createDescendantL(int i, bool parentIndex)
 		{
 			if (vLMX.at(last).lastMotherIndex != p.parentIndex)   // ha az utoljára kiírt motherIndex más, akkor ezt kiírja
 			{
-				//				if (p.parentIndex == 1)
-				//					str.Format(L" ;/%d", p.parentIndex);
-				//				else
-				str.Format(L"/%d", p.parentIndex);
-				name += str;
-				vLMX.at(last).lastMotherIndex = p.parentIndex;
+				if (p.parentIndex)
+				{
+					str.Format(L"/%d", p.parentIndex);
+					name += str;
+					vLMX.at(last).lastMotherIndex = p.parentIndex;
+				}
 			}
 		}
 
@@ -946,6 +947,7 @@ CString CDescendantsLinearTable::createSpRelativesL()
 	}
 	return(parents);
 }
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CDescendantsLinearTable::getSeededName(int i)
 {
@@ -961,6 +963,7 @@ CString CDescendantsLinearTable::getSeededName(int i)
 	}
 	return familyname;
 }
+/*
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsLinearTable::OnDescendantLength()
 {
@@ -1303,7 +1306,7 @@ void CDescendantsLinearTable::printVector(int tbl)
 		if (!p_womenDescendants && vD.at(i).parentSex == WOMAN) continue;
 
 		printBegining(i);	// html kódok és generáció elkészítése; 
-		people = getComplexDescription(i,true);
+		people = getComplexDescriptionL1(i,true);
 
 		line.Format(L"%s%s", m_diamond, people);
 		line.Replace('|', '\'');
@@ -1513,3 +1516,4 @@ void CDescendantsLinearTable::descendants()
 	}
 	wndP.DestroyWindow();
 }
+*/

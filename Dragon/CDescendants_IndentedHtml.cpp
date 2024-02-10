@@ -385,12 +385,9 @@ CString CDescendants::createSpouses(int i)
 		{
 			queryPeople(spouse_id, &s);   // házastárs adatainak beolvasása
 			marriage = createMarriage(place, date, i, numberOfSpouses);
-//			print(marriage);
 			spouse = createSpouse();				// kiírás elõtt ellenõrzi, hogy szerepel-e ilyen névem már kiírt házastárs. Ha igen, akkor színezi
-//			print(spouse);
 			vFullname.push_back(s.fullname);	// vFullname-en gyûjti a már kilistázott házastársak nevét
 			spRelatives = createSpRelatives();
-//			print(spRelatives);
 			if (!marriage.IsEmpty())
 				spouses += marriage;
 			if (!spouse.IsEmpty())
@@ -402,9 +399,6 @@ CString CDescendants::createSpouses(int i)
 	}
 	spouses.Trim();
 	return spouses;
-
-//	fwprintf(fl, L"\n");
-//	fflush(fl);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CDescendants::createMarriage(CString place, CString date, int i, int numberOfSpouses)
@@ -539,10 +533,6 @@ CString CDescendants::createSpRelatives()
 		str = getFirstWord(sf.first_name);
 
 		father = getColoredString(str, p_otherNameAttrib);
-		//		if (!sf.peer.IsEmpty())
-		//			father.Format(L"%s %s", sf.peer, (CString)father);
-
-
 	}
 	if (!s.mother_id.IsEmpty() && s.mother_id != L"0")
 	{
@@ -595,9 +585,6 @@ CString CDescendants::createSpRelatives()
 			if (ss.rowid != p.rowid)		// a GA sorban szereplõ házastársat kihagyja
 			{
 				spouseSpouse = getLastFirst(&ss);
-
-				//spouseSpouse.Format(L"%s %s", ss.peer, (CString)spouseSpouse);
-				// spouseSpouse.Trim();
 				if (parents.GetLength())
 					parents += L", ";
 				else

@@ -426,7 +426,7 @@ void CDescendants::descendants()
 		desc.cntRep = 0;
 		if (desc.sex == WOMAN && !p_womenDescendants)		// ha nõ a leszármazott és annak a gyerekeit nem akarjuk listázni
 			desc.numOfChildren = 0;
-
+/*
 		if (p_repeated == 1)						// ismétlõdõ leszármazottak kihagyása
 		{
 			for (j = 0; j < vDesc.size(); ++j)
@@ -440,6 +440,7 @@ void CDescendants::descendants()
 				++m_cntRepeated;
 		}
 		else
+*/
 			vDesc.push_back(desc);
 
 		if (vDesc.size() == m_maxDesc)
@@ -755,7 +756,7 @@ void CDescendants::multipleRowid()
 		if (wndP.Cancelled()) break;
 	}
 
-	if (p_repeated == 2)   // apa leszármazottait tartja meg
+	if (p_repeated )   // apa leszármazottait tartja meg
 	{
 		str.Format(L"Ismétlõdõ leszármazottak jelölése...");
 		CProgressWnd wndP(NULL, str);
@@ -794,8 +795,9 @@ void CDescendants::multipleRowid()
 
 		}
 	}
-}
 
+}
+/*
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // i-tõl kezdve minden leszármazottat ( saját és magasabb generációkat) megtart
 // j-tõl kezdve minden leszármazottat ( saját és magasabb generációkat) kihagy
@@ -819,6 +821,7 @@ void CDescendants::signeD(int i, int j)
 			vDesc.at(k).status = -1;			// nem kell listázni
 	}
 }
+*/
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CDescendants::query(CString command)
 {
@@ -947,6 +950,7 @@ void CDescendants::printvLen()
 	}
 
 }
+/*
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // A leszármazottkat tartalmazó vGKR vektort szakaszokra bontjuk, és minden szakaszhoz egy sorrendet rendelünk.
 // A sorrendet visszavezetjük a vGKR-be, kívánság szerint rendezzük, majd kiírjuk.
@@ -1064,94 +1068,8 @@ void CDescendants::order_vDesc()
 	vLenOu->push_back(ou);
 
 	printvLen();
-	/*
-		int gNext = ou.g;
-		bool bontas = true;
-		while (bontas)
-		{
-			// ciklusonként felcseréli a két vLen vektort, hogy a bemenet a korábbi ciklus kimente legyen
-			vLenTemp = vLenIn;
-			vLenIn = vLenOu;
-			vLenOu = vLenTemp;
-			vLenOu->clear();
-			bontas = false;
-			multiplyer *= 2;
-			++gNext;
-			// minden intervallumon végigmegy
-			for (i = 0; i < vLenIn->size(); ++i)
-			{
-				in = vLenIn->at(i);
-				if (in.gBack == 0)  // azokat az intervallumokat, amelyekben nincs generációs visszaugrás, átteszi a kimenetbe
-				{
-					vLenOu->push_back( in );
-				}
-				else  // az intervallumban generációs visszaugrás van, fel kell bontani child-intervallumokra
-				{
-					// az intervallum elsõ tagját kiírjuk, a maradékot vizsgáljuk
-					ou = in;
-					ou.ixLast = ou.ixFirst;
-					ou.gBack = 0;
-					ou.multiplyer = multiplyer;
-					vLenOu->push_back(ou);
-
-					for (int j = in.ixFirst +1; j <= in.ixLast; ++j)
-					{
-						gPrev = ou.g;
-						// A következõ generációt vizsgáljuk
-
-						if (vDesc.at(j).g == gNext )  // ou.g elsõ elõfordulása,
-						{
-							//  a felbontott uj intervallum kezdete
-							ou.g = gNext;
-							ou.ixFirst = j;
-							ou.gBack = 0;
-							gPrev = gNext;
-							// keressük ou.g kövekezõ elõfordulását, ami az intervallum vége lesz
-							for ( k = j + 1; k <= in.ixLast; ++k)
-							{
-								gAct = vDesc.at(k).g;
-								// van az intervellumon belül generációs visszaugrás ?
-								if (gAct < gPrev) // visszaugrás
-								{
-									ou.gBack = gAct;
-									bontas = true;
-								}
-
-								if (gAct == gNext )  // ou.g következõ elõfordulása
-								{
-									// az intervallum vége
-									ou.ixLast = k - 1;
-									vLenOu->push_back(ou);
-									break;
-								}
-								gPrev = gAct;
-							}
-							if (k > in.ixLast)
-							{
-								ou.ixLast = k - 1;
-								vLenOu->push_back(ou);
-								break;
-							}
-
-						}
-
-	//					if (vDesc.at(j).g == in.gBack)
-	//					// ebben nincs ismétlõdés, et a szakaszt kiírjuk,
-	//					{
-	//						ou.ixFirst = in.ixFirst;
-	//						ou.ixLast = j-1;
-	//						ou.gBack = 0;
-	//						vLenOu->push_back(ou);
-	//					}
-					}
-				}
-			}
-			printvLen();
-	//		break;
-		}
-	*/
 	
-	printvLen();
+//	printvLen();
 
 	// A vDesc vektorba átvezeti a sorrendet, majd ennek megfelelõen rendezi azt
 	for (int i = 0; i < vLenOu->size(); ++i)
@@ -1171,6 +1089,7 @@ void CDescendants::order_vDesc()
 
 
 }
+*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendants::numOfDesc()
 {
@@ -1361,11 +1280,12 @@ void CDescendants::create_id()
 	}
 	std::sort(vDesc.begin(), vDesc.end(), sortById3);
 
-	OnDescendantLength();
+//	order_numOfD();
 	wndP.DestroyWindow();
 }
+/*
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendants::OnDescendantLength()
+void CDescendants::order_numOfD()
 {
 	int idC;
 	int dbC;
@@ -1400,3 +1320,4 @@ void CDescendants::OnDescendantLength()
 		}
 	}
 }
+*/
