@@ -6,7 +6,7 @@
 #include "afxdialogex.h"
 #include "CDescendantsLinearTable.h"
 #include "CDescendantsUnique.h"
-
+#include "Relatives.h"
 
 // CDescendantsUnique dialog
 
@@ -32,16 +32,12 @@ BEGIN_MESSAGE_MAP(CDescendantsUnique, CDialogEx)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST, &CDescendantsUnique::OnCustomdrawList)
 
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
-	ON_COMMAND(ID_KERESS_BEGINNING, &CDescendantsUnique::OnKeressBeginning)
-	ON_COMMAND(ID_KERESS_NEXT, &CDescendantsUnique::OnKeressNext)
-	ON_COMMAND(ID_KERESS_PREVIOUS, &CDescendantsUnique::OnKeressPrevious)
 
-	ON_COMMAND(ID_FUNCTIONS_NOTEPAD, &CDescendantsUnique::OnFunctionsNotepad)
+	ON_NOTIFY(NM_DBLCLK, IDC_LIST, &CDescendantsUnique::OnDblclkList)
+	ON_COMMAND(ID_ALL_ASCENDANTS, &CDescendantsUnique::OnAllAscendants)
+	ON_COMMAND(ID_ALL_DESCENDANTS, &CDescendantsUnique::OnAllDescendants)
+	ON_COMMAND(ID_FUNCTIONS_NOTEPAD, &CDescendantsUnique::OnNotepad)
 
-	ON_COMMAND(ID_DESCENDANTS_MARKED, &CDescendantsUnique::OnDescendantsMarked)
-	ON_COMMAND(ID_DESCENDANTS_LISTED, &CDescendantsUnique::OnDescendantsListed)
-	ON_COMMAND(ID_ASCENDANTS_MARKED, &CDescendantsUnique::OnAscendantsMarked)
-	ON_COMMAND(ID_ASCENDANTS_LISTED, &CDescendantsUnique::OnAscendantsListed)
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CDescendantsUnique::OnInitDialog()
@@ -55,6 +51,8 @@ BOOL CDescendantsUnique::OnInitDialog()
 
 	m_ListCtrlU.InsertColumn(L_CLRTEXTBK, L"", LVCFMT_RIGHT, 10, -1, COL_HIDDEN);
 	m_ListCtrlU.InsertColumn(L_CLRTEXT, L"", LVCFMT_RIGHT, 10, -1, COL_HIDDEN);
+	m_ListCtrlU.InsertColumn(L_NAME, L"", LVCFMT_RIGHT, 10, -1, COL_HIDDEN);
+	m_ListCtrlU.InsertColumn(L_ROWID, L"", LVCFMT_RIGHT, 10, -1, COL_HIDDEN);
 	m_ListCtrlU.InsertColumn(L_LINENUMBER, L"", LVCFMT_RIGHT, 10, -1, COL_HIDDEN);
 	m_ListCtrlU.InsertColumn(L_NUMOFD, L"desc", LVCFMT_RIGHT, 50, -1, COL_NUM);
 	m_ListCtrlU.InsertColumn(L_ISM, L"ism", LVCFMT_CENTER, 50, -1, COL_HIDDEN);
@@ -131,235 +129,178 @@ LRESULT CDescendantsUnique::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 	}
 	return TRUE;
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsUnique::OnKeressBeginning()
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDescendantsUnique::OnDblclkList(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	int nItem = m_ListCtrlU.GetNextItem(-1, LVNI_SELECTED);
-	CString ism = m_ListCtrlU.GetItemText(nItem, L_ISM);
-	if (ism.IsEmpty())
-	{
-		AfxMessageBox(L"Többször nem fordul elõ a kijelölt leszármazott!");
-	}
-	CString name = m_ListCtrlU.GetItemText(nItem, L_DESCENDANT);
-	int n = m_ListCtrlU.GetItemCount();
-	for (int i = 0; i < n; ++i)
-	{
-		str = m_ListCtrlU.GetItemText(i, L_DESCENDANT);
-		if (str == name)
-		{
-			if (i != nItem)
-			{
-				m_ListCtrlU.EnsureVisible(i, FALSE);
-				m_ListCtrlU.SetItemState(i, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
-			}
-		}
-	}
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsUnique::OnKeressNext()
-{
-	bool gotit = false;
-	int nItem = m_ListCtrlU.GetNextItem(-1, LVNI_SELECTED);
-	CString name = m_ListCtrlU.GetItemText(nItem, L_DESCENDANT);
-	int n = m_ListCtrlU.GetItemCount();
-	for (int i = nItem + 1; i < n; ++i)
-	{
-		str = m_ListCtrlU.GetItemText(i, L_DESCENDANT);
-		if (str == name)
-		{
-			m_ListCtrlU.EnsureVisible(i, FALSE);
-			m_ListCtrlU.SetItemState(i, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
-			gotit = true;
-			break;
-		}
-	}
-	if (!gotit)
-		AfxMessageBox(L"Többször nem fordul elõ a kijelölt leszármazott!");
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsUnique::OnKeressPrevious()
-{
-	bool gotit = false;
-	int nItem = m_ListCtrlU.GetNextItem(-1, LVNI_SELECTED);
-	if (nItem == 0) return;
-	CString name = m_ListCtrlU.GetItemText(nItem, L_DESCENDANT);
-	int n = m_ListCtrlU.GetItemCount();
+	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+	int nItem = pNMItemActivate->iItem;
 
-	for (int i = nItem - 1; i >= 0; --i)
-	{
-		str = m_ListCtrlU.GetItemText(i, L_DESCENDANT);
-		if (str == name)
-		{
-			m_ListCtrlU.EnsureVisible(i, FALSE);
-			m_ListCtrlU.SetItemState(i, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
-			gotit = true;
-			break;
-		}
-	}
-	if (!gotit)
-		AfxMessageBox(L"Többször nem fordul elõ a kijelölt leszármazott!");
+	CRelatives dlgR;
+	dlgR.m_rowid = m_ListCtrlU.GetItemText(nItem, L_ROWID);
+	if (dlgR.DoModal() == IDCANCEL) return;
+	*pResult = 0;
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsUnique::OnDescendantsMarked()
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDescendantsUnique::OnAllAscendants()
 {
-	int nItem = m_ListCtrlU.GetNextItem(-1, LVNI_SELECTED);
-	int dbC;
+	int n = m_ListCtrlU.GetItemCount();
 	int id;
+	int idF;
 	int idC;
-	int idF;
-	CString gen;
-	int cnt;
-	int j = nItem;
-	CString descendant;
-
-	std::vector<int> vid1;
-	std::vector<int> vid2;
-	idC = _wtoi(m_ListCtrlU.GetItemText(nItem, L_IDC));
-	if (!idC)
-	{
-		descendant = m_ListCtrlU.GetItemText(nItem, L_DESCENDANT);
-		str = getTwoWords(descendant);
-		str.Format(L"%s-nek nincs leszármazottja!", (CString)str);
-		AfxMessageBox(str, MB_ICONEXCLAMATION);
-		return;
-	}
-	vid.clear();
-	vid1.push_back(nItem);  // ezeknek a leszármazottait fogja keresni
-	vid.push_back(nItem);	// összes leszármazott	
-	theApp.unselectAll(&m_ListCtrlU);
-	m_ListCtrlU.SetItemState(nItem, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
-	while (true)
-	{
-		vid2.clear();		// a következõ generációt gyûjti benne
-
-		for (int i = 0; i < vid1.size(); ++i)
-		{
-			nItem = vid1.at(i);	// apa azonosítója
-			idC = _wtoi(m_ListCtrlU.GetItemText(nItem, L_IDC));  // elsõ gyereke azonosítója
-			if (idC)
-			{
-				cnt = 0;
-				dbC = _wtoi(m_ListCtrlU.GetItemText(nItem, L_DBC));
-				for (j = nItem + 1; j < m_ListCtrlU.GetItemCount(); ++j)
-				{
-					if (_wtoi(m_ListCtrlU.GetItemText(j, L_ID)) == idC)
-					{
-						m_ListCtrlU.SetItemState(j, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
-						//						m_ListCtrlF.EnsureVisible(j, FALSE);
-						vid2.push_back(j);  // a következõ generációt gyûjti
-						vid.push_back(j);	// az összes leszármazottat gyûjti
-						++cnt;
-						++idC;
-						if (cnt == dbC) break;
-					}
-
-				}
-			}
-		}
-		if (!vid2.size()) break;
-		vid1 = vid2;
-	}
-	m_ListCtrlU.SetItemState(j, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
-	m_ListCtrlU.EnsureVisible(j, FALSE);	// TODO: Add your command handler code here
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsUnique::OnDescendantsListed()
-{
-	OnDescendantsMarked();
-
 	int dbC;
-	int id;
-	int idC;
-	int idF;
-	int j;
-	CString gen;
-	CString descendant;
-	CString filePathName;
-	filePathName = theApp.openTextFile(&flDesc, L"descU", L"w+");  // log fájl
-
-	fwprintf(flDesc, L"Leszármazotti lánc\n\n");
-	fwprintf(flDesc, L"%6s %5s %5s %5s %5s %4s leszármazott\n", L"", L"id", L"idF", L"idC", L"dbC", L"gen");
-	for (int i = 0; i < vid.size(); ++i)
-	{
-		j = vid.at(i);
-		id = _wtoi(m_ListCtrlU.GetItemText(j, L_ID));
-		idF = _wtoi(m_ListCtrlU.GetItemText(j, L_IDF));
-		idC = _wtoi(m_ListCtrlU.GetItemText(j, L_IDC));
-		dbC = _wtoi(m_ListCtrlU.GetItemText(j, L_DBC));
-		gen = m_ListCtrlU.GetItemText(j, L_GEN);
-		descendant = m_ListCtrlU.GetItemText(j, L_DESCENDANT);
-
-		fwprintf(flDesc, L"%5d %5d %5d %5d %5d %4s %s\n", i + 1, id, idF, idC, dbC, gen.Trim(), descendant.Trim());
-	}
-	fclose(flDesc);
-	theApp.showFile(filePathName);	// TODO: Add your command handler code here
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsUnique::OnAscendantsMarked()
-{
-	int nItem = m_ListCtrlU.GetNextItem(-1, LVNI_SELECTED);
-	int n = m_ListCtrlU.GetItemCount();
-	int id;
-	int idF;
-	int i = nItem;
-
-	id = nItem;
-	idF = _wtoi(m_ListCtrlU.GetItemText(nItem, L_IDF));
-
-	vid.clear();
-	vid.push_back(nItem);
-	theApp.unselectAll(&m_ListCtrlU);
-	m_ListCtrlU.SetItemState(nItem, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
-	for (i = nItem; i > -1; --i)
-	{
-		if (_wtoi(m_ListCtrlU.GetItemText(i, L_ID)) == idF)
-		{
-			m_ListCtrlU.SetItemState(i, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
-			idF = _wtoi(m_ListCtrlU.GetItemText(i, L_IDF));
-			vid.push_back(i);
-		}
-	}
-	m_ListCtrlU.EnsureVisible(i, FALSE);
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsUnique::OnAscendantsListed()
-{
-	OnAscendantsMarked();
-
-	int dbC;
-	int id;
-	int idC;
-	int idF;
-	int j;
 	CString gen;
 	CString ascendant;
-	CString filePathName;
-	filePathName = theApp.openTextFile(&flDesc, L"asc", L"w+");  // log fájl
+	int j;
 
+	std::vector<int> vN;
+
+	int nItem = m_ListCtrlU.GetNextItem(-1, LVNI_SELECTED);
+	CString descendant = m_ListCtrlU.GetItemText(nItem, L_DESCENDANT);
+	CString file;
+	file.Format(L"%s felmenõi", m_ListCtrlU.GetItemText(nItem, L_NAME));
+	CString filePathName;
+	filePathName = theApp.openTextFile(&flDesc, file, L"w+");  // log fájl
 
 	fwprintf(flDesc, L"Felmenõi lánc\n\n");
 	fwprintf(flDesc, L"%6s %5s %5s %5s %5s %4s felmenõ\n", L"", L"id", L"idF", L"idC", L"dbC", L"gen");
 
-	for (int i = 0; i < vid.size(); ++i)
+	for (int i = 0; i < n; ++i)
 	{
-		j = vid.at(i);
-		id  = _wtoi(m_ListCtrlU.GetItemText(j, L_ID));
-		idF = _wtoi(m_ListCtrlU.GetItemText(j, L_IDF));
-		idC = _wtoi(m_ListCtrlU.GetItemText(j, L_IDC));
-		dbC = _wtoi(m_ListCtrlU.GetItemText(j, L_DBC));
-		gen = m_ListCtrlU.GetItemText(j, L_GEN);
-		ascendant = m_ListCtrlU.GetItemText(j, L_DESCENDANT);
-		if (dbC)
+		str = m_ListCtrlU.GetItemText(i, L_DESCENDANT);
+		if (str == descendant)
+		{
+			vN.push_back(i);
+		}
+	}
+
+	// vN-ben az ember mindenegyes elõfordulása, akiknke a felmenõit akarjuk listázni
+	for (int i = 0; i < vN.size(); ++i)
+	{
+		nItem = vN.at(i);
+		id = nItem;
+		idF = _wtoi(m_ListCtrlU.GetItemText(nItem, L_IDF));
+		vid.clear();
+		vid.push_back(nItem);
+		for (j = nItem; j > -1; --j)
+		{
+			if (_wtoi(m_ListCtrlU.GetItemText(j, L_ID)) == idF)
+			{
+				idF = _wtoi(m_ListCtrlU.GetItemText(j, L_IDF));
+				vid.push_back(j);
+			}
+		}
+
+		// vid-ban a felmenõk
+		for (int i = 0; i < vid.size(); ++i)
+		{
+			j = vid.at(i);
+			id = _wtoi(m_ListCtrlU.GetItemText(j, L_ID));
+			idF = _wtoi(m_ListCtrlU.GetItemText(j, L_IDF));
+			idC = _wtoi(m_ListCtrlU.GetItemText(j, L_IDC));
+			dbC = _wtoi(m_ListCtrlU.GetItemText(j, L_DBC));
+			gen = m_ListCtrlU.GetItemText(j, L_GEN);
+			ascendant = m_ListCtrlU.GetItemText(j, L_DESCENDANT);
 			fwprintf(flDesc, L"%5d. %5d %5d %5d %5d %4s %s\n", i + 1, id, idF, idC, dbC, gen.Trim(), ascendant.Trim());
+		}
+		fwprintf(flDesc, L"\n");
+	}
+	fclose(flDesc);
+	theApp.showFile(filePathName);
+
+
+
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDescendantsUnique::OnAllDescendants()
+{
+	int id;
+	int idF;
+	int idC;
+	int dbC;
+	CString gen;
+	CString ascendant;
+	int j;
+
+	std::vector<int> vN;
+	std::vector<int>vC1;
+	std::vector<int>vC2;
+
+	int nItem = m_ListCtrlU.GetNextItem(-1, LVNI_SELECTED);
+	CString descendant = m_ListCtrlU.GetItemText(nItem, L_DESCENDANT);
+	CString file;
+	file.Format(L"%s leszármazottai", m_ListCtrlU.GetItemText(nItem, L_NAME));
+	CString filePathName;
+	filePathName = theApp.openTextFile(&flDesc, file, L"w+");  // log fájl
+
+	fwprintf(flDesc, L"Leszármazotti lánc\n\n");
+	fwprintf(flDesc, L"%6s %5s %5s %5s %5s %4s leszármazott\n", L"", L"id", L"idF", L"idC", L"dbC", L"gen");
+
+
+	// vN-be a kijelölt leszármazott elõfordulásai
+	for (int i = 0; i < m_ListCtrlU.GetItemCount(); ++i)
+	{
+		str = m_ListCtrlU.GetItemText(i, L_DESCENDANT);
+		if (str == descendant)
+		{
+			vN.push_back(i);
+		}
+	}
+	// vN-ben az ember mindenegyes elõfordulása, akiknek a leszármazottait akarjuk listázni
+	// vC1-be gyõjtjük a vN.at(i)-t és leszármazottait
+	for (int i = 0; i < vN.size(); ++i)
+	{
+		nItem = vN.at(i);
+		vid.clear();
+		vC1.clear();
+		vC1.push_back(nItem);
+		vid.push_back(nItem);
+
+		while (vC1.size())
+		{
+			// vC1-be tesszük a  gyerekeit
+			// Az összes gyerek összes gyerekét vC2-be majd vC1-be tesszük
+			vC2.clear();
+			for (int j = 0; j < vC1.size(); ++j)
+			{
+				idC = _wtoi(m_ListCtrlU.GetItemText(vC1.at(j), L_IDC));
+				dbC = _wtoi(m_ListCtrlU.GetItemText(vC1.at(j), L_DBC));
+				for (int k = idC; k < idC + dbC; ++k)
+				{
+					vC2.push_back(k);
+					vid.push_back(k);
+				}
+			}
+			vC1 = vC2;
+		}
+
+
+		// vid-ben a leszármazottak
+		for (int i = 0; i < vid.size(); ++i)
+		{
+			j = vid.at(i);
+			id = _wtoi(m_ListCtrlU.GetItemText(j, L_ID));
+			idF = _wtoi(m_ListCtrlU.GetItemText(j, L_IDF));
+			idC = _wtoi(m_ListCtrlU.GetItemText(j, L_IDC));
+			dbC = _wtoi(m_ListCtrlU.GetItemText(j, L_DBC));
+			gen = m_ListCtrlU.GetItemText(j, L_GEN);
+			ascendant = m_ListCtrlU.GetItemText(j, L_DESCENDANT);
+			fwprintf(flDesc, L"%5d. %5d %5d %5d %5d %4s %s\n", i + 1, id, idF, idC, dbC, gen.Trim(), ascendant.Trim());
+		}
+		fwprintf(flDesc, L"\n");
 	}
 	fclose(flDesc);
 	theApp.showFile(filePathName);
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsUnique::OnFunctionsNotepad()
+void CDescendantsUnique::OnNotepad()
 {
 	int nItem = m_ListCtrlU.GetNextItem(-1, LVNI_SELECTED);
 	CString lineNumber = m_ListCtrlU.GetItemText(nItem, L_LINENUMBER);
 	if (!lineNumber.IsEmpty())
-		theApp.editNotepad(theApp.m_htmlPathName, lineNumber);
+	{
+		if (theApp.m_inputMode == GAHTML)
+			theApp.editNotepad(theApp.m_htmlPathName, lineNumber);
+		else if (theApp.m_inputMode == GEDCOM)
+			theApp.editNotepad(theApp.m_gedPathName, lineNumber);
+	}
 }

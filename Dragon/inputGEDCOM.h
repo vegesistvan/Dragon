@@ -67,13 +67,12 @@ protected:
 	std::vector<INDI> v_INDI;
 	std::vector<FAM> v_FAM;
 	std::vector<CHIL> v_CHIL;
-	std::vector<INDIFAMS>v_indiFAMS;
-
+//	std::vector<INDIFAMS>v_indiFAMS;
 	std::vector<PHOTOS> vPhotos;
 
 	INDI I;
 	FAM F;
-	INDIFAMS IFAMS;
+//	INDIFAMS IFAMS;
 	CHIL CHIL;
 
 	FILE* fl;

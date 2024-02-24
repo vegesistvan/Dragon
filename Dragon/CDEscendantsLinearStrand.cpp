@@ -180,18 +180,12 @@ void CDescendantsLinearTable::descendants()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CDescendantsLinearTable::openHtml()
 {
-	CString descendantsPath;
 	CString dragonjpgPathName;
-	CString file;
-	file = L"descendantsLength";
-
-	descendantsPath.Format(L"%s\\%s", theApp.m_workingDirectory, theApp.m_dbFileTitle);
-	if (_waccess(descendantsPath, 0))
-		_wmkdir(descendantsPath);
-	dragonjpgPathName.Format(L"%s\\dragon.jpg", descendantsPath);
+	
+	dragonjpgPathName.Format(L"%s\\dragon.jpg", m_descendantsPath);
 	CopyFile(theApp.m_dragonjpg, dragonjpgPathName, false);
 
-	m_htmlPathName.Format(L"%s\\%s_leszármazotti táblája_%s.html", descendantsPath, m_os, getTimeTag());
+	m_htmlPathName.Format(L"%s\\%s_leszármazotti táblája_hosszra rendezve_%s.html", m_descendantsPath, m_os, getTimeTag());
 
 	if (!openFileSpec(&fhDescTable, m_htmlPathName, L"w+")) return false;
 
@@ -204,19 +198,6 @@ bool CDescendantsLinearTable::openHtml()
 		nok = L"igen";
 	else
 		nok = L"nem";
-
-	CString kihagy;
-	switch (p_repeated)
-	{
-	case 0:
-		kihagy = L"Nem hagyja aki az ismétlõdõ leszármazottakat.";
-		break;
-	case 1:
-		kihagy = L"Az elsõ leszármazottat kiírja, a többit elhagyja.";
-		break;
-	case 2:
-		kihagy = L"Ha az apja leszármazott, akkor kiírja, ha az anyja, akkor nem";
-	}
 
 	CString maxGen;
 	if (p_generationMax.IsEmpty())
@@ -313,10 +294,7 @@ bool CDescendantsLinearTable::openHtml()
 
 	if (p_repeatedColor)
 	{
-		if (p_repeated == 0)
-			str.Format(L"%*s %s", l, L"Ismétlõdõk színezése:", L"zöld - elsõ elõfordulás, piros - újabb elõfordulás");
-		else
-			str.Format(L"%*s %s", l, L"Ismétlõdõk színezése:", L"zöld");
+		str.Format(L"%*s %s", l, L"Ismétlõdõk színezése:", L"zöld - elsõ elõfordulás, piros - újabb elõfordulás");
 		print(str);
 	}
 	print(L"</pre>\n\n");
@@ -412,25 +390,18 @@ bool CDescendantsLinearTable::closeHtml()
 		gen = TCHAR('a') + bias;
 
 
-	//	if ( theApp.v_tableNumbers.size() == 1   || !theApp.v_rowid.size() == 1 )
-	{
 
-		print(L"<pre>");
-		str.Format(L"%-*s %8s(%c)", l, L"Listázott generációk száma:", thousand(bias), gen);
-		print(str);
-		str.Format(L"%-*s %8s", l, L"Listázott leszármazottak száma:", thousand(m_listedD));
-		print(str);
-		if (p_repeated)
-		{
-			str.Format(L"%-*s %8s", l, L"Ismétlõdõ, nem listázott leszármazottak száma:", thousand(m_cntRepeated));
-			print(str);
-		}
-		str.Format(L"%-*s %8s", l, L"Összes listázott emberek száma:", thousand(m_listedP));
-		print(str);
-		str.Format(L"%-*s %s", l, L"Futási idõ:", theApp.getTimeElapsed(m_startTime));
-		print(str);
-		print(L"</pre>");
-	}
+	print(L"<pre>");
+	str.Format(L"%-*s %8s(%c)", l, L"Listázott generációk száma:", thousand(bias), gen);
+	print(str);
+	str.Format(L"%-*s %8s", l, L"Listázott leszármazottak száma:", thousand(m_listedD));
+	print(str);
+	str.Format(L"%-*s %8s", l, L"Összes listázott emberek száma:", thousand(m_listedP));
+	print(str);
+	str.Format(L"%-*s %s", l, L"Futási idõ:", theApp.getTimeElapsed(m_startTime));
+	print(str);
+	print(L"</pre>");
+
 	fclose(fhDescTable);
 	return true;
 }
@@ -484,9 +455,7 @@ void CDescendantsLinearTable::printVector(int tbl)
 		desc = vD.at(i);
 
 		if (vD.at(i).hidden) continue;   // apa bejegyzése, aki más táblában szerepel
-		if (p_repeated && vD.at(i).status == 2)
-			continue;
-
+		
 		queryPeople(vD.at(i).rowid, &p);
 
 		if (!p_womenDescendants && vD.at(i).parentSex == WOMAN) continue;
@@ -979,7 +948,7 @@ void CDescendantsLinearTable::multipleRowid()
 	str.Format(L"Ismétlõdõ leszármazottak jelölése...");
 	CProgressWnd wndP(NULL, str);
 	wndP.GoModal();
-	wndP.SetRange(0, vD.size());
+	wndP.SetRange(0, vD.size()*2);
 	wndP.SetPos(0);
 
 	for (int i = 0; i < vD.size(); ++i)
@@ -1005,13 +974,13 @@ void CDescendantsLinearTable::multipleRowid()
 		wndP.PeekAndPump();
 		if (wndP.Cancelled()) break;
 	}
-
-	if (p_repeated)   // apa leszármazottait tartja meg
+/*
+	if (p_repeatedColor)   // apa leszármazottait tartja meg
 	{
 		str.Format(L"Ismétlõdõ leszármazottak jelölése...");
 		CProgressWnd wndP(NULL, str);
 		wndP.GoModal();
-		wndP.SetRange(0, vD.size());
+		wndP.SetRange(0, vD.size()*2);
 		wndP.SetPos(0);
 		for (int i = 0; i < vD.size();)
 		{
@@ -1043,4 +1012,6 @@ void CDescendantsLinearTable::multipleRowid()
 
 		}
 	}
+*/
+	wndP.DestroyWindow();
 }

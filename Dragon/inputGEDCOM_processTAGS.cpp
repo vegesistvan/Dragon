@@ -90,9 +90,8 @@ void CInputGEDCOM::famc()	// Egfy család azonosítója, amelyben az INDI gyerekkén
 	I.FAMC = lxtv.value;
 };
 void CInputGEDCOM::fams()	// Egy család azonosítója, amelyben az INDI az egyik házastárs. 
-							// Eldobhatjuk ezt az adatot, hiszen minden benne van a FAM rekordokban,
 							// Csak az INDI házasságainak számolására használjuk (többszörös házasságok)
-{						
+{
 	++I.numOfSpouses;
 };
 void CInputGEDCOM::getFile()

@@ -560,7 +560,7 @@ void CTableTables::OnDescendantsTable()  // Kijelölt táblák listája
 	while (pos)
 	{
 		nItem = m_ListCtrl.GetNextSelectedItem(pos);
-		rowid = m_ListCtrl.GetItemText(nItem, 1);
+		rowid = m_ListCtrl.GetItemText(nItem, T_ROWID);
 		theApp.v_tableNumbers.push_back(rowid);
 	}
 	CDescendants dlg;

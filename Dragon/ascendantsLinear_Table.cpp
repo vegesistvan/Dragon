@@ -252,7 +252,7 @@ void CAscendantsLinearTable::fullTable()
 		str.Format(L"%d", vGKR->at(i).toggle);		// hidden: generációk háttér színezésére
 		m_ListCtrl->InsertItem(nItem, str);
 
-
+		m_ListCtrl->SetItemText(nItem, F_ROWID, vGKR->at(i).rowid);		// hidden
 		m_ListCtrl->SetItemText(nItem, F_LINENUMBER, vGKR->at(i).linenumber);	// hidden
 
 		str.Format(L"%d", vGKR->at(i).sex_id);
@@ -330,6 +330,7 @@ void CAscendantsLinearTable::uniqueTable()
 		str.Format(L"%d", vGKR->at(i).moreC);
 		m_ListCtrl->SetItemText(nItem, U_MOREC, str);
 
+		m_ListCtrl->SetItemText(nItem, U_ROWID, vGKR->at(i).rowid);
 		m_ListCtrl->SetItemText(nItem, U_LINENUMBER, vGKR->at(i).linenumber);
 
 		str.Format(L"%d", nItem);

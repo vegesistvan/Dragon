@@ -52,34 +52,27 @@ BOOL CDescendants::create_vDesc()
 		return false;
 	}
 
+	DE::DESC desc;
 	for (int i = 0; i < theApp.v_rowid.size(); ++i)
 	{
-		m_rowid = theApp.v_rowid.at(i);
-
-		if (theApp.m_inputMode == GEDCOM)
-			m_tablenumber = L"1";
-		else
-		{
-			m_command.Format(L"SELECT tablenumber FROM people WHERE rowid = '%s'", m_rowid);
-			m_command = L"SELECT tablenumber FROM people WHERE rowid = '370175'";
-			if (!query(m_command)) return false;
-			m_tablenumber = rs.GetFieldString(0);
-		}
-
 		// Az õs berakása a vDesc vektorba
-		DE::DESC desc;
+		m_rowid = theApp.v_rowid.at(i);
 		queryR(m_rowid);
 
-		m_tablenumber = peoS.tablenumber;
-
+//		m_tablenumber = peoS.tablenumber;
+		desc = {};
 		desc.g = 0;
+//		desc.X = 0;
 		desc.rowid = m_rowid;
-		desc.tablenumber = m_tablenumber;
+		desc.tablenumber = peoS.tablenumber;
 		desc.linenumber = peoS.linenumber;
 		desc.titolo = peoS.titolo;
 		desc.rowidF.Empty();
 		desc.lastname = m_lastname;
+		desc.firstname = m_firstname;
 		desc.name = peoS.name;
+		desc.birth = peoS.birth;
+		desc.death = peoS.death;
 		desc.sex = peoS.sex;
 		desc.numOfSpouses = peoS.numOfSpouses;
 		desc.numOfChildren = peoS.numOfChildren;
@@ -95,6 +88,7 @@ BOOL CDescendants::create_vDesc()
 		desc.numOfRep = 0;
 		desc.original = 0;
 		desc.fatherIndex = -1;  // nincs apja
+		desc.shift = -1;
 		vDesc.clear();
 		vDesc.push_back(desc);
 		m_os = desc.name;
@@ -105,7 +99,7 @@ BOOL CDescendants::create_vDesc()
 
 		indentedHtml();
 		create_id();
-
+		order_numOfD();
 	
 		CDescendantsLinearTable dlg;
 		dlg.p_descendantName = p_descendantName;
@@ -119,7 +113,6 @@ BOOL CDescendants::create_vDesc()
 		dlg.p_specAttrib = p_specAttrib;
 		dlg.p_commentAttrib = p_commentAttrib;
 		dlg.p_numberingSystem = p_numberingSystem;		// leszármazottak számozása
-		dlg.p_repeated = p_repeated;
 		dlg.p_descendantAttrib = p_descendantAttrib;
 		dlg.p_otherNameAttrib = p_otherNameAttrib;
 		dlg.p_commentAttrib = p_commentAttrib;
@@ -139,7 +132,7 @@ BOOL CDescendants::create_vDesc()
 		dlg.m_descendantsPath = m_descendantsPath;
 		dlg.vDesc = &vDesc;
 		dlg.m_name = vDesc.at(0).name;
-		dlg.m_htmlFile = m_htmlFile;
+		dlg.m_htmlPathName1 = m_htmlPathName1;
 
 		dlg.DoModal();
 	}
@@ -245,6 +238,7 @@ bool CDescendants::tablesDescendants()  // listázandó táblák a theapp.v_tableNum
 			desc.hidden = true;
 		}
 		desc.g = 0;
+//		desc.X = 0;
 		desc.tablenumber = peoS.tablenumber;
 		desc.linenumber = peoS.linenumber;
 		desc.titolo = peoS.titolo;
@@ -257,12 +251,15 @@ bool CDescendants::tablesDescendants()  // listázandó táblák a theapp.v_tableNum
 		desc.parentIndex = 0;
 		desc.motherIndex = 1;
 		desc.lastname = m_lastname;
+		desc.firstname = m_firstname;
 		desc.name = peoS.name;
+		desc.birth = peoS.birth;
+		desc.death = peoS.death;
 		desc.cntRep = 0;
 		desc.order = 0;
 		desc.numOfRep = 0;
 		desc.fatherIndex = -1;  // ez nem biztos!!!!!!!!
-
+		desc.shift = -1;
 		vDesc.clear();
 		vDesc.push_back(desc);
 
@@ -292,7 +289,6 @@ bool CDescendants::tablesDescendants()  // listázandó táblák a theapp.v_tableNum
 		dlg.p_specAttrib = p_specAttrib;
 		dlg.p_commentAttrib = p_commentAttrib;
 		dlg.p_numberingSystem = p_numberingSystem;		// leszármazottak számozása
-		dlg.p_repeated = p_repeated;
 		dlg.p_descendantAttrib = p_descendantAttrib;
 		dlg.p_otherNameAttrib = p_otherNameAttrib;
 		dlg.p_commentAttrib = p_commentAttrib;
@@ -310,7 +306,7 @@ bool CDescendants::tablesDescendants()  // listázandó táblák a theapp.v_tableNum
 		dlg.m_descendantsPath = m_descendantsPath;
 		dlg.vDesc = &vDesc;
 		dlg.m_name = vDesc.at(0).name;
-		dlg.m_htmlFile = m_htmlFile;
+		dlg.m_htmlPathName1 = m_htmlPathName1;
 		dlg.DoModal();
 
 		wndProgress.StepIt();
@@ -397,13 +393,17 @@ void CDescendants::descendants()
 
 		if (rowid == L"308824")
 			z = 1;
+//		desc.X = 0;
 		desc.tablenumber = peoS.tablenumber;
 		desc.linenumber = peoS.linenumber;
 		desc.titolo = peoS.titolo;
 		desc.rowidF = vDesc.at(i).rowid;
 		desc.rowid = rowid;
 		desc.lastname = m_lastname;
+		desc.firstname = m_firstname;
 		desc.name = peoS.name;
+		desc.birth = peoS.birth;
+		desc.death = peoS.death;
 		desc.sex = peoS.sex;
 		desc.numOfSpouses = peoS.numOfSpouses;
 		desc.numOfChildren = peoS.numOfChildren;
@@ -424,24 +424,10 @@ void CDescendants::descendants()
 
 		desc.hidden = false;
 		desc.cntRep = 0;
+		desc.shift = -1;
 		if (desc.sex == WOMAN && !p_womenDescendants)		// ha nõ a leszármazott és annak a gyerekeit nem akarjuk listázni
 			desc.numOfChildren = 0;
-/*
-		if (p_repeated == 1)						// ismétlõdõ leszármazottak kihagyása
-		{
-			for (j = 0; j < vDesc.size(); ++j)
-			{
-				if (vDesc.at(j).rowid == rowid)		// szerepel-e a már meglaláltak között a rowid?
-					break;
-			}
-			if (j == vDesc.size())					// csak akkor teszi el, ha nem találta ismétlõdõnek
-				vDesc.push_back(desc);				// 
-			else
-				++m_cntRepeated;
-		}
-		else
-*/
-			vDesc.push_back(desc);
+		vDesc.push_back(desc);
 
 		if (vDesc.size() == m_maxDesc)
 		{
@@ -582,15 +568,15 @@ bool CDescendants::queryR(CString rowid)
 {
 	int z;
 
-	m_command.Format(L"SELECT generation, sex_id, posterior, last_name, first_name, tableNumber, folyt, parentIndex, numOfChildren, titolo, linenumber  FROM people WHERE rowid ='%s'", rowid);
+	m_command.Format(L"SELECT generation, sex_id, posterior, last_name, first_name, tableNumber, folyt, parentIndex, numOfChildren, titolo, linenumber, birth_date, death_date  FROM people WHERE rowid ='%s'", rowid);
 	if (!queryP(m_command)) return false;
 
 	CString folyt;
 	folyt = rsP.GetFieldString(6);
 	//	if ( !folyt.IsEmpty())
 	//		++m_folyt_db;
-
 	peoS.tablenumber = rsP.GetFieldString(5);
+	m_tableNumber = peoS.tablenumber;
 	peoS.linenumber = rsP.GetFieldString(10);
 	peoS.titolo = rsP.GetFieldString(9);
 	if (p_titololower)
@@ -607,22 +593,23 @@ bool CDescendants::queryR(CString rowid)
 	m_lastname.Replace('/', ' ');
 	m_lastname.Replace('?', ' ');
 
-	CString firstname = rsP.GetFieldString(4);
+	m_firstname = rsP.GetFieldString(4);
 	peoS.tablenumber = rsP.GetFieldString(5);
-	firstname.Replace('/', ' ');
-	firstname.Replace('(', ' ');
-	firstname.Replace(')', ' ');
-	firstname.Replace('*', ' ');
-	firstname.Replace('|', ' ');
-	firstname.Replace('"', ' ');
-	firstname.Replace('?', ' ');
-	firstname.Trim();
-	peoS.firstname = firstname;
-	if (firstname == L"Emília")
-		z = 1;
-	peoS.name.Format(L"%s %s", m_lastname, firstname);
+	m_firstname.Replace('/', ' ');
+	m_firstname.Replace('(', ' ');
+	m_firstname.Replace(')', ' ');
+	m_firstname.Replace('*', ' ');
+	m_firstname.Replace('|', ' ');
+	m_firstname.Replace('"', ' ');
+	m_firstname.Replace('?', ' ');
+	m_firstname.Trim();
+	peoS.firstname = m_firstname;
+	peoS.name.Format(L"%s %s", m_lastname, m_firstname);
 	peoS.name.Trim();
 	peoS.numOfChildren = getNumberOfChildren(rowid, peoS.sex);
+	//	peoS.numOfChildren = _wtoi(rsP.GetFieldString(8));
+	peoS.birth = rsP.GetFieldString(11);
+	peoS.death = rsP.GetFieldString(12);
 
 	peoS.motherIndex = _wtoi(rsP.GetFieldString(7));
 	/*
@@ -729,7 +716,7 @@ void CDescendants::multipleRowid()
 	str.Format(L"Ismétlõdõ leszármazottak jelölése...");
 	CProgressWnd wndP(NULL, str);
 	wndP.GoModal();
-	wndP.SetRange(0, vDesc.size());
+	wndP.SetRange(0, vDesc.size()*2);
 	wndP.SetPos(0);
 
 	for (int i = 0; i < vDesc.size(); ++i)
@@ -755,13 +742,13 @@ void CDescendants::multipleRowid()
 		wndP.PeekAndPump();
 		if (wndP.Cancelled()) break;
 	}
-
-	if (p_repeated )   // apa leszármazottait tartja meg
+/*
+	if (p_repeatedColor )   // apa leszármazottait tartja meg
 	{
 		str.Format(L"Ismétlõdõ leszármazottak jelölése...");
 		CProgressWnd wndP(NULL, str);
 		wndP.GoModal();
-		wndP.SetRange(0, vDesc.size());
+		wndP.SetRange(0, vDesc.size()*2);
 		wndP.SetPos(0);
 		for (int i = 0; i < vDesc.size();)
 		{
@@ -795,34 +782,11 @@ void CDescendants::multipleRowid()
 
 		}
 	}
+*/
+	wndP.DestroyWindow();
 
 }
-/*
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// i-tõl kezdve minden leszármazottat ( saját és magasabb generációkat) megtart
-// j-tõl kezdve minden leszármazottat ( saját és magasabb generációkat) kihagy
-void CDescendants::signeD(int i, int j)
-{
-	int g = vDesc.at(i).g;
-	for (int k = i; k < vDesc.size(); ++k)
-	{
-		if (vDesc.at(k).g < g)
-			break;
-		else
-			vDesc.at(k).status = 1;              // listázandó
-	}
-	// anya minden leszármazottját kihagyásra jelzi
-	g = vDesc.at(j).g;
-	for (int k = j; k < vDesc.size(); ++k)
-	{
-		if (vDesc.at(k).g < g)
-			break;
-		else
-			vDesc.at(k).status = -1;			// nem kell listázni
-	}
-}
-*/
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CDescendants::query(CString command)
 {
 	if (rs.Query(command, theApp.mainDB))
@@ -879,10 +843,6 @@ void CDescendants::printGAline()
 	rowid = vDesc.at(m_gen).rowid;
 	queryPeople(rowid, &p);
 
-	m_printed = rowidExist();					// ismétlõdõ leszármazottak kiszûrése
-	if (m_printed && p_repeated)
-		return;
-
 	// a leszármazatti sor elõtt kiírja a megváltozott családnevet: % name
 	if (m_lastnamePrev != p.last_name && !p_capitalName)
 	{
@@ -893,11 +853,8 @@ void CDescendants::printGAline()
 	m_sexidPrev = p.sex_id;
 
 	printBegining(vDesc.size() - 1);	// html kódok és generáció elkészítése; 
-	//	printDescendant(vDesc.size() - 1 );
 	desc = createDescendant(vDesc.size() - 1, true);
-	//	print(str);
 	spouses = createSpouses(vDesc.size() - 1);
-	//	print(str);
 	str.Format(L"%s %s", desc, spouses);
 	print(str);
 	if (!p.arm.IsEmpty())
@@ -950,146 +907,6 @@ void CDescendants::printvLen()
 	}
 
 }
-/*
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// A leszármazottkat tartalmazó vGKR vektort szakaszokra bontjuk, és minden szakaszhoz egy sorrendet rendelünk.
-// A sorrendet visszavezetjük a vGKR-be, kívánság szerint rendezzük, majd kiírjuk.
-// A szakaszokat interációs módszerrel állítjuk elõ.
-// Generációnkét bontjuk szakaszokra a vGKR-t az alábbi bejegyzésekkel:
-//
-// int g;			// vizsgált generáció
-// int multiplyer;	// generációhoz rendelt szorzó
-// int ixFirst;		// intervallum vGKR beli elsõ indexe
-// int ixLast;		// intervallum vGKR beli utolsó indexe
-// int order;		// intervallum hossza * multiplyer         
-// int gBack;		// az intervallumban történt visszaugrott generáció. Ha nincs akkor 0 
-//
-// A legkisebbtõl a legnagyobb generációig ciklusban végezzük az intervallumok felbontását.
-// Egy korábbi cikusban létrehozott intervallumot elfogadunk, ha nincs benne generációs visszaugrás ( gBack != 0 )
-// Ha van, akkor azt a szakaszt tovább bontjuk a következõ generáció szerint, hasonló módon, csak egy felbontott al-intervallum
-//  "order"  értéke az anya-intervallum "order" értékéhez adódik hozzá
-
-void CDescendants::order_vDesc()
-{
-	int i;
-	int j;
-	int k;
-
-	// vLen vektor elemei
-	int g;			// vizsgált generáció
-	int multiplyer;	// generációhoz rendelt szorzó
-	int ixFirst;	// intervallum vGKR beli elsõ indexe
-	int ixLast;		// intervallum vGKR beli utolsó indexe
-	int order;		// intervallum hossza * multiplyer         
-	int gBack;		// az intervallumban történt visszaugrott generáció. Ha nincs akkor 0 
-
-	int maxLen;
-
-	std::vector< DE::LEN > vLen1;		// a parent-intervallumokat tartalmazó vektor (bemenet)
-	std::vector< DE::LEN > vLen2;		// a gyerek-intervallumokat tartalmazó vektor (kimenet)
-
-	std::vector<DE::LEN>* vLenIn;
-	std::vector<DE::LEN>* vLenTemp;		// vLenI  és vLenOu váltásához átmeneti cím
-
-
-
-	if (m_log)
-	{
-		m_orderFileTitle = L"order";
-		m_orderPathName;
-		m_orderPathName.Format(L"%s\\%s_%s.txt", m_descendantsPath, m_orderFileTitle, getTimeTag());
-
-		if (!openFileSpec(&orderTxt, m_orderPathName, L"w+")) return;
-	}
-
-	// A legnagyobb generáció beállítása és 
-	// a generációk számától függõ szorzó beállítása úgy, hogy 
-
-	int gMax = 1;
-	multiplyer = 1000;	// a vizsgált generácira vonatkozó szorzó
-	for (int i = 0; i < vDesc.size(); ++i)
-	{
-		if (vDesc.at(i).g > gMax)
-		{
-			gMax = vDesc.at(i).g;
-			//			multiplyer *= 10;
-		}
-	}
-
-
-
-	// a ciklushoz felhasznált változók:
-	// g - vizsgált generáció
-
-	// A vLenOu vectorba kigyûjti a leszármazotti szakaszokat 
-	DE::LEN in;			// aktuális bemeneti intervallum
-	DE::LEN ou;			// felbontás utáni kimeneti intervallum
-	vLenIn = &vLen1;
-	vLenOu = &vLen2;
-
-	bool found;
-
-	int gP;			// parent intervallum generációja
-	int gAct;
-	int gPrev = 0;
-	vLenOu->clear();
-	// B leszármazotti lánc rendezendõ intervallumainak meghatározása
-	j = 0;
-	for (i = j + 1; i < vDesc.size(); ++i)
-	{
-		if (vDesc.at(i).g == 1)
-		{
-			// intrevallum kezdete
-			ou.g = 1;
-			ou.multiplyer = multiplyer;
-			ou.ixFirst = i;
-			ou.gBack = 0;
-
-			for (j = i + 1; j < vDesc.size(); ++j)
-			{
-				gAct = vDesc.at(j).g;
-				// az intervellumon belül elõforduló generációs visszaugrás
-				if (gAct > 1 && gAct < gPrev) // visszaugrás
-					ou.gBack = gAct;
-
-				if (gAct == 1)
-				{
-					ou.ixLast = j - 1;
-					ou.order = (j - i) * multiplyer;
-					vLenOu->push_back(ou);
-					break;
-				}
-				gPrev = gAct;
-			}
-		}
-	}
-	ou.ixLast = vDesc.size() - 1;
-	ou.order = ou.ixLast - ou.ixFirst + 1;
-	vLenOu->push_back(ou);
-
-	printvLen();
-	
-//	printvLen();
-
-	// A vDesc vektorba átvezeti a sorrendet, majd ennek megfelelõen rendezi azt
-	for (int i = 0; i < vLenOu->size(); ++i)
-	{
-		for (int j = vLenOu->at(i).ixFirst; j <= vLenOu->at(i).ixLast; ++j)
-		{
-			vDesc.at(j).order = i + 1;
-		}
-	}
-	std::sort(vDesc.begin() + 1, vDesc.end(), sortByOrder);
-
-	if (m_log)
-	{
-		fclose(orderTxt);
-		theApp.showFile(m_orderPathName);
-	}
-
-
-}
-*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendants::numOfDesc()
 {
@@ -1166,8 +983,12 @@ void CDescendants::create_id()
 	std::vector<DE::DESC> vD1;
 	std::vector<DE::DESC> vD2;
 	int cnt;
+	int cntRepI;
+	int cntRepJ;
 	int g = 1;
 	DE::DESC desc;
+	DE::DESC desci;
+	DE::DESC descj;
 	int numOfSpouses;
 
 	str.Format(L"Leszármazottak rendezése a lineáris listához...");
@@ -1226,36 +1047,57 @@ void CDescendants::create_id()
 		vD1 = vD2;
 		if (!vD1.size()) break;
 	}
+	std::sort(vDesc.begin(), vDesc.end(), sortById3);
+
 
 	int j;
 	int gPrev = -1;
 	// apák azonosítója
 	for (int i = 0; i < vDesc.size(); ++i)
 	{
-		for ( j = 0; j < vDesc.size(); ++j)
+		vDesc.at(i).idF = 1234567890;
+		rowidF = vDesc.at(i).rowidF;
+		cntRepI = vDesc.at(i).cntRep;
+		g = vDesc.at(i).g;
+		for (j = 0; j < i; ++j)
 		{
-	//		if (vDesc.at(j).rowid == vDesc.at(i).rowidF && vDesc.at(j).cntRep == vDesc.at(i).cntRep )
-			if (vDesc.at(j).rowid == vDesc.at(i).rowidF && vDesc.at(j).g + 1 == vDesc.at(i).g)
+			cntRepJ = vDesc.at(j).cntRep;
+			if( cntRepJ && cntRepI)
 			{
-				vDesc.at(i).idF = vDesc.at(j).id;
-				break;
+				if ((vDesc.at(j).rowid == rowidF) && (cntRepJ == cntRepI))
+				{
+					vDesc.at(i).idF = vDesc.at(j).id;
+					break;
+				}
 			}
-		}
-		if (j == vDesc.size())
-		{
-			for (j = 0; j < vDesc.size(); ++j)
+			else
 			{
-				if (vDesc.at(j).rowid == vDesc.at(i).rowidF && vDesc.at(j).g + 1 == vDesc.at(i).g)
+				if (vDesc.at(j).rowid == rowidF )
 				{
 					vDesc.at(i).idF = vDesc.at(j).id;
 					break;
 				}
 			}
 		}
+		if (j == i )
+		{
+			for (j = 0; j < vDesc.size(); ++j)
+			{
+				if (vDesc.at(j).rowidF == rowidF )
+				{
+					vDesc.at(i).idF = vDesc.at(j).id;
+					break;
+				}
+			}
+		}
+	}
+
+
+	for (int i = 0; i < vDesc.size(); ++i)
+	{
 		// gyerekek azonosítója
 		for ( j = 0; j < vDesc.size(); ++j)
 		{
-		//	if (vDesc.at(j).rowidF == vDesc.at(i).rowid && vDesc.at(j).cntRep == vDesc.at(i).cntRep)
 			if (vDesc.at(j).rowidF == vDesc.at(i).rowid && vDesc.at(j).g == vDesc.at(i).g + 1)
 			{
 				vDesc.at(i).idC = vDesc.at(j).id;
@@ -1278,12 +1120,10 @@ void CDescendants::create_id()
 		if (wndP.Cancelled()) break;
 		
 	}
-	std::sort(vDesc.begin(), vDesc.end(), sortById3);
+//	std::sort(vDesc.begin(), vDesc.end(), sortById3);
 
-//	order_numOfD();
 	wndP.DestroyWindow();
 }
-/*
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendants::order_numOfD()
 {
@@ -1295,19 +1135,19 @@ void CDescendants::order_numOfD()
 	int cnt;
 	DE::DESC desc;
 	std::vector<DE::DESC> vCH;
-	
+
 	for (int i = 0; i < vDesc.size(); ++i)
 	{
 		desc = vDesc.at(i);
 
 		idC = desc.idC;
 		dbC = desc.numOfChildren;
-		
+
 		if (dbC > 1)
 		{
 			j = idC;
 			k = idC + dbC;
-			std::sort(vDesc.begin()+idC, vDesc.begin()+k, sortByNumOfD);
+			std::sort(vDesc.begin() + idC, vDesc.begin() + k, sortByNumOfD);
 			cnt = 1;
 			for (j = idC; j < k; ++j)
 			{
@@ -1320,4 +1160,3 @@ void CDescendants::order_numOfD()
 		}
 	}
 }
-*/

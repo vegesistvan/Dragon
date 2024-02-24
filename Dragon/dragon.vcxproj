@@ -347,7 +347,8 @@
     <ClCompile Include="Brackets.cpp" />
     <ClCompile Include="CDescendants.cpp" />
     <ClCompile Include="CDescendantsFull.cpp" />
-    <ClCompile Include="CDEscendantsLinearStrand.cpp" />
+    <ClCompile Include="CDescendantsLinearStrand.cpp" />
+    <ClCompile Include="CDescendantsLinearGraf.cpp" />
     <ClCompile Include="CDialogRichText.cpp" />
     <ClCompile Include="checkBefore.cpp" />
     <ClCompile Include="checkDateFormat.cpp" />

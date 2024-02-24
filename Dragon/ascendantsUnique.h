@@ -40,9 +40,8 @@ public:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg LRESULT OnListCtrlMenu(WPARAM wParam, LPARAM lParam);
-	afx_msg void OnDescendantsMarked();
-	afx_msg void OnDescendantsListed();
-	afx_msg void OnAscendantsMarked();
-	afx_msg void OnAscendantsListed();
 	afx_msg void OnFunctionsNotepad();
+	afx_msg void OnAllAscendants();
+	afx_msg void OnAllDescendants();
+	afx_msg void OnDblclkListUnique(NMHDR* pNMHDR, LRESULT* pResult);
 };

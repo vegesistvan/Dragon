@@ -785,7 +785,10 @@
     <ClCompile Include="CDescendantsLinearHtml.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CDEscendantsLinearStrand.cpp">
+    <ClCompile Include="CDescendantsLinearStrand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CDescendantsLinearGraf.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

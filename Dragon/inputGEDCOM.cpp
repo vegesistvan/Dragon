@@ -14,25 +14,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//void CDragonDlg::OnInputGedcom()
-//{
-//	CInputGEDCOM dlg;
-//	if (dlg.DoModal() == IDCANCEL) return;
-//
-//	theApp.m_inputVersion = theApp.m_version;
-//	theApp.m_inputMode = GEDCOM;
-//	m_command.Format(L"INSERT INTO properties (inputVersion, inputMode) VALUES ('%s', '%s')", theApp.m_inputVersion, theApp.m_inputMode );
-//	theApp.execute(m_command);
-////	if (theApp.mainDB->IsConnected()) theApp.mainDB->Close();
-////	theApp.openDatabase(true);
-//
-//	mainTitle();
-//	ChangeMenu();
-//}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 IMPLEMENT_DYNAMIC(CInputGEDCOM, CDialogEx)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CInputGEDCOM::CInputGEDCOM(CWnd* pParent /*=nullptr*/)
@@ -175,6 +156,7 @@ void CInputGEDCOM::OnBnClickedOk()
 
 	m_gedCtrl.GetWindowTextW(theApp.m_gedFileName);
 
+
 	insertINDI();
 	insertFAM();
 	updateParents();
@@ -222,9 +204,10 @@ bool CInputGEDCOM::fillVectors()
 	UINT j;
 	int cnt = 0;
 
+	m_lineNumber = 0;
 	v_INDI.clear();
 	v_FAM.clear();
-	v_indiFAMS.clear();
+//	v_indiFAMS.clear();
 	v_CHIL.clear();
 	
 	v_lxtv.clear();
@@ -298,13 +281,15 @@ bool CInputGEDCOM::process0()
 	}
 	else if (tag == L"INDI")
 	{
-		v_INDI.push_back(I);
-		clearIndi();
+		v_INDI.push_back(I);	// elõzõ INDI mentése
+		I = {};
+//		clearIndi();			// következõ INDI indítása
 	}
 	else if (tag == L"FAM")
 	{
 		v_FAM.push_back(F);
-		clearFAM();
+		F = {};
+//		clearFAM();
 	}
 	else if (tag == L"OBJE")
 	{
@@ -314,6 +299,9 @@ bool CInputGEDCOM::process0()
 	{
 //		fwprintf(fl, L"TRL skipped\n\n");
 	}
+
+
+
 	return true;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -326,6 +314,7 @@ bool CInputGEDCOM::insertINDI()
 	CString filespec;
 	CString filename;
 	CString ext;
+	CString refI;
 	int		pos;
 	int i;
 	int parentIndex;
@@ -341,6 +330,52 @@ bool CInputGEDCOM::insertINDI()
 	wndP.SetRange(0, (int)v_INDI.size() );
 	wndP.SetPos(0);
 	wndP.SetStep(1);
+
+	CString refF;
+	CString refW;
+	CString refH;
+	int numOfSpouses;
+
+	// parentIndex meghatározása
+	for (i = 0; i < v_INDI.size(); ++i)
+	{
+		refF = v_INDI.at(i).refF; // család azonosítója
+		for( int j = 0; j < v_CHIL.size(); ++j )
+		{ 
+			if (v_CHIL.at(j).refF == refF)		// a gyerek vektorból az apa és anya azonosítója
+			{
+				refH = v_CHIL.at(j).refH;
+				refW = v_CHIL.at(j).refW;
+				cnt = 0;
+				for( int m = 0; m < v_FAM.size(); ++m)	// a család vektorból az apa feleségének sorszáma
+				{ 
+					if (v_FAM.at(m).refH == refH)
+					{
+						++cnt;
+						if (v_FAM.at(m).refW == refW)
+						{
+							v_INDI.at(i).parentIndex = cnt;
+						}
+					}
+				}
+			}
+		}
+
+
+	}
+
+	int numOfChildren;
+	for (int i = 0; i < v_INDI.size(); ++i)
+	{
+		refI = v_INDI.at(i).refI;
+		numOfChildren = 0;
+		for (int j = 0; j < v_CHIL.size(); ++j)
+		{
+			if (v_CHIL.at(j).refH == refI)
+				++numOfChildren;
+		}
+		v_INDI.at(i).numOfChildren = numOfChildren;
+	}
 
 	theApp.execute(L"BEGIN");
 	for (i = 0; i < v_INDI.size(); ++i)
@@ -494,6 +529,8 @@ bool CInputGEDCOM::insertFAM()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CInputGEDCOM::clearIndi()
 {
+	I = {};
+/*
 	I.birth_date.Empty();
 	I.birth_place.Empty();
 	I.comment.Empty();
@@ -518,10 +555,13 @@ void CInputGEDCOM::clearIndi()
 	I.tablenumber = L"1";
 	I.title.Empty();
 	I.titolo.Empty();
+*/
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CInputGEDCOM::clearFAM()
 {
+	F = {};
+/*
 	F.cnt = 0;
 	F.date.Empty();
 	F.marriageH = 0;
@@ -533,6 +573,7 @@ void CInputGEDCOM::clearFAM()
 	F.refF.Empty();
 	F.refH.Empty();
 	F.refW.Empty();
+*/
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int CInputGEDCOM::gedCHAR(CString fileSpec)
@@ -576,6 +617,8 @@ CString CInputGEDCOM::getRowid( CString ref )
 // A people táblában lévõ emberek father_id és mother_id értékeit update-eli a v_fam és v_chil alapján
 void CInputGEDCOM::updateParents()
 {
+	int numOfChildren;
+	CString refH;
 	CString refF;
 	CString xref_child;
 
@@ -596,10 +639,13 @@ void CInputGEDCOM::updateParents()
 		rowid_father = getRowid(v_FAM.at(i).refH);
 		rowid_mother = getRowid(v_FAM.at(i).refW);
 		rowid_mother.Trim();
+		numOfChildren = 0;
+		refH = v_FAM.at(i).refH;
 		for (UINT j = 0; j < v_CHIL.size(); ++j)
 		{
 			if (v_CHIL.at(j).refF == refF)
 			{
+				++numOfChildren;
 				xref_child = v_CHIL.at(j).refC;
 				for (UINT k = 0; k < v_INDI.size(); ++k)
 				{

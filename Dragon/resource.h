@@ -585,6 +585,7 @@
 #define IDC_GROUP_DONTWORK_TEXT         1859
 #define IDC_COMBO_FAMILYNAME            1860
 #define IDC_TITOLOLOWER                 1862
+#define IDC_RICHEDIT1                   1864
 #define IDC_LISTCOLUMNS                 11044
 #define ID_EDIT_INSERT                  32771
 #define ID_EDIT_UPDATE                  32772
@@ -1008,14 +1009,21 @@
 #define ID_HTMLLIST_PR_NOREP            35076
 #define ID_TABUL35077                   35077
 #define ID_DESCENDANT_LENGTH            35078
+#define ID_T35079                       35079
+#define ID_TABLE                        35080
+#define ID_FUNCTIONS_35081              35081
+#define ID_ALL_ASCENDANTS               35082
+#define IDC_ALL_DESCENDANTS             35083
+#define ID_ALL_DESCENDANTS              35084
+#define ID_FELMEN35085                  35085
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        577
-#define _APS_NEXT_COMMAND_VALUE         35079
-#define _APS_NEXT_CONTROL_VALUE         1864
+#define _APS_NEXT_COMMAND_VALUE         35086
+#define _APS_NEXT_CONTROL_VALUE         1866
 #define _APS_NEXT_SYMED_VALUE           387
 #endif
 #endif

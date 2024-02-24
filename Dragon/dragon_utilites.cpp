@@ -273,7 +273,8 @@ CString CDragApp::getYear( _int64 diff )
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 _int64 CDragApp::getStartTime()
 {
-	m_command = L"SELECT strftime('%s','now' )";
+//	m_command = L"SELECT strftime('%s','now' )";
+	m_command = L"SELECT strftime('%s','HH:MM:SS.SSS' )";
 	if( !query4( m_command ) ) return 0;
 	return ( _wtoi( m_recordset4->GetFieldString( 0 ) ) );
 }

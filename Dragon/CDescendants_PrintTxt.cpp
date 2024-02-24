@@ -45,8 +45,6 @@ void CDescendants::printVectorTxt(int i)
 
 		if (vDesc.at(i).hidden) continue;   // apa bejegyzése, aki más táblában szerepel
 
-		if (p_repeated != 0 && vDesc.at(i).status == 2) continue;	// ismétlõdõ bejegyzés, amit nem ki akarunk kiírni
-
 		queryPeople(vDesc.at(i).rowid, &p);
 
 		if (!p_womenDescendants && vDesc.at(i).parentSex == WOMAN) continue;
@@ -470,19 +468,6 @@ bool CDescendants::openTxt( CString file, CString title )
 	else
 		nok = L"nem";
 
-	CString kihagy;
-	switch (p_repeated)
-	{
-	case 0:
-		kihagy = L"Nem hagyja aki az ismétlõdõ leszármazottakat.";
-		break;
-	case 1:
-		kihagy = L"Az elsõ leszármazottat kiírja, a többit elhagyja.";
-		break;
-	case 2:
-		kihagy = L"Ha az apja leszármazott, akkor kiírja, ha az anyja, akkor nem";
-	}
-
 	CString maxGen;
 	if (p_generationMax.IsEmpty())
 		maxGen = L"minden generáció";
@@ -543,15 +528,11 @@ bool CDescendants::openTxt( CString file, CString title )
 	printTxt(str);
 	str.Format(L"%*s %s\n", l, L"Nõk leszármazottai:", nok);
 	printTxt(str);
-	str.Format(L"%*s %s\n", l, L"Ismétlõdõk kihagyása:", kihagy);
-	printTxt(str);
+	
 
 	if (p_repeatedColor)
 	{
-		if (p_repeated == 0)
-			str.Format(L"%*s %s\n", l, L"Ismétlõdõk színezése:", L"zöld - elsõ elõfordulás, piros - újabb elõfordulás");
-		else
-			str.Format(L"%*s %s\n", l, L"Ismétlõdõk színezése:", L"zöld");
+		str.Format(L"%*s %s\n", l, L"Ismétlõdõk színezése:", L"zöld - elsõ elõfordulás, piros - újabb elõfordulás");
 		printTxt(str);
 	}
 	printTxt(L"\n\n");
@@ -597,11 +578,6 @@ void CDescendants::closeTxt()
 		printTxt(str);
 		str.Format(L"%-*s %8s\n", l, L"Listázott leszármazottak száma:", thousand(m_listedD));
 		printTxt(str);
-		if (p_repeated)
-		{
-			str.Format(L"%-*s %8s\n", l, L"Ismétlõdõ, nem listázott leszármazottak száma:", thousand(m_cntRepeated));
-			printTxt(str);
-		}
 		str.Format(L"%-*s %8s\n", l, L"Összes listázott emberek száma:", thousand(m_listedP));
 		printTxt(str);
 		str.Format(L"%-*s %s\n", l, L"Futási idõ:", theApp.getTimeElapsed(m_startTime));

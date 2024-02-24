@@ -1,6 +1,10 @@
 #pragma once
 
-#define VERSION L"10.171"
+#define VERSION L"10.173"
+
+// 10.173 2024.02.24 Leszármazotti gráf
+// 
+// 10.172 2024.02.11 A leszármazotti listák a ...lists\descendants_name alkönyvtárban
 
 // 10.171 2024.02.10 Hosszra rendezett leszármazotti szálak javítása.
 // 

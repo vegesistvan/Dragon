@@ -3,6 +3,7 @@ enum
 {
 	U_TOGGLE = 0,		// hidden
 	U_MOREC,			// hidden
+	U_ROWID,
 	U_LINENUMBER,
 	U_CNT,
 	U_ISM,
@@ -22,6 +23,7 @@ enum
 enum
 {
 	F_TOGGLE = 0,		// hidden
+	F_ROWID,
 	F_LINENUMBER,
 	F_SEX,
 	F_CNT,

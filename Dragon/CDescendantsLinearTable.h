@@ -8,6 +8,8 @@ enum
 {
 	L_CLRTEXTBK = 0,		// hidden
 	L_CLRTEXT,
+	L_NAME,
+	L_ROWID,
 	L_LINENUMBER,
 	L_NUMOFD,
 	L_ISM,
@@ -62,6 +64,7 @@ protected:
 	bool m_log;
 
 	CHARFORMAT cf = { 0 };
+	CHARFORMAT cf1 = { 0 };
 
 	CDescendantsFull m_aF;
 	CDescendantsUnique m_aU;
@@ -78,7 +81,7 @@ protected:
 
 	CTabCtrl m_TabCtrl;
 	
-
+	CString m_txtFile;
 	CString m_titleF;
 	CString m_titleU;
 
@@ -124,7 +127,10 @@ protected:
 	std::vector<DE::DESC> vDL;
 	std::vector<CH> vCH;
 	std::vector<DE::DESC> vD;
-
+	std::vector<DE::VXY> vXY;
+	std::vector<DE::DIRECT> vDirect;
+	std::vector<DE::L> vL;
+	
 	DE::PEO peoS;
 
 	bool gflag;
@@ -194,7 +200,18 @@ protected:
 	void CDescendantsLinearTable::order_numOfD();
 	BOOL CDescendantsLinearTable::create_vD();
 	void CDescendantsLinearTable::descendants();
-
+	CString CDescendantsLinearTable::getDesc(int i);
+	void CDescendantsLinearTable::fillSp();
+	void CDescendantsLinearTable::fillX(int g, int max, CString kar);
+	void CDescendantsLinearTable::fillL1(int g, int ln, CString kar);
+	void CDescendantsLinearTable::fillL2(int g, int len, CString kar);
+	int CDescendantsLinearTable::getLengthMax();
+	int CDescendantsLinearTable::getLength(int g, int ix);
+	int CDescendantsLinearTable::getLongestUnderG(int g);
+	void CDescendantsLinearTable::child(int id);
+	void CDescendantsLinearTable::sibling(int id);
+	void CDescendantsLinearTable::graph();
+	void CDescendantsLinearTable::graph2();
 
 	CString getSeededName(int i);
 	DECLARE_MESSAGE_MAP()
@@ -224,6 +241,8 @@ protected:
 
 
 	CRichEditCtrl m_RichEditCtrl;
+	CRichEditCtrl m_RichEditCtrl1;
+	
 	CListCtrlEx* m_ListCtrl;
 
 
@@ -237,6 +256,10 @@ protected:
 	DE::PPEOPLE ss;
 
 	CString m_title;
+
+	int X;
+	int Y;
+
 public:
 	std::vector<DE::DESC>* vDesc;
 	
@@ -260,8 +283,6 @@ public:
 
 	int p_fontSize;
 	int	p_numberingSystem;		// leszármazottak számozása
-	int	p_repeated;
-	
 	
 	UINT p_colorBgrnd;
 
@@ -274,10 +295,20 @@ public:
 	CString p_rowWidth;
 
 	CString m_name;
-	CString m_htmlFile;
 	CString m_descendantsPath;
 	CString m_htmlPathName;
+	CString m_htmlPathName1;
+
+
 
 	afx_msg void OnDescendantLength();
+
+	afx_msg void OnGraph();
+	afx_msg void OnGraph2();
+	void CDescendantsLinearTable::printX(CString str);
+	void CDescendantsLinearTable::setXOfChildren();
+	void CDescendantsLinearTable::listDescendants();
+	int CDescendantsLinearTable::getLength(int g);
+	void CDescendantsLinearTable::getDirectDescendants();
 };
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

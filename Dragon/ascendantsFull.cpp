@@ -8,6 +8,7 @@
 #include "ascendantsFull.h"
 #include "ascendantsEnum.h"
 #include "ProgressWnd.h"
+#include "Relatives.h"
 
 IMPLEMENT_DYNAMIC(CAscendantsFull, CDialogEx)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -31,15 +32,10 @@ BEGIN_MESSAGE_MAP(CAscendantsFull, CDialogEx)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST_FULL, &CAscendantsFull::OnCustomdrawList)
 	ON_MESSAGE(WM_LISTCTRL_MENU, OnListCtrlMenu)
 
-	ON_COMMAND(ID_KERESS_BEGINNING, &CAscendantsFull::OnKeressBeginning)
-	ON_COMMAND(ID_KERESS_NEXT, &CAscendantsFull::OnKeressNext)
-	ON_COMMAND(ID_KERESS_PREVIOUS, &CAscendantsFull::OnKeressPrevious)
-
-	ON_COMMAND(ID_DESCENDANTS_MARKED, &CAscendantsFull::OnDescendantsMarked)
-	ON_COMMAND(ID_DESCENDANTS_LISTED, &CAscendantsFull::OnDescendantsListed)
-	ON_COMMAND(ID_ASCENDANTS_MARKED, &CAscendantsFull::OnAscendantsMarked)
-	ON_COMMAND(ID_ASCENDANTS_LISTED, &CAscendantsFull::OnAscendantsListed)
 	ON_COMMAND(ID_FUNCTIONS_NOTEPAD, &CAscendantsFull::OnFunctionsNotepad)
+	ON_COMMAND(ID_ALL_ASCENDANTS, &CAscendantsFull::OnAllAscendants)
+	ON_COMMAND(ID_ALL_DESCENDANTS, &CAscendantsFull::OnAllDescendants)
+	ON_NOTIFY(NM_DBLCLK, IDC_LIST_FULL, &CAscendantsFull::OnDblclkListFull)
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CAscendantsFull::OnInitDialog()
@@ -53,6 +49,7 @@ BOOL CAscendantsFull::OnInitDialog()
 	m_ListCtrlF.SetExtendedStyle(m_ListCtrlF.GetExtendedStyle() | LVS_EX_GRIDLINES);
 
 	m_ListCtrlF.InsertColumn(F_TOGGLE, L"", LVCFMT_RIGHT, 30, -1, COL_HIDDEN);
+	m_ListCtrlF.InsertColumn(F_ROWID, L"", LVCFMT_RIGHT, 30, -1, COL_HIDDEN);
 	m_ListCtrlF.InsertColumn(F_LINENUMBER, L"", LVCFMT_RIGHT, 30, -1, COL_HIDDEN);
 	m_ListCtrlF.InsertColumn(F_SEX, L"", LVCFMT_RIGHT, 30, -1, COL_HIDDEN);
 	m_ListCtrlF.InsertColumn(F_CNT, L"#", LVCFMT_RIGHT, 50, -1, COL_NUM);
@@ -184,181 +181,134 @@ LRESULT CAscendantsFull::OnListCtrlMenu(WPARAM wParam, LPARAM lParam)
 	}
 	return TRUE;
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CAscendantsFull::OnKeressBeginning()
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CAscendantsFull::OnDblclkListFull(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	int nItem = m_ListCtrlF.GetNextItem(-1, LVNI_SELECTED);
-	CString name = m_ListCtrlF.GetItemText(nItem, F_ASCENDANT);
-	int i = nItem;
-	theApp.keress(name, &m_ListCtrlF, F_ASCENDANT, 0, true );
+	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+	int nItem = pNMItemActivate->iItem;
 
-/*
+	CRelatives dlgR;
+	dlgR.m_rowid = m_ListCtrlF.GetItemText(nItem, F_ROWID);
+	if (dlgR.DoModal() == IDCANCEL) return;
+	*pResult = 0;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CAscendantsFull::OnAllAscendants()
+{
 	int n = m_ListCtrlF.GetItemCount();
-	for ( i = 0; i < n; ++i)
+	CString id;
+	CString idF;
+	CString idC;
+	int j;
+
+	std::vector<int> vN;
+
+	int nItem = m_ListCtrlF.GetNextItem(-1, LVNI_SELECTED);
+	CString ascendant = m_ListCtrlF.GetItemText(nItem, F_ASCENDANT);
+	CString file;
+	file.Format(L"%s felmenõi", m_ListCtrlF.GetItemText(nItem, F_NAME));
+	CString filePathName;
+	filePathName = theApp.openTextFile(&flDesc, file, L"w+");  // log fájl
+
+	fwprintf(flDesc, L"Felmenõi lánc\n\n");
+	fwprintf(flDesc, L"%6s %15s %15s %15s felmenõ\n", L"", L"idF", L"idC", L"id");
+	for (int i = 0; i < n; ++i)
 	{
 		str = m_ListCtrlF.GetItemText(i, F_ASCENDANT);
-		if (str == name)
+		if (str == ascendant)
 		{
-			if (i != nItem)
+			vN.push_back(i);
+		}
+	}
+	// vN-ben az ember mindenegyes elõfordulása, akiknke a felmenõit akarjuk listázni
+	for (int i = 0; i < vN.size(); ++i)
+	{
+		nItem = vN.at(i);
+		idF = m_ListCtrlF.GetItemText(nItem, F_IDF);
+		vid.clear();
+		vid.push_back(nItem);
+
+		for (i = nItem + 1; i < m_ListCtrlF.GetItemCount(); ++i)
+		{
+			id = m_ListCtrlF.GetItemText(i, F_ID);
+			if (id == idF)
 			{
-				m_ListCtrlF.SetItemState(i, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
+				idF = m_ListCtrlF.GetItemText(i, F_IDF);
+				vid.push_back(i);
 			}
 		}
-	}
-	m_ListCtrlF.EnsureVisible(i, FALSE);
-*/
-}
-/// //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CAscendantsFull::OnKeressNext()
-{
-	int nItem = m_ListCtrlF.GetNextItem(-1, LVNI_SELECTED);
-	CString name = m_ListCtrlF.GetItemText(nItem, F_ASCENDANT);
-	theApp.keress(name, &m_ListCtrlF, F_ASCENDANT, nItem + 1, true);
-/*
-	int n = m_ListCtrlF.GetItemCount();
-	for (int i = nItem+1; i < n; ++i)
-	{
-		str = m_ListCtrlF.GetItemText(i, F_ASCENDANT);
-		if (str == name)
+
+		// vid-ban a felmenõk
+		for (int i = 0; i < vid.size(); ++i)
 		{
-			m_ListCtrlF.EnsureVisible(i, FALSE);
-			m_ListCtrlF.SetItemState(i, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
-			break;
+			j = vid.at(i);
+			id = m_ListCtrlF.GetItemText(j, F_ID);
+			idF = m_ListCtrlF.GetItemText(j, F_IDF);
+			idC = m_ListCtrlF.GetItemText(j, F_IDC);
+			ascendant = m_ListCtrlF.GetItemText(j, F_ASCENDANT);
+			fwprintf(flDesc, L"%5d. %15s %15s %15s %s\n", i + 1, idF, idC, id, ascendant);
 		}
-	}
-*/
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CAscendantsFull::OnKeressPrevious()
-{
-	int nItem = m_ListCtrlF.GetNextItem(-1, LVNI_SELECTED);
-	if (nItem == 0) return;
-	CString name = m_ListCtrlF.GetItemText(nItem, F_ASCENDANT);
-	theApp.keress(name, &m_ListCtrlF, F_ASCENDANT, -1, true );
-	
-	
-/*
-	int n = m_ListCtrlF.GetItemCount();
-
-	for (int i = nItem - 1; i >= 0; --i)
-	{
-		str = m_ListCtrlF.GetItemText(i, F_ASCENDANT);
-		if (str == name)
-		{
-			m_ListCtrlF.EnsureVisible(i, FALSE);
-			m_ListCtrlF.SetItemState(i, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
-			break;
-		}
-	}
-*/
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CAscendantsFull::OnDescendantsMarked()
-{
-	int nItem = m_ListCtrlF.GetNextItem(-1, LVNI_SELECTED);
-	int n = m_ListCtrlF.GetItemCount();
-	int i;
-	CString id;
-	CString idC;
-
-	id = m_ListCtrlF.GetItemText(nItem, F_ID);
-	idC = m_ListCtrlF.GetItemText(nItem, F_IDC);
-	vid.clear();
-	vid.push_back(nItem);
-
-	theApp.unselectAll(&m_ListCtrlF);
-	m_ListCtrlF.SetItemState(nItem, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
-	for ( i = nItem - 1; i > -1; --i)
-	{
-		id = m_ListCtrlF.GetItemText(i, F_ID);
-		if (id == idC)
-		{
-			m_ListCtrlF.SetItemState(i, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
-			idC = m_ListCtrlF.GetItemText(i, F_IDC);
-			vid.push_back(i);
-		}
-	}
-	m_ListCtrlF.EnsureVisible(i, FALSE);
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CAscendantsFull::OnDescendantsListed()
-{
-	OnDescendantsMarked();
-
-	CString id;
-	CString idC;
-	CString idF;
-	int j;
-	CString descendant;
-	CString filePathName;
-	filePathName = theApp.openTextFile(&flDesc, L"desc", L"w+");  // log fájl
-
-	fwprintf(flDesc, L"Leszármazotti lánc\n\n");
-	fwprintf(flDesc, L"%6s %5s %5s %5s leszármazott\n", L"", L"idF", L"idC", L"id");
-	for (int i = 0; i < vid.size(); ++i)
-	{
-		j = vid.at(i);
-		id = m_ListCtrlF.GetItemText(j, F_ID);
-		idF = m_ListCtrlF.GetItemText(j, F_IDF);
-		idC = m_ListCtrlF.GetItemText(j, F_IDC);
-		descendant = m_ListCtrlF.GetItemText(j, F_ASCENDANT);
-		fwprintf(flDesc, L"%5d. %5s %5s %5s %s\n", i + 1, idF, idC, id, descendant );
+		fwprintf(flDesc, L"\n");
 	}
 	fclose(flDesc);
 	theApp.showFile(filePathName);
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CAscendantsFull::OnAscendantsMarked()
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CAscendantsFull::OnAllDescendants()
 {
-	int nItem = m_ListCtrlF.GetNextItem(-1, LVNI_SELECTED);
-	int n = m_ListCtrlF.GetItemCount();
-
-	int i;
 	CString id;
 	CString idF;
+	CString idC;
+	CString ascendant;
+	int j;
 
-	id = m_ListCtrlF.GetItemText(nItem, F_ID);
-	idF = m_ListCtrlF.GetItemText(nItem, F_IDF);
-	vid.clear();
-	vid.push_back(nItem);
+	std::vector<int> vN;
+	int nItem = m_ListCtrlF.GetNextItem(-1, LVNI_SELECTED);
+	CString file;
+	file.Format(L"%s leszármazottai", m_ListCtrlF.GetItemText(nItem, F_NAME));
+	CString filePathName;
+	filePathName = theApp.openTextFile(&flDesc, file, L"w+");  // log fájl
 
-	theApp.unselectAll(&m_ListCtrlF);
-	m_ListCtrlF.SetItemState(nItem, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
-	for (i = nItem + 1; i < m_ListCtrlF.GetItemCount(); ++i)
+	fwprintf(flDesc, L"Leszármazotti lánc\n\n");
+	fwprintf(flDesc, L"%6s %7s %7s %7s leszármazott\n", L"", L"idF", L"idC", L"id");
+	// vN-be a kijelölt leszármazott elõfordulásai
+
+	CString descendant = m_ListCtrlF.GetItemText(nItem, F_ASCENDANT);
+	for (int i = 0; i < m_ListCtrlF.GetItemCount(); ++i)
 	{
-		id = m_ListCtrlF.GetItemText(i, F_ID);
-		if (id == idF)
+		str = m_ListCtrlF.GetItemText(i, F_ASCENDANT);
+		if (str == descendant)
 		{
-			m_ListCtrlF.SetItemState(i, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
-			idF = m_ListCtrlF.GetItemText(i, F_IDF);
-			vid.push_back(i);
+			vN.push_back(i);
 		}
 	}
-	m_ListCtrlF.EnsureVisible(i, FALSE);
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CAscendantsFull::OnAscendantsListed()
-{
-	OnAscendantsMarked();
-
-	CString id;
-	CString idC;
-	CString idF;
-	int j;
-	CString ascendants;
-	CString filePathName;
-	filePathName = theApp.openTextFile(&flDesc, L"desc", L"w+");  // log fájl
-
-	fwprintf(flDesc, L"Felmenõi lánc\n\n");
-	fwprintf(flDesc, L"%6s %15s %15s %15s felmenõ\n", L"", L"idF", L"idC", L"id");
-	for (int i = 0; i < vid.size(); ++i)
+	// vN-ben az ember mindenegyes elõfordulása, akiknek a leszármazottait akarjuk listázni
+	for (int i = 0; i < vN.size(); ++i)
 	{
-		j = vid.at(i);
-		id = m_ListCtrlF.GetItemText(j, F_ID);
-		idF = m_ListCtrlF.GetItemText(j, F_IDF);
-		idC = m_ListCtrlF.GetItemText(j, F_IDC);
-		ascendants = m_ListCtrlF.GetItemText(j, F_ASCENDANT);
-		fwprintf(flDesc, L"%5d. %15s %15s %15s %s\n", i + 1, idF, idC, id, ascendants);
+		vid.clear();
+		nItem = vN.at(i);
+		vid.push_back(nItem);
+		idC = m_ListCtrlF.GetItemText(nItem, F_IDC);
+		for (int i = nItem - 1; i > -1; --i)
+		{
+			id = m_ListCtrlF.GetItemText(i, F_ID);
+			if (id == idC)
+			{
+				idC = m_ListCtrlF.GetItemText(i, F_IDC);
+				vid.push_back(i);
+			}
+		}
+		// vid-ben a leszármazottak
+		for (int j = 0; j < vid.size(); ++j)
+		{
+			nItem = vid.at(j);
+			id = m_ListCtrlF.GetItemText(nItem, F_ID);
+			idF = m_ListCtrlF.GetItemText(nItem, F_IDF);
+			idC = m_ListCtrlF.GetItemText(nItem, F_IDC);
+			descendant = m_ListCtrlF.GetItemText(nItem, F_ASCENDANT);
+			fwprintf(flDesc, L"%5d. %7s %7s %7s %s\n", nItem + 1, idF, idC, id, descendant);
+		}
+		fwprintf(flDesc, L"\n");
 	}
 	fclose(flDesc);
 	theApp.showFile(filePathName);
@@ -369,5 +319,11 @@ void CAscendantsFull::OnFunctionsNotepad()
 	int nItem = m_ListCtrlF.GetNextItem(-1, LVNI_SELECTED);
 	CString lineNumber = m_ListCtrlF.GetItemText(nItem, F_LINENUMBER);
 	if (!lineNumber.IsEmpty())
-		theApp.editNotepad(theApp.m_htmlPathName, lineNumber);
+	{
+		if (theApp.m_inputMode == GAHTML)
+			theApp.editNotepad(theApp.m_htmlPathName, lineNumber);
+		else if (theApp.m_inputMode == GEDCOM)
+			theApp.editNotepad(theApp.m_gedPathName, lineNumber);
+	}
 }
+

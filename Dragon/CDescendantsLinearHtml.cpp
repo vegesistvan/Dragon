@@ -575,19 +575,7 @@ bool CDescendantsLinearTable::printTopContainer(CString title)
 		nok = L"nem";
 
 	CString kihagy;
-/*
-	switch (p_repeated)
-	{
-	case 0:
-		kihagy = L"Nem hagyja aki az ismétlõdõ leszármazottakat.";
-		break;
-	case 1:
-		kihagy = L"Az elsõ leszármazottat kiírja, a többit elhagyja.";
-		break;
-	case 2:
-		kihagy = L"Ha az apja leszármazott, akkor kiírja, ha az anyja, akkor nem";
-	}
-*/
+
 	CString maxGen;
 //	if (p_generationMax.IsEmpty())
 //		maxGen = L"minden generáció";

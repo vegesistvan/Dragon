@@ -22,7 +22,7 @@ void CDescendants::indentedHtml()
 	
 	printVector( 0 );
 	closeHtml();
-//	ShellExecute(NULL, L"open", m_htmlFile, NULL, NULL, SW_SHOWNORMAL);
+//	ShellExecute(NULL, L"open", m_htmlPathName, NULL, NULL, SW_SHOWNORMAL);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendants::printVector( int tbl)
@@ -72,8 +72,6 @@ void CDescendants::printVector( int tbl)
 
 		if (vDesc.at(i).hidden) continue;   // apa bejegyzése, aki más táblában szerepel
 
-		if (p_repeated != 0  && vDesc.at(i).status == 2) continue;	// ismétlõdõ bejegyzés, amit nem ki akarunk kiírni
-		
 		queryPeople(vDesc.at(i).rowid, &p);
 
 		if (!p_womenDescendants && vDesc.at(i).parentSex == WOMAN) continue;
@@ -749,19 +747,13 @@ CString CDescendants::getColoredString(CString str, int index)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CDescendants::openHtml(CString file, CString title, UINT colorBgrnd)
 {
-	CString descendantsPath;
 	CString dragonjpgPathName;
-	descendantsPath.Format(L"%s\\descendants_%s", theApp.m_workingDirectory, theApp.m_dbFileTitle);
-	if (_waccess(descendantsPath, 0))
-		_wmkdir(descendantsPath);
-	dragonjpgPathName.Format(L"%s\\dragon.jpg", descendantsPath);
+	dragonjpgPathName.Format(L"%s\\dragon.jpg", m_descendantsPath);
 	CopyFile(theApp.m_dragonjpg, dragonjpgPathName, false);
 	
-	m_htmlFile.Format(L"%s\\%s_%s.html", descendantsPath, file, getTimeTag());
+	m_htmlPathName1.Format(L"%s\\%s_leszármazotti táblája_%s.html", m_descendantsPath, m_os, getTimeTag());
 
-
-
-	if (!openFileSpec(&fl, m_htmlFile, L"w+")) return false;
+	if (!openFileSpec(&fl, m_htmlPathName1, L"w+")) return false;
 
 
 	int l = -37;
@@ -773,19 +765,6 @@ BOOL CDescendants::openHtml(CString file, CString title, UINT colorBgrnd)
 		nok = L"igen";
 	else
 		nok = L"nem";
-
-	CString kihagy;
-	switch (p_repeated)
-	{
-	case 0:
-		kihagy = L"Nem hagyja aki az ismétlõdõ leszármazottakat.";
-		break;
-	case 1:
-		kihagy = L"Az elsõ leszármazottat kiírja, a többit elhagyja.";
-		break;
-	case 2:
-		kihagy = L"Ha az apja leszármazott, akkor kiírja, ha az anyja, akkor nem";
-	}
 
 	CString maxGen;
 	if (p_generationMax.IsEmpty())
@@ -910,10 +889,7 @@ BOOL CDescendants::openHtml(CString file, CString title, UINT colorBgrnd)
 
 	if (p_repeatedColor)
 	{
-		if (p_repeated == 0)
-			str.Format(L"%*s %s", l, L"Ismétlõdõk színezése:", L"zöld - elsõ elõfordulás, piros - újabb elõfordulás");
-		else
-			str.Format(L"%*s %s", l, L"Ismétlõdõk színezése:", L"zöld");
+		str.Format(L"%*s %s", l, L"Ismétlõdõk színezése:", L"zöld - elsõ elõfordulás, piros - újabb elõfordulás");
 		print(str);
 	}
 	print(L"</pre>\n\n");
@@ -1017,11 +993,6 @@ void CDescendants::closeHtml()
 		print(str);
 		str.Format(L"%-*s %8s", l, L"Listázott leszármazottak száma:", thousand(m_listedD));
 		print(str);
-		if (p_repeated)
-		{
-			str.Format(L"%-*s %8s", l, L"Ismétlõdõ, nem listázott leszármazottak száma:", thousand(m_cntRepeated));
-			print(str);
-		}
 		str.Format(L"%-*s %8s", l, L"Összes listázott emberek száma:", thousand(m_listedP));
 		print(str);
 		str.Format(L"%-*s %s", l, L"Futási idõ:", theApp.getTimeElapsed(m_startTime));

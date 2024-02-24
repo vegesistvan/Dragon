@@ -17,11 +17,14 @@ namespace DE
 		CString rowidF;		// apa rowid-ja
 		CString rowidM;		// anya rowid-ja
 		CString lastname;
+		CString firstname;
 		CString titolo;
 		CString tablenumber;
 		CString linenumber;
 		CString name;
 		CString sex;
+		CString birth;
+		CString death;
 		int numOfSpouses;
 		int numOfChildren;
 		int procChildren;
@@ -34,18 +37,33 @@ namespace DE
 		int cntRep;
 		int numOfRep;
 		int status;			// 0: alaphelyzet, listázandó (fekete)  1: ismétlõdõ elsõ bejegyzés, listázandó 2 (kék): ismétlõdõ második bejegyzés, nem listázandó(piros)
-		
+
 		bool printed;		// bejegyzés kiírva
 		int	id;			// a lineáris listázásnál a bejegyzés id-je; id-re történt rendezés után a vDesc indexe
 		int idC;
 		int idF;
+		int length;
 		CString ixM;
 		int nOfD;			// a bejegyzés leszármazottainak száma
 		bool clrText;
 		bool clrTextBk;
+		int shift;
 
 	}DESC;
 
+	typedef struct
+	{
+		int g;
+		int id;
+	}GID;
+
+	typedef struct
+	{
+		int id;			// first entry in the generation
+		int pos;		// utolsó bejegyzés elsõ karaktersorszáma
+		CString l1;		// a generáció sora
+		CString l2;
+	}L;
 
 	typedef struct
 	{
@@ -56,6 +74,8 @@ namespace DE
 		CString firstname;
 		CString titolo;
 		CString name;
+		CString birth;
+		CString death;
 		int numOfSpouses;
 		int numOfChildren;
 		int motherIndex;
@@ -91,6 +111,14 @@ namespace DE
 
 	}SIB;
 
+	typedef struct
+	{
+		TCHAR kar;
+		int x;
+		int y;
+		int length;
+	}VXY;
+
 	const ATTRIB attrib[] =
 	{
 		L"normál ",		L"",						L"",
@@ -100,6 +128,18 @@ namespace DE
 		L"piros",		L"<font color='red'>",		L"</font>",
 		L"zöld",		L"<font color='green'>",	L"</font>",
 	};
+
+	typedef struct
+	{
+		int g;
+		int id;
+		int idC;
+		int idF;
+		int dbC;
+		int dbCLeft;
+		int cnt;
+	}DIRECT;
+
 
 
 	enum
@@ -122,8 +162,7 @@ namespace DE
 	{
 		ORDER_INPUT = 0,
 		ORDER_BIRTH,
-		ORDER_INCREASING,
-		ORDER_DECREASING
+		ORDER_NUMOFDESC,
 	};
 
 	enum
@@ -229,7 +268,6 @@ protected:
 	int p_familyNameAttrib;
 
 	int	p_numberingSystem;		// leszármazottak számozása
-	int	p_repeated;
 	
 	UINT p_colorBgrnd;
 	
@@ -264,16 +302,15 @@ protected:
 	CColorStatic colorOutput;
 	CColorStatic colorPrint;
 	CColorStatic colorOrder;
-	CColorStatic colorRepeated;
 	CColorStatic colorBgrnd;
 
 
 	bool m_printed;
 	CString m_tableNumber;
 	CString m_lastname;
-
+	CString m_firstname;
 	CString m_command;
-	CString m_htmlFile;
+	CString m_htmlPathName1;
 	CString m_os;
 	_int64 m_startTime;
 
@@ -304,7 +341,6 @@ protected:
 	std::vector<int> vSib;
 	std::vector<DE::DESC> vDesc2;
 	std::vector<DE::DESC> vDL;
-	
 
 	DE::PEO peoS;
 
@@ -355,12 +391,10 @@ protected:
 	void CDescendants::OnClickedDefault();
 	void CDescendants::updateParameters();
 	void CDescendants::updateRadioDName();
-	void CDescendants::updateRepeated();
 	void CDescendants::updateRadioNumbering();
 	void CDescendants::OnClickedCheckConnect();
 	void CDescendants::OnClickedCheckWoman();
 	void CDescendants::OnClickedCheckFolyt();
-//	void CDescendants::OnClickedCheckCapital();
 	void CDescendants::OnClickedSzluha();
 	void CDescendants::OnVillers();
 	void CDescendants::OnTupigny();
@@ -386,7 +420,6 @@ protected:
 	int CDescendants::getNumberOfChildren(CString rowid, CString sex_id);
 	void CDescendants::listDescendants();
 	void CDescendants::multipleRowid();
-//	void CDescendants::signeD(int i, int j);
 	CString CDescendants::getTableHeader();
 	CString CDescendants::getPlaceDateBlock(CString place, CString date, CString jel);
 	CString CDescendants::getColoredString(CString str, int index);
@@ -417,7 +450,6 @@ protected:
 	CString CDescendants::createSpRelatives();
 	CString CDescendants::getComplexDescription(int i, bool parentIndex);
 
-//	void CDescendants::order_vDesc();
 	void CDescendants::printvLen();
 	void CDescendants::print_vDesc();
 	void CDescendants::numOfDesc();
@@ -425,8 +457,8 @@ protected:
 	void CDescendants::create_id();
 	void CDescendants::printGAline();
 	bool CDescendants::rowidExist();
-	CString CDescendants::konvTitolo(CString titolo);
 	void CDescendants::order_numOfD();
+	CString CDescendants::konvTitolo(CString titolo);
 	
 	DECLARE_MESSAGE_MAP()
 public:
@@ -437,14 +469,11 @@ public:
 
 	void CDescendants::indentedHtml();
 
-	afx_msg void OnClickedRepeatedAll();
-	afx_msg void OnRepeatedFather();
-	afx_msg void OnRepeatedFirst();
 	afx_msg void OnPaint();
 	afx_msg void OnClickedOrderInput();
 	afx_msg void OnOrderLength();
-	afx_msg void OnOrderDecreasing();
 	afx_msg void OnOrderBirth();
 
 	afx_msg void OnClickedTitololower();
+
 };
