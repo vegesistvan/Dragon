@@ -92,7 +92,7 @@
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>e:\VS2022\common</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>d:\VS2022\common</AdditionalIncludeDirectories>
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -107,7 +107,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <AdditionalDependencies>common.lib;version.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>e:\VS2022\common\$(Platform_Actual)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>d:\VS2022\common\$(Platform_Actual)\$(Configuration)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <LinkTimeCodeGenerationObjectFile>$(IntDir)$(TargetName).iobj</LinkTimeCodeGenerationObjectFile>
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
@@ -179,7 +179,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>e:\VS2022\common</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>d:\VS2022\common</AdditionalIncludeDirectories>
       <SDLCheck>true</SDLCheck>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -187,7 +187,7 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>false</EnableCOMDATFolding>
       <OptimizeReferences>false</OptimizeReferences>
-      <AdditionalLibraryDirectories>e:\VS2022\common\$(Platform_Actual)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>d:\VS2022\common\$(Platform_Actual)\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>common.lib;version.lib</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>

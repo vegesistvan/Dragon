@@ -191,6 +191,7 @@ void CDescendantsLinearTable::graph()
 	DE::DESC desc;
 	CString title;
 	int g;
+	int id;
 
 
 	title.Format(L"%s leszármazotti gráfja", m_name);
@@ -212,10 +213,9 @@ void CDescendantsLinearTable::graph()
 		vL.push_back(l);
 	}
 
-
 	// Elsõ leszármazotti lánc insertálása vL-be
 	desc = vDesc->at(0);
-	int id = desc.id;
+	id = desc.id;
 	vL.at(0).id = 0;
 	vL.at(0).l1 += getDesc(0);
 	vL.at(0).l2 += L"|";
@@ -257,48 +257,70 @@ void CDescendantsLinearTable::graph()
 	int cnt1;
 	int cnt2;
 	int idC;
+	int g1;
 	cnt = 1;
-	std::vector<int> vId;
-	std::vector<int> vId2;
-	for( int x = 0; x <10; ++x)
+
+	
+	
+//	for (int x = 0; x < 10; ++x)
 //	while (cnt)
 	{
 		// Egy generáción a testvérek és azok leszármazottait írja ki, amíg van
 		for (g = vL.size() - 1; g >= 0; --g)
 		{
-			cnt = 0;
-			id = vL.at(g).id;				// a generáció elõzõ (utolsó) bejegyzése
-			if (id < 1) continue;			// nincs a generációban leszármazott ( a végén elõfordulhat )
-			idF = vDesc->at(id).idF;
-			// testvérek keresése
-			for (int j = id + 1; j < vDesc->size(); ++j)
+			for (g1 = vL.size() - 1; g1 >= g; --g1)
 			{
-				if (vDesc->at(j).idF == idF && !vDesc->at(j).printed)  // testvérek
+				while (true)
 				{
-					sibling(j);
-					++cnt;
-
-					// testvér leszármazottai
-					idF1 = vDesc->at(j).id;
-					vId.clear();
-				//	for (int k = j + 1; k < vDesc->size(); ++k)
-					for (int k = 0; k < vDesc->size(); ++k)
+					cnt = 0;
+					id = vL.at(g).id;				// a generáció elõzõ (utolsó) bejegyzése
+					if (id < 1) break;				// nincs a generációban leszármazott ( a végén elõfordulhat )
+					idF = vDesc->at(id).idF;
+					collectSiblings(idF);			// akiknek az apja idF
+					for (int i = 0; i < vSiblings.size(); ++i)
 					{
-						if (vDesc->at(k).idF == idF1 && !vDesc->at(k).printed)   // leszármazottak
+						id = vSiblings.at(i);
+						sibling(id);
+						str.Format(L"sibling: %d %d", g, id);
+					//	AfxMessageBox(str);
+						++cnt;
+						// j testvér gyerekeinek keresése
+						collectChildren(id);		// akik id leszármazottai
+						for (int j = 0; j < vChildren.size(); ++j)
 						{
-							child( k);
+							id = vChildren.at(j);
+							child(id);
+							str.Format(L"child: %d %d", g, id);
+					//		AfxMessageBox(str);
 							++cnt;
-
-							idF1 = k;
-							vId.push_back(k);  // vId-ban a listázott gyerekek azonosítói
 						}
 					}
-					// Az utolsó leszármazott testvéreivel kezdi, hogy a fölötte lévõk kikerülhessék
+					if (!cnt) 
+						break;		
+					if (vChildren.size())
+					{
+						id = vChildren.at(vChildren.size() - 1);
+						g1 = vDesc->at(id).g;
+						if (g1 <= g)
+						{
+							g1 = -1;  // lépjen ki
+							break;
+						}
+					}
+
+				}
+				if (!cnt) break;
+			}
+		}
+	}
+/*
+					// Az utolsó gyerek testvéréveleivel kezdi, hogy a fölötte lévõk kikerülhessék
+					// Testvér, ha apaindexük azonos
 //					while (true)
 					{
-						for (int i = vId.size() - 1; i >= 0; --i)
+						for (int i = vChildren1.size() - 1; i >= 0; --i)
 						{
-							id = vId.at(i);
+							id = vChildren1.at(i);
 							idF1 = vDesc->at(id).idF;
 						//	for (int j = id + 1; j < vDesc->size(); ++j)
 							for (int j = 0; j < vDesc->size(); ++j)
@@ -310,7 +332,7 @@ void CDescendantsLinearTable::graph()
 									// testvér leszármazottai
 
 									idF2 = vDesc->at(j).id;
-									vId2.clear();
+									vSiblings.clear();
 								//	for (int k = j + 1; k < vDesc->size(); ++k)
 									for (int k = 0; k < vDesc->size(); ++k)
 									{
@@ -319,13 +341,13 @@ void CDescendantsLinearTable::graph()
 											child(k);
 											++cnt;
 											idF2 = k;
-											vId2.push_back(k);
+											vSiblings.push_back(k);
 										}
 									}
 									
-									for (int i = vId2.size() - 1; i >= 0; --i)
+									for (int i = vSiblings.size() - 1; i >= 0; --i)
 									{
-										id = vId2.at(i);
+										id = vSiblings.at(i);
 										idF3 = vDesc->at(id).idF;
 										//		for (int j = id + 1; j < vDesc->size(); ++j)
 										for (int j = 0; j < vDesc->size(); ++j)
@@ -359,7 +381,7 @@ void CDescendantsLinearTable::graph()
 		}
 	}
 
-
+*/
 
 	for (int i = 0; i < vL.size(); ++i)
 	{
@@ -379,6 +401,29 @@ void CDescendantsLinearTable::graph()
 
 	fclose(txtOut);
 	theApp.notepad(m_txtFile, L"");
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDescendantsLinearTable::collectSiblings(int idF)
+{
+	vSiblings.clear();
+	for (int i = 0; i < vDesc->size(); ++i)
+	{
+		if (vDesc->at(i).idF == idF && !vDesc->at(i).printed )
+			vSiblings.push_back(i);
+	}
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDescendantsLinearTable::collectChildren( int id)
+{
+	vChildren.clear();
+	for (int i = 0; i < vDesc->size(); ++i)
+	{
+		if (vDesc->at(i).idF == id && !vDesc->at(i).printed)
+		{
+			vChildren.push_back(i);
+			id = i;
+		}
+	}
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsLinearTable::graph2()
@@ -455,7 +500,7 @@ void CDescendantsLinearTable::graph2()
 	cnt = 1;
 	std::vector<int> vId;
 	std::vector<int> vId2;
-	for (int x = 0; x < 2; ++x)
+	for (int x = 0; x < 10; ++x)
 		//	while (cnt)
 	{
 		// Egy generáción a testvérek és azok leszármazottait írja ki, amíg van
@@ -538,6 +583,7 @@ void CDescendantsLinearTable::graph2()
 													{
 														child(k);
 														idF2 = k;
+														//					vId2.push_back(k);
 														++cnt;
 													}
 												}
@@ -626,13 +672,15 @@ CString CDescendantsLinearTable::getDesc(int i)
 {
 	DE::DESC desc = vDesc->at(i);
 	str.Format(L"(%d %d %d %d %d)%s", desc.g, desc.idF, desc.id, desc.idC, desc.shift, desc.firstname);
-/*	str.Format(L"%s", desc.firstname);
+/*
+	str.Format(L"%s", desc.firstname);
 
 	if (!desc.birth.IsEmpty())
 		str.Format(L"%s *%s", (CString)str, desc.birth);
 	if( !desc.death.IsEmpty())
 		str.Format(L"%s +%s", (CString)str, desc.death);
 */
+
 	return(str);
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

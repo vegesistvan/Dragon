@@ -130,6 +130,8 @@ protected:
 	std::vector<DE::VXY> vXY;
 	std::vector<DE::DIRECT> vDirect;
 	std::vector<DE::L> vL;
+	std::vector<int> vSiblings;
+	std::vector<int> vChildren;
 	
 	DE::PEO peoS;
 
@@ -212,6 +214,8 @@ protected:
 	void CDescendantsLinearTable::sibling(int id);
 	void CDescendantsLinearTable::graph();
 	void CDescendantsLinearTable::graph2();
+	void CDescendantsLinearTable::collectSiblings(int idF);
+	void CDescendantsLinearTable::collectChildren(int idF);
 
 	CString getSeededName(int i);
 	DECLARE_MESSAGE_MAP()
