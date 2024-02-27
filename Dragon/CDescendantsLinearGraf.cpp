@@ -183,6 +183,7 @@ void CDescendantsLinearTable::OnGraph()
 			}
 		}
 	}
+
 	graph();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -198,201 +199,6 @@ void CDescendantsLinearTable::graph()
 	if (!openFileSpec(&txtOut, m_txtFile, L"w+")) return;
 	printX(title);
 	printX(L"");
-	
-
-	// vL vektor feltöltése a generáció jelével
-	DE::L l;
-	for (int i = 0; i <= Y; ++i)
-	{
-		str.Format(L"%c ", get_gABC(i));
-		l.id = -1;
-		l.l1 = str;
-		l.l2 = L"  ";
-		l.pos = 0;
-		vL.push_back(l);
-	}
-
-
-	// Elsõ leszármazotti lánc insertálása vL-be
-	desc = vDesc->at(0);
-	int id = desc.id;
-	vL.at(0).id = 0;
-	vL.at(0).l1 += getDesc(0);
-	vL.at(0).l2 += L"|";
-	vDesc->at(0).printed = true;
-	g = 1;
-	for (int i = 1; i < vDesc->size(); ++i)
-	{
-		if (vDesc->at(i).g == g)   // a generáció elsõ bejegyzése
-		{
-			desc = vDesc->at(i);
-			if (desc.idF == id)		// az elõzõ generációban az elsõ bejegyzés az apa
-			{
-				vDesc->at(i).shift = 2;
-				vDesc->at(i).printed = true;
-				vL.at(g).id = i;
-				vL.at(g).pos = vL.at(g).l1.GetLength();
-				vL.at(g).l1 += getDesc(i);
-				vL.at(g).l2 += L"|";
-				id = desc.id;
-				++g;
-			}
-		}
-	}
-	// hátulról keresem a testvéreket
-
-	CString str1;
-	CString str2;
-	int idF;
-	int ln;
-	int ln1;
-	int ln2;
-	int dbC;
-	int pos;
-
-	int idF1;
-	int idF2;
-	int idF3;
-	int cnt;
-	int cnt1;
-	int cnt2;
-	int idC;
-	cnt = 1;
-	std::vector<int> vId;
-	std::vector<int> vId2;
-	for( int x = 0; x <10; ++x)
-//	while (cnt)
-	{
-		// Egy generáción a testvérek és azok leszármazottait írja ki, amíg van
-		for (g = vL.size() - 1; g >= 0; --g)
-		{
-			cnt = 0;
-			id = vL.at(g).id;				// a generáció elõzõ (utolsó) bejegyzése
-			if (id < 1) continue;			// nincs a generációban leszármazott ( a végén elõfordulhat )
-			idF = vDesc->at(id).idF;
-			// testvérek keresése
-			for (int j = id + 1; j < vDesc->size(); ++j)
-			{
-				if (vDesc->at(j).idF == idF && !vDesc->at(j).printed)  // testvérek
-				{
-					sibling(j);
-					++cnt;
-
-					// testvér leszármazottai
-					idF1 = vDesc->at(j).id;
-					vId.clear();
-				//	for (int k = j + 1; k < vDesc->size(); ++k)
-					for (int k = 0; k < vDesc->size(); ++k)
-					{
-						if (vDesc->at(k).idF == idF1 && !vDesc->at(k).printed)   // leszármazottak
-						{
-							child( k);
-							++cnt;
-
-							idF1 = k;
-							vId.push_back(k);  // vId-ban a listázott gyerekek azonosítói
-						}
-					}
-					// Az utolsó leszármazott testvéreivel kezdi, hogy a fölötte lévõk kikerülhessék
-//					while (true)
-					{
-						for (int i = vId.size() - 1; i >= 0; --i)
-						{
-							id = vId.at(i);
-							idF1 = vDesc->at(id).idF;
-						//	for (int j = id + 1; j < vDesc->size(); ++j)
-							for (int j = 0; j < vDesc->size(); ++j)
-							{
-								if (vDesc->at(j).idF == idF1 && !vDesc->at(j).printed) 	// testvérek								
-								{
-									sibling(j);
-									++cnt;
-									// testvér leszármazottai
-
-									idF2 = vDesc->at(j).id;
-									vId2.clear();
-								//	for (int k = j + 1; k < vDesc->size(); ++k)
-									for (int k = 0; k < vDesc->size(); ++k)
-									{
-										if (vDesc->at(k).idF == idF2 && !vDesc->at(k).printed)   // leszármazottak
-										{
-											child(k);
-											++cnt;
-											idF2 = k;
-											vId2.push_back(k);
-										}
-									}
-									
-									for (int i = vId2.size() - 1; i >= 0; --i)
-									{
-										id = vId2.at(i);
-										idF3 = vDesc->at(id).idF;
-										//		for (int j = id + 1; j < vDesc->size(); ++j)
-										for (int j = 0; j < vDesc->size(); ++j)
-										{
-											if (vDesc->at(j).idF == idF3 && !vDesc->at(j).printed) 	// testvérek								
-											{
-												sibling(j);
-												++cnt;
-
-												idF2 = vDesc->at(j).id;
-												//	for (int k = j + 1; k < vDesc->size(); ++k)
-												for (int k = 0; k < vDesc->size(); ++k)
-												{
-													if (vDesc->at(k).idF == idF2 && !vDesc->at(k).printed)   // leszármazottak
-													{
-														child(k);
-														idF2 = k;
-														//					vId2.push_back(k);
-														++cnt;
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-
-
-	for (int i = 0; i < vL.size(); ++i)
-	{
-		printX(vL.at(i).l1);
-		printX(vL.at(i).l2);
-	}
-	printX(L"\n\n");
-
-	// a gráfban nem szereplõ leszármazottak
-	for (int i = 0; i < vDesc->size(); ++i)
-	{
-		if (!vDesc->at(i).printed)
-		{
-			printX(getDesc(i));
-		}
-	}
-
-	fclose(txtOut);
-	theApp.notepad(m_txtFile, L"");
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsLinearTable::graph2()
-{
-	DE::DESC desc;
-	CString title;
-	int g;
-
-
-	title.Format(L"%s leszármazotti gráfja", m_name);
-	m_txtFile.Format(L"%s\\%s_%s.txt", m_descendantsPath, title, getTimeTag());
-	if (!openFileSpec(&txtOut, m_txtFile, L"w+")) return;
-	printX(title);
-	printX(L"");
 
 
 	// vL vektor feltöltése a generáció jelével
@@ -436,27 +242,10 @@ void CDescendantsLinearTable::graph2()
 	}
 	// hátulról keresem a testvéreket
 
-	CString str1;
-	CString str2;
 	int idF;
-	int ln;
-	int ln1;
-	int ln2;
-	int dbC;
-	int pos;
+	int cnt = 1;
 
-	int idF1;
-	int idF2;
-	int idF3;
-	int cnt;
-	int cnt1;
-	int cnt2;
-	int idC;
-	cnt = 1;
-	std::vector<int> vId;
-	std::vector<int> vId2;
-	for (int x = 0; x < 2; ++x)
-		//	while (cnt)
+	while (cnt)
 	{
 		// Egy generáción a testvérek és azok leszármazottait írja ki, amíg van
 		for (g = vL.size() - 1; g >= 0; --g)
@@ -466,94 +255,33 @@ void CDescendantsLinearTable::graph2()
 			if (id < 1) continue;			// nincs a generációban leszármazott ( a végén elõfordulhat )
 			idF = vDesc->at(id).idF;
 			// testvérek keresése
-			for (int j = id + 1; j < vDesc->size(); ++j)
+			for (int i = id + 1; i < vDesc->size(); ++i)
 			{
-				if (vDesc->at(j).idF == idF && !vDesc->at(j).printed)  // testvérek
+				if (vDesc->at(i).idF == idF && !vDesc->at(i).printed)  // testvérek
 				{
-					sibling(j);
+					sibling(i);
 					++cnt;
-
-					// testvér leszármazottai
-					idF1 = vDesc->at(j).id;
-					vId.clear();
-					//	for (int k = j + 1; k < vDesc->size(); ++k)
-					for (int k = 0; k < vDesc->size(); ++k)
+					idF = vDesc->at(i).id;
+					break;
+				}
+			}
+			if (cnt)
+			{
+				// testvér leszármazottai
+				for (int k = 0; k < vDesc->size(); ++k)
+				{
+					if (vDesc->at(k).idF == idF && !vDesc->at(k).printed)   // leszármazottak
 					{
-						if (vDesc->at(k).idF == idF1 && !vDesc->at(k).printed)   // leszármazottak
-						{
-							child(k);
-							++cnt;
-
-							idF1 = k;
-							vId.push_back(k);  // vId-ban a listázott gyerekek azonosítói
-						}
-					}
-					// Az utolsó leszármazott testvéreivel kezdi, hogy a fölötte lévõk kikerülhessék
-//					while (true)
-					{
-						for (int i = vId.size() - 1; i >= 0; --i)
-						{
-							id = vId.at(i);
-							idF1 = vDesc->at(id).idF;
-							//	for (int j = id + 1; j < vDesc->size(); ++j)
-							for (int j = 0; j < vDesc->size(); ++j)
-							{
-								if (vDesc->at(j).idF == idF1 && !vDesc->at(j).printed) 	// testvérek								
-								{
-									sibling(j);
-									++cnt;
-									// testvér leszármazottai
-
-									idF2 = vDesc->at(j).id;
-									vId2.clear();
-									//	for (int k = j + 1; k < vDesc->size(); ++k)
-									for (int k = 0; k < vDesc->size(); ++k)
-									{
-										if (vDesc->at(k).idF == idF2 && !vDesc->at(k).printed)   // leszármazottak
-										{
-											child(k);
-											++cnt;
-											idF2 = k;
-											vId2.push_back(k);
-										}
-									}
-
-									for (int i = vId2.size() - 1; i >= 0; --i)
-									{
-										id = vId2.at(i);
-										idF3 = vDesc->at(id).idF;
-										//		for (int j = id + 1; j < vDesc->size(); ++j)
-										for (int j = 0; j < vDesc->size(); ++j)
-										{
-											if (vDesc->at(j).idF == idF3 && !vDesc->at(j).printed) 	// testvérek								
-											{
-												sibling(j);
-												++cnt;
-
-												idF2 = vDesc->at(j).id;
-												//	for (int k = j + 1; k < vDesc->size(); ++k)
-												for (int k = 0; k < vDesc->size(); ++k)
-												{
-													if (vDesc->at(k).idF == idF2 && !vDesc->at(k).printed)   // leszármazottak
-													{
-														child(k);
-														idF2 = k;
-														++cnt;
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
+						child(k);
+						++cnt;
+						idF = vDesc->at(k).id;
 					}
 				}
 			}
+			if (cnt)	// a generációban nem volt új bejegyzés
+				break;	// menjünk a következõ generációra
 		}
 	}
-
-
 
 	for (int i = 0; i < vL.size(); ++i)
 	{
@@ -563,6 +291,15 @@ void CDescendantsLinearTable::graph2()
 	printX(L"\n\n");
 
 	// a gráfban nem szereplõ leszármazottak
+	cnt = 0;
+	for (int i = 0; i < vDesc->size(); ++i)
+	{
+		if (!vDesc->at(i).printed)
+			++cnt;
+	}
+	if (cnt)
+		printX(L"Valami baj van, mert az alábbi bejegyzések kimaradtak a leszármazotti gráfból.");
+
 	for (int i = 0; i < vDesc->size(); ++i)
 	{
 		if (!vDesc->at(i).printed)
@@ -574,19 +311,17 @@ void CDescendantsLinearTable::graph2()
 	fclose(txtOut);
 	theApp.notepad(m_txtFile, L"");
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsLinearTable::child(int id )
 {
 	int g = vDesc->at(id).g;			// gyerek generációja
 	int idF = vDesc->at(id).idF;
 	int ln1 = vDesc->at(idF).shift;			// apja kezdõ karakter sorszáma
-	int ln2= vL.at(g-1).l2.GetLength();	// apa generációja jelsorának hossza
+	int ln2 = vL.at(g - 1).l2.GetLength();	// apa generációja jelsorának hossza
 	int ln = ln1 - ln2;
-	fillL2(g-1, ln, L" ");
-	fillL2(g-1, 1, L"|");
+	fillL2(g - 1, ln, L" ");
+	fillL2(g - 1, 1, L"|");
 
 	ln2 = vL.at(g).l1.GetLength();		// gyerek generációjának hossza
 	ln = ln1 - ln2;
@@ -609,7 +344,7 @@ void CDescendantsLinearTable::sibling( int id)
 	if (ln1 > ln2)  ln = 3;
 	else
 		ln = ln2 - ln1 + 3;
-	
+
 	fillL1(g, ln, L"-");						// elhúzás ln-nel
 	vDesc->at(id).shift = vL.at(g).l1.GetLength();
 	vL.at(g).l1 += getDesc(id);					// most már õ az utolsó bejegyzés a sorban
@@ -620,26 +355,33 @@ void CDescendantsLinearTable::sibling( int id)
 void CDescendantsLinearTable::printX(CString str)
 {
 	fwprintf(txtOut, L"%s\n", str);
+	fflush(txtOut);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CDescendantsLinearTable::getDesc(int i)
 {
 	DE::DESC desc = vDesc->at(i);
 	str.Format(L"(%d %d %d %d %d)%s", desc.g, desc.idF, desc.id, desc.idC, desc.shift, desc.firstname);
-/*	str.Format(L"%s", desc.firstname);
 
+//	str.Format(L"%s", desc.firstname);
+
+/*/
 	if (!desc.birth.IsEmpty())
 		str.Format(L"%s *%s", (CString)str, desc.birth);
 	if( !desc.death.IsEmpty())
 		str.Format(L"%s +%s", (CString)str, desc.death);
 */
+/*
+	m_lastname = desc.lastname;
+	m_birthdeath.Empty();
+	m_lastname.Empty();
+	if (!desc.birth.IsEmpty())
+		m_birthdeath.Format(L"*%s", desc.birth);
+	if (!desc.death.IsEmpty())
+		m_birthdeath.Format(L"%s +%s", (CString)m_birthdeath, desc.death);
+	m_birthdeath.TrimLeft();
+*/
 	return(str);
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsLinearTable::fillL2(int g, int len, CString kar)
-{
-	for (int j = 0; j < len; ++j)
-		vL.at(g).l2 += kar;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsLinearTable::fillL1(int g, int ln, CString kar)
@@ -647,6 +389,26 @@ void CDescendantsLinearTable::fillL1(int g, int ln, CString kar)
 	for (int i = 0; i < ln; ++i)
 		vL.at(g).l1 += kar;
 }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDescendantsLinearTable::fillL2(int g, int len, CString kar)
+{
+	for (int j = 0; j < len; ++j)
+		vL.at(g).l2 += kar;
+}
+/*
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDescendantsLinearTable::fillL3(int g, int ln, CString kar)
+{
+	for (int i = 0; i < ln; ++i)
+		vL.at(g).l3 += kar;
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDescendantsLinearTable::fillL4(int g, int ln, CString kar)
+{
+	for (int i = 0; i < ln; ++i)
+		vL.at(g).l4 += kar;
+}
+*/
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // A 'g' generációtól a leghosszabb sor hosszának meghatározása, amik még az õ leszármazottai elõtt vannak

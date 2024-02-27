@@ -230,7 +230,7 @@ void CDescendants::OnClickedDefault()
 
 	updateParameters();
 
-	GetDlgItem(IDC_CHECK_CAPITAL)->EnableWindow(true);
+//	GetDlgItem(IDC_CHECK_CAPITAL)->EnableWindow(true);
 	GetDlgItem(IDC_COMBO_DESCATTRIB)->EnableWindow(true);
 	GetDlgItem(IDC_COMBO_NAME)->EnableWindow(true);
 	GetDlgItem(IDC_COMBO_COMMENT)->EnableWindow(true);

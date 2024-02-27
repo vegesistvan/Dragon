@@ -209,7 +209,6 @@
 #define IDR_DROPDOWN_MARRIAGES          490
 #define IDR_DROPDOWN_MARRIAGES_GA       491
 #define IDD_COMPARE_ASC                 492
-#define IDD_DESCENDANTS_PARAM           506
 #define IDD_DESCENDANTS                 507
 #define IDD_NOTEPAD                     508
 #define IDD_UNITED_ENTRIES_UNITED       515
@@ -442,7 +441,6 @@
 #define IDC_STATIC_KERESS               1577
 #define IDC_STATIC_BACKGROUND           1578
 #define IDC_BUTTON_BGNCOLOR             1579
-#define IDC_CHECK_CAPITAL               1582
 #define IDC_COMBO_DESCATTRIB            1587
 #define IDC_RADIO_NOFAMILYNAME          1588
 #define IDC_RADIO_FAMILYNAME            1589
@@ -470,8 +468,6 @@
 #define IDC_STATIC_CODE                 1637
 #define IDC_STATIC_NUM                  1638
 #define IDC_STATIC_FAMILY_INLINE        1643
-#define IDC_STATIC_FAMILYNAME_NO        1644
-#define IDC_STATIC_FAMILYNAME_UP        1645
 #define IDC_STATIC_ORAND                1646
 #define IDC_GENMAX                      1648
 #define IDC_DEFAULT                     1649
@@ -526,12 +522,7 @@
 #define IDC_NUMOFGDF                    1724
 #define IDC_NUMOFGDM                    1725
 #define IDC_PIRAMID                     1727
-#define IDC_REPEATED_ALL                1744
-#define IDC_REPEATED_FIRST              1745
-#define IDC_REPEATED_FATHER             1746
 #define IDC_REPEATED_COLOR              1747
-#define IDC_GROUP_REPEATED              1748
-#define IDC_STATIC_REPEATED             1749
 #define IDC_EDIT_SEARCH                 1756
 #define IDC_TAB                         1757
 #define IDC_LIST_UNITED                 1758
@@ -547,7 +538,6 @@
 #define IDC_STATIC_R                    1795
 #define IDC_STATIC_L                    1796
 #define IDC_BUTTON_LINE                 1799
-#define IDC_COMBO_HTMTXT                1800
 #define IDC_STATIC_INPUTVERSION         1802
 #define IDC_CHECK_COLOR                 1810
 #define IDC_STATIC_LINENUMBER           1811
@@ -564,8 +554,6 @@
 #define IDC_CHECK_PRINTABLE             1828
 #define IDC_CHECK_ORDINAL               1829
 #define IDC_ORDER_INPUT                 1831
-#define IDC_ORDER_LENGTH                1833
-#define IDC_ORDER_DECREASING            1834
 #define IDC_ORDER_TXT                   1835
 #define IDC_ORDER_BIRTH                 1836
 #define IDC_LINEAR_SQLITETABLE          1837

@@ -130,6 +130,8 @@ protected:
 	std::vector<DE::VXY> vXY;
 	std::vector<DE::DIRECT> vDirect;
 	std::vector<DE::L> vL;
+	std::vector<int> vSiblings;
+	std::vector<int> vChildren;
 	
 	DE::PEO peoS;
 
@@ -147,6 +149,7 @@ protected:
 	CString m_rowid;
 	CString m_tablenumber;
 	CString m_filePathName;
+	CString m_birthdeath;
 	
 
 	void CDescendantsLinearTable::keress(int start);
@@ -186,6 +189,7 @@ protected:
 	CString CDescendantsLinearTable::createMarriageL1(CString place, CString date, int i, int numberOfSpouses);
 	CString CDescendantsLinearTable::createSpouseL1();
 	CString CDescendantsLinearTable::createSpRelativesL1();
+	CString CDescendantsLinearTable::getPlaceDateBlockL1(CString place, CString date, CString jel);
 
 
 	bool CDescendantsLinearTable::createHtmlFile(bool printable, bool repeated );
@@ -202,9 +206,10 @@ protected:
 	void CDescendantsLinearTable::descendants();
 	CString CDescendantsLinearTable::getDesc(int i);
 	void CDescendantsLinearTable::fillSp();
-	void CDescendantsLinearTable::fillX(int g, int max, CString kar);
 	void CDescendantsLinearTable::fillL1(int g, int ln, CString kar);
 	void CDescendantsLinearTable::fillL2(int g, int len, CString kar);
+	void CDescendantsLinearTable::fillL3(int g, int ln, CString kar);
+	void CDescendantsLinearTable::fillL4(int g, int ln, CString kar);
 	int CDescendantsLinearTable::getLengthMax();
 	int CDescendantsLinearTable::getLength(int g, int ix);
 	int CDescendantsLinearTable::getLongestUnderG(int g);
@@ -212,6 +217,10 @@ protected:
 	void CDescendantsLinearTable::sibling(int id);
 	void CDescendantsLinearTable::graph();
 	void CDescendantsLinearTable::graph2();
+	void CDescendantsLinearTable::graph3();
+//	void CDescendantsLinearTable::collectSiblings(int idF);
+//	void CDescendantsLinearTable::collectChildren(int idF);
+
 
 	CString getSeededName(int i);
 	DECLARE_MESSAGE_MAP()

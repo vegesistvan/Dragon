@@ -818,6 +818,34 @@ CString CDescendantsLinearTable::getPlaceDateBlock(CString place, CString date, 
 	block.Trim();
 	return block;
 }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CString CDescendantsLinearTable::getPlaceDateBlockL1(CString place, CString date, CString jel)
+{
+
+	CString block(L"");
+
+	if (jel == L"+" && date == L"meghalt")
+	{
+		if (date.Left(4) < L"10")
+			date.Empty();
+	}
+
+	if (!place.IsEmpty() || !date.IsEmpty())
+	{
+		block = jel;
+		if (!place.IsEmpty())
+		{
+			block += place;
+			block += L" ";
+		}
+		if (!date.IsEmpty())
+		{
+			block += date;
+		}
+	}
+	block.Trim();
+	return block;
+}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CDescendantsLinearTable::getLastFirst(DE::PPEOPLE* p, bool style ) // házatárs anyjának é stovábbi házastársainak neve képzõdik így
 {

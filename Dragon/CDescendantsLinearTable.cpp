@@ -700,12 +700,12 @@ CString CDescendantsLinearTable::createDescendantL(int i, bool parentIndex)
 	}
 
 
-	str = getPlaceDateBlock(p.birth_place, p.birth_date, L"*");
+	str = getPlaceDateBlockL1(p.birth_place, p.birth_date, L"*");
 	line = name.Trim();
 	if (!str.IsEmpty())
 		line.Format(L"%s %s", name, str);
 
-	str = getPlaceDateBlock(p.death_place, p.death_date, L"+");
+	str = getPlaceDateBlockL1(p.death_place, p.death_date, L"+");
 	if (!str.IsEmpty())
 		line.Format(L"%s %s", (CString)line, str);
 
