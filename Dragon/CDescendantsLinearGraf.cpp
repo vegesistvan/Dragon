@@ -192,6 +192,7 @@ void CDescendantsLinearTable::graph()
 	DE::DESC desc;
 	CString title;
 	int g;
+	int id;
 
 
 	title.Format(L"%s leszármazotti gráfja", m_name);
@@ -213,10 +214,9 @@ void CDescendantsLinearTable::graph()
 		vL.push_back(l);
 	}
 
-
 	// Elsõ leszármazotti lánc insertálása vL-be
 	desc = vDesc->at(0);
-	int id = desc.id;
+	id = desc.id;
 	vL.at(0).id = 0;
 	vL.at(0).l1 += getDesc(0);
 	vL.at(0).l2 += L"|";
