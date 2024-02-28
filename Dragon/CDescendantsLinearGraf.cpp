@@ -210,6 +210,7 @@ void CDescendantsLinearTable::graph()
 		l.id = -1;
 		l.l1 = str;
 		l.l2 = L"  ";
+		l.l3 = L"  ";
 		l.pos = 0;
 		vL.push_back(l);
 	}
@@ -218,8 +219,10 @@ void CDescendantsLinearTable::graph()
 	desc = vDesc->at(0);
 	id = desc.id;
 	vL.at(0).id = 0;
+	vL.at(0).l1 += L"|";
 	vL.at(0).l1 += getDesc(0);
 	vL.at(0).l2 += L"|";
+	vL.at(0).l3 += L"|";
 	vDesc->at(0).printed = true;
 	g = 1;
 	for (int i = 1; i < vDesc->size(); ++i)
@@ -233,8 +236,11 @@ void CDescendantsLinearTable::graph()
 				vDesc->at(i).printed = true;
 				vL.at(g).id = i;
 				vL.at(g).pos = vL.at(g).l1.GetLength();
+				vL.at(g).l1 += L"|";
 				vL.at(g).l1 += getDesc(i);
 				vL.at(g).l2 += L"|";
+				vL.at(g).l2 += m_birthdeath;
+				vL.at(g).l3 += L"|";
 				id = desc.id;
 				++g;
 			}
@@ -287,6 +293,7 @@ void CDescendantsLinearTable::graph()
 	{
 		printX(vL.at(i).l1);
 		printX(vL.at(i).l2);
+		printX(vL.at(i).l3);
 	}
 	printX(L"\n\n");
 
@@ -315,39 +322,76 @@ void CDescendantsLinearTable::graph()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsLinearTable::child(int id )
 {
-	int g = vDesc->at(id).g;			// gyerek generációja
-	int idF = vDesc->at(id).idF;
+
+	int g = vDesc->at(id).g;				// gyerek generációja
+	int idF = vDesc->at(id).idF;			// gyerek apja
 	int ln1 = vDesc->at(idF).shift;			// apja kezdõ karakter sorszáma
+
 	int ln2 = vL.at(g - 1).l2.GetLength();	// apa generációja jelsorának hossza
 	int ln = ln1 - ln2;
-	fillL2(g - 1, ln, L" ");
-	fillL2(g - 1, 1, L"|");
+	fillL2(g - 1, ln-1, L" ");				// maga fölött apjával összeköti
+//	vL.at(g-1).l2 += L"|";
 
-	ln2 = vL.at(g).l1.GetLength();		// gyerek generációjának hossza
+	ln2 = vL.at(g - 1).l3.GetLength();		// apa generációja jelsorának hossza
 	ln = ln1 - ln2;
+	fillL3(g - 1, ln-1, L" ");				// apjával összeköti
+	vL.at(g - 1).l3 += L"|";
 
-	fillL1(g, ln, L" ");
+
+	ln2 = vL.at(g).l1.GetLength();			// gyerek generációjának hossza
+	ln = ln1 - ln2;
+	fillL1(g, ln-1, L" ");
+	vL.at(g).l1 += L"|";					// saját nevbe elé teszi
+
+	ln2 = vL.at(g).l2.GetLength();			// gyerek generációjának hossza
+	ln = ln1 - ln2;
+	fillL2(g, ln - 1, L" ");
+	vL.at(g).l2 += L"|";					// saját nevbe elé teszi
+
+
 	vDesc->at(id).shift = vL.at(g).l1.GetLength();  // gyerek kezdõ karakter sorszáma
 	vL.at(g).l1 += getDesc(id);			// most már õ az utolsó bejegyzés a sorban
+	vL.at(g).l2 += m_birthdeath;
 	vDesc->at(id).printed = true;
 	vL.at(g).id = id;					// vL-be beteszi
+
+
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsLinearTable::sibling( int id)
 {
 	int g = vDesc->at(id).g;					// testvér generációja
 	int idF = vDesc->at(id).idF;
-	int ln1 = vL.at(g).l1.GetLength();			// testvér sor hossza
-	int ln2 = getLongestUnderG(g);				// g alatti generációk leghosszabb sora
-	int ln;
+	int ln11 = vL.at(g).l1.GetLength();			// testvér sor hossza
+	int ln12 = getLongestUnderG(g);				// g alatti generációk leghosszabb sora
+	int ln1;
+	int ln2;
 
-	if (ln1 > ln2)  ln = 3;
+	if (ln11 > ln12)  ln1 = 3;
 	else
-		ln = ln2 - ln1 + 3;
+		ln1 = ln12 - ln11 + 3;
 
-	fillL1(g, ln, L"-");						// elhúzás ln-nel
+	int ln21 = vL.at(g).l2.GetLength();			// testvér l2 sor hossza
+	if (ln21 > ln12)  ln2 = 3;
+	else
+		ln2 = ln12 - ln21 + 3;
+
+	if (!vDesc->at(id).numOfChildren)			
+	{
+		fillL1(g, ln1, L"-");					// elhúzás ln-nel
+		fillL2(g, ln2, L" ");
+	}
+	else
+	{
+		fillL1(g, ln1 - 1, L"-");				// ha lesz gyereke, akkor | tesz a név elé
+		vL.at(g).l1 += L"|";					// saját neve elé tesz |
+
+		fillL2(g, ln2 - 1, L" ");
+		vL.at(g).l2 += L"|";					// születés elé tesz |
+	}
 	vDesc->at(id).shift = vL.at(g).l1.GetLength();
 	vL.at(g).l1 += getDesc(id);					// most már õ az utolsó bejegyzés a sorban
+	vL.at(g).l2 += m_birthdeath;
 	vDesc->at(id).printed = true;
 	vL.at(g).id = id;							// vL-be beteszi
 }
@@ -363,7 +407,7 @@ CString CDescendantsLinearTable::getDesc(int i)
 	DE::DESC desc = vDesc->at(i);
 	str.Format(L"(%d %d %d %d %d)%s", desc.g, desc.idF, desc.id, desc.idC, desc.shift, desc.firstname);
 
-//	str.Format(L"%s", desc.firstname);
+	str.Format(L"%s", desc.firstname);
 
 /*/
 	if (!desc.birth.IsEmpty())
@@ -371,7 +415,7 @@ CString CDescendantsLinearTable::getDesc(int i)
 	if( !desc.death.IsEmpty())
 		str.Format(L"%s +%s", (CString)str, desc.death);
 */
-/*
+
 	m_lastname = desc.lastname;
 	m_birthdeath.Empty();
 	m_lastname.Empty();
@@ -380,7 +424,7 @@ CString CDescendantsLinearTable::getDesc(int i)
 	if (!desc.death.IsEmpty())
 		m_birthdeath.Format(L"%s +%s", (CString)m_birthdeath, desc.death);
 	m_birthdeath.TrimLeft();
-*/
+
 	return(str);
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -395,7 +439,6 @@ void CDescendantsLinearTable::fillL2(int g, int len, CString kar)
 	for (int j = 0; j < len; ++j)
 		vL.at(g).l2 += kar;
 }
-/*
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsLinearTable::fillL3(int g, int ln, CString kar)
 {
@@ -408,7 +451,6 @@ void CDescendantsLinearTable::fillL4(int g, int ln, CString kar)
 	for (int i = 0; i < ln; ++i)
 		vL.at(g).l4 += kar;
 }
-*/
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // A 'g' generációtól a leghosszabb sor hosszának meghatározása, amik még az õ leszármazottai elõtt vannak
@@ -417,10 +459,15 @@ int CDescendantsLinearTable::getLongestUnderG(int g)
 {
 	int length;
 	int lengthMax = 0;
-	for( int i = g + 1; i < vL.size(); ++i )
+	for( int i = g; i < vL.size(); ++i )
 	{ 
 		length = vL.at(i).l1.GetLength();
 		if (length > lengthMax) lengthMax = length;
+		length = vL.at(i).l2.GetLength();
+		if (length > lengthMax) lengthMax = length;
+		length = vL.at(i).l3.GetLength();
+		if (length > lengthMax) lengthMax = length;
+
 	}
 	return lengthMax;
 

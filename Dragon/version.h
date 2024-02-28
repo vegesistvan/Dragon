@@ -1,7 +1,9 @@
 #pragma once
 
-#define VERSION L"10.173"
+#define VERSION L"10.174"
 
+// 10.174 2024.02.28 Leszármazotti gráfban a születési-halálozási idõk is benne vannak
+// 
 // 10.173 2024.02.24 Leszármazotti gráf
 // 
 // 10.172 2024.02.11 A leszármazotti listák a ...lists\descendants_name alkönyvtárban

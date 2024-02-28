@@ -63,6 +63,8 @@ namespace DE
 		int pos;		// utolsó bejegyzés elsõ karaktersorszáma
 		CString l1;		// a generáció sora
 		CString l2;
+		CString l3;
+		CString l4;
 	}L;
 
 	typedef struct
