@@ -150,6 +150,7 @@ void CDescendantsFull::OnAllAscendants()
 	std::vector<int> vN;
 	
 	int nItem = m_ListCtrlF.GetNextItem(-1, LVNI_SELECTED);
+	if (nItem == 0) return;
 	CString descendant = m_ListCtrlF.GetItemText(nItem, L_DESCENDANT);
 	CString file;
 	file.Format(L"%s felmenõi", m_ListCtrlF.GetItemText( nItem, L_NAME ) );
@@ -221,6 +222,7 @@ void CDescendantsFull::OnAllDescendants()
 	std::vector<int>vC2;
 
 	int nItem = m_ListCtrlF.GetNextItem(-1, LVNI_SELECTED);
+	if (nItem == 0) return;
 	CString descendant = m_ListCtrlF.GetItemText(nItem, L_DESCENDANT);
 	CString file;
 	file.Format(L"%s leszármazottai", m_ListCtrlF.GetItemText(nItem, L_NAME));

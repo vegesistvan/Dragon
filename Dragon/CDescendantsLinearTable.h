@@ -205,6 +205,7 @@ protected:
 	BOOL CDescendantsLinearTable::create_vD();
 	void CDescendantsLinearTable::descendants();
 	CString CDescendantsLinearTable::getDesc(int i);
+	CString CDescendantsLinearTable::getMissing(int i);
 	void CDescendantsLinearTable::fillSp();
 	void CDescendantsLinearTable::fillL1(int g, int ln, CString kar);
 	void CDescendantsLinearTable::fillL2(int g, int len, CString kar);

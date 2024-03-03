@@ -191,6 +191,7 @@ void CDescendantsLinearTable::graph()
 {
 	DE::DESC desc;
 	CString title;
+	
 	int g;
 	int id;
 
@@ -201,6 +202,17 @@ void CDescendantsLinearTable::graph()
 	printX(title);
 	printX(L"");
 
+	
+	if (p_womenDescendants)
+	{
+		title = L"Nõk leszármazottai is a listában";
+	}
+	else
+	{
+		title = L"Nõk leszármazottai nincsenek a listában";
+	}
+	printX(title);
+	printX(L"");
 
 	// vL vektor feltöltése a generáció jelével
 	DE::L l;
@@ -311,7 +323,7 @@ void CDescendantsLinearTable::graph()
 	{
 		if (!vDesc->at(i).printed)
 		{
-			printX(getDesc(i));
+			printX(getMissing(i));
 		}
 	}
 
@@ -425,6 +437,13 @@ CString CDescendantsLinearTable::getDesc(int i)
 		m_birthdeath.Format(L"%s +%s", (CString)m_birthdeath, desc.death);
 	m_birthdeath.TrimLeft();
 
+	return(str);
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CString CDescendantsLinearTable::getMissing(int i)
+{
+	DE::DESC desc = vDesc->at(i);
+	str.Format(L"(g=%d idF=%d id=%d idC=%d shift=%d %s", desc.g, desc.idF, desc.id, desc.idC, desc.shift, desc.firstname);
 	return(str);
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

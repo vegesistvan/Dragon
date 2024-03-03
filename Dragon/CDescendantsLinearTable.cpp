@@ -160,7 +160,7 @@ cont:	wndP.StepIt();
 		title2 = L"Gyerekek beviteli sorrendben\n";
 		break;
 	case DE::ORDER_BIRTH:
-		title2 = L"Gyerekek születési sorrendben\n";
+		title2 = L"Gyerekek születési/beviteli sorrendben\n";
 		break;
 	case DE::ORDER_NUMOFDESC:
 		title2 = L"Gyerekek leszármazainak száma sorrendjében\n";

@@ -59,10 +59,9 @@ BOOL CDescendants::create_vDesc()
 		m_rowid = theApp.v_rowid.at(i);
 		queryR(m_rowid);
 
-//		m_tablenumber = peoS.tablenumber;
+		m_tablenumber = peoS.tablenumber;
 		desc = {};
 		desc.g = 0;
-//		desc.X = 0;
 		desc.rowid = m_rowid;
 		desc.tablenumber = peoS.tablenumber;
 		desc.linenumber = peoS.linenumber;
@@ -99,7 +98,7 @@ BOOL CDescendants::create_vDesc()
 
 		indentedHtml();
 		create_id();
-		order_numOfD();
+//		order_numOfD();
 	
 		CDescendantsLinearTable dlg;
 		dlg.p_descendantName = p_descendantName;
@@ -634,21 +633,21 @@ int CDescendants::getNumberOfChildren(CString rowid, CString sex_id)
 {
 	if (sex_id == MAN)
 	{
-		if (p_connect)
-			m_command.Format(L"SELECT count() FROM people WHERE father_id='%s'", rowid);
-		else
-			m_command.Format(L"SELECT count() FROM people WHERE father_id='%s' AND tableNumber='%s'", rowid, m_tablenumber);
+//		if (p_connect)
+			m_command.Format(L"SELECT rowid FROM people WHERE father_id='%s'", rowid);
+//		else
+//			m_command.Format(L"SELECT rowid FROM people WHERE father_id='%s' AND tableNumber='%s'", rowid, m_tablenumber);
 	}
 	else
 	{
-		if (p_connect)
-			m_command.Format(L"SELECT count() FROM people WHERE mother_id='%s'", rowid);
-		else
-			m_command.Format(L"SELECT count() FROM people WHERE mother_id='%s' AND tableNumber='%s'", rowid, m_tablenumber);
+//		if (p_connect)
+			m_command.Format(L"SELECT rowid FROM people WHERE mother_id='%s'", rowid);
+//		else
+//			m_command.Format(L"SELECT rowid FROM people WHERE mother_id='%s' AND tableNumber='%s'", rowid, m_tablenumber);
 	}
 	if (!query(m_command)) return 0;
 
-	return(_wtoi(rs.GetFieldString(0)));
+	return(rs.RecordsCount());
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CDescendants::getNextChildRowid(UINT i)

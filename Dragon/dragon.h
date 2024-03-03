@@ -344,7 +344,7 @@ public:
 	void	createCaption();
 	bool	selectHtml();
 	bool	selectGedcom();
-
+	void CDragApp::fillDbChildren();
 
 	CString	contractions(void);
 

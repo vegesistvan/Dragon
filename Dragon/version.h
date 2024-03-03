@@ -1,7 +1,11 @@
 #pragma once
 
-#define VERSION L"10.174"
+#define VERSION L"10.176"
 
+// 10.176 2024.03.03 Lineáris leszármazotti listában a sorrend csak kétféle(bementi/születési idõ)
+
+// 10.175 2024.02.01 Leszármazotti list ajavítása, ha a táblákat nem kapcsoljuk össze.
+// 
 // 10.174 2024.02.28 Leszármazotti gráfban a születési-halálozási idõk is benne vannak
 // 
 // 10.173 2024.02.24 Leszármazotti gráf

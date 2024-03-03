@@ -575,6 +575,7 @@ BOOL CDragApp::openDatabase(bool same)
 
 		pM->m_wndRibbonBar.ShowCategory(CAT_GEDCOM, false );
 		pM->m_wndRibbonBar.SetActiveCategory(pCAT_TABLES, false);
+		fillDbChildren();
 
 	}
 //	if (theApp.m_inputMode != GAHTML)
@@ -1123,4 +1124,26 @@ void CDragApp::OnAverageLifespan()
 	}
 	fclose(flAv);
 	showFile(filePathName);
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDragApp::fillDbChildren()
+{
+	CString rowid;
+	int numOfChildren;
+
+	m_command = L"SELECT rowid, father_id FROM people";
+	if (!query(m_command)) return;
+
+	execute( L"BEGIN" );
+	for (int i = 0; i < m_recordset->RecordsCount(); ++i)
+	{
+		rowid = m_recordset->GetFieldString(0);
+		m_command.Format(L"SELECT rowid FROM people WHERE father_id = '%s'", rowid);
+		if (!query1(m_command)) return;
+		numOfChildren = m_recordset1->RecordsCount();
+		m_command.Format(L"UPDATE people SET numOfChildren = '%d' WHERE rowid = '%s'", numOfChildren, rowid);
+		if (!execute(m_command)) return;
+		m_recordset->MoveNext();
+	}
+	execute(L"COMMIT");
 }
