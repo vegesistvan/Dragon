@@ -25,6 +25,8 @@ protected:
 
 	FILE* flDesc;
 	std::vector<int> vid;
+
+	void CDescendantsUnique::onDescendants(int print);
 public:
 	CListCtrlColoredHeader m_ListCtrlU;
 	afx_msg void OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult);
@@ -33,6 +35,8 @@ public:
 	afx_msg void OnDblclkList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnAllAscendants();
 	afx_msg void OnAllDescendants();
+	afx_msg void OnAscendants();
+	afx_msg void OnDescendants();
 	afx_msg void OnNotepad();
 
 

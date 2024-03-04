@@ -25,6 +25,7 @@ public:
 	CDescendantsFull(CWnd* pParent = nullptr);   // standard constructor
 	virtual ~CDescendantsFull();
 
+	int p_descendantName;
 // Dialog Data
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_DESCENDANTS_FULL };
@@ -37,6 +38,8 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	std::vector<int> vid; // leszármazottak
 
+	void CDescendantsFull::onDescendants(int print);
+	void CDescendantsFull::OnDescendants2();
 	DECLARE_MESSAGE_MAP()
 public:
 	CListCtrlColoredHeader m_ListCtrlF;
@@ -47,5 +50,7 @@ public:
 	afx_msg void OnDblclkList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnAllAscendants();
 	afx_msg void OnAllDescendants();
+	afx_msg void OnAscendants();
+	afx_msg void OnDescendants();
 	afx_msg void OnNotepad();
 };

@@ -123,7 +123,7 @@ cont:	wndP.StepIt();
 	m_titleU.Format(L"%s leszármazotti listája ismétlések kihagyásával", m_name);
 
 
-
+	m_aF.p_descendantName = p_descendantName;
 	m_aF.Create(IDD_DESCENDANTS_FULL, this);
 	m_aU.Create(IDD_DESCENDANTS_UNIQUE, this);
 

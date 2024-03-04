@@ -24,7 +24,8 @@ protected:
 
 	FILE* flDesc;
 	std::vector<int> vid;
-
+	void CAscendantsFull::onAscendants(int print);
+	void CAscendantsFull::onDescendants(int print);
 	DECLARE_MESSAGE_MAP()
 public:
 	CListCtrlColoredHeader m_ListCtrlF;
@@ -36,5 +37,8 @@ public:
 	afx_msg void OnFunctionsNotepad();
 	afx_msg void OnAllAscendants();
 	afx_msg void OnAllDescendants();
+	afx_msg void OnAscendants();
+	afx_msg void OnDescendants();
+
 	afx_msg void OnDblclkListFull(NMHDR* pNMHDR, LRESULT* pResult);
 };

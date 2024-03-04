@@ -1,7 +1,9 @@
 #pragma once
 
-#define VERSION L"10.176"
+#define VERSION L"10.177"
 
+// 10.177 2024.03.03 Lineáris leszármazotti lista legördülõ menüjében a leszármazottak és felmenõk kijelölése visszakerült.
+//  
 // 10.176 2024.03.03 Lineáris leszármazotti listában a sorrend csak kétféle(bementi/születési idõ)
 
 // 10.175 2024.02.01 Leszármazotti list ajavítása, ha a táblákat nem kapcsoljuk össze.

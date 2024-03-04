@@ -32,6 +32,8 @@ protected:
 	void CAscendantsUnique::OnKeressBeginning();
 	void CAscendantsUnique::OnKeressNext();
 	void CAscendantsUnique::OnKeressPrevious();
+	void CAscendantsUnique::onAscendants(int print);
+	void CAscendantsUnique::onDescendants(int print);
 	DECLARE_MESSAGE_MAP()
 public:
 //	CListCtrlEx m_ListCtrlU;
@@ -43,5 +45,9 @@ public:
 	afx_msg void OnFunctionsNotepad();
 	afx_msg void OnAllAscendants();
 	afx_msg void OnAllDescendants();
+	afx_msg void OnAllAscendants2();
+	afx_msg void OnAllDescendants2();
+	afx_msg void OnAscendants();
+	afx_msg void OnDescendants();
 	afx_msg void OnDblclkListUnique(NMHDR* pNMHDR, LRESULT* pResult);
 };

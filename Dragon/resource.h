@@ -1004,13 +1004,15 @@
 #define IDC_ALL_DESCENDANTS             35083
 #define ID_ALL_DESCENDANTS              35084
 #define ID_FELMEN35085                  35085
+#define ID_FUNCTIONS_LESZ35086          35086
+#define ID_FUNCTIONS_FELMEN35087        35087
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        577
-#define _APS_NEXT_COMMAND_VALUE         35086
+#define _APS_NEXT_COMMAND_VALUE         35088
 #define _APS_NEXT_CONTROL_VALUE         1866
 #define _APS_NEXT_SYMED_VALUE           387
 #endif

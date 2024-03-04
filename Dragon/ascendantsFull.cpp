@@ -35,6 +35,8 @@ BEGIN_MESSAGE_MAP(CAscendantsFull, CDialogEx)
 	ON_COMMAND(ID_FUNCTIONS_NOTEPAD, &CAscendantsFull::OnFunctionsNotepad)
 	ON_COMMAND(ID_ALL_ASCENDANTS, &CAscendantsFull::OnAllAscendants)
 	ON_COMMAND(ID_ALL_DESCENDANTS, &CAscendantsFull::OnAllDescendants)
+	ON_COMMAND(ID_ASCENDANTS, &CAscendantsFull::OnAscendants)
+	ON_COMMAND(ID_DESCENDANTS, &CAscendantsFull::OnDescendants)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST_FULL, &CAscendantsFull::OnDblclkListFull)
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -195,31 +197,48 @@ void CAscendantsFull::OnDblclkListFull(NMHDR* pNMHDR, LRESULT* pResult)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CAscendantsFull::OnAllAscendants()
 {
+	onAscendants(1);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CAscendantsFull::OnAscendants()
+{
+	onAscendants(0);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CAscendantsFull::onAscendants(int print)
+{
 	int n = m_ListCtrlF.GetItemCount();
 	CString id;
 	CString idF;
 	CString idC;
+	CString filePathName;
+	CString file;
 	int j;
 
 	std::vector<int> vN;
 
 	int nItem = m_ListCtrlF.GetNextItem(-1, LVNI_SELECTED);
 	CString ascendant = m_ListCtrlF.GetItemText(nItem, F_ASCENDANT);
-	CString file;
-	file.Format(L"%s felmenõi", m_ListCtrlF.GetItemText(nItem, F_NAME));
-	CString filePathName;
-	filePathName = theApp.openTextFile(&flDesc, file, L"w+");  // log fájl
-
-	fwprintf(flDesc, L"Felmenõi lánc\n\n");
-	fwprintf(flDesc, L"%6s %15s %15s %15s felmenõ\n", L"", L"idF", L"idC", L"id");
-	for (int i = 0; i < n; ++i)
+	if (print)
 	{
-		str = m_ListCtrlF.GetItemText(i, F_ASCENDANT);
-		if (str == ascendant)
+		file.Format(L"%s felmenõi", m_ListCtrlF.GetItemText(nItem, F_NAME));
+		filePathName = theApp.openTextFile(&flDesc, file, L"w+");  // log fájl
+		fwprintf(flDesc, L"Felmenõi lánc\n\n");
+		fwprintf(flDesc, L"%6s %15s %15s %15s felmenõ\n", L"", L"idF", L"idC", L"id");
+	}
+	if (print)
+	{
+		for (int i = 0; i < n; ++i)
 		{
-			vN.push_back(i);
+			str = m_ListCtrlF.GetItemText(i, F_ASCENDANT);
+			if (str == ascendant)
+			{
+				vN.push_back(i);
+			}
 		}
 	}
+	else
+		vN.push_back(nItem);
 	// vN-ben az ember mindenegyes elõfordulása, akiknke a felmenõit akarjuk listázni
 	for (int i = 0; i < vN.size(); ++i)
 	{
@@ -242,35 +261,59 @@ void CAscendantsFull::OnAllAscendants()
 		for (int i = 0; i < vid.size(); ++i)
 		{
 			j = vid.at(i);
-			id = m_ListCtrlF.GetItemText(j, F_ID);
-			idF = m_ListCtrlF.GetItemText(j, F_IDF);
-			idC = m_ListCtrlF.GetItemText(j, F_IDC);
-			ascendant = m_ListCtrlF.GetItemText(j, F_ASCENDANT);
-			fwprintf(flDesc, L"%5d. %15s %15s %15s %s\n", i + 1, idF, idC, id, ascendant);
+			if (print)
+			{
+				id = m_ListCtrlF.GetItemText(j, F_ID);
+				idF = m_ListCtrlF.GetItemText(j, F_IDF);
+				idC = m_ListCtrlF.GetItemText(j, F_IDC);
+				ascendant = m_ListCtrlF.GetItemText(j, F_ASCENDANT);
+				fwprintf(flDesc, L"%5d. %15s %15s %15s %s\n", i + 1, idF, idC, id, ascendant);
+			}
+			else
+				m_ListCtrlF.SetItemState(j, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
 		}
-		fwprintf(flDesc, L"\n");
+		if(print)
+			fwprintf(flDesc, L"\n");
 	}
-	fclose(flDesc);
-	theApp.showFile(filePathName);
+	if (print)
+	{
+		fclose(flDesc);
+		theApp.showFile(filePathName);
+	}
 }
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CAscendantsFull::OnAllDescendants()
+{
+	onDescendants(1);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CAscendantsFull::OnDescendants()
+{
+	onDescendants(0);
+
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CAscendantsFull::onDescendants(int print )
 {
 	CString id;
 	CString idF;
 	CString idC;
 	CString ascendant;
+	CString file;
+	CString filePathName;
 	int j;
 
 	std::vector<int> vN;
 	int nItem = m_ListCtrlF.GetNextItem(-1, LVNI_SELECTED);
-	CString file;
-	file.Format(L"%s leszármazottai", m_ListCtrlF.GetItemText(nItem, F_NAME));
-	CString filePathName;
-	filePathName = theApp.openTextFile(&flDesc, file, L"w+");  // log fájl
+	if (print)
+	{
+		file.Format(L"%s leszármazottai", m_ListCtrlF.GetItemText(nItem, F_NAME));
+		filePathName = theApp.openTextFile(&flDesc, file, L"w+");  // log fájl
 
-	fwprintf(flDesc, L"Leszármazotti lánc\n\n");
-	fwprintf(flDesc, L"%6s %7s %7s %7s leszármazott\n", L"", L"idF", L"idC", L"id");
+		fwprintf(flDesc, L"Leszármazotti lánc\n\n");
+		fwprintf(flDesc, L"%6s %7s %7s %7s leszármazott\n", L"", L"idF", L"idC", L"id");
+	}
 	// vN-be a kijelölt leszármazott elõfordulásai
 
 	CString descendant = m_ListCtrlF.GetItemText(nItem, F_ASCENDANT);
@@ -302,17 +345,27 @@ void CAscendantsFull::OnAllDescendants()
 		for (int j = 0; j < vid.size(); ++j)
 		{
 			nItem = vid.at(j);
-			id = m_ListCtrlF.GetItemText(nItem, F_ID);
-			idF = m_ListCtrlF.GetItemText(nItem, F_IDF);
-			idC = m_ListCtrlF.GetItemText(nItem, F_IDC);
-			descendant = m_ListCtrlF.GetItemText(nItem, F_ASCENDANT);
-			fwprintf(flDesc, L"%5d. %7s %7s %7s %s\n", nItem + 1, idF, idC, id, descendant);
+			if (print)
+			{
+				id = m_ListCtrlF.GetItemText(nItem, F_ID);
+				idF = m_ListCtrlF.GetItemText(nItem, F_IDF);
+				idC = m_ListCtrlF.GetItemText(nItem, F_IDC);
+				descendant = m_ListCtrlF.GetItemText(nItem, F_ASCENDANT);
+				fwprintf(flDesc, L"%5d. %7s %7s %7s %s\n", nItem + 1, idF, idC, id, descendant);
+			}
+			else
+				m_ListCtrlF.SetItemState(nItem, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
 		}
-		fwprintf(flDesc, L"\n");
+		if( print)
+			fwprintf(flDesc, L"\n");
 	}
-	fclose(flDesc);
-	theApp.showFile(filePathName);
+	if (print)
+	{
+		fclose(flDesc);
+		theApp.showFile(filePathName);
+	}
 }
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CAscendantsFull::OnFunctionsNotepad()
 {
