@@ -55,6 +55,17 @@ namespace DE
 	{
 		int g;
 		int id;
+		int idC;
+		int dbC;
+		int dbCP;
+	}IDCDBC;
+
+
+
+	typedef struct
+	{
+		int g;
+		int id;
 	}GID;
 
 	typedef struct

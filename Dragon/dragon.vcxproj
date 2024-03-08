@@ -347,6 +347,7 @@
     <ClCompile Include="Brackets.cpp" />
     <ClCompile Include="CDescendants.cpp" />
     <ClCompile Include="CDescendantsFull.cpp" />
+    <ClCompile Include="CDescendantsLinearABC.cpp" />
     <ClCompile Include="CDescendantsLinearStrand.cpp" />
     <ClCompile Include="CDescendantsLinearGraf.cpp" />
     <ClCompile Include="CDialogRichText.cpp" />
@@ -448,6 +449,7 @@
     <ClCompile Include="SelectTable.cpp" />
     <ClCompile Include="SelectTableName.cpp" />
     <ClCompile Include="Setup.cpp" />
+    <ClCompile Include="Source.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="Table_blobs.cpp" />
     <ClCompile Include="Table_files.cpp" />

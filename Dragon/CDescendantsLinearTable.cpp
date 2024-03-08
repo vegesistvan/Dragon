@@ -52,6 +52,7 @@ BEGIN_MESSAGE_MAP(CDescendantsLinearTable, CDialogEx)
 	
 	ON_COMMAND(ID_DESCENDANT_LENGTH, &CDescendantsLinearTable::OnDescendantLength)
 	ON_COMMAND(ID_TABLE, &CDescendantsLinearTable::OnGraph)
+	ON_COMMAND(ID_ABCD, &CDescendantsLinearTable::OnAbcd)
 END_MESSAGE_MAP()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CDescendantsLinearTable::OnInitDialog()
@@ -986,3 +987,4 @@ CString CDescendantsLinearTable::getSeededName(int i)
 	}
 	return familyname;
 }
+////////////////////////////////////////////////////////////////////////////////////////////////////////4

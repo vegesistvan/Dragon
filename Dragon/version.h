@@ -1,6 +1,10 @@
 #pragma once
 
-#define VERSION L"10.177"
+#define VERSION L"10.179"
+
+// 10.179 2024.03.08 ABCD funkció a lineáris leszármazotti lista menüjében
+
+// 10.178 2024.03.05 leszármazotti hosszra rendezett html listában a leírás ismétlõdésének megszüntetése
 
 // 10.177 2024.03.03 Lineáris leszármazotti lista legördülõ menüjében a leszármazottak és felmenõk kijelölése visszakerült.
 //  

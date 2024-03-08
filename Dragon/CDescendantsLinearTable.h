@@ -132,6 +132,7 @@ protected:
 	std::vector<DE::L> vL;
 	std::vector<int> vSiblings;
 	std::vector<int> vChildren;
+	std::vector<DE::IDCDBC> vIdcdbc;
 	
 	DE::PEO peoS;
 
@@ -221,6 +222,12 @@ protected:
 	void CDescendantsLinearTable::graph3();
 //	void CDescendantsLinearTable::collectSiblings(int idF);
 //	void CDescendantsLinearTable::collectChildren(int idF);
+
+	void CDescendantsLinearTable::fill_l1(int g, int lg, CString kar);
+	void CDescendantsLinearTable::fill_l2(int g, int lg, CString kar);
+	void CDescendantsLinearTable::putG( int id, bool descendant );
+	int CDescendantsLinearTable::findID();
+	int CDescendantsLinearTable::longestLine(int g);
 
 
 	CString getSeededName(int i);
@@ -320,5 +327,6 @@ public:
 	void CDescendantsLinearTable::listDescendants();
 	int CDescendantsLinearTable::getLength(int g);
 	void CDescendantsLinearTable::getDirectDescendants();
+	afx_msg void OnAbcd();
 };
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

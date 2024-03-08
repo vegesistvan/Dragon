@@ -714,11 +714,6 @@ CString CDescendantsLinearTable::createDescendantL1(int i, bool parentIndex)
 			break;
 		}
 	}
-	if (str.GetAt(0) == ',')
-		line.Format(L"%s%s", (CString)line, comment);
-	else
-		line.Format(L"%s %s", (CString)line, comment);
-
 
 	++m_listedP;
 	++m_listedD;
@@ -832,7 +827,7 @@ CString CDescendantsLinearTable::createSpouseL1()
 	if (!str.IsEmpty())
 		spouse.Format(L"%s %s", (CString)spouse, str);
 
-	//str = getColoredString(s.comment, p_commentAttrib);
+	s.comment = getColoredString(s.comment, p_commentAttrib);
 	str = s.comment;
 	if (!str.IsEmpty())
 	{
