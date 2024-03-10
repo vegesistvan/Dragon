@@ -19,19 +19,12 @@ void CDescendantsLinearTable::OnAbcd()
 		return;
 	}
 
-	DE::DESC desc;
 	CString title;
-
-	int g;
-	int id;
-
-
 	title.Format(L"%s leszármazotti strukturája", m_name);
 	m_txtFile.Format(L"%s\\%s_%s.txt", m_descendantsPath, title, getTimeTag());
 	if (!openFileSpec(&txtOut, m_txtFile, L"w+")) return;
 	printX(title);
 	printX(L"");
-
 
 	if (p_womenDescendants)
 	{
@@ -45,6 +38,7 @@ void CDescendantsLinearTable::OnAbcd()
 	printX(L"");
 
 
+	// inicializálás
 	for (int i = 0; i < vDesc->size(); ++i)
 	{
 		vDesc->at(i).printed = false;
@@ -53,6 +47,8 @@ void CDescendantsLinearTable::OnAbcd()
 
 	Y = vDesc->at(vDesc->size() - 1).g;		// legmagasabb generáció szám
 
+	// feltölti a vL vektort
+	vL.clear();
 	DE::L l;
 	for (int i = 0; i <= Y; ++i)
 	{
@@ -62,46 +58,47 @@ void CDescendantsLinearTable::OnAbcd()
 		l.l2.Empty();
 		vL.push_back(l);
 	}
-/*
-	int cnt = 5;
-	CString cntS;
-	cntS.Format(L"%d", cnt);
 
-	CGetString dlg;
-	dlg.m_string = cntS;
-	if (!dlg.DoModal()) return;
-	cnt = _wtoi(dlg.m_string);
-*/
-	// Elsõ leszármazotti lánc insertálása vL-be
-	int ret;
-	int ix;
-	int idS;
+	int g;
+	int id = 0;
 	int idF;
 	int idC;
 	int dbC;
-	id = 0;
-	int lg;
-	int G;
-	int ID;
-
-	id = 0;
+	m_cnt = 129;
+	CString cntS;
+	cntS.Format(L"%d", m_cnt);
+//	CGetString dlg;
+//	dlg.m_string = cntS;
+//	if( !dlg.DoModal()) return;
+//	m_cnt = _wtoi(dlg.m_string);
+	
+	long double x;
+	int y;
+	CString sex;
 	while( true )
 	{
-		g = vDesc->at(id).g; 
-		putG(id, false );				// iírja id-t, aki az õs, vagy egy gyerek id-ja
+		if (m_cnt == 2)
+		{
+			x = 2;
+			y = pow(x, 2);
+		}
+		g = vDesc->at(id).g;
+		putG(id, false);				// kiírja id-t, aki az õs, vagy egy gyerek id-ja
 		// a gyerek összes leszármazottját kiírja
-		while( true)
+		while (true)
 		{
 			id = vDesc->at(id).idC;
-			if (id == 0) break;
-			putG(id, true );
+			if (id == 0) break;								// nincs több leszármazott
+			putG(id, true);								// leszármazottak kiírása
 		}
-		for ( g = Y; g > 0; --g)
+		for (g = Y; g > 0; --g)							// következõ kiirandó id és g keresése
 		{
 			id = vL.at(g).id;
-			if (id > 0)										// lehetnek még üres generációk
+			if (id > 0)										// lehetnek még üres generációk, ahol id == 0
 			{
 				idF = vDesc->at(id).idF;
+				sex = vDesc->at(idF).sex;					// apa elsõ gyermekének indexe
+
 				idC = vDesc->at(idF).idC;					// apa elsõ gyermekének indexe
 				if (idC > 0)
 				{
@@ -117,6 +114,8 @@ void CDescendantsLinearTable::OnAbcd()
 			}
 		}
 		if (!g) break;				// nem talált senkit
+		--m_cnt;
+//		if (!m_cnt) break;
 	}
 
 	// kiírás
@@ -130,24 +129,23 @@ void CDescendantsLinearTable::OnAbcd()
 	}
 
 	int cnt = 0;
-	
 	for (int i = 0; i < vDesc->size(); ++i)
 	{
 		if (!vDesc->at(i).printed)
 			++cnt;
 	}
-	if( cnt )
+	if (cnt)
 		printX(L"\nFel nem használt bejegyzések\n");
 	for (int i = 0; i < vDesc->size(); ++i)
 	{
 		if (!vDesc->at(i).printed)
-				printX(vDesc->at(i).name);
+			printX(vDesc->at(i).name);
 	}
 	fclose(txtOut);
 	theApp.notepad(m_txtFile, L"");
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsLinearTable::fill_l1( int g, int lg, CString kar)
+void CDescendantsLinearTable::fill_l1(int g, int lg, CString kar)
 {
 	int length = vL.at(g).l1.GetLength();
 	if (length < lg)
@@ -181,11 +179,17 @@ void CDescendantsLinearTable::fill_l2(int g, int lg, CString kar)
 // Ha mindkettõjüknek vannak leszármazottai, akkor az eltolálás az alatta lévõk legnagyobb 
 // hossza + 3, amiket "-"-el kötünk össze.
 
-void CDescendantsLinearTable::putG( int id, bool descendant )
+void CDescendantsLinearTable::putG(int id, bool descendant)
 {
+	int x = 0;
+	if ( m_cnt == 2 )
+	{
+		x = 13;
+		x = pow(x, 2);
+	}
 	int g = vDesc->at(id).g;
 	int lg1 = longestLine(g);
-	int lg;
+	int lg = vL.at(g).l1.GetLength();
 	int idL = vL.at(g).id;
 	if (!descendant)					// horizontális terjeszkedés
 	{
@@ -193,11 +197,12 @@ void CDescendantsLinearTable::putG( int id, bool descendant )
 		{
 			if (vDesc->at(id).idF == vDesc->at(idL).idF)		// testvérek
 			{
-				if (!vDesc->at(id).numOfChildren) 
+				if (!vDesc->at(id).numOfChildren)				// új embernek nincs leszármazottja
 					goto cont;
-				else
+				else											// új embernek van leszármazottja
 				{
-					if (lg1)
+
+					if (lg1 >= lg)
 					{
 						fill_l1(g, lg1, L"-");
 						vL.at(g).l1 += L"---";

@@ -1,46 +1,28 @@
 #include "pch.h"
 #include "Dragon.h"
 #include "afxdialogex.h"
+#include "descendantsNew.h"
 #include "Table_people_columns.h"
 #include "utilities.h"
 #include "build_defs.h"
-#include "CDescendants.h"
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ix a kiirandó leszármazott indexe a vDesc vektorban
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendants::indentedHtml()
+void CDescendantsNew::printVector( int i )
 {
-	CString title;
-	CString file;
-	
-	file.Format(L"%s tabulált leszármazotti listája", vDesc.at(0).name);
-	
-	title = file;
-	if (!openHtml(file, title, p_colorBgrnd)) return;
-	
-	printVector( 0 );
-	closeHtml();
-//	ShellExecute(NULL, L"open", m_htmlPathName, NULL, NULL, SW_SHOWNORMAL);
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendants::printVector( int tbl)
-{
-//	CString tableheader;
-//	CString tableNumber;
-	CString people;
-	CString line;
-//	tableNumber = theApp.v_tableNumbers.at(tbl);
-//	m_command.Format(L"SELECT tableHeader FROM tables WHERE rowid = '%s'", tableNumber);
-//	if (!theApp.query(m_command)) return;
-//	tableheader = theApp.m_recordset->GetFieldString(0);
-//	str.Format(L"<b>%s</b>\n\n", tableheader);
+	CString tableheader;
+	CString tableNumber;
+	tableNumber = theApp.v_tableNumbers.at(i);
+	m_command.Format(L"SELECT tableHeader FROM tables WHERE rowid = '%s'", tableNumber);
+	if (!theApp.query(m_command)) return;
+	tableheader = theApp.m_recordset->GetFieldString(0);
+	str.Format(L"<b>%s</b>\n\n", tableheader);
 //	print(str);
 
 	int ix;
 
-	if (p_numberingSystem == DE::SZLUHA) // orderd list
+	if (p_numbering == SZLUHA) // orderd list
 	{
 		m_tag1 = L"<ol>";
 		m_tag2 = L"</ol>\n";
@@ -51,6 +33,8 @@ void CDescendants::printVector( int tbl)
 		m_tag2 = L"</ul>\n";
 	}
 
+	m_listedP = 0;
+	m_listedD = 0;
 	m_indent = 0;
 	m_genPrev = 0;
 
@@ -58,7 +42,7 @@ void CDescendants::printVector( int tbl)
 	vLMX.clear();		// a generáció utolsó kiírt motherIndexe
 	vSerial.clear();
 	vSerial.push_back(1);
-	str.Format(L"%s leszármazottainak tabulált listázása...", m_os);
+	str.Format(L"%s leszármazottainak listázása...", m_os);
 	CProgressWnd wndP(NULL, str );
 	wndP.GoModal();
 	wndP.SetRange(0, vDesc.size() );
@@ -71,28 +55,44 @@ void CDescendants::printVector( int tbl)
 		if (wndP.Cancelled()) break;
 
 		if (vDesc.at(i).hidden) continue;   // apa bejegyzése, aki más táblában szerepel
-		if (vDesc.at(i).cntRep > 1 && p_repeatedDelete) continue;
-		if (!p_womenDescendants && vDesc.at(i).parentSex == WOMAN) continue;
 
-		queryPeople(vDesc.at(i).rowid, &p);
-		printBegining(i);	// html kódok és generáció elkészítése; 
-		people = getComplexDescription(i, true );
-
+		if (p_repeated != 0  && vDesc.at(i).status == 2) continue;	// ismétlõdõ bejegyzés, amit nem ki akarunk kiírni
 		
-		line.Format(L"%s%s", m_diamond, people);
-		line.Replace('|', '\'');
-		print(line);
+		queryPeople(vDesc.at(i).rowid, &p);
 
+		if (!p_mother && vDesc.at(i).parentSex == WOMAN) continue;
+
+		printBegining(i);	// html kódok és generáció elkészítése; 
+		printDescendant(i);
+		printSpouses(i);
 		m_genPrev = vDesc.at(i).g;
-	}
 
+		if (!p.arm.IsEmpty())
+		{
+			str.Format(L" <font color='blue'>[%s]</font>", p.arm);
+			print(str);
+		}
+		if (!p.csalad.IsEmpty())
+		{
+			str.Format(L" <font color='blue'>[%s]</font>", p.csalad);
+			print(str);
+		}
+
+
+		if (!p.folyt.IsEmpty() && p_folyt)
+		{
+			str.Format(L"<font color='blue'> %c%c%c folyt %s</font>", '%', '%', '%', p.folyt);
+			print(str);
+		}
+		fflush(fl);
+	}
 	for (int i = 0; i < m_indent; ++i)			// a kihúzások megszüntetése, vissza az alapvonalra
 		fwprintf(fl, L"%s", m_tag2);
 	wndP.DestroyWindow();
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // A genráció változástól függû behuzás és genrációs kód nyomtatása az m_sytax értékétõl függõen
-void CDescendants::printBegining(int i)
+void CDescendantsNew::printBegining(int i)
 {
 	CString family;
 	CString shift;
@@ -125,42 +125,43 @@ void CDescendants::printBegining(int i)
 		gen = TCHAR('a') + bias;
 
 	// Kiemelt családnév //////////////////////////////////////
-	if (p_descendantName == DE::RAISED ) 
+	if (p_lastname == 2) 
 	{
 		if (m_familyName != p.last_name)
 		{
 			family = getTableHeader();
-			str = getColoredString(family, DE::KEK);
+			str = getColoredString(family, KEK);
 			if (p_repeatedColor)
 			{
 				switch (vDesc.at(i).status)
 				{
 				case 0:
-					str = getColoredString(family, DE::KEK);
+					str = getColoredString(family, KEK);
 					break;
 				case 1:
-					str = getColoredString(family, DE::ZOLD);
+					str = getColoredString(family, ZOLD);
 					break;
 				case 2:
-					str = getColoredString(family, DE::PIROS);
+					str = getColoredString(family, PIROS);
 					break;
 				}
 			}
 			if (g == m_genPrev) // ugyanabban  a generációban névváltozás!!
-				str.Format(L"<br>%s%s", shift, (CString)str);	// hogy ugyabban a betolásban legyünk, de új sorban
+				str.Format(L"<br>%s%s\n", shift, (CString)str);	// hogy ugyabban a betolásban legyünk, de új sorban
 			else
-				str.Format(L"%s%s", shift, (CString)str);			// </ol> benne van a shiftben, ha kell
-			shift.Empty();		// az ezt követõ leszármazottat már nem kell tolni
+				str.Format(L"%s%s\n", shift, (CString)str);			// </ol> benne van a shiftben, ha kell
+			shift.Empty();										// az ezt követõ leszármazottat már nem kell tolni
 			print(str);
 			m_familyName = p.last_name;
+			
 		}
 	}
 	/////leszármazott sorának kezedete /////////////////////////////////////////////
-	if (p_numberingSystem == DE::SZLUHA)
+	if (p_numbering == SZLUHA)
 		str.Format(L"%s<li>%c&diams;", shift, gen);
-	else if (p_numberingSystem == DE::VIL)
+	else if (p_numbering == VIL)
 		str.Format(L"%s<li>%c%d&diams;", shift, gen, vDesc.at(i).childorder);
-	else if (p_numberingSystem == DE::TUP)
+	else if (p_numbering == TUP)
 	{
 		z = vSerial.size() - 1;
 		if (g < z)
@@ -174,18 +175,17 @@ void CDescendants::printBegining(int i)
 		switch (vDesc.at(i).status)
 		{
 		case 1:
-			str = getColoredString(str, DE::ZOLD);
+			str = getColoredString(str, ZOLD);
 			break;
 		case 2:
-			str = getColoredString(str, DE::PIROS);
+			str = getColoredString(str, PIROS);
 			break;
 		}
 	}
-	m_diamond = str;
-//	print(str);		
+	print(str);		
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CDescendants::getTableHeader()
+CString CDescendantsNew::getTableHeader()
 {
 	CString last_name;
 	CString percent;
@@ -217,7 +217,7 @@ CString CDescendants::getTableHeader()
 	return(str);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CDescendants::createDescendant(int i, bool parentIndex )
+void CDescendantsNew::printDescendant(int i)
 {
 	CString name;
 	CString line;
@@ -225,23 +225,22 @@ CString CDescendants::createDescendant(int i, bool parentIndex )
 	CString rang;
 	CString lastname;
 	CString comment;
+	int parentIndex;
 	int motherIndex;
 	int z;
 	int j;
 	int last;
 	int	lastMotherIndex;
-	DE::LMX lmx;
+	LMX lmx;
 	TCHAR ch;
 
 	name = p.first_name;
-	if (p_descendantName == DE::INLINE)
+	if (p_lastname == 1)
 	{
 		lastname = p.last_name;
 		if (lastname == L"N") lastname.Empty();
 		if (p_capitalName)
 			lastname = convertNameToUpper(lastname);
-		if (p_bold)
-			lastname.Format(L"<b>%s</b>", lastname);
 		if (lastname == L"N;")
 			name.Format(L"\n%s %s %s", lastname, p.first_name, p.peer);
 		else
@@ -250,12 +249,17 @@ CString CDescendants::createDescendant(int i, bool parentIndex )
 		if (!p.other_names.IsEmpty())
 			name.Format(L"\n%s_(%s)", (CString)name, p.other_names);
 	}
-	name = getColoredString(name, p_descendantAttrib);
+	name = getColoredString(name, p_descStyle);
 	
 
 
 	if (i && vDesc.at(vDesc.at(i).parentIndex).numOfSpouses > 1)  // csak az kaphat motherIndexet, akinek az apjának több felesége volt
 	{
+		if (vDesc.at(vDesc.at(i).parentIndex).sex == WOMAN)
+			p.parentIndex = _wtoi(p.whichHusband);
+		else
+			p.parentIndex = _wtoi(p.whichWife);
+
 		last = vLMX.size() - 1;
 		if (last == -1 || vLMX.at(last).g < vDesc.at(i).g)		// magasabb generációban van
 		{
@@ -274,39 +278,79 @@ CString CDescendants::createDescendant(int i, bool parentIndex )
 			}
 		}
 		last = vLMX.size() - 1;
-		
-
-		
-		if (parentIndex)
+		if (vLMX.at(last).lastMotherIndex != p.parentIndex)   // ha az utoljára kiírt motherIndex más, akkor ezt kiírja
 		{
-			if (vLMX.at(last).lastMotherIndex != p.parentIndex)   // ha az utoljára kiírt motherIndex más, akkor ezt kiírja
-			{
-				if (p.parentIndex)
-				{
-					str.Format(L"/%d", p.parentIndex);
-					name += str;
-					vLMX.at(last).lastMotherIndex = p.parentIndex;
-				}
-			}
+			str.Format(L"/%d", p.parentIndex);
+			name += str;
+			vLMX.at(last).lastMotherIndex = p.parentIndex;
 		}
-
 	}
 	
+	/*
+	if (i && vDesc.at(vDesc.at(i).parentIndex).numOfSpouses > 1)  // csak az kaphat motherIndexet, akinek az apjának több felesége volt
+	{
+		if (vDesc.at(vDesc.at(i).parentIndex).sex == MAN)  // csak az apa leszármozattai kapnak anya indexet!!
+		{
+			last = vLMX.size() - 1;
+			if (last == -1 || vLMX.at(last).g < vDesc.at(i).g)		// magasabb generációban van
+			{
+				lmx.g = vDesc.at(i).g;
+				lmx.lastMotherIndex = p.parentIndex -1;
+				vLMX.push_back(lmx);
+			}
+			else													// alacsonyabb generációban van
+			{
+				// megkeresi saját generációjának utoljára listázott motherIndex-ét
+				j = vLMX.size() - 1;
+				for (j = vLMX.size() - 1; j > 0; --j)
+				{
+					if (vLMX.at(j).g > vDesc.at(i).g) // a nagyobb generációk eldobása
+						vLMX.pop_back();
+				}
+			}
+			last = vLMX.size() - 1;
+			if (vLMX.at(last).lastMotherIndex < p.parentIndex)   // ha az utoljára kiírt motherIndex más, akkor ezt kiírja
+			{
+				str.Format(L"/%d", p.parentIndex);
+				name += str;
+				vLMX.at(last).lastMotherIndex = p.parentIndex;
+			}
+		}
+	}
+	*/
+
+
+
+
+	/*
+	// ha apjának több felesége volt (aki anya), akkor az anya sorszámának kiírása
+	if (vDesc.at(vDesc.at(i).parentIndex).numOfSpouses > 1)
+	{
+		parentIndex = vDesc.at(vDesc.at(i).parentIndex).parentIndex;
+		parentIndex = vDesc.at(i).parentIndex;
+		if (p.parentIndex && p.parentIndex != parentIndex) // csak akkor írja ki a parentIndex-et, ha változik
+		{
+		//	vDesc.at(vDesc.at(i).parentIndex).parentIndex = p.parentIndex;
+			if (p_numbering == SZLUHA || p_numbering == TUP)
+			{
+				str.Format(L"/%d", p.parentIndex);
+				name += str;
+			}
+			else if (p_numbering == VIL)
+				fwprintf(fl, L"%d. ", p.parentIndex);
+		}
+	}
+	*/
 	if( p.comment.GetAt(0) != ',' )
 		name += L" ";
 
-	if (!p.posterior.IsEmpty() )
-	{
-		name += p.posterior;
-		if (p_checkCRLF)
-			name += L"\n";
-	}
-
+	name += p.posterior;
+	name.TrimRight();
 
 	str = getPlaceDateBlock(p.birth_place, p.birth_date, L"*");
-	line = name.Trim();
+	line = name;
 	if (!str.IsEmpty())
-		line.Format(L"%s %s", name.Trim(), str);
+		line.Format(L"%s %s", name, str);
 
 	str = getPlaceDateBlock(p.death_place, p.death_date, L"+");
 	if (!str.IsEmpty())
@@ -326,8 +370,7 @@ CString CDescendants::createDescendant(int i, bool parentIndex )
 			str = p.occupation;
 	}
 
-	comment = getColoredString(str, p_commentAttrib);
-	comment.Trim();
+	comment = getColoredString(str, p_commentStyle);
 	if (str.GetAt(0) == ',')
 		line.Format(L"%s%s", (CString)line, comment);
 	else
@@ -340,35 +383,31 @@ CString CDescendants::createDescendant(int i, bool parentIndex )
 		switch (vDesc.at(i).status)			
 		{
 		case 1:
-			line = getColoredString(line, DE::ZOLD);
+			line = getColoredString(line, ZOLD);
 			break;
 		case 2:
-			line = getColoredString(line, DE::PIROS);
+			line = getColoredString(line, PIROS);
 			break;
 		}
 	}
 	++m_listedP;
 	++m_listedD;
-	return(line);
+	print(line);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CDescendants::createSpouses(int i)
+void CDescendantsNew::printSpouses(int i)
 {
 	CString rowid = vDesc.at(i).rowid;
 	CString rowidS;
 	CString place;
 	CString date;
 	CString spouse_id;
-	CString marriage;
-	CString spouse;
-	CString spRelatives;
-	CString spouses;
-	
+
 	if (p.sex_id == MAN)
 		m_command.Format(L"SELECT place, date, wife_id FROM marriages WHERE husband_id='%s' ORDER BY whichWife", rowid);
 	else
 		m_command.Format(L"SELECT place, date, husband_id FROM marriages WHERE wife_id='%s' ORDER BY whichHusband", rowid);
-	if (!queryM(m_command)) return L"";
+	if (!queryM(m_command)) return;
 
 	int numberOfSpouses = rsM.RecordsCount();
 
@@ -381,24 +420,17 @@ CString CDescendants::createSpouses(int i)
 		if (!spouse_id.IsEmpty() && spouse_id.Compare(L"0"))
 		{
 			queryPeople(spouse_id, &s);   // házastárs adatainak beolvasása
-			marriage = createMarriage(place, date, i, numberOfSpouses);
-			spouse = createSpouse();				// kiírás elõtt ellenõrzi, hogy szerepel-e ilyen névem már kiírt házastárs. Ha igen, akkor színezi
+			printMarriage(place, date, i, numberOfSpouses);
+			printSpouse();				// kiírás elõtt ellenõrzi, hogy szerepel-e ilyen névem már kiírt házastárs. Ha igen, akkor színezi
 			vFullname.push_back(s.fullname);	// vFullname-en gyûjti a már kilistázott házastársak nevét
-			spRelatives = createSpRelatives();
-			if (!marriage.IsEmpty())
-				spouses += marriage;
-			if (!spouse.IsEmpty())
-				spouses += spouse;
-			if (!spRelatives.IsEmpty())
-				spouses += spRelatives;
-			spouses += L" ";
+			printSpRelatives();
 		}
 	}
-	spouses.Trim();
-	return spouses;
+	fwprintf(fl, L"\n");
+	fflush(fl);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CDescendants::createMarriage(CString place, CString date, int i, int numberOfSpouses)
+void CDescendantsNew::printMarriage(CString place, CString date, int i, int numberOfSpouses)
 {
 	CString marriage;
 
@@ -407,13 +439,11 @@ CString CDescendants::createMarriage(CString place, CString date, int i, int num
 	else
 		str = L" =";
 
-	marriage = getColoredString(str, p_specAttrib);
+	marriage = getColoredString(str, p_specStyle);
 
 	if (!place.IsEmpty())
 	{
 		marriage += place;
-		if (date.IsEmpty())
-			marriage += L",";
 		marriage += L" ";
 	}
 	if (!date.IsEmpty())
@@ -421,11 +451,11 @@ CString CDescendants::createMarriage(CString place, CString date, int i, int num
 		marriage += date;
 		marriage += L" ";
 	}
-	return marriage;
+	print(marriage);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // a házastárs listázados blokkját elkészíti
-CString CDescendants::createSpouse()
+void CDescendantsNew::printSpouse()
 {
 	CString spouse;
 	CString fullname;
@@ -433,8 +463,7 @@ CString CDescendants::createSpouse()
 
 	if (p_capitalName)
 		lastname = convertNameToUpper(lastname);
-	if (p_bold)
-		lastname.Format(L"<b>%s</b>", lastname);
+
 	if (lastname != L"N;" && !s.titolo.IsEmpty() && s.peer.IsEmpty())
 	{
 		fullname += s.titolo;
@@ -447,7 +476,6 @@ CString CDescendants::createSpouse()
 	}
 	if (!s.other_names.IsEmpty())
 	{
-		fullname.TrimRight();
 		fullname += L"_(";
 		fullname += s.other_names;
 		fullname += L") ";
@@ -457,14 +485,14 @@ CString CDescendants::createSpouse()
 		fullname += s.first_name;
 	}
 	fullname.Trim();
-	fullname = getColoredString(fullname, p_otherNameAttrib);
+	fullname = getColoredString(fullname, p_otherNameStyle);
 
 	// Ellenõrti, hogy ilyen néven már listázott-e házastársat. Ha igen, akkoe színezi
 	for (int i = 0; i < vFullname.size(); ++i)
 	{
 		if (s.fullname == vFullname.at(i))
 		{
-			fullname = getColoredString(fullname, DE::PIROS);   //!!!!!!!!!!!!!!!!!!
+			fullname = getColoredString(fullname, PIROS);   //!!!!!!!!!!!!!!!!!!
 			break;
 		}
 	}
@@ -482,8 +510,6 @@ CString CDescendants::createSpouse()
 	{
 		fullname += L" ";
 		fullname += s.posterior;
-		if (p_checkCRLF)
-			fullname += L"\n";
 	}
 	fullname.Trim();
 	spouse = fullname;
@@ -497,7 +523,7 @@ CString CDescendants::createSpouse()
 	if (!str.IsEmpty())
 		spouse.Format(L"%s %s", (CString)spouse, str);
 
-	str = getColoredString(s.comment, p_commentAttrib);
+	str = getColoredString(s.comment, p_commentStyle);
 	if (!str.IsEmpty())
 	{
 		if (s.comment.GetAt(0) == ',')
@@ -507,12 +533,11 @@ CString CDescendants::createSpouse()
 	}
 
 	++m_listedP;
-	return spouse;
+	print(spouse);
 }
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // a házastárs személyleíró blokkját elkészíti, a neveket bold-dal kiemnelve
-CString CDescendants::createSpRelatives()
+void CDescendantsNew::printSpRelatives()
 {
 	CString father(L"");
 	CString mother(L"");
@@ -529,7 +554,11 @@ CString CDescendants::createSpRelatives()
 		sf.first_name.Replace('-', ' ');
 		str = getFirstWord(sf.first_name);
 
-		father = getColoredString(str, p_otherNameAttrib);
+		father = getColoredString(str, p_otherNameStyle);
+		//		if (!sf.peer.IsEmpty())
+		//			father.Format(L"%s %s", sf.peer, (CString)father);
+
+
 	}
 	if (!s.mother_id.IsEmpty() && s.mother_id != L"0")
 	{
@@ -568,7 +597,7 @@ CString CDescendants::createSpRelatives()
 		m_command.Format(L"SELECT wife_id, whichWife  FROM marriages WHERE husband_id='%s' ORDER BY whichWife", s.rowid); // a házastárs házastársai
 	else
 		m_command.Format(L"SELECT husband_id, whichHusband FROM marriages WHERE wife_id='%s' ORDER BY whichHusband", s.rowid); // a házastárs házastársai
-	if (!query(m_command)) return L"";
+	if (!query(m_command)) return;
 	numOfSpouses = rs.RecordsCount();
 	if (numOfSpouses > 1)
 	{
@@ -582,6 +611,9 @@ CString CDescendants::createSpRelatives()
 			if (ss.rowid != p.rowid)		// a GA sorban szereplõ házastársat kihagyja
 			{
 				spouseSpouse = getLastFirst(&ss);
+
+				//spouseSpouse.Format(L"%s %s", ss.peer, (CString)spouseSpouse);
+				// spouseSpouse.Trim();
 				if (parents.GetLength())
 					parents += L", ";
 				else
@@ -590,7 +622,7 @@ CString CDescendants::createSpRelatives()
 				str.Format(L"%sf. %s", order, spouseSpouse);
 				if (voltmar(order))
 				{
-					str = getColoredString(str, DE::PIROS);
+					str = getColoredString(str, PIROS);
 				}
 				++m_listedP;
 				parents += str;
@@ -603,10 +635,10 @@ CString CDescendants::createSpRelatives()
 		parents.TrimRight();
 		parents += L")";
 	}
-	return(parents);
+	print(parents);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CDescendants::voltmar(CString index)
+bool CDescendantsNew::voltmar(CString index)
 {
 	for (int i = 0; i < vSpouseIndex.size(); ++i)
 	{
@@ -616,14 +648,15 @@ bool CDescendants::voltmar(CString index)
 	return false;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendants::print(CString str)
+void CDescendantsNew::print(CString str)
 {
+	str.Replace('|', '\'');
 	str = UnicodeToUtf8(str);
-	fwprintf(fl, L"%s\n", str);  // a soreleji %-okat printelési karakterekenk értelmezné, ha közvetlenül nyomtatnánk!!! 
+	fwprintf(fl, L"%s", str);  // a soreleji %-okat printelési karakterekenk értelmezné, ha közvetlenül nyomtatnánk!!! 
 	fflush(fl);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendants::queryPeople(CString rowid, DE::PPEOPLE* p)
+void CDescendantsNew::queryPeople(CString rowid, PPEOPLE* p)
 {
 	m_command.Format(L"SELECT rowid,* FROM people WHERE rowid ='%s'", rowid);
 	if (!queryP(m_command)) return;
@@ -641,7 +674,7 @@ void CDescendants::queryPeople(CString rowid, DE::PPEOPLE* p)
 	p->posterior = rsP.GetFieldString(DBP_POSTERIOR);
 	p->folyt = rsP.GetFieldString(DBP_FOLYT);
 	p->gap = rsP.GetFieldString(DBP_GAP);
-	p->generation	= rsP.GetFieldString( DBP_GENERATION );
+	//	p->generation		= m_r.GetFieldString( DBP_GENERATION );
 	p->last_name = rsP.GetFieldString(DBP_LAST_NAME);
 	p->lineNumber = rsP.GetFieldString(DBP_LINENUMBER);
 	p->mother_id = rsP.GetFieldString(DBP_MOTHER_ID);
@@ -658,8 +691,6 @@ void CDescendants::queryPeople(CString rowid, DE::PPEOPLE* p)
 	p->tableRoman = rsP.GetFieldString(DBP_TABLEROMAN);
 	p->title = rsP.GetFieldString(DBP_TITLE);
 	p->titolo = rsP.GetFieldString(DBP_TITOLO);
- 	if (p_titololower && !p->titolo.IsEmpty() )
-		p->titolo = konvTitolo(p->titolo);
 	p->whichHusband = rsP.GetFieldString(DBP_WHICHHUSBAND);
 	p->whichWife = rsP.GetFieldString(DBP_WHICHWIFE);
 
@@ -668,22 +699,7 @@ void CDescendants::queryPeople(CString rowid, DE::PPEOPLE* p)
 	if ((p->comment.Find(L"http")) != -1) p->comment.Empty();
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CDescendants::konvTitolo(CString titolo)
-{
-	TCHAR kar;
-
-	for (int i = 0; i < titolo.GetLength(); ++i)
-	{
-		if (iswupper(titolo[i]))
-		{
-			kar = towlower(titolo[i]);
-			titolo.SetAt(i, kar);
-		}
-	}
-	return titolo;
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CDescendants::getPlaceDateBlock(CString place, CString date, CString jel)
+CString CDescendantsNew::getPlaceDateBlock(CString place, CString date, CString jel)
 {
 
 	CString block(L"");
@@ -697,7 +713,6 @@ CString CDescendants::getPlaceDateBlock(CString place, CString date, CString jel
 	if (!place.IsEmpty() || !date.IsEmpty())
 	{
 		block = jel;
-		block = getColoredString(jel, p_specAttrib );
 		if (!place.IsEmpty())
 		{
 			block += place;
@@ -712,14 +727,12 @@ CString CDescendants::getPlaceDateBlock(CString place, CString date, CString jel
 	return block;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CDescendants::getLastFirst(DE::PPEOPLE* p) // házatárs anyjának é stovábbi házastársainak neve képzõdik így
+CString CDescendantsNew::getLastFirst(PPEOPLE* p) // házatárs anyjának é stovábbi házastársainak neve képzõdik így
 {
 
 	CString name = p->last_name;
 	if (p_capitalName )
 		name = convertNameToUpper(name);
-	if (p_bold)
-		name.Format( L"<b>%s</b>", name);
 	if (!p->other_names.IsEmpty())
 		name.Format(L"%s_(%s)", p->last_name, p->other_names);
 
@@ -727,7 +740,8 @@ CString CDescendants::getLastFirst(DE::PPEOPLE* p) // házatárs anyjának é stováb
 	{
 		name += L" ";
 		name += p->first_name;
-			name = getColoredString(name, p_otherNameAttrib);
+		if( p_html )
+			name = getColoredString(name, p_otherNameStyle);
 	}
 	if (!p->peer.IsEmpty())
 		name.Format(L"%s %s", p->peer, (CString)name);
@@ -735,24 +749,30 @@ CString CDescendants::getLastFirst(DE::PPEOPLE* p) // házatárs anyjának é stováb
 	return name;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CDescendants::getColoredString(CString str, int index)
+CString CDescendantsNew::getColoredString(CString str, int index)
 {
 //	str.Trim();
 	CString colored(str);
 	if (!str.IsEmpty() && index)
-		colored.Format(L"%s%s%s", DE::attrib[index].code1, str, DE::attrib[index].code2);
+		colored.Format(L"%s%s%s", attrib[index].code1, str, attrib[index].code2);
 	return colored;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CDescendants::openHtml(CString file, CString title, UINT colorBgrnd)
+BOOL CDescendantsNew::openHtml(CString file, CString title, UINT colorBgrnd)
 {
+	CString descendantsPath;
 	CString dragonjpgPathName;
-	dragonjpgPathName.Format(L"%s\\dragon.jpg", m_descendantsPath);
+	descendantsPath.Format(L"%s\\descendants_%s", theApp.m_workingDirectory, theApp.m_dbFileTitle);
+	if (_waccess(descendantsPath, 0))
+		_wmkdir(descendantsPath);
+	dragonjpgPathName.Format(L"%s\\dragon.jpg", descendantsPath);
 	CopyFile(theApp.m_dragonjpg, dragonjpgPathName, false);
 	
-	m_htmlPathName1.Format(L"%s\\%s_leszármazotti táblája_%s.html", m_descendantsPath, m_os, getTimeTag());
+	m_htmlFile.Format(L"%s\\%s_%s.html", descendantsPath, file, getTimeTag());
 
-	if (!openFileSpec(&fl, m_htmlPathName1, L"w+")) return false;
+
+
+	if (!openFileSpec(&fl, m_htmlFile, L"w+")) return false;
 
 
 	int l = -37;
@@ -760,16 +780,29 @@ BOOL CDescendants::openHtml(CString file, CString title, UINT colorBgrnd)
 	today = getPresentDateTime();
 	CString yesno;
 	CString nok;
-	if (p_womenDescendants)
+	if (p_mother)
 		nok = L"igen";
 	else
 		nok = L"nem";
 
+	CString kihagy;
+	switch (p_repeated)
+	{
+	case 0:
+		kihagy = L"Nem hagyja aki az ismétlõdõ leszármazottakat.";
+		break;
+	case 1:
+		kihagy = L"Az elsõ leszármazottat kiírja, a többit elhagyja.";
+		break;
+	case 2:
+		kihagy = L"Ha az apja leszármazott, akkor kiírja, ha az anyja, akkor nem";
+	}
+
 	CString maxGen;
-	if (p_generationMax.IsEmpty())
+	if (m_editGenMax.IsEmpty())
 		maxGen = L"minden generáció";
 	else
-		maxGen = p_generationMax;
+		maxGen = m_editGenMax;
 
 	CString inputFile;
 	CString created;
@@ -784,28 +817,26 @@ BOOL CDescendants::openHtml(CString file, CString title, UINT colorBgrnd)
 	connect = p_connect ? L"igen": L"nem";
 
 
-	print(L"<!DOCTYPE html>");
-	print(L"<html lang=hu>");
-	print(L"<head>");
-	str.Format(L"<title>%s</title>", today);
+	print(L"<!DOCTYPE html>\n");
+	print(L"<html lang=hu>\n");
+	print(L"<head>\n");
+	str.Format(L"<title>%s</title>\n", today);
 	print(str);
-	print(L"<meta charset=\"UTF-8\">");
+	print(L"<meta charset=\"UTF-8\">\n");
 	createStyle();
-	print(L"</head>");
+	print(L"</head>\n");
 	
 //	CString head;
 //	head = L"<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"UTF-8\">\n</head>\n<body>\n";
 //	print(head);
 
 	CString body;
-	body.Format(L"<body bgcolor=\"%06x\">", colorBgrnd);
+	body.Format(L"<body bgcolor=\"%06x\">\n", colorBgrnd);
 //	body.Format(L"<body>\n" );
 	print(body);
 
-
-
 	//str.Format(L"<b><center>%s</center>\n<pre></b>\n", title);
-	str.Format(L"<b><center>%s</center></b><br>", title);
+	str.Format(L"<b><center>%s</center><br>\n\n", title);
 	print(str);
 	print(L"<center><img src = \"dragon.jpg\" alt = \"Dragon\" width = \"100\" height = \"70\"></center>");
 
@@ -816,16 +847,13 @@ BOOL CDescendants::openHtml(CString file, CString title, UINT colorBgrnd)
 	str.Format(L"<b><center>%s</center></b>", program);
 	print(str);
 */
-
-	
-
-	print(L"<br>\n<pre>\n");
-	str.Format(L"%*s Dragon v. %s", l, L"Program:", theApp.m_version );
+	print(L"<pre>");
+	str.Format(L"%*s Dragon v. %s\n", l, L"Program:", theApp.m_version );
 	print(str);
-	str.Format(L"%*s %s", l, L"Dragon.exe készült:", MultiToUnicode(LPCSTR(BUILD)));
+	str.Format(L"%*s %s\n", l, L"Dragon.exe készült:", MultiToUnicode(LPCSTR(BUILD)));
 	print(str);
 
-	str.Format(L"%*s %s", l, L"Alapkönyvtár:", theApp.m_dbFolderPath);
+	str.Format(L"%*s %s\n", l, L"Alapkönyvtár:", theApp.m_dbFolderPath);
 	print(str);
 
 	str = L"ÜRES";
@@ -836,67 +864,54 @@ BOOL CDescendants::openHtml(CString file, CString title, UINT colorBgrnd)
 	else if (theApp.m_inputMode = GAHTML)
 		str = L"GA.htm fájl";
 
-	str.Format(L"%*s %s", l, L"Adatbázis bemenete:", (CString)str);
+	str.Format(L"%*s %s\n", l, L"Adatbázis bemenete:", (CString)str);
 	print(str);
 
 	if (theApp.m_inputMode == GAHTML || theApp.m_inputMode == GEDCOM )
 	{
-		str.Format(L"%*s %s %s", l, L"Bementi fájl készült:", created, inputFile );
+		str.Format(L"%*s %s %s\n", l, L"Bementi fájl készült:", created, inputFile );
 		print(str);
 	}
-	str.Format(L"%*s %s %s", l, L"Adatbázis készült:", dateDB, theApp.m_dbFileName );
+	str.Format(L"%*s %s %s\n", l, L"Adatbázis készült:", dateDB, theApp.m_dbFileName );
 	print(str);
 	if (!theApp.m_inputVersion.IsEmpty() && theApp.m_inputVersion != theApp.m_version)
 	{
-		str.Format(L"%*s %s", l, L"Beolvasás programverziója:", theApp.m_inputVersion);
+		str.Format(L"%*s %s\n", l, L"Beolvasás programverziója:", theApp.m_inputVersion);
 		print(str);
 	}
 	if (!theApp.m_uniteVersion.IsEmpty() )
 	{
+		if (theApp.m_snameEnough)
+			yesno = L"igen";
+		else
+			yesno = L"nem";
+
+		str.Format(L"%*s %s\n", l, L"Azonos nevõ házaspárok összevonása:", yesno);
+		print(str);
 		if (theApp.m_uniteVersion != theApp.m_version)
 		{
-			str.Format(L"%*s %s", l, L"Összevonás programverziója:", theApp.m_uniteVersion);
+			str.Format(L"%*s %s\n", l, L"Összevonás programverziója:", theApp.m_uniteVersion);
 			print(str);
 		}
 	}
-	CString rep;
-	if (p_repeatedDelete)
-		rep = L"törölve";
-	else
-		rep = L"szerepelnek";
 
-
-	str.Format(L"%*s %s<br>", l, L"Lista készült:", theApp.getPresentDateTime());
+	str.Format(L"%*s %s<br>\n", l, L"Lista készült:", theApp.getPresentDateTime());
 	print(str);
-	str.Format(L"%*s %s", l, L"Generációk max száma:", maxGen);
+	str.Format(L"%*s %s\n", l, L"Generációk max száma:", maxGen);
 	print(str);
-	str.Format(L"%*s %s", l, L"Elágazások összekötése:", connect);
+	str.Format(L"%*s %s\n", l, L"Elágazások összekötése:", connect);
 	print(str);
-	str.Format(L"%*s %s", l, L"Nõk leszármazottai:", nok);
+	str.Format(L"%*s %s\n", l, L"Nõk leszármazottai:", nok);
 	print(str);
-	str.Format(L"%*s %s", l, L"Ismétlõdõ leszármazottak:", rep);
-	print(str);
-
-//	str.Format(L"%*s %s", l, L"Ismétlõdõk kihagyása:", kihagy);
-//	print(str);
-
-	CString sorrend;
-	switch (p_childrenOrder)
-	{
-	case DE::ORDER_INPUT:
-		sorrend = L"bementi sorrend";
-		break;
-	case DE::ORDER_BIRTH:
-		sorrend = L"születési idõ";
-		break;
-	}
-
-	str.Format(L"%*s %s", l, L"Sorrend:", sorrend);
+	str.Format(L"%*s %s\n", l, L"Ismétlõdõk kihagyása:", kihagy);
 	print(str);
 
 	if (p_repeatedColor)
 	{
-		str.Format(L"%*s %s", l, L"Ismétlõdõk színezése:", L"zöld - elsõ elõfordulás, piros - újabb elõfordulás");
+		if (p_repeated == 0)
+			str.Format(L"%*s %s\n", l, L"Ismétlõdõk színezése:", L"zöld - elsõ elõfordulás, piros - újabb elõfordulás");
+		else
+			str.Format(L"%*s %s\n", l, L"Ismétlõdõk színezése:", L"zöld");
 		print(str);
 	}
 	print(L"</pre>\n\n");
@@ -905,12 +920,12 @@ BOOL CDescendants::openHtml(CString file, CString title, UINT colorBgrnd)
 	return TRUE;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendants::createStyle()
+void CDescendantsNew::createStyle()
 {
 
 	fwprintf(fl, L"<style>\n");
-	if (p_rowWidth != L"képernyõ" && p_rowWidth != L"0")
-		fwprintf(fl, L"html{width:%scm;}\n", p_rowWidth);
+	if (m_editWidth != L"0")
+		fwprintf(fl, L"html{width:%scm;}\n", m_editWidth);
 
 
 	CString font;
@@ -920,7 +935,7 @@ void CDescendants::createStyle()
 	font = L"<body class=\"w3-container\">";
 	//	fwprintf( fl, L"%s\n", font );
 	CString fontSize;
-	fontSize.Format(L"body {font-size: %dpx;}", 10 + 2 * p_fontSize);
+	fontSize.Format(L"body {font-size: %dpx;}", 10 + 2 * m_comboFontSize);
 	fwprintf(fl, L"%s\n", fontSize);
 
 	//	fwprintf( fl, L"body {font-size: 10px;}" );
@@ -930,33 +945,37 @@ void CDescendants::createStyle()
 	//	font = L"<font-family: Avenir Next, Calibri, Verdana, sans-serif>\n";
 	//	fwprintf( fl, font );
 
-	fwprintf(fl, L"ul {\n");
-	fwprintf(fl, L"display: block;\n");
-	fwprintf(fl, L"max-width: 200%;\n");
-	//	fwprintf( fl, L"list-style-type: square;\n" );
-	fwprintf(fl, L"list-style-type: none;\n");
-	fwprintf(fl, L"margin-top: 0 em;\n");
-	fwprintf(fl, L"margin-bottom: 0 em;\n");
-	fwprintf(fl, L"margin-left: 0;\n");
-	fwprintf(fl, L"margin-right: 0;\n");
-	fwprintf(fl, L"padding-left: 40px;\n");
-	fwprintf(fl, L"}\n");
-
-	fwprintf(fl, L"ol {\n");
-	fwprintf(fl, L"display: block;\n");
-	fwprintf(fl, L"list-style-type: decimal;\n");
-	fwprintf(fl, L"margin-top: 0 em;\n");
-	fwprintf(fl, L"margin-bottom: 0 em;\n");
-	fwprintf(fl, L"margin-left: 0;\n");
-	fwprintf(fl, L"margin-right: 0;\n");
-	fwprintf(fl, L"padding-left: 40px;\n");
-	fwprintf(fl, L"}\n");
-
+//	if (p_numbering != SZLUHA)
+	{
+		fwprintf(fl, L"ul {\n");
+		fwprintf(fl, L"display: block;\n");
+		fwprintf(fl, L"max-width: 200%;\n");
+		//	fwprintf( fl, L"list-style-type: square;\n" );
+		fwprintf(fl, L"list-style-type: none;\n");
+		fwprintf(fl, L"margin-top: 0 em;\n");
+		fwprintf(fl, L"margin-bottom: 0 em;\n");
+		fwprintf(fl, L"margin-left: 0;\n");
+		fwprintf(fl, L"margin-right: 0;\n");
+		fwprintf(fl, L"padding-left: 40px;\n");
+		fwprintf(fl, L"}\n");
+	}
+//	else
+	{
+		fwprintf(fl, L"ol {\n");
+		fwprintf(fl, L"display: block;\n");
+		fwprintf(fl, L"list-style-type: decimal;\n");
+		fwprintf(fl, L"margin-top: 0 em;\n");
+		fwprintf(fl, L"margin-bottom: 0 em;\n");
+		fwprintf(fl, L"margin-left: 0;\n");
+		fwprintf(fl, L"margin-right: 0;\n");
+		fwprintf(fl, L"padding-left: 40px;\n");
+		fwprintf(fl, L"}\n");
+	}
 	fwprintf(fl, L"</style>\n");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendants::closeHtml()
+void CDescendantsNew::closeHtml()
 {
 //	for (int i = 0; i < m_indent; ++i)			// a kihúzások megszüntetése, vissza az alapvonalra
 //		fwprintf(fl, L"%s", m_tag2);
@@ -992,19 +1011,25 @@ void CDescendants::closeHtml()
 		gen = TCHAR('a') + bias;
 
 
-//	if ( theApp.v_tableNumbers.size() == 1   || !theApp.v_rowid.size() == 1 )
+	if ( theApp.v_tableNumbers.size() == 1   || !theApp.v_rowid.size() == 1 )
 	{
 
-		print(L"<pre>");
-		str.Format(L"%-*s %8s(%c)", l, L"Listázott generációk száma:", thousand(bias), gen);
+		print(L"<pre>\n");
+		str.Format(L"%-*s %8s(%c)\n", l, L"Listázott generációk száma:", thousand(bias), gen);
 		print(str);
-		str.Format(L"%-*s %8s", l, L"Listázott leszármazottak száma:", thousand(m_listedD));
+		str.Format(L"%-*s %8s\n", l, L"Listázott leszármazottak száma:", thousand(m_listedD));
 		print(str);
-		str.Format(L"%-*s %8s", l, L"Összes listázott emberek száma:", thousand(m_listedP));
+		if (p_repeated)
+		{
+			str.Format(L"%-*s %8s\n", l, L"Ismétlõdõ, nem listázott leszármazottak száma:", thousand(m_cntRepeated));
+			print(str);
+		}
+		str.Format(L"%-*s %8s\n", l, L"Összes listázott emberek száma:", thousand(m_listedP));
 		print(str);
-		str.Format(L"%-*s %s", l, L"Futási idõ:", theApp.getTimeElapsed(m_startTime));
+		str.Format(L"%-*s %s\n", l, L"Futási idõ:", theApp.getTimeElapsed(m_startTime));
 		print(str);
 		print(L"</pre>");
 	}
 	fclose(fl);
+	ShellExecute(NULL, L"open", m_htmlFile, NULL, NULL, SW_SHOWNORMAL);
 }

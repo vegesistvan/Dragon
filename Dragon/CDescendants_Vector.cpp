@@ -127,6 +127,7 @@ BOOL CDescendants::create_vDesc()
 		dlg.p_repeatedColor = p_repeatedColor;
 		dlg.p_rowWidth = p_rowWidth;
 		dlg.p_colorBgrnd = p_colorBgrnd;
+		dlg.p_repeatedDelete = p_repeatedDelete;
 
 		dlg.m_descendantsPath = m_descendantsPath;
 		dlg.vDesc = &vDesc;
@@ -301,6 +302,7 @@ bool CDescendants::tablesDescendants()  // listázandó táblák a theapp.v_tableNum
 		dlg.p_checkCRLF = p_checkCRLF;
 		dlg.p_oneOutputFile = p_oneOutputFile;
 		dlg.p_repeatedColor = p_repeatedColor;
+		dlg.p_repeatedDelete = p_repeatedDelete;
 
 		dlg.m_descendantsPath = m_descendantsPath;
 		dlg.vDesc = &vDesc;
@@ -781,9 +783,9 @@ void CDescendants::multipleRowid()
 
 		}
 	}
-*/
-	wndP.DestroyWindow();
 
+	wndP.DestroyWindow();
+*/
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CDescendants::query(CString command)

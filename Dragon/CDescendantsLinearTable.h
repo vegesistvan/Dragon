@@ -287,6 +287,7 @@ public:
 	bool p_connect;
 	bool p_womenDescendants;
 	bool p_titololower;
+	bool p_repeatedDelete;
 
 // html-hez
 	bool p_capital;

@@ -489,4 +489,6 @@ public:
 
 	afx_msg void OnClickedTitololower();
 
+	BOOL p_repeatedDelete;
+	afx_msg void OnClickedRepeatedDelete();
 };

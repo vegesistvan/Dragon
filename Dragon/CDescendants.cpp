@@ -30,6 +30,7 @@ CDescendants::CDescendants(CWnd* pParent /*=nullptr*/)
 	, p_checkCRLF(FALSE)
 	, p_childrenOrder(1)
 	, p_titololower(FALSE)
+	, p_repeatedDelete(FALSE)
 {
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -73,6 +74,7 @@ void CDescendants::DoDataExchange(CDataExchange* pDX)
 	DDX_Radio(pDX, IDC_ORDER_INPUT, p_childrenOrder);
 	DDX_Control(pDX, IDC_BUTTON_BGNCOLOR, m_backgroundColor);
 	DDX_Check(pDX, IDC_TITOLOLOWER, p_titololower);
+	DDX_Check(pDX, IDC_REPEATED_DELETE, p_repeatedDelete);
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BEGIN_MESSAGE_MAP(CDescendants, CDialogEx)
@@ -98,6 +100,7 @@ BEGIN_MESSAGE_MAP(CDescendants, CDialogEx)
 	ON_COMMAND(IDC_ORDER_BIRTH, &CDescendants::OnOrderBirth)
 	ON_BN_CLICKED(IDC_TITOLOLOWER, &CDescendants::OnClickedTitololower)
 
+	ON_BN_CLICKED(IDC_REPEATED_DELETE, &CDescendants::OnClickedRepeatedDelete)
 END_MESSAGE_MAP()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CDescendants::OnInitDialog()
@@ -174,6 +177,7 @@ void CDescendants::setParameters()
 	p_childrenOrder		= theApp.GetProfileInt(L"dragon", L"p_childrenOrder", p_childrenOrder);
 	p_titololower		= theApp.GetProfileInt(L"dragon", L"p_titololower", p_titololower);
 	p_repeatedColor		= theApp.GetProfileInt(L"dragon", L"p_repeatedColor", p_repeatedColor);
+	p_repeatedDelete	= theApp.GetProfileInt(L"dragon", L"p_repeatedDelete", p_repeatedDelete);
 	p_folyt				= theApp.GetProfileInt(L"dragon", L"p_folyt", p_folyt);
 	p_descendantAttrib	= theApp.GetProfileInt(L"dragon", L"p_descendantAttrib", p_descendantAttrib);
 	p_familyNameAttrib	= theApp.GetProfileInt(L"dragon", L"p_familyNameAttrib", p_familyNameAttrib);
@@ -210,6 +214,7 @@ void CDescendants::OnClickedDefault()
 	p_checkCRLF = false;
 	p_oneOutputFile = true;
 	p_folyt = false;
+	p_repeatedDelete = false;
 
 	p_rowWidth = L"0";
 	p_generationMax.Empty();
@@ -497,6 +502,7 @@ void CDescendants::OnBnClickedOk()
 	theApp.WriteProfileInt(L"dragon", L"p_childrenOrder", p_childrenOrder);
 	theApp.WriteProfileInt(L"dragon", L"p_titololower", p_titololower);
 	theApp.WriteProfileInt(L"dragon", L"p_repeatedColor", p_repeatedColor);
+	theApp.WriteProfileInt(L"dragon", L"p_repeatedDelete", p_repeatedDelete);
 	theApp.WriteProfileInt(L"dragon", L"p_folyt", p_folyt);
 	theApp.WriteProfileInt(L"dragon", L"p_descendantAttrib", p_descendantAttrib);
 	theApp.WriteProfileInt(L"dragon", L"p_familyNameAttrib", p_familyNameAttrib);
@@ -524,9 +530,17 @@ void CDescendants::OnClickedTitololower()
 	p_titololower = !p_titololower;
 	UpdateData(TOSCREEN);
 }
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDescendants::OnClickedRepeatedDelete()
+{
+	p_repeatedDelete = !p_repeatedDelete;
+	if (p_repeatedDelete)
+	{
+		p_repeatedColor = false;
+		GetDlgItem(IDC_REPEATED_COLOR)->EnableWindow(false);
+	}
+	else
+		GetDlgItem(IDC_REPEATED_COLOR)->EnableWindow(true);
 
-
-//void CDescendants::OnStnClickedStaticRepeated()
-//{
-	// TODO: Add your control notification handler code here
-//}
+	UpdateData(TOSCREEN);
+}

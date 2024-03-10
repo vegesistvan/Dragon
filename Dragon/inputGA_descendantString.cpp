@@ -410,7 +410,7 @@ bool CInputGA::setFatherMother()
 
 			m_command.Format(L"SELECT last_name FROM people WHERE rowid='%s'", d.father_id);
 			if (!theApp.query4(m_command)) return false;
-			d.last_name = theApp.m_recordset4->GetFieldString(0);
+//			d.last_name = theApp.m_recordset4->GetFieldString(0);
 		}
 		if (!d.mother_id.IsEmpty())
 		{

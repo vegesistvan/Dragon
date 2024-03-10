@@ -470,6 +470,7 @@ bool CInputGA::inputFile()
 			str.Replace(',', ' ');			// % Aba, aaaaa
 			str.Trim();
 			m_familyName = str;
+
 		}
 		else			// descendant line
 		{

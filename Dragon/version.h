@@ -1,7 +1,9 @@
 #pragma once
 
-#define VERSION L"10.179"
+#define VERSION L"10.180"
 
+// 10.180 2024.03.10 Családnév változások javítása a html beolvasásakor 
+// 
 // 10.179 2024.03.08 ABCD funkció a lineáris leszármazotti lista menüjében
 
 // 10.178 2024.03.05 leszármazotti hosszra rendezett html listában a leírás ismétlõdésének megszüntetése
