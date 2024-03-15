@@ -308,7 +308,6 @@ public:
 	BOOL p_folyt;
 	BOOL p_bold;
 	BOOL p_checkCRLF;
-	BOOL p_oneOutputFile;
 	BOOL p_repeatedColor;
 	CString p_rowWidth;
 

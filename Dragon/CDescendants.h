@@ -42,6 +42,7 @@ namespace DE
 		int	id;			// a lineáris listázásnál a bejegyzés id-je; id-re történt rendezés után a vDesc indexe
 		int idC;
 		int idF;
+		int idM;
 		int length;
 		CString ixM;
 		int nOfD;			// a bejegyzés leszármazottainak száma
@@ -288,7 +289,6 @@ protected:
 	bool p_capitalName;
 	BOOL p_folyt;
 	BOOL p_checkCRLF;
-	BOOL p_oneOutputFile;
 	BOOL p_repeatedColor;
 	CString p_rowWidth;
 
@@ -312,7 +312,7 @@ protected:
 	CColorStatic colorNum;
 	CColorStatic colorAttrib;
 	CColorStatic colorContent;
-	CColorStatic colorOutput;
+//	CColorStatic colorOutput;
 	CColorStatic colorPrint;
 	CColorStatic colorOrder;
 	CColorStatic colorBgrnd;

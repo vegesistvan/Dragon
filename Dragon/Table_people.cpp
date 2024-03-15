@@ -154,6 +154,7 @@ ON_COMMAND(ID_EDIT_NOTEPAD, &CTablePeople::OnEditNotepad)
 ON_COMMAND(ID_ROKONOK, &CTablePeople::OnRokonok)
 ON_COMMAND(ID_BIRTH_DEATH, &CTablePeople::OnBirthDeath)
 ON_COMMAND(ID_DESCENDANTS, &CTablePeople::OnDescendants)
+ON_COMMAND(ID_GEDCOM_DELETE, &CTablePeople::OnGedcomDelete)
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL CTablePeople::OnInitDialog()
@@ -1323,6 +1324,23 @@ void CTablePeople::OnHtmlChildren()
 
 	dlg.DoModal();
 }
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CTablePeople::OnGedcomDelete()
+{
+	int nItem = m_ListCtrl.GetNextItem(-1, LVNI_SELECTED);
+	CString rowid = m_ListCtrl.GetItemText(nItem, G_ROWID);
+	CString name;
+	name.Format(L"%s %s", m_ListCtrl.GetItemText(nItem, G_LAST_NAME), m_ListCtrl.GetItemText(nItem, G_FIRST_NAME));
+	
+	str.Format(L"Valóban törölni akarod %s(%s) bejegyzést\nés minden rá való hivatkozást?", name, rowid);
+	if (AfxMessageBox(str, MB_YESNO) == IDYES)
+	{
+		m_ListCtrl.DeleteItem(nItem);
+		m_command.Format(L"DELETE FROM people WHERE rowid='%s'", rowid);
+		if (!theApp.execute(m_command)) return;
+		--theApp.m_cntPeople;
+	}
+}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTablePeople::OnEditDelete()
 {
@@ -1815,3 +1833,4 @@ void CTablePeople::OnDescendants()
 	CDescendants dlg;
 	dlg.DoModal();
 }
+

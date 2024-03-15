@@ -210,6 +210,15 @@ void CInputGEDCOM::surn()
 	if ((pos = I.last_name.Find('(')) != -1)
 		I.last_name = I.last_name.Left(pos);
 
+	CStringArray A;
+	int n = wordList(i.last_name, &A, ' ', false);
+	if (n > 1)
+	{
+		if (A[0].GetAt(0).isLower())
+		{
+			I.last_name = A[1];
+		}
+	}
 }
 void CInputGEDCOM::text()
 {

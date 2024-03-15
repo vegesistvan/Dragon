@@ -25,7 +25,6 @@ CDescendants::CDescendants(CWnd* pParent /*=nullptr*/)
 	, m_printed(FALSE)
 	, p_folyt(FALSE)
 	, p_generationMax(_T(""))
-	, p_oneOutputFile(true)
 	, p_repeatedColor(FALSE)
 	, p_checkCRLF(FALSE)
 	, p_childrenOrder(1)
@@ -61,8 +60,7 @@ void CDescendants::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_STATIC_ATTRIB, colorAttrib);
 	DDX_Text(pDX, IDC_GENMAX, p_generationMax);
 
-	DDX_Radio(pDX, IDC_RADIO_ONE, p_oneOutputFile);
-	DDX_Control(pDX, IDC_STATIC_OUTPUT, colorOutput);
+///	DDX_Control(pDX, IDC_STATIC_OUTPUT, colorOutput);
 	DDX_Control(pDX, IDC_STATIC_PRINT, colorPrint);
 	DDX_Control(pDX, IDC_STATIC_CONTENT, colorContent);
 	DDX_Check(pDX, IDC_REPEATED_COLOR, p_repeatedColor);
@@ -129,7 +127,7 @@ BOOL CDescendants::OnInitDialog()
 	groupIndentedText.SetTextColor(LIGHTBLUE);
 	colorAttrib.SetTextColor(theApp.m_colorClick);
 	colorPrint.SetTextColor(theApp.m_colorClick);
-	colorOutput.SetTextColor(theApp.m_colorClick);
+//	colorOutput.SetTextColor(theApp.m_colorClick);
 	colorNum.SetTextColor(theApp.m_colorClick);
 	
 	groupAllText.SetTextColor(RED);
@@ -156,14 +154,6 @@ BOOL CDescendants::OnInitDialog()
 		p_connect = false;
 	}
 	
-//	if (theApp.v_rowid.size() < 2 && theApp.v_tableNumbers.size() < 2)
-	if ( theApp.v_tableNumbers.size() < 2)
-	{
-		p_oneOutputFile = true;
-		UpdateData(TOSCREEN);
-		GetDlgItem(IDC_RADIO_ONE)->EnableWindow(false);
-		GetDlgItem(IDC_RADIO_ONE1)->EnableWindow(false);
-	}
 	UpdateData(TOSCREEN);
 	return TRUE;
 }
@@ -188,7 +178,6 @@ void CDescendants::setParameters()
 	p_numberingSystem	= theApp.GetProfileInt(L"dragon", L"p_numberingSystem", p_numberingSystem);
 	p_colorBgrnd		= theApp.GetProfileInt(L"dragon", L"p_colorBgrnd", WHITE);
 	p_checkCRLF			= theApp.GetProfileInt(L"dragon", L"p_checkCRLF", WHITE);
-	p_oneOutputFile		= theApp.GetProfileInt(L"dragon", L"p_oneOutputFile", p_oneOutputFile);
 
 	p_rowWidth			= theApp.GetProfileString(L"dragon", L"p_rowWidth", L"0");
 	p_generationMax		= theApp.GetProfileString(L"dragon", L"p_generationMax", p_generationMax);
@@ -212,7 +201,6 @@ void CDescendants::OnClickedDefault()
 	p_folyt = false;
 	p_capital = false;
 	p_checkCRLF = false;
-	p_oneOutputFile = true;
 	p_folyt = false;
 	p_repeatedDelete = false;
 
@@ -235,7 +223,6 @@ void CDescendants::OnClickedDefault()
 
 	updateParameters();
 
-//	GetDlgItem(IDC_CHECK_CAPITAL)->EnableWindow(true);
 	GetDlgItem(IDC_COMBO_DESCATTRIB)->EnableWindow(true);
 	GetDlgItem(IDC_COMBO_NAME)->EnableWindow(true);
 	GetDlgItem(IDC_COMBO_COMMENT)->EnableWindow(true);
@@ -401,7 +388,7 @@ void CDescendants::OnPaint()
 	colorFrame(&dc, IDC_GROUPBOX_ATTRIB, color);
 	colorFrame(&dc, IDC_GROUPBOX_NUM, color);
 	colorFrame(&dc, IDC_GROUPBOX_PRINT, color);
-	colorFrame(&dc, IDC_GROUPBOX_OUTPUT, color);
+//	colorFrame(&dc, IDC_GROUPBOX_OUTPUT, color);
 	colorFrame(&dc, IDC_GROUP_ORDER, color);
 
 	colorFrame(&dc, IDC_GROUP_INDENTED, LIGHTBLUE);
@@ -513,7 +500,6 @@ void CDescendants::OnBnClickedOk()
 	theApp.WriteProfileInt(L"dragon", L"p_numberingSystem", p_numberingSystem);
 	theApp.WriteProfileInt(L"dragon", L"p_colorBgrnd", p_colorBgrnd);
 	theApp.WriteProfileInt(L"dragon", L"p_checkCRLF", p_checkCRLF);
-	theApp.WriteProfileInt(L"dragon", L"p_oneOutputFile", p_oneOutputFile);
 
 	theApp.WriteProfileString(L"dragon", L"p_rowWidth", p_rowWidth);
 	theApp.WriteProfileString(L"dragon", L"p_generationMax", p_generationMax);

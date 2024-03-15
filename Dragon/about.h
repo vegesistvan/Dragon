@@ -15,6 +15,4 @@ protected:
 	DECLARE_MESSAGE_MAP()
 	virtual BOOL OnInitDialog();
 public:
-
-	afx_msg void OnStatic();
 };

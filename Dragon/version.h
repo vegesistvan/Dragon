@@ -1,7 +1,11 @@
 #pragma once
 
-#define VERSION L"10.180"
+#define VERSION L"10.182"
 
+// 10.182 2024.03.15 GEDCOM SURN-ben kisbetûs elõnév és családnév
+// 
+// 10.181 2024.03.14 Apró kiegészítések
+// 
 // 10.180 2024.03.10 Családnév változások javítása a html beolvasásakor 
 // 
 // 10.179 2024.03.08 ABCD funkció a lineáris leszármazotti lista menüjében

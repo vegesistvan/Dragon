@@ -14,6 +14,7 @@
 #include "OpenDatabase.h"
 #include "version.h"
 #include "Table_people.h"
+#include "GetString.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -161,6 +162,9 @@ BEGIN_MESSAGE_MAP(CDragApp, CWinAppEx)
 		ON_UPDATE_COMMAND_UI(ID_UNITE, &CDragApp::OnUpdateUnite)
 		ON_COMMAND(ID_UNITE, &CDragApp::OnUnite)
 		ON_COMMAND(ID_AVERAGE_LIFESPAN, &CDragApp::OnAverageLifespan)
+		ON_COMMAND(ID_MERGE_NAME, &CDragApp::OnMergeName)
+		ON_COMMAND(ID_MERGE_NAME3, &CDragApp::OnMergeName3)
+		ON_COMMAND(ID_MERGE_NAME2, &CDragApp::OnMergeName2)
 		END_MESSAGE_MAP()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CDragApp::CDragApp() noexcept

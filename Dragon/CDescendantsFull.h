@@ -39,7 +39,7 @@ protected:
 	std::vector<int> vid; // leszármazottak
 
 	void CDescendantsFull::onDescendants(int print);
-	void CDescendantsFull::OnDescendants2();
+	
 	DECLARE_MESSAGE_MAP()
 public:
 	CListCtrlColoredHeader m_ListCtrlF;

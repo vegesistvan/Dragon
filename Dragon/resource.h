@@ -1009,13 +1009,18 @@
 #define ID_FUNCTIONS_LESZ35086          35086
 #define ID_FUNCTIONS_FELMEN35087        35087
 #define ID_ABCD                         35088
+#define ID_MERGE_NAME                   35091
+#define ID_MERGE_NAME3                  35093
+#define ID_MERGE_NAME2                  35094
+#define ID_OPERATIONS_BEJEGYZ35095      35095
+#define ID_GEDCOM_DELETE                35096
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        577
-#define _APS_NEXT_COMMAND_VALUE         35089
+#define _APS_NEXT_COMMAND_VALUE         35097
 #define _APS_NEXT_CONTROL_VALUE         1867
 #define _APS_NEXT_SYMED_VALUE           387
 #endif

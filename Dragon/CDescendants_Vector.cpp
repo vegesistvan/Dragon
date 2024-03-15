@@ -38,8 +38,6 @@ bool sortByOrderAsc(const DE::LEN& v1, const DE::LEN& v2)
 BOOL CDescendants::create_vDesc()
 {
 	m_startTime = theApp.getStartTime();
-	CString file;
-	CString title;
 	vDesc.clear();
 
 	m_listedP = 0;
@@ -52,90 +50,151 @@ BOOL CDescendants::create_vDesc()
 		return false;
 	}
 
+	CString title;
+	CString file;
 	DE::DESC desc;
-	for (int i = 0; i < theApp.v_rowid.size(); ++i)
+	if (theApp.v_rowid.size() > 1)
 	{
-		// Az õs berakása a vDesc vektorba
-		m_rowid = theApp.v_rowid.at(i);
-		queryR(m_rowid);
 
-		m_tablenumber = peoS.tablenumber;
-		desc = {};
-		desc.g = 0;
-		desc.rowid = m_rowid;
-		desc.tablenumber = peoS.tablenumber;
-		desc.linenumber = peoS.linenumber;
-		desc.titolo = peoS.titolo;
-		desc.rowidF.Empty();
-		desc.lastname = m_lastname;
-		desc.firstname = m_firstname;
-		desc.name = peoS.name;
-		desc.birth = peoS.birth;
-		desc.death = peoS.death;
-		desc.sex = peoS.sex;
-		desc.numOfSpouses = peoS.numOfSpouses;
-		desc.numOfChildren = peoS.numOfChildren;
-		desc.motherIndex = 1;
-		desc.procChildren = 0;
-		desc.childorder = 1;
-		desc.parentSex = peoS.sex;
-		desc.parentIndex = 0;
-		desc.status = 0;
-		desc.hidden = false;
-		desc.cntRep = 0;
-		desc.order = 0;
-		desc.numOfRep = 0;
-		desc.original = 0;
-		desc.fatherIndex = -1;  // nincs apja
-		desc.shift = -1;
-		vDesc.clear();
-		vDesc.push_back(desc);
-		m_os = desc.name;
-
-		descendants();
-		numOfDesc();
-		multipleRowid();
-
-		indentedHtml();
-		create_id();
-//		order_numOfD();
-	
-		CDescendantsLinearTable dlg;
-		dlg.p_descendantName = p_descendantName;
-		dlg.p_connect = p_connect;
-		dlg.p_womenDescendants = p_womenDescendants;
-		dlg.p_generationMax = p_generationMax;
-		dlg.p_childrenOrder = p_childrenOrder;
-		dlg.p_titololower = p_titololower;
-		dlg.p_descendantAttrib = p_descendantAttrib;
-		dlg.p_otherNameAttrib = p_otherNameAttrib;
-		dlg.p_specAttrib = p_specAttrib;
-		dlg.p_commentAttrib = p_commentAttrib;
-		dlg.p_numberingSystem = p_numberingSystem;		// leszármazottak számozása
-		dlg.p_descendantAttrib = p_descendantAttrib;
-		dlg.p_otherNameAttrib = p_otherNameAttrib;
-		dlg.p_commentAttrib = p_commentAttrib;
-		dlg.p_specAttrib = p_specAttrib;
-		dlg.p_colorBgrnd = p_colorBgrnd;
-		dlg.p_fontSize = p_fontSize;
-		dlg.p_capitalName = p_capitalName;
-		dlg.p_folyt = p_folyt;
-		dlg.p_capital = p_capital;
-		dlg.p_bold = p_bold;
-		dlg.p_checkCRLF = p_checkCRLF;
-		dlg.p_oneOutputFile = p_oneOutputFile;
-		dlg.p_repeatedColor = p_repeatedColor;
-		dlg.p_rowWidth = p_rowWidth;
-		dlg.p_colorBgrnd = p_colorBgrnd;
-		dlg.p_repeatedDelete = p_repeatedDelete;
-
-		dlg.m_descendantsPath = m_descendantsPath;
-		dlg.vDesc = &vDesc;
-		dlg.m_name = vDesc.at(0).name;
-		dlg.m_htmlPathName1 = m_htmlPathName1;
-
-		dlg.DoModal();
+		file.Format(L"%d_leszármazott_tabulált_leszármazotti_listája", theApp.v_rowid.size());
+		title = file;
+		if (!openHtml(file, title, p_colorBgrnd)) return false;
 	}
+
+	if( theApp.v_rowid.size() > 1 )
+	{ 
+
+		for (int i = 0; i < theApp.v_rowid.size(); ++i)
+		{
+
+			m_rowid = theApp.v_rowid.at(i);
+			queryR(m_rowid);
+
+			m_tablenumber = peoS.tablenumber;
+			desc = {};
+			desc.g = 0;
+			desc.rowid = m_rowid;
+			desc.tablenumber = peoS.tablenumber;
+			desc.linenumber = peoS.linenumber;
+			desc.titolo = peoS.titolo;
+			desc.rowidF.Empty();
+			desc.lastname = m_lastname;
+			desc.firstname = m_firstname;
+			desc.name = peoS.name;
+			desc.birth = peoS.birth;
+			desc.death = peoS.death;
+			desc.sex = peoS.sex;
+			desc.numOfSpouses = peoS.numOfSpouses;
+			desc.numOfChildren = peoS.numOfChildren;
+			desc.motherIndex = 1;
+			desc.procChildren = 0;
+			desc.childorder = 1;
+			desc.parentSex = peoS.sex;
+			desc.parentIndex = 0;
+			desc.status = 0;
+			desc.hidden = false;
+			desc.cntRep = 0;
+			desc.order = 0;
+			desc.numOfRep = 0;
+			desc.original = 0;
+			desc.fatherIndex = -1;  // nincs apja
+			desc.shift = -1;
+			vDesc.clear();
+			vDesc.push_back(desc);
+			m_os = desc.name;
+
+			descendants();
+			indentedHtml();
+		}
+		closeHtml();
+		ShellExecute(NULL, L"open", m_htmlPathName1, NULL, NULL, SW_SHOWNORMAL);
+		return false;
+	}
+
+	
+	// Az õs berakása a vDesc vektorba
+	m_rowid = theApp.v_rowid.at(0);
+	queryR(m_rowid);
+
+	m_tablenumber = peoS.tablenumber;
+	desc = {};
+	desc.g = 0;
+	desc.rowid = m_rowid;
+	desc.tablenumber = peoS.tablenumber;
+	desc.linenumber = peoS.linenumber;
+	desc.titolo = peoS.titolo;
+	desc.rowidF.Empty();
+	desc.lastname = m_lastname;
+	desc.firstname = m_firstname;
+	desc.name = peoS.name;
+	desc.birth = peoS.birth;
+	desc.death = peoS.death;
+	desc.sex = peoS.sex;
+	desc.numOfSpouses = peoS.numOfSpouses;
+	desc.numOfChildren = peoS.numOfChildren;
+	desc.motherIndex = 1;
+	desc.procChildren = 0;
+	desc.childorder = 1;
+	desc.parentSex = peoS.sex;
+	desc.parentIndex = 0;
+	desc.status = 0;
+	desc.hidden = false;
+	desc.cntRep = 0;
+	desc.order = 0;
+	desc.numOfRep = 0;
+	desc.original = 0;
+	desc.fatherIndex = -1;  // nincs apja
+	desc.shift = -1;
+
+	vDesc.clear();
+	vDesc.push_back(desc);
+	m_os = desc.name;
+
+	file.Format(L"%s_tabulált_leszármazotti_listája", m_firstname );
+	title = file;
+	if (!openHtml(file, title, p_colorBgrnd)) return false;
+
+
+	descendants();
+	numOfDesc();
+	multipleRowid();
+	indentedHtml();
+	create_id();
+
+	closeHtml();
+
+	CDescendantsLinearTable dlg;
+	dlg.p_descendantName = p_descendantName;
+	dlg.p_connect = p_connect;
+	dlg.p_womenDescendants = p_womenDescendants;
+	dlg.p_generationMax = p_generationMax;
+	dlg.p_childrenOrder = p_childrenOrder;
+	dlg.p_titololower = p_titololower;
+	dlg.p_descendantAttrib = p_descendantAttrib;
+	dlg.p_otherNameAttrib = p_otherNameAttrib;
+	dlg.p_specAttrib = p_specAttrib;
+	dlg.p_commentAttrib = p_commentAttrib;
+	dlg.p_numberingSystem = p_numberingSystem;		// leszármazottak számozása
+	dlg.p_descendantAttrib = p_descendantAttrib;
+	dlg.p_otherNameAttrib = p_otherNameAttrib;
+	dlg.p_commentAttrib = p_commentAttrib;
+	dlg.p_specAttrib = p_specAttrib;
+	dlg.p_colorBgrnd = p_colorBgrnd;
+	dlg.p_fontSize = p_fontSize;
+	dlg.p_capitalName = p_capitalName;
+	dlg.p_folyt = p_folyt;
+	dlg.p_capital = p_capital;
+	dlg.p_bold = p_bold;
+	dlg.p_checkCRLF = p_checkCRLF;
+	dlg.p_repeatedColor = p_repeatedColor;
+	dlg.p_repeatedDelete = p_repeatedDelete;
+
+	dlg.m_descendantsPath = m_descendantsPath;
+	dlg.vDesc = &vDesc;
+	dlg.m_name = vDesc.at(0).name;
+	dlg.m_htmlPathName1 = m_htmlPathName1;
+	dlg.DoModal();
+
 	return TRUE;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -159,25 +218,6 @@ bool CDescendants::tablesDescendants()  // listázandó táblák a theapp.v_tableNum
 
 	vDesc.clear();
 
-	if (p_oneOutputFile)
-	{
-		m_command.Format(L"SELECT familyName, tableHeader, tableRoman FROM tables WHERE rowid ='%s'", theApp.v_tableNumbers.at(0));
-		if (!query(m_command)) return false;
-		familyName = rs.GetFieldString(0);
-		tableHeader = rs.GetFieldString(1);
-		tableRoman = rs.GetFieldString(2);
-		title.Format(L"%s %s tábla", familyName, tableRoman);
-		title.Trim();
-
-		descendantsTablePathName.Format(L"%s\\%s_%s.html", m_descendantsPath, title, getTimeTag());
-
-		if (theApp.v_tableNumbers.size() > 1)
-			file.Format(L"%d_tabulált tábla", theApp.v_tableNumbers.size() - 1);
-		else
-			file.Format(L"%s_tabulált_tábla", title);
-		if (!openHtml(file, title, p_colorBgrnd)) return false;
-	}
-
 	CProgressWnd wndProgress(NULL, L"Leszármazotti táblák készítése folyik....");
 	wndProgress.GoModal();
 	wndProgress.SetRange(0, theApp.v_tableNumbers.size());
@@ -193,24 +233,12 @@ bool CDescendants::tablesDescendants()  // listázandó táblák a theapp.v_tableNum
 		tableHeader = rs.GetFieldString(1);
 		tableRoman = rs.GetFieldString(2);
 
-		if (!p_oneOutputFile)
-		{
-			title.Format(L"%s %s tábla", familyName, tableRoman);
-			title.Trim();
-			title.Format(L"%s tábla leszármazotti listája", (CString)title);
+		title.Format(L"%s %s tábla", familyName, tableRoman);
+		title.Trim();
+		title.Format(L"%s tábla leszármazotti listája", (CString)title);
 
-			file.Format(L"%s_tábla", title);
-			if (!openHtml(file, title, p_colorBgrnd)) return false;
-		}
-		else
-		{
-			if (!i && theApp.v_tableNumbers.size() > 1)
-			{
-				title.Format(L"%d tábla tabulált leszármazotti listája", theApp.v_tableNumbers.size());
-				file = title;
-				if( !openHtml(file, title, p_colorBgrnd)) return false;
-			}
-		}
+		file.Format(L"%s_tábla", title);
+		if (!openHtml(file, title, p_colorBgrnd)) return false;
 
 		m_command.Format(L"SELECT rowid, last_name, sex_id, father_id, peer FROM people WHERE tableNumber = '%s' AND tableAncestry == 1 ", m_tablenumber);
 		if (!query(m_command)) return false;
@@ -238,7 +266,7 @@ bool CDescendants::tablesDescendants()  // listázandó táblák a theapp.v_tableNum
 			desc.hidden = true;
 		}
 		desc.g = 0;
-//		desc.X = 0;
+		//		desc.X = 0;
 		desc.tablenumber = peoS.tablenumber;
 		desc.linenumber = peoS.linenumber;
 		desc.titolo = peoS.titolo;
@@ -264,58 +292,21 @@ bool CDescendants::tablesDescendants()  // listázandó táblák a theapp.v_tableNum
 		vDesc.push_back(desc);
 
 		m_os = desc.name;
-		if (p_oneOutputFile && theApp.v_tableNumbers.size() > 1)
-		{
-			str.Format(L"<b>%s</b>\n", tableHeader);
-			print(str);
-		}
 
+		
 		descendants();
-		numOfDesc();
-		multipleRowid();
 
 		indentedHtml();
-		create_id();
-		CDescendantsLinearTable dlg;
-
-		dlg.p_descendantName = p_descendantName;
-		dlg.p_connect = p_connect;
-		dlg.p_womenDescendants = p_womenDescendants;
-		dlg.p_generationMax = p_generationMax;
-		dlg.p_childrenOrder = p_childrenOrder;
-		dlg.p_titololower = p_titololower;
-		dlg.p_descendantAttrib = p_descendantAttrib;
-		dlg.p_otherNameAttrib = p_otherNameAttrib;
-		dlg.p_specAttrib = p_specAttrib;
-		dlg.p_commentAttrib = p_commentAttrib;
-		dlg.p_numberingSystem = p_numberingSystem;		// leszármazottak számozása
-		dlg.p_descendantAttrib = p_descendantAttrib;
-		dlg.p_otherNameAttrib = p_otherNameAttrib;
-		dlg.p_commentAttrib = p_commentAttrib;
-		dlg.p_specAttrib = p_specAttrib;
-		dlg.p_colorBgrnd = p_colorBgrnd;
-		dlg.p_fontSize = p_fontSize;
-		dlg.p_capitalName = p_capitalName;
-		dlg.p_folyt = p_folyt;
-		dlg.p_capital = p_capital;
-		dlg.p_bold = p_bold;
-		dlg.p_checkCRLF = p_checkCRLF;
-		dlg.p_oneOutputFile = p_oneOutputFile;
-		dlg.p_repeatedColor = p_repeatedColor;
-		dlg.p_repeatedDelete = p_repeatedDelete;
-
-		dlg.m_descendantsPath = m_descendantsPath;
-		dlg.vDesc = &vDesc;
-		dlg.m_name = vDesc.at(0).name;
-		dlg.m_htmlPathName1 = m_htmlPathName1;
-		dlg.DoModal();
 
 		wndProgress.StepIt();
 		wndProgress.PeekAndPump();
 		if (wndProgress.Cancelled()) break;
+		closeHtml();
+		ShellExecute(NULL, L"open", m_htmlPathName1, NULL, NULL, SW_SHOWNORMAL);
 	}
 	wndProgress.DestroyWindow();
 	theApp.v_tableNumbers.clear();
+
 	return true;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -382,7 +373,7 @@ void CDescendants::descendants()
 
 
 		// a kinyomtatott ember következõ, míg ki nem nyomtatott gyerekét keresi
-		// szülõ index: i;
+//		// szülõ index: i;
 		str = m_tablenumber;
 		rowid = getNextChildRowid(i);
 		m_actGen = vDesc.at(i).g;
@@ -577,7 +568,7 @@ bool CDescendants::queryR(CString rowid)
 	//	if ( !folyt.IsEmpty())
 	//		++m_folyt_db;
 	peoS.tablenumber = rsP.GetFieldString(5);
-	m_tableNumber = peoS.tablenumber;
+	m_tablenumber = peoS.tablenumber;
 	peoS.linenumber = rsP.GetFieldString(10);
 	peoS.titolo = rsP.GetFieldString(9);
 	if (p_titololower)
@@ -635,17 +626,17 @@ int CDescendants::getNumberOfChildren(CString rowid, CString sex_id)
 {
 	if (sex_id == MAN)
 	{
-//		if (p_connect)
+		if (p_connect)
 			m_command.Format(L"SELECT rowid FROM people WHERE father_id='%s'", rowid);
-//		else
-//			m_command.Format(L"SELECT rowid FROM people WHERE father_id='%s' AND tableNumber='%s'", rowid, m_tablenumber);
+		else
+			m_command.Format(L"SELECT rowid FROM people WHERE father_id='%s' AND tableNumber='%s'", rowid, m_tablenumber);
 	}
 	else
 	{
-//		if (p_connect)
+		if (p_connect)
 			m_command.Format(L"SELECT rowid FROM people WHERE mother_id='%s'", rowid);
-//		else
-//			m_command.Format(L"SELECT rowid FROM people WHERE mother_id='%s' AND tableNumber='%s'", rowid, m_tablenumber);
+		else
+			m_command.Format(L"SELECT rowid FROM people WHERE mother_id='%s' AND tableNumber='%s'", rowid, m_tablenumber);
 	}
 	if (!query(m_command)) return 0;
 
@@ -977,6 +968,7 @@ void CDescendants::create_id()
 		vDesc.at(i).printed = false;
 		vDesc.at(i).idC = 0;
 		vDesc.at(i).idF = 0;
+		vDesc.at(i).idM = 0;
 		vDesc.at(i).id = -1; 
 		vDesc.at(i).ixM.Empty();
 	}
@@ -1007,6 +999,7 @@ void CDescendants::create_id()
 	vD1.push_back(vDesc.at(0));
 
 	CString rowidF;
+	CString rowidM;
 	CString ixM;
 	
 	// vD1-k már ki vannak írva, a gyerekeiken kell végigmenni, akiket vD2-be gyûjtünk
@@ -1017,6 +1010,7 @@ void CDescendants::create_id()
 		{
 			desc = vD1.at(i);
 			rowidF = desc.rowid;
+			rowidM = desc.rowidM;
 			for (int j = 0; j < desc.numOfChildren; ++j)
 			{
 				// gyerekeiket keressük
@@ -1024,7 +1018,7 @@ void CDescendants::create_id()
 				{
 					if (!vDesc.at(k).printed) 
 					{
-						if (vDesc.at(k).rowidF == rowidF)
+						if (vDesc.at(k).rowidF == rowidF )
 						{
 							if (desc.numOfSpouses > 1)
 								vDesc.at(k).ixM.Format(L"%d", vDesc.at(k).motherIndex);
@@ -1058,6 +1052,7 @@ void CDescendants::create_id()
 	{
 		vDesc.at(i).idF = 1234567890;
 		rowidF = vDesc.at(i).rowidF;
+		rowidM = vDesc.at(i).rowidM;
 		cntRepI = vDesc.at(i).cntRep;
 		g = vDesc.at(i).g;
 		for (j = 0; j < i; ++j)
@@ -1070,12 +1065,22 @@ void CDescendants::create_id()
 					vDesc.at(i).idF = vDesc.at(j).id;
 					break;
 				}
+				if ((vDesc.at(j).rowid == rowidM) && (cntRepJ == cntRepI))
+				{
+					vDesc.at(i).idM = vDesc.at(j).id;
+					break;
+				}
 			}
 			else
 			{
 				if (vDesc.at(j).rowid == rowidF )
 				{
 					vDesc.at(i).idF = vDesc.at(j).id;
+					break;
+				}
+				if (vDesc.at(j).rowid == rowidM)
+				{
+					vDesc.at(i).idM = vDesc.at(j).id;
 					break;
 				}
 			}
@@ -1087,6 +1092,11 @@ void CDescendants::create_id()
 				if (vDesc.at(j).rowidF == rowidF )
 				{
 					vDesc.at(i).idF = vDesc.at(j).id;
+					break;
+				}
+				if (vDesc.at(j).rowidM == rowidM)
+				{
+					vDesc.at(i).idM = vDesc.at(j).id;
 					break;
 				}
 			}
@@ -1104,12 +1114,22 @@ void CDescendants::create_id()
 				vDesc.at(i).idC = vDesc.at(j).id;
 				break;
 			}
+			if (vDesc.at(j).rowidM == vDesc.at(i).rowid && vDesc.at(j).g == vDesc.at(i).g + 1)
+			{
+				vDesc.at(i).idC = vDesc.at(j).id;
+				break;
+			}
 		}
 		if (j == vDesc.size())
 		{
 			for (j = 0; j < vDesc.size(); ++j)
 			{
 				if (vDesc.at(j).rowidF == vDesc.at(i).rowid && vDesc.at(j).g == vDesc.at(i).g + 1)
+				{
+					vDesc.at(i).idC = vDesc.at(j).id;
+					break;
+				}
+				if (vDesc.at(j).rowidM == vDesc.at(i).rowid && vDesc.at(j).g == vDesc.at(i).g + 1)
 				{
 					vDesc.at(i).idC = vDesc.at(j).id;
 					break;

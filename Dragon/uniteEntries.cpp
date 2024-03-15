@@ -8,6 +8,7 @@
 #include "displayInfo.h"
 #include "uniteEntries.h"
 #include "unitedEntries.h"
+#include "GetString.h"
 
 enum
 {
@@ -69,13 +70,10 @@ CUniteEntries::~CUniteEntries()
 {
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BEGIN_MESSAGE_MAP(CUniteEntries, CWnd)
-END_MESSAGE_MAP()
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CUniteEntries::parameteres()
 {
-	m_name = L"Almásy József";
-	m_name.Empty();
+//	m_name = L"Kállay Elek";
+//	m_name.Empty();
 	m_loopMax = 3;
 	R1 = L"7125";
 	R2 = L"7142";
@@ -143,6 +141,10 @@ bool CUniteEntries::parameteres()
 		str.Format(L"Azonos nevû, ellentmondás mentes, de nem összevonható bejegyzések a %s adatbázisból\n", theApp.m_dbFileName);
 		fwprintf(textX, str);
 
+
+		CProgressWnd pWnd(NULL, L"");
+		if (m_loop > 1)
+			pWnd.DestroyWindow();
 		switch (m_algorithm)
 		{
 		case SLOW:
@@ -155,9 +157,22 @@ bool CUniteEntries::parameteres()
 		}
 		fclose(textN);
 		fclose(textX);
+		
+		if (m_loop < m_loopMax)
+		{
+			pWnd.GoModal();
+#ifndef _DEBUG
+			str.Format(L"%d. ciklus adatbázisának mentése...", m_loop);
+			pWnd.SetText(str);
+#endif
+		}
+
 		++m_loop;
 
 		if (!m_modified) break;		// nincs összevont ember, vége a programnak
+
+
+
 	}
 	fclose(textU);
 	fclose(textD);
@@ -433,7 +448,19 @@ bool CUniteEntries::fast()
 	pWnd.GoModal();
 
 	theApp.execute(L"BEGIN");
-	m_command.Format(L"SELECT rowid, last_name, first_name FROM people ORDER BY last_name, first_name, source");
+	if( m_name.IsEmpty())
+		m_command.Format(L"SELECT rowid, last_name, first_name FROM people ORDER BY last_name, first_name, source");
+	else
+	{
+		last_name = getFirstWord(m_name);
+		first_name = dropFirstWord(m_name);
+		first_name = sepFirstName(first_name);
+		if( first_name.IsEmpty())
+			m_command.Format(L"SELECT rowid, last_name, first_name FROM people WHERE last_name = '%s' ORDER BY last_name, first_name, source", last_name );
+		else
+			m_command.Format(L"SELECT rowid, last_name, first_name FROM people WHERE last_name = '%s' AND first_name = '%s' ORDER BY last_name, first_name, source", last_name, first_name);
+
+	}
 	if (!query(m_rset, m_command)) return false;
 
 	// átteszi a vEntries-be, hogy az összevonáskor törölt bejegyzéseket megjelölhesse üres rowid-val
@@ -450,8 +477,8 @@ bool CUniteEntries::fast()
 			sEntries.rowid = rowid;
 			sEntries.name = name;
 			vEntries.push_back(sEntries);
-			if (!m_name.IsEmpty() && name.GetAt(0) > m_name.GetAt(0))
-				break;
+//			if (!m_name.IsEmpty() && name.GetAt(0) > m_name.GetAt(0))
+//				break;
 		}
 		m_rset->MoveNext();
 	}
@@ -467,7 +494,7 @@ bool CUniteEntries::fast()
 #ifndef _DEBUG
 		pWnd.SetText(name1);
 #endif
-		
+/*
 		if (!m_name.IsEmpty())							// ha m_name-ben mneg van adva egy név, akkor csak azt próbálja összevonni.
 		{
 			if( m_name != name1.Left(m_name.GetLength() ) )		// csak vezeték nevet is meg lehet adni m_name-ben!!
@@ -482,7 +509,7 @@ bool CUniteEntries::fast()
 
 
 		}
-
+*/
 		for( j = i + 1; j < vEntries.size(); ++j )
 		{
 			name2 = vEntries.at(j).name;
@@ -1180,7 +1207,7 @@ bool CUniteEntries::childNameSame(int i, int j)
 			}
 		}
 	}
-	return false;
+ 	return false;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CUniteEntries::uniteSamePeople()
@@ -1787,4 +1814,13 @@ void CUniteEntries::examine()
 		}
 	}
 */
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CUniteEntries::GetName()
+{
+	CGetString dlg;
+	dlg.m_string = m_name;
+	dlg.DoModal();
+	m_name = dlg.m_string;
+	parameteres();
 }

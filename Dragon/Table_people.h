@@ -207,4 +207,5 @@ public:
 	afx_msg void OnRokonok();
 	afx_msg void OnBirthDeath();
 	afx_msg void OnDescendants();
+	afx_msg void OnGedcomDelete();
 };

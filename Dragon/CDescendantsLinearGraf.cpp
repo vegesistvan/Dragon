@@ -212,8 +212,11 @@ void CDescendantsLinearTable::graph()
 		title = L"Nõk leszármazottai nincsenek a listában";
 	}
 	printX(title);
+	str.Format(L"%d leszármazott van a listában.", vDesc->size());
+	printX(str);
 	printX(L"");
 
+	vL.clear();
 	// vL vektor feltöltése a generáció jelével
 	DE::L l;
 	for (int i = 0; i <= Y; ++i)
@@ -242,7 +245,7 @@ void CDescendantsLinearTable::graph()
 		if (vDesc->at(i).g == g)   // a generáció elsõ bejegyzése
 		{
 			desc = vDesc->at(i);
-			if (desc.idF == id)		// az elõzõ generációban az elsõ bejegyzés az apa
+			if (desc.idF == id )		// az elõzõ generációban az elsõ bejegyzés az apa
 			{
 				vDesc->at(i).shift = 2;
 				vDesc->at(i).printed = true;
@@ -330,7 +333,22 @@ void CDescendantsLinearTable::graph()
 	fclose(txtOut);
 	theApp.notepad(m_txtFile, L"");
 }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CString CDescendantsLinearTable::getDesc(int i)
+{
+	DE::DESC desc = vDesc->at(i);
+	str.Format(L"%s", desc.firstname);
+	m_lastname = desc.lastname;
+	m_birthdeath.Empty();
+	m_lastname.Empty();
+	if (!desc.birth.IsEmpty())
+		m_birthdeath.Format(L"*%s", desc.birth);
+	if (!desc.death.IsEmpty())
+		m_birthdeath.Format(L"%s +%s", (CString)m_birthdeath, desc.death);
+	m_birthdeath.TrimLeft();
 
+	return(str);
+}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendantsLinearTable::child(int id )
 {
@@ -407,38 +425,7 @@ void CDescendantsLinearTable::sibling( int id)
 	vDesc->at(id).printed = true;
 	vL.at(g).id = id;							// vL-be beteszi
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CDescendantsLinearTable::printX(CString str)
-{
-	fwprintf(txtOut, L"%s\n", str);
-	fflush(txtOut);
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CString CDescendantsLinearTable::getDesc(int i)
-{
-	DE::DESC desc = vDesc->at(i);
-	str.Format(L"(%d %d %d %d %d)%s", desc.g, desc.idF, desc.id, desc.idC, desc.shift, desc.firstname);
 
-	str.Format(L"%s", desc.firstname);
-
-/*/
-	if (!desc.birth.IsEmpty())
-		str.Format(L"%s *%s", (CString)str, desc.birth);
-	if( !desc.death.IsEmpty())
-		str.Format(L"%s +%s", (CString)str, desc.death);
-*/
-
-	m_lastname = desc.lastname;
-	m_birthdeath.Empty();
-	m_lastname.Empty();
-	if (!desc.birth.IsEmpty())
-		m_birthdeath.Format(L"*%s", desc.birth);
-	if (!desc.death.IsEmpty())
-		m_birthdeath.Format(L"%s +%s", (CString)m_birthdeath, desc.death);
-	m_birthdeath.TrimLeft();
-
-	return(str);
-}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CString CDescendantsLinearTable::getMissing(int i)
 {
@@ -490,4 +477,10 @@ int CDescendantsLinearTable::getLongestUnderG(int g)
 	}
 	return lengthMax;
 
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CDescendantsLinearTable::printX(CString str)
+{
+	fwprintf(txtOut, L"%s\n", str);
+	fflush(txtOut);
 }

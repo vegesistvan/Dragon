@@ -35,8 +35,13 @@ void CDescendantsLinearTable::OnAbcd()
 		title = L"Nõk leszármazottai nincsenek a listában";
 	}
 	printX(title);
+	str.Format(L"%d leszármazott van a listában.", vDesc->size());
+	printX(str);
+
+
 	printX(L"");
 
+	order_numOfD();
 
 	// inicializálás
 	for (int i = 0; i < vDesc->size(); ++i)
@@ -47,7 +52,7 @@ void CDescendantsLinearTable::OnAbcd()
 
 	Y = vDesc->at(vDesc->size() - 1).g;		// legmagasabb generáció szám
 
-	// feltölti a vL vektort
+	// feltölti a vL vektort üres sorokkal
 	vL.clear();
 	DE::L l;
 	for (int i = 0; i <= Y; ++i)
@@ -77,21 +82,16 @@ void CDescendantsLinearTable::OnAbcd()
 	CString sex;
 	while( true )
 	{
-		if (m_cnt == 2)
-		{
-			x = 2;
-			y = pow(x, 2);
-		}
 		g = vDesc->at(id).g;
-		putG(id, false);				// kiírja id-t, aki az õs, vagy egy gyerek id-ja
+		putG(id, false);									// kiírja id-t, aki az õs, vagy egy gyerek
 		// a gyerek összes leszármazottját kiírja
 		while (true)
 		{
 			id = vDesc->at(id).idC;
 			if (id == 0) break;								// nincs több leszármazott
-			putG(id, true);								// leszármazottak kiírása
+			putG(id, true);									// leszármazottak kiírása
 		}
-		for (g = Y; g > 0; --g)							// következõ kiirandó id és g keresése
+		for (g = Y; g > 0; --g)								// következõ kiirandó id és g keresése
 		{
 			id = vL.at(g).id;
 			if (id > 0)										// lehetnek még üres generációk, ahol id == 0

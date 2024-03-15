@@ -188,8 +188,8 @@ cont:	wndP.StepIt();
 	menu->EnableMenuItem(1, MF_BYPOSITION | MF_GRAYED);
 
 
-	if( p_womenDescendants )
-		menu->EnableMenuItem(5, MF_BYPOSITION | MF_GRAYED);
+//	if( p_womenDescendants )
+//		menu->EnableMenuItem(5, MF_BYPOSITION | MF_GRAYED);
 
 
 	fullTable();

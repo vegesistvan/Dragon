@@ -335,10 +335,54 @@ void CInputGEDCOM::subm()
 };
 void CInputGEDCOM::surn()
 {
-	I.last_name = lxtv.value;
 
-	int pos;										// Szücs.ged-ben a néve betettek '( hely)' 
-	if ((pos = I.last_name.Find('(')) != -1)
+	I.last_name = lxtv.value;
+	CStringArray A;
+	CString word;
+	TCHAR firstCharacter;
+	TCHAR lastCharacter;
+	CString titolo;
+	int n = splitCString(lxtv.value, ' ', false, &A);
+	int m = n;
+	if (n > 1)
+	{
+		for ( int i = 0; i < n; ++i)
+		{
+			word = A[i];
+			firstCharacter = word.GetAt(0);
+			lastCharacter = word.GetAt(word.GetLength() - 1);
+			if ((islower(firstCharacter) && lastCharacter == 'i') || word == L"és")
+			{
+				if (word == L"és")
+				{
+					titolo += L" ";
+					titolo += word;
+				}
+				else
+				{
+					titolo += L" ";
+					titolo += firstUpper(word);
+				}
+				A[i].Empty();
+				--m;
+			}
+		}
+		I.titolo = titolo.Trim();
+		
+		I.last_name.Empty();
+		for (int i = 0; i < n; ++i)
+		{
+			if (!A[i].IsEmpty())
+			{
+				I.last_name += L" ";
+				I.last_name += A[i];
+			}
+		}
+		I.last_name.Trim();
+	}
+
+	int pos;
+	if (( pos = I.last_name.Find('(')) != -1)
 		I.last_name = I.last_name.Left(pos);
 
 }

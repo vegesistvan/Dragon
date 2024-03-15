@@ -21,6 +21,7 @@ public:
 	bool    m_term;
 
 	bool CUniteEntries::parameteres();
+	void CUniteEntries::GetName();
 protected:
 	CString str;
 	CString m_command;
@@ -111,9 +112,9 @@ protected:
 	BOOL CUniteEntries::query( CSqliteDBRecordSet* r, CString command);
 
 
-	DECLARE_MESSAGE_MAP()
+//	DECLARE_MESSAGE_MAP()
 public:
-	
+
 };
 
 

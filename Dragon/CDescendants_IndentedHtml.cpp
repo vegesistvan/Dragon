@@ -12,17 +12,7 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendants::indentedHtml()
 {
-	CString title;
-	CString file;
-	
-	file.Format(L"%s tabulált leszármazotti listája", vDesc.at(0).name);
-	
-	title = file;
-	if (!openHtml(file, title, p_colorBgrnd)) return;
-	
 	printVector( 0 );
-	closeHtml();
-//	ShellExecute(NULL, L"open", m_htmlPathName, NULL, NULL, SW_SHOWNORMAL);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDescendants::printVector( int tbl)
@@ -130,6 +120,7 @@ void CDescendants::printBegining(int i)
 		if (m_familyName != p.last_name)
 		{
 			family = getTableHeader();
+			family.Replace('|', '\'');
 			str = getColoredString(family, DE::KEK);
 			if (p_repeatedColor)
 			{
@@ -750,7 +741,11 @@ BOOL CDescendants::openHtml(CString file, CString title, UINT colorBgrnd)
 	dragonjpgPathName.Format(L"%s\\dragon.jpg", m_descendantsPath);
 	CopyFile(theApp.m_dragonjpg, dragonjpgPathName, false);
 	
-	m_htmlPathName1.Format(L"%s\\%s_leszármazotti táblája_%s.html", m_descendantsPath, m_os, getTimeTag());
+//	if( theApp.v_rowid.size() > 1)
+//		m_htmlPathName1.Format(L"%s\\%d_ember leszármazotti táblája_%s.html", m_descendantsPath, theApp.v_rowid.size(), getTimeTag());
+//	else
+
+	m_htmlPathName1.Format(L"%s\\%s_%s.html", m_descendantsPath, file, getTimeTag());
 
 	if (!openFileSpec(&fl, m_htmlPathName1, L"w+")) return false;
 
