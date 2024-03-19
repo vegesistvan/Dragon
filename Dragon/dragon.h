@@ -576,5 +576,6 @@ public:
 	afx_msg void OnMergeName();
 	afx_msg void OnMergeName3();
 	afx_msg void OnMergeName2();
+	afx_msg void OnFirstnamesMerge();
 };
 extern CDragApp theApp;

@@ -10,7 +10,6 @@
 #include "EditMarriage.h"
 #include "ascendants.h"
 #include "SelectFromPeople.h"
-#include "old_descendants.h"
 #include "CDescendants.h"
 
 enum

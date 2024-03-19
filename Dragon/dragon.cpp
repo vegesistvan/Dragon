@@ -15,7 +15,6 @@
 #include "version.h"
 #include "Table_people.h"
 #include "GetString.h"
-
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -165,6 +164,7 @@ BEGIN_MESSAGE_MAP(CDragApp, CWinAppEx)
 		ON_COMMAND(ID_MERGE_NAME, &CDragApp::OnMergeName)
 		ON_COMMAND(ID_MERGE_NAME3, &CDragApp::OnMergeName3)
 		ON_COMMAND(ID_MERGE_NAME2, &CDragApp::OnMergeName2)
+		ON_COMMAND(ID_FIRSTNAMES_MERGE, &CDragApp::OnFirstnamesMerge)
 		END_MESSAGE_MAP()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CDragApp::CDragApp() noexcept

@@ -1,6 +1,8 @@
 #pragma once
 
-#define VERSION L"10.182"
+#define VERSION L"10.183"
+
+// 10.183 2024.03.19 Keresztnév adatbázisok összevonása
 
 // 10.182 2024.03.15 GEDCOM SURN-ben kisbetûs elõnév és családnév
 // 

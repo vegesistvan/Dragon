@@ -180,6 +180,7 @@
 #define IDR_CHECK_DATES                 387
 #define IDR_RIBBON                      388
 #define IDD_CONTRACTED_COUPLES          389
+#define IDD_FIRSTNAMES_MERGE            390
 #define IDD_CONTRACT_DBP_DLG            391
 #define IDD_TABLECOUPLES                392
 #define IDD_CHECK_FAMILYDATES           394
@@ -576,6 +577,9 @@
 #define IDC_RICHEDIT1                   1864
 #define IDC_REPEATED                    1866
 #define IDC_REPEATED_DELETE             1866
+#define IDC_DATABASE_OUT                1867
+#define IDC_DATABASE_OUT2               1868
+#define IDC_DATABASE_IN                 1868
 #define IDC_LISTCOLUMNS                 11044
 #define ID_EDIT_INSERT                  32771
 #define ID_EDIT_UPDATE                  32772
@@ -955,73 +959,49 @@
 #define ID_CHECK_SPOUSESEX              35020
 #define ID_CHECK_GENERATIONCODE         35022
 #define ID_CHECK_REPEATED_FAMILIES      35025
+#define ID_FIRSTNAMES_MERGE	            35026
 #define ID_BUTTON                       35028
 #define ID_MARRIAGE_ALL                 35037
 #define ID_MARRIAGE_ROWID               35038
 #define ID_MARRIAGE_NAME                35039
-#define ID_BUTTON2                      35040
 #define ID_AVERAGE_LIFESPAN             35040
-#define ID_MEGJELEN35041                35041
 #define ID_BIRTH_DEATH                  35042
-#define ID_EDIT_KERSZTN35043            35043
 #define ID_EDIT_KERSZTNEV               35044
 #define ID_EDIT_GA                      35045
-#define ID_EDIT_GA35046                 35046
 #define ID_EDIT_SPLIT                   35047
-#define ID_MEGJELEN35048                35048
-#define ID_K35049                       35049
-#define ID_K35050                       35050
-#define ID_K35051                       35051
-#define ID_K35052                       35052
 #define ID_GROUP_MPLACE                 35053
 #define ID_GROUP_MDATA                  35054
 #define ID_GROUP_MDATE                  35055
 #define ID_GROUP_HUSBAND                35056
 #define ID_GROUP_WIFE                   35057
-#define ID_LESZ35058                    35058
 #define ID_INDENTED_LIST                35059
-#define ID_TABUL35060                   35060
 #define ID_INDENTED_ASCENDANTS          35061
 #define ID_FUNCTIONS_NOTEPAD            35062
-#define ID_LESZ35063                    35063
 #define ID_DESCENDANTS_MARKED           35064
-#define ID_LESZ35065                    35065
 #define ID_DESCENDANTS_LISTED           35066
-#define ID_FUNCTIONS_FELMEN35067        35067
-#define ID_FELMEN35068                  35068
-#define ID_FELMEN35069                  35069
 #define ID_ASCENBANTS_MARKED            35070
 #define ID_ASCENDANTS_MARKED            35071
 #define ID_ASCENDANTS_LISTED            35072
-#define ID_LINE35073                    35073
-#define ID_LINE35074                    35074
 #define ID_HTMLLIST_FIX_NOREP           35075
 #define ID_HTMLLIST_PR_NOREP            35076
-#define ID_TABUL35077                   35077
 #define ID_DESCENDANT_LENGTH            35078
-#define ID_T35079                       35079
 #define ID_TABLE                        35080
-#define ID_FUNCTIONS_35081              35081
 #define ID_ALL_ASCENDANTS               35082
 #define IDC_ALL_DESCENDANTS             35083
 #define ID_ALL_DESCENDANTS              35084
-#define ID_FELMEN35085                  35085
-#define ID_FUNCTIONS_LESZ35086          35086
-#define ID_FUNCTIONS_FELMEN35087        35087
 #define ID_ABCD                         35088
 #define ID_MERGE_NAME                   35091
 #define ID_MERGE_NAME3                  35093
 #define ID_MERGE_NAME2                  35094
-#define ID_OPERATIONS_BEJEGYZ35095      35095
 #define ID_GEDCOM_DELETE                35096
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        577
+#define _APS_NEXT_RESOURCE_VALUE        578
 #define _APS_NEXT_COMMAND_VALUE         35097
-#define _APS_NEXT_CONTROL_VALUE         1867
-#define _APS_NEXT_SYMED_VALUE           387
+#define _APS_NEXT_CONTROL_VALUE         1868
+#define _APS_NEXT_SYMED_VALUE           391
 #endif
 #endif

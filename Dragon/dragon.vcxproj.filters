@@ -393,15 +393,15 @@
     <ClInclude Include="CDescendants.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FirstnamesMerge.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dragon.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MainFrm.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="dragonDoc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dragonView.cpp">
@@ -795,6 +795,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CDescendantsLinearABC.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dragonDoc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FirstnamesMerge.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

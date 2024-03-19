@@ -31,12 +31,8 @@
 #include "utilities_dragon.h"
 #include "compareEntries.h"
 #include "compareAscendants.h"
-
 #include "ascendants.h"
-
-#include "old_descendants.h"
 #include "CDescendants.h"
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool sortBySource(const UNITE_ENTRIES& v1, const UNITE_ENTRIES& v2)

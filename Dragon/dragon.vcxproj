@@ -266,6 +266,7 @@
     <ClInclude Include="EditTable.h" />
     <ClInclude Include="FatherMother.h" />
     <ClInclude Include="Filter.h" />
+    <ClInclude Include="FirstnamesMerge.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="GEDCOM_file.h" />
     <ClInclude Include="GEDCOM_out.h" />
@@ -404,6 +405,7 @@
     <ClCompile Include="EditTable.cpp" />
     <ClCompile Include="FatherMother.cpp" />
     <ClCompile Include="Filter.cpp" />
+    <ClCompile Include="FirstnamesMerge.cpp" />
     <ClCompile Include="GEDCOM_file.cpp" />
     <ClCompile Include="GEDCOM_out.cpp" />
     <ClCompile Include="GetLastFirst.cpp" />
